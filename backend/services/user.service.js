@@ -1,0 +1,269 @@
+const config = require("../configs/app"),
+  db = require("../models/User"),
+  jwt = require("jsonwebtoken"),
+  {
+    ErrorBadRequest,
+    ErrorNotFound,
+    ErrorUnauthorized,
+  } = require("../configs/errorMethods"),
+  { Op } = require("sequelize");
+const nodemailer = require("nodemailer");
+
+const methods = {
+  scopeSearch(req, limit, offset) {
+    // Where
+    $where = {};
+
+    if (req.query.UserID) $where["UserID"] = req.query.UserID;
+    if (req.query.Username)
+      $where["Username"] = {
+        [Op.like]: "%" + req.query.Username + "%",
+      };
+
+    if (req.query.CreatedUserID)
+      $where["CreatedUserID"] = req.query.CreatedUserID;
+    if (req.query.UpdatedUserID)
+      $where["UpdatedUserID"] = req.query.UpdatedUserID;
+
+    const query = Object.keys($where).length > 0 ? { where: $where } : {};
+
+    // Order
+    $order = [["UserID", "ASC"]];
+    if (req.query.orderByField && req.query.orderBy)
+      $order = [
+        [
+          req.query.orderByField,
+          req.query.orderBy.toLowerCase() == "desc" ? "desc" : "asc",
+        ],
+      ];
+    query["order"] = $order;
+
+    query["include"] = [{ all: true, required: false }];
+
+    if (!isNaN(limit)) query["limit"] = limit;
+
+    if (!isNaN(offset)) query["offset"] = offset;
+
+    return { query: query };
+  },
+
+  find(req) {
+    const limit = +(req.query.size || config.pageLimit);
+    const offset = +(limit * ((req.query.page || 1) - 1));
+    const _q = methods.scopeSearch(req, limit, offset);
+    return new Promise(async (resolve, reject) => {
+      try {
+        Promise.all([db.findAll(_q.query), db.count(_q.query)])
+          .then((result) => {
+            let rows = result[0],
+              count = rows.length;
+
+            resolve({
+              total: count,
+              lastPage: Math.ceil(count / limit),
+              currPage: +req.query.page || 1,
+              rows: rows,
+            });
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  findById(id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let obj = await db.findByPk(id, {
+          include: [{ all: true, required: false }],
+        });
+
+        if (!obj) reject(ErrorNotFound("id: not found"));
+
+        resolve(obj.toJSON());
+      } catch (error) {
+        reject(ErrorNotFound("id: not found"));
+      }
+    });
+  },
+
+  insert(data) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const obj = new db(data);
+        obj.Password = obj.passwordHash(obj.Password);
+        const inserted = await obj.save();
+
+        let transporter = nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          port: 587,
+          secure: false,
+          auth: {
+            // ข้อมูลการเข้าสู่ระบบ
+            user: "edocument@fba.kmutnb.ac.th", // email user ของเรา
+            pass: "edoc2565", // email password
+          },
+        });
+
+        let info = await transporter.sendMail({
+          from: '"ระบบฐานข้อมูลโคเนื้อ กระบือ แพะ', // อีเมลผู้ส่ง
+          to: obj.Username, // อีเมลผู้รับ สามารถกำหนดได้มากกว่า 1 อีเมล โดยขั้นด้วย ,(Comma)
+          subject: "ระบบฐานข้อมูล โคเนื้อ กระบิอ แพะ", // หัวข้ออีเมล
+          // text: "d", // plain text body
+          html: "<b>คุณได้รับการอนุมัติการเข้าใช้งานระบบฐานข้อมูล โคเนื้อ กระบือ แพะ สามารถเข้าใช้งานได้ที่ <a href='http://178.128.216.177/'>คลิก</a></b>", // html body
+        });
+
+        let res = methods.findById(inserted.UserID);
+
+        resolve(res);
+      } catch (error) {
+        reject(ErrorBadRequest(error.message));
+      }
+    });
+  },
+
+  update(id, data) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Check ID
+        const obj = await db.findByPk(id);
+        if (!obj) reject(ErrorNotFound("id: not found"));
+
+        // Update
+        data.UserID = parseInt(id);
+
+        if (data.Password) {
+          data.Password = obj.passwordHash(data.Password);
+        }
+
+        await db.update(data, { where: { UserID: id } });
+
+        let res = methods.findById(obj.UserID);
+
+        resolve(res);
+      } catch (error) {
+        reject(ErrorBadRequest(error.message));
+      }
+    });
+  },
+
+  delete(id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const obj = await db.findByPk(id);
+        if (!obj) reject(ErrorNotFound("id: not found"));
+
+        await db.update(
+          { isRemove: 1, isActive: 0 },
+          { where: { UserID: id } }
+        );
+
+        const obj1 = UserToAnimalType.destroy({
+          where: { UserID: id },
+          // // truncate: true,
+        });
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  login(data, ip, device) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const obj = await db.findOne({
+          where: { username: data.username},
+          include: { all: true },
+        });
+
+        // checkICIT ACCOUNT
+        // 
+
+        // ตรวจสอบว่ามี username
+        if (!obj) {
+          reject(ErrorUnauthorized("Username not found"));
+        } else {
+          // ตรวจสอบ Password
+          if (!obj.validPassword(data.password)) {
+            reject(ErrorUnauthorized("Password is invalid."));
+          }
+        }
+
+        res = {
+          ...obj.toJSON(),
+        };
+
+        resolve({ accessToken: obj.generateJWT(obj), userData: res });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  register(data) {
+    return new Promise(async (resolve, reject) => {
+      try {
+      
+
+       
+        const obj = new db(data);
+        obj.Password = obj.passwordHash(obj.Password);
+        const inserted = await obj.save();
+
+        // Send mail
+        let transporter = nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          port: 587,
+          secure: false,
+          auth: {
+            // ข้อมูลการเข้าสู่ระบบ
+            user: "edocument@fba.kmutnb.ac.th", // email user ของเรา
+            pass: "edoc2565", // email password
+          },
+        });
+
+        let info = await transporter.sendMail({
+          from: '"ระบบฐานข้อมูลโคเนื้อ กระบือ แพะ', // อีเมลผู้ส่ง
+          to: inserted.Username, // อีเมลผู้รับ สามารถกำหนดได้มากกว่า 1 อีเมล โดยขั้นด้วย ,(Comma)
+          subject: "ระบบฐานข้อมูล โคเนื้อ กระบือ แพะ", // หัวข้ออีเมล
+          // text: "d", // plain text body
+          html: "<b>ระบบฐานข้อมูล โคเนื้อ กระบิอ แพะ ได้รับข้อมูลของท่านเรียบร้อยแล้ว อยู่ระหว่างรอการอนุมัติ", // html body
+        });
+
+        let res = methods.findById(inserted.UserID);
+
+        resolve(res);
+      } catch (error) {
+        reject(ErrorBadRequest(error.message));
+      }
+    });
+  },
+
+  refreshToken(accessToken) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const decoded = jwt.decode(accessToken);
+        const obj = await db.findOne({
+          where: { Username: decoded.Username },
+          include: [
+            { all: true, nested: true },
+          ],
+        });
+
+        if (!obj) {
+          reject(ErrorUnauthorized("Username not found"));
+        }
+        resolve({ accessToken: obj.generateJWT(obj), userData: obj });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+};
+
+module.exports = { ...methods };
