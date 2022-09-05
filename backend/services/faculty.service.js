@@ -16,17 +16,17 @@ const methods = {
       $where["faculty_id"] = req.query.faculty_id;
 
     if (req.query.faculty_code)
-        $where["faculty_code"] = req.query.faculty_code;  
+      $where["faculty_code"] = req.query.faculty_code;
 
     if (req.query.name_th)
       $where["name_th"] = {
         [Op.like]: "%" + req.query.name_th + "%",
-    };
-    
+      };
+
     if (req.query.name_en)
       $where["name_en"] = {
         [Op.like]: "%" + req.query.name_en + "%",
-    };
+      };
 
     if (req.query.active) $where["active"] = req.query.active;
 
@@ -108,7 +108,7 @@ const methods = {
         const obj = new db(data);
         const inserted = await obj.save();
         const res = methods.findById(inserted.faculty_id);
-        
+
         resolve(res);
       } catch (error) {
         reject(ErrorBadRequest(error.message));
@@ -154,4 +154,3 @@ const methods = {
 };
 
 module.exports = { ...methods };
-console.log("tx");

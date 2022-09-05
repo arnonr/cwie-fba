@@ -26,6 +26,7 @@ Faculty.init(
     faculty_code: {
       type: DataTypes.STRING(2),
       allowNull: false,
+      unique: true,
       comment: "รหัสคณะ",
     },
     name_th: {
@@ -34,22 +35,22 @@ Faculty.init(
       comment: "ชื่อคณะ (ไทย)",
     },
     name_en: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        comment: "ชื่อคณะ (อังกฤษ)",
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      comment: "ชื่อคณะ (อังกฤษ)",
     },
     tel: {
-        type: DataTypes.STRING(32),
-        comment: "เบอร์โทรศัพท์",
-    },    
+      type: DataTypes.STRING(32),
+      comment: "เบอร์โทรศัพท์",
+    },
     fax: {
-        type: DataTypes.STRING(32),
-        comment: "โทรสาร",
-    },     
+      type: DataTypes.STRING(32),
+      comment: "โทรสาร",
+    },
     email: {
-        type: DataTypes.STRING(32),
-        comment: "อีเมล",
-    },          
+      type: DataTypes.STRING(32),
+      comment: "อีเมล",
+    },
     active: {
       type: DataTypes.TINYINT(1),
       allowNull: false,

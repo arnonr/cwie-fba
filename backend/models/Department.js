@@ -1,8 +1,6 @@
 const { Model, DataTypes } = require("sequelize"),
   { sequelize } = require("../configs/databases");
 
-const Faculty = require("./Faculty");
-
 class Department extends Model {
   // Custom JSON Response
   //   toJSON() {
@@ -24,6 +22,7 @@ Department.init(
     department_code: {
       type: DataTypes.STRING(4),
       allowNull: false,
+      unique: true,
       comment: "รหัสภาควิชา",
     },
     name_th: {
@@ -96,6 +95,8 @@ Department.init(
     modelName: "department" /* ชื่อตาราง */,
   }
 );
+
+const Faculty = require("./Faculty");
 
 Department.belongsTo(Faculty, { foreignKey: "faculty_id" });
 
