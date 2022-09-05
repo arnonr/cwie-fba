@@ -3,7 +3,7 @@ const { Model, DataTypes } = require("sequelize"),
 
 class Faculty extends Model {
   static associate(models) {
-    this.hasMany(models.Department, { foreignKey: 'faculty_id' });
+    // this.hasMany(models.Department, { foreignKey: 'faculty_id' });
   }
 
   // Custom JSON Response

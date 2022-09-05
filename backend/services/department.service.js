@@ -6,7 +6,6 @@ const config = require("../configs/app"),
     ErrorUnauthorized,
   } = require("../configs/errorMethods"),
   { Op } = require("sequelize");
-const Faculty = require("../models/Faculty");
 
 const methods = {
   scopeSearch(req, limit, offset) {
@@ -94,7 +93,7 @@ const methods = {
       try {
 
         let obj = await db.findByPk(id, {
-          include: [{ all: true, required: false }, { model: Faculty, as: "Faculty" }],
+          include: [{ all: true, required: false }],
         });
 
         if (!obj) reject(ErrorNotFound("id: not found"));

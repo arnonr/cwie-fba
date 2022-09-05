@@ -6,10 +6,10 @@ const Sequelize = require("sequelize"),
 //     console.log('yes re-sync done!')
 // })
 
-const User = require("./User");
-const DocumentType = require("./DocumentType");
-const Faculty = require("./Faculty");
-const Department = require("./Department");
+// const User = require("./User");
+// const DocumentType = require("./DocumentType");
+const Faculty = require("./faculty");
+const Department = require("./department");
 
 Department.associate({
   Faculty,

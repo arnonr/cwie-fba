@@ -1,9 +1,11 @@
 const { Model, DataTypes } = require("sequelize"),
   { sequelize } = require("../configs/databases");
 
+const Faculty = require("./Faculty");
+
 class Department extends Model {
   static associate(models) {
-    this.belongsTo(models.Faculty, { foreignKey: "faculty_id", as: "Faculty"});
+    this.belongsTo(models.Faculty, { foreignKey: "faculty_id" });
   }
 
   // Custom JSON Response
@@ -13,7 +15,6 @@ class Department extends Model {
   //     };
   //   }
 }
-
 
 Department.init(
   {
@@ -35,27 +36,27 @@ Department.init(
       comment: "ชื่อภาควิชา (ไทย)",
     },
     name_en: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        comment: "ชื่อภาควิชา (อังกฤษ)",
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      comment: "ชื่อภาควิชา (อังกฤษ)",
     },
     tel: {
-        type: DataTypes.STRING(32),
-        comment: "เบอร์โทรศัพท์",
-    },    
+      type: DataTypes.STRING(32),
+      comment: "เบอร์โทรศัพท์",
+    },
     fax: {
-        type: DataTypes.STRING(32),
-        comment: "โทรสาร",
-    },     
+      type: DataTypes.STRING(32),
+      comment: "โทรสาร",
+    },
     email: {
-        type: DataTypes.STRING(32),
-        comment: "อีเมล",
-    },  
+      type: DataTypes.STRING(32),
+      comment: "อีเมล",
+    },
     faculty_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        comment: "รหัสคณะ",
-    },  
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      comment: "รหัสคณะ",
+    },
     active: {
       type: DataTypes.TINYINT(1),
       allowNull: false,
@@ -96,8 +97,12 @@ Department.init(
     timestamps: true,
     freezeTableName: true,
     paranoid: true,
-    modelName: "department", /* ชื่อตาราง */
+    modelName: "department" /* ชื่อตาราง */,
   }
 );
+
+// Department.associate({
+//   Faculty,
+// });
 
 module.exports = Department;
