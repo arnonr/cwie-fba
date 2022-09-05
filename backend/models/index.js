@@ -1,29 +1,29 @@
-const Sequelize = require("sequelize"),
-  { sequelize } = require("../configs/databases");
+// const Sequelize = require("sequelize"),
+//   { sequelize } = require("../configs/databases");
 
-// // ห้าม force เป็น true เด็ดขาด ข้อมูลจะถูกรีเซต
-// db.sequelize.sync({force: false}).then(() => {
-//     console.log('yes re-sync done!')
-// })
+// // // ห้าม force เป็น true เด็ดขาด ข้อมูลจะถูกรีเซต
+// // db.sequelize.sync({force: false}).then(() => {
+// //     console.log('yes re-sync done!')
+// // })
 
-// const User = require("./User");
-// const DocumentType = require("./DocumentType");
-const Faculty = require("./faculty");
-const Department = require("./department");
+// // const User = require("./User");
+// // const DocumentType = require("./DocumentType");
+// const Faculty = require("./faculty");
+// const Department = require("./department");
 
-Department.associate({
-  Faculty,
-});
-
-// Faculty.associate({
-//   Department,
+// Department.associate({
+//   Faculty,
 // });
 
-// เคย error เรื่องของลำดับด้วย
+// // Faculty.associate({
+// //   Department,
+// // });
 
-(async () => {
-  await sequelize.sync();
-  // Code here
-})();
+// // เคย error เรื่องของลำดับด้วย
 
-// module.exports = db
+// (async () => {
+//   await sequelize.sync();
+//   // Code here
+// })();
+
+// // module.exports = db

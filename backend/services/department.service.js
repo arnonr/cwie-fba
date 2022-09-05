@@ -1,5 +1,5 @@
 const config = require("../configs/app"),
-  db = require("../models/department"),
+  db = require("../models/Department"),
   {
     ErrorBadRequest,
     ErrorNotFound,

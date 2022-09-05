@@ -4,10 +4,6 @@ const { Model, DataTypes } = require("sequelize"),
 const Faculty = require("./Faculty");
 
 class Department extends Model {
-  static associate(models) {
-    this.belongsTo(models.Faculty, { foreignKey: "faculty_id" });
-  }
-
   // Custom JSON Response
   //   toJSON() {
   //     return {
@@ -101,8 +97,6 @@ Department.init(
   }
 );
 
-// Department.associate({
-//   Faculty,
-// });
+Department.belongsTo(Faculty, { foreignKey: "faculty_id" });
 
 module.exports = Department;
