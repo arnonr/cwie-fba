@@ -24,7 +24,7 @@ Teacher.init(
             comment: "รหัสอาจารย์",
         },
         user_id: {
-            type: DataTypes.STRING(2),
+            type: DataTypes.INTEGER,
             allowNull: true,
             comment: "รหัสผู้ใช้งาน",
         },
@@ -49,7 +49,7 @@ Teacher.init(
             comment: "เบอร์โทรศัพท์",
         },
         email: {
-            type: DataTypes.STRING(32),
+            type: DataTypes.STRING(100),
             allowNull: true,
             comment: "อีเมล",
         },
@@ -61,17 +61,17 @@ Teacher.init(
         province_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: "รหัสอ้างอิงจังหวัด",
+            comment: "จังหวัด",
         },
         amphur_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: "รหัสอ้างอิงอำเภอ",
+            comment: "อำเภอ",
         },
         tumbol_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: "รหัสอ้างอิงตำบล",
+            comment: "ตำบล",
         },
         signature_file: {
             type: DataTypes.STRING(100),
@@ -81,12 +81,12 @@ Teacher.init(
         faculty_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: "รหัสคณะ",
+            comment: "คณะ",
         },
         department_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: "รหัสภาควิชา",
+            comment: "ภาควิชา",
         },
         executive_position: {
             type: DataTypes.STRING(100),
@@ -138,17 +138,17 @@ Teacher.init(
 );
 
 const User = require("./User");
-const Faculty = require("./Faculty");
-const Department = require("./Department");
 const Province = require("./Province");
 const Amphur = require("./Amphur");
 const Tumbol = require("./Tumbol");
+const Faculty = require("./Faculty");
+const Department = require("./Department");
 
 Teacher.belongsTo(User, { foreignKey: "user_id" });
-Teacher.belongsTo(Faculty, { foreignKey: "faculty_id" });
-Teacher.belongsTo(Department, { foreignKey: "department_id" });
 Teacher.belongsTo(Province, { foreignKey: "province_id" });
 Teacher.belongsTo(Amphur, { foreignKey: "amphur_id" });
 Teacher.belongsTo(Tumbol, { foreignKey: "tumbol_id" });
+Teacher.belongsTo(Faculty, { foreignKey: "faculty_id" });
+Teacher.belongsTo(Department, { foreignKey: "department_id" });
 
 module.exports = Teacher;

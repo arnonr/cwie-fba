@@ -2,9 +2,7 @@ const { Model, DataTypes } = require("sequelize"),
     { sequelize } = require("../configs/databases");
 
 class Province extends Model {
-    static associate(models) {
-        // this.hasMany(models.Department, { foreignKey: 'faculty_id' });
-    }
+    static associate(models) { }
 
     // Custom JSON Response
     //   toJSON() {

@@ -1,9 +1,7 @@
 const { Model, DataTypes } = require("sequelize"),
     { sequelize } = require("../configs/databases");
 
-class Tumbol extends Model {
-    static associate(models) { }
-
+class VisitImage extends Model {
     // Custom JSON Response
     //   toJSON() {
     //     return {
@@ -12,40 +10,24 @@ class Tumbol extends Model {
     //   }
 }
 
-Tumbol.init(
+VisitImage.init(
     {
-        tumbol_id: {
+        visit_image_id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
             allowNull: false,
-            comment: "รหัสอ้างอิงตำบล",
+            comment: "รหัสรูปภาพการออกนิเทศ",
         },
-        tumbol_code: {
-            type: DataTypes.STRING(4),
-            allowNull: false,
-            unique: true,
-            comment: "รหัสตำบล",
-        },
-        name_th: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            comment: "ชื่อตำบล (ไทย)",
-        },
-        name_en: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            comment: "ชื่อตำบล (อังกฤษ)",
-        },
-        postcode: {
-            type: DataTypes.STRING(5),
-            allowNull: true,
-            comment: "รหัสไปรษณีย์",
-        },
-        amphur_id: {
+        visit_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: "อำเภอ",
+            comment: "รหัสการออกนิเทศ",
+        },
+        image_file: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+            comment: "รูปภาพการออกนิเทศ",
         },
         active: {
             type: DataTypes.TINYINT(1),
@@ -87,12 +69,12 @@ Tumbol.init(
         timestamps: true,
         freezeTableName: true,
         paranoid: true,
-        modelName: "tumbol", /* ชื่อตาราง */
+        modelName: "visit_image" /* ชื่อตาราง */,
     }
 );
 
-const Amphur = require("./Amphur");
+const Visit = require("./Visit");
 
-Tumbol.belongsTo(Amphur, { foreignKey: "amphur_id" });
+VisitImage.belongsTo(Visit, { foreignKey: "visit_id" });
 
-module.exports = Tumbol;
+module.exports = VisitImage;

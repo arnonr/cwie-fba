@@ -2,7 +2,7 @@ const { Model, DataTypes } = require("sequelize"),
   { sequelize } = require("../configs/databases");
 
 class DocumentType extends Model {
-  static associate(models) {}
+  static associate(models) { }
 
   // Custom JSON Response
   //   toJSON() {
@@ -27,7 +27,7 @@ DocumentType.init(
       comment: "ชื่อประเภทเอกสาร",
     },
     description: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(255),
       comment: "คำอธิบาย",
     },
     active: {

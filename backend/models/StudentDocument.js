@@ -1,7 +1,7 @@
 const { Model, DataTypes } = require("sequelize"),
     { sequelize } = require("../configs/databases");
 
-class Tumbol extends Model {
+class StudentDocument extends Model {
     static associate(models) { }
 
     // Custom JSON Response
@@ -12,40 +12,29 @@ class Tumbol extends Model {
     //   }
 }
 
-Tumbol.init(
+StudentDocument.init(
     {
-        tumbol_id: {
+        document_id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
             allowNull: false,
-            comment: "รหัสอ้างอิงตำบล",
+            comment: "รหัสเอกสาร",
         },
-        tumbol_code: {
-            type: DataTypes.STRING(4),
-            allowNull: false,
-            unique: true,
-            comment: "รหัสตำบล",
-        },
-        name_th: {
+        document_file: {
             type: DataTypes.STRING(100),
             allowNull: false,
-            comment: "ชื่อตำบล (ไทย)",
+            comment: "ไฟล์เอกสาร",
         },
-        name_en: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            comment: "ชื่อตำบล (อังกฤษ)",
-        },
-        postcode: {
-            type: DataTypes.STRING(5),
-            allowNull: true,
-            comment: "รหัสไปรษณีย์",
-        },
-        amphur_id: {
+        student_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: "อำเภอ",
+            comment: "นักศึกษา",
+        },
+        document_type_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            comment: "รหัสอ้างอิงประเภทเอกสาร",
         },
         active: {
             type: DataTypes.TINYINT(1),
@@ -87,12 +76,14 @@ Tumbol.init(
         timestamps: true,
         freezeTableName: true,
         paranoid: true,
-        modelName: "tumbol", /* ชื่อตาราง */
+        modelName: "student_document", /* ชื่อตาราง */
     }
 );
 
-const Amphur = require("./Amphur");
+const Student = require("./Student");
+const DocumentType = require("./DocumentType");
 
-Tumbol.belongsTo(Amphur, { foreignKey: "amphur_id" });
+StudentDocument.belongsTo(Student, { foreignKey: "student_id" });
+StudentDocument.belongsTo(DocumentType, { foreignKey: "document_type_id" });
 
-module.exports = Tumbol;
+module.exports = StudentDocument;

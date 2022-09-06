@@ -1,7 +1,7 @@
 const { Model, DataTypes } = require("sequelize"),
     { sequelize } = require("../configs/databases");
 
-class Tumbol extends Model {
+class RejectLog extends Model {
     static associate(models) { }
 
     // Custom JSON Response
@@ -12,40 +12,34 @@ class Tumbol extends Model {
     //   }
 }
 
-Tumbol.init(
+RejectLog.init(
     {
-        tumbol_id: {
+        log_id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
             allowNull: false,
-            comment: "รหัสอ้างอิงตำบล",
+            comment: "รหัส Log",
         },
-        tumbol_code: {
-            type: DataTypes.STRING(4),
+        comment: {
+            type: DataTypes.TEXT,
             allowNull: false,
-            unique: true,
-            comment: "รหัสตำบล",
+            comment: "รายละเอียด",
         },
-        name_th: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            comment: "ชื่อตำบล (ไทย)",
-        },
-        name_en: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            comment: "ชื่อตำบล (อังกฤษ)",
-        },
-        postcode: {
-            type: DataTypes.STRING(5),
-            allowNull: true,
-            comment: "รหัสไปรษณีย์",
-        },
-        amphur_id: {
+        user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: "อำเภอ",
+            comment: "ผู้ใช้งาน",
+        },
+        form_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            comment: "ฟอร์มสหกิจ",
+        },
+        reject_status_id: {
+            type: DataTypes.TINYINT(1),
+            allowNull: false,
+            comment: "ขั้นตอนการปฏิเสธ (1=ที่ปรึกษา, ประธานอาจารย์นิเทศ,3=เจ้าหน้าที่คณะ, 4=เอกสารตอบรับ, 5=แผนการปฏิบัติงาน)",
         },
         active: {
             type: DataTypes.TINYINT(1),
@@ -87,12 +81,14 @@ Tumbol.init(
         timestamps: true,
         freezeTableName: true,
         paranoid: true,
-        modelName: "tumbol", /* ชื่อตาราง */
+        modelName: "reject_log", /* ชื่อตาราง */
     }
 );
 
-const Amphur = require("./Amphur");
+const User = require("./User");
+const Form = require("./Form");
 
-Tumbol.belongsTo(Amphur, { foreignKey: "amphur_id" });
+RejectLog.belongsTo(User, { foreignKey: "user_id" });
+RejectLog.belongsTo(Form, { foreignKey: "form_id" });
 
-module.exports = Tumbol;
+module.exports = RejectLog;

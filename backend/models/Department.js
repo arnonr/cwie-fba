@@ -44,13 +44,13 @@ Department.init(
       comment: "โทรสาร",
     },
     email: {
-      type: DataTypes.STRING(32),
+      type: DataTypes.STRING(100),
       comment: "อีเมล",
     },
     faculty_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      comment: "รหัสคณะ",
+      comment: "คณะ",
     },
     active: {
       type: DataTypes.TINYINT(1),

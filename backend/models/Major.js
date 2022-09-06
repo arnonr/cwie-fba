@@ -38,7 +38,7 @@ Major.init(
         department_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: "รหัสภาควิชา",
+            comment: "ภาควิชา",
         },
         active: {
             type: DataTypes.TINYINT(1),

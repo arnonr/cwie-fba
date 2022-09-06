@@ -2,9 +2,7 @@ const { Model, DataTypes } = require("sequelize"),
   { sequelize } = require("../configs/databases");
 
 class Faculty extends Model {
-  static associate(models) {
-    // this.hasMany(models.Department, { foreignKey: 'faculty_id' });
-  }
+  static associate(models) { }
 
   // Custom JSON Response
   //   toJSON() {
@@ -48,7 +46,7 @@ Faculty.init(
       comment: "โทรสาร",
     },
     email: {
-      type: DataTypes.STRING(32),
+      type: DataTypes.STRING(100),
       comment: "อีเมล",
     },
     active: {

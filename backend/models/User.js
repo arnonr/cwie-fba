@@ -17,7 +17,7 @@ class User extends Model {
   generateJWT(obj) {
     let today = new Date(),
       exp = new Date(today);
-      exp.setDate(today.getDate() + 10 || 1);
+    exp.setDate(today.getDate() + 10 || 1);
 
     // exp.setMinutes(today.getMinutes() + 60);
 
@@ -59,7 +59,7 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
       allowNull: false,
-      comment: "เลขไอดีอ้างอิง อาชีพ",
+      comment: "รหัสผู้ใช้งาน",
     },
 
     username: {
@@ -83,11 +83,35 @@ User.init(
         },
       },
     },
-
     password: {
       type: DataTypes.STRING(255),
       allowNull: false,
       comment: "รหัสผ่าน",
+    },
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      comment: "ชื่อ - สกุล",
+    },
+    tel: {
+      type: DataTypes.STRING(32),
+      allowNull: true,
+      comment: "หมายเลขโทรศัพท์",
+    },
+    email: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      comment: "อีเมล",
+    },
+    citizen_id: {
+      type: DataTypes.STRING(32),
+      allowNull: true,
+      comment: "เลขประจำตัวประชาชน",
+    },
+    account_type: {
+      type: DataTypes.TINYINT(1),
+      allowNull: false,
+      comment: "ประเภทผู้ใช้งาน (1 = นักศึกษา, 2 = อาจารย์, 3 = เจ้าหน้าที่, 4 = admin)",
     },
     active: {
       type: DataTypes.TINYINT(1),
@@ -116,6 +140,11 @@ User.init(
       type: DataTypes.DATE,
       allowNull: true,
       comment: "วัน-เวลาที่แก้ไขข้อมูลล่าสุด",
+    },
+    blocked_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: "วันที่ระงับการใช้งาน",
     },
   },
   {

@@ -2,9 +2,7 @@ const { Model, DataTypes } = require("sequelize"),
     { sequelize } = require("../configs/databases");
 
 class Amphur extends Model {
-    static associate(models) {
-        // this.hasMany(models.Department, { foreignKey: 'faculty_id' });
-    }
+    static associate(models) { }
 
     // Custom JSON Response
     //   toJSON() {
@@ -24,7 +22,7 @@ Amphur.init(
             comment: "รหัสอ้างอิงอำเภอ",
         },
         amphur_code: {
-            type: DataTypes.STRING(2),
+            type: DataTypes.STRING(4),
             allowNull: false,
             unique: true,
             comment: "รหัสอำเภอ",
@@ -42,7 +40,7 @@ Amphur.init(
         province_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: "รหัสจังหวัด",
+            comment: "จังหวัด",
         },
         active: {
             type: DataTypes.TINYINT(1),

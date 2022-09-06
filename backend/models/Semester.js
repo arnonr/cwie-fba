@@ -45,7 +45,7 @@ Semester.init(
             comment: "เลขที่หนังสือขอความอนุเคราะห์",
         },
         default_request_doc_date: {
-            type: DataTypes.STRING(20),
+            type: DataTypes.DATEONLY,
             allowNull: true,
             comment: "วันที่หนังสือขอความอนุเคราะห์",
         },

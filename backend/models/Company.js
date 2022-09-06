@@ -26,7 +26,7 @@ Company.init(
         },
         name_en: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
             comment: "ชื่อสถานประกอบการ (อังกฤษ)",
         },
         tel: {
@@ -40,7 +40,7 @@ Company.init(
             comment: "โทรสาร",
         },
         email: {
-            type: DataTypes.STRING(32),
+            type: DataTypes.STRING(100),
             allowNull: true,
             comment: "อีเมล",
         },
@@ -53,7 +53,7 @@ Company.init(
             type: DataTypes.TINYINT(1),
             allowNull: false,
             defaultValue: 0,
-            comment: "ขึ้นบัญชีดำ 1 = ใช่ / 0 = ไม่ใช่",
+            comment: "ขึ้นบัญชีดำ (1 = ใช่ / 0 = ไม่ใช่)",
         },
         comment: {
             type: DataTypes.TEXT,
@@ -73,17 +73,17 @@ Company.init(
         province_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: "รหัสอ้างอิงจังหวัด",
+            comment: "อิงจังหวัด",
         },
         amphur_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: "รหัสอ้างอิงอำเภอ",
+            comment: "อิงอำเภอ",
         },
         tumbol_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: "รหัสอ้างอิงตำบล",
+            comment: "อิงตำบล",
         },
         active: {
             type: DataTypes.TINYINT(1),

@@ -1,8 +1,10 @@
 const { Model, DataTypes } = require("sequelize"),
     { sequelize } = require("../configs/databases");
 
-class Tumbol extends Model {
-    static associate(models) { }
+class Config extends Model {
+    static associate(models) {
+        // this.hasMany(models.Department, { foreignKey: 'faculty_id' });
+    }
 
     // Custom JSON Response
     //   toJSON() {
@@ -12,40 +14,24 @@ class Tumbol extends Model {
     //   }
 }
 
-Tumbol.init(
+Config.init(
     {
-        tumbol_id: {
+        setting_id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
             allowNull: false,
-            comment: "รหัสอ้างอิงตำบล",
+            comment: "รหัสการตั้งค่า",
         },
-        tumbol_code: {
-            type: DataTypes.STRING(4),
-            allowNull: false,
-            unique: true,
-            comment: "รหัสตำบล",
-        },
-        name_th: {
+        email: {
             type: DataTypes.STRING(100),
             allowNull: false,
-            comment: "ชื่อตำบล (ไทย)",
+            comment: "อีเมล",
         },
-        name_en: {
+        password: {
             type: DataTypes.STRING(100),
             allowNull: false,
-            comment: "ชื่อตำบล (อังกฤษ)",
-        },
-        postcode: {
-            type: DataTypes.STRING(5),
-            allowNull: true,
-            comment: "รหัสไปรษณีย์",
-        },
-        amphur_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            comment: "อำเภอ",
+            comment: "รหัสผ่านอีเมล",
         },
         active: {
             type: DataTypes.TINYINT(1),
@@ -87,12 +73,8 @@ Tumbol.init(
         timestamps: true,
         freezeTableName: true,
         paranoid: true,
-        modelName: "tumbol", /* ชื่อตาราง */
+        modelName: "config", /* ชื่อตาราง */
     }
 );
 
-const Amphur = require("./Amphur");
-
-Tumbol.belongsTo(Amphur, { foreignKey: "amphur_id" });
-
-module.exports = Tumbol;
+module.exports = Config;

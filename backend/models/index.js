@@ -2,15 +2,36 @@ const Sequelize = require("sequelize"),
     { sequelize } = require("../configs/databases");
 
 // // ห้าม force เป็น true เด็ดขาด ข้อมูลจะถูกรีเซต
-// db.sequelize.sync({force: false}).then(() => {
+// db.sequelize.sync({ force: false }).then(() => {
 //     console.log('yes re-sync done!')
 // })
 
-// const User = require("./User");
-// const DocumentType = require("./DocumentType");
-const Faculty = require("./faculty");
+const Amphur = require("./Amphur");
+const Company = require("./Company");
+const Config = require("./Config");
 const Department = require("./department");
+const DocumentType = require("./DocumentType");
+const Faculty = require("./faculty");
+const Form = require("./Form");
+const FormStatus = require("./FormStatus");
+const Major = require("./Major");
+const Province = require("./Province");
+const RejectLog = require("./RejectLog");
+const Semester = require("./Semester");
+const Student = require("./Student");
+const StudentDocument = require("./StudentDocument");
+const Teacher = require("./Teacher");
+const Tumbol = require("./Tumbol");
+const User = require("./User");
+const Visit = require("./Visit");
+const VisitImage = require("./VisitImage");
 
+// StudentDocument.sync({ force: true });
+// Semester.sync({ force: true });
+// Department.sync({ force: true });
+// Major.sync({ force: true });
+// Student.sync({ force: true });
+// Form.sync({ force: true });
 // Department.associate({
 //     Faculty,
 // });
@@ -22,7 +43,9 @@ const Department = require("./department");
 // เคย error เรื่องของลำดับด้วย
 
 (async () => {
-    await sequelize.sync();
+    await sequelize.sync().then(() => {
+        console.log('yes re-sync done!')
+    });
     // Code here
 })();
 
