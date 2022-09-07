@@ -44,7 +44,7 @@ const VisitImage = require("./VisitImage");
 
 (async () => {
     await sequelize.sync().then(() => {
-        console.log('yes re-sync done!')
+        console.log('models done!')
     });
     // Code here
 })();

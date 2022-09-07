@@ -12,12 +12,16 @@ const methods = {
     // Where
     $where = {};
 
-    if (req.query.document_type_id)
-      $where["document_type_id"] = req.query.document_type_id;
+    if (req.query.document_type_id) $where["document_type_id"] = req.query.document_type_id;
 
     if (req.query.name)
       $where["name"] = {
         [Op.like]: "%" + req.query.name + "%",
+      };
+
+    if (req.query.description)
+      $where["name"] = {
+        [Op.like]: "%" + req.query.description + "%",
       };
 
     if (req.query.active) $where["active"] = req.query.active;
@@ -100,7 +104,7 @@ const methods = {
         const obj = new db(data);
         const inserted = await obj.save();
         const res = methods.findById(inserted.document_type_id);
-        
+
         resolve(res);
       } catch (error) {
         reject(ErrorBadRequest(error.message));

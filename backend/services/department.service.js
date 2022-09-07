@@ -12,24 +12,36 @@ const methods = {
     // Where
     $where = {};
 
-    if (req.query.faculty_id)
-      $where["faculty_id"] = req.query.faculty_id;    
-   
-    if (req.query.department_id)    
-        $where["department_id"] = req.query.department_id;
+    if (req.query.department_id) $where["department_id"] = req.query.department_id;
 
-    if (req.query.department_code)
-        $where["department_code"] = req.query.department_code;  
+    if (req.query.department_code) $where["department_code"] = req.query.department_code;
 
     if (req.query.name_th)
       $where["name_th"] = {
         [Op.like]: "%" + req.query.name_th + "%",
-    };
-    
+      };
+
     if (req.query.name_en)
       $where["name_en"] = {
         [Op.like]: "%" + req.query.name_en + "%",
-    };
+      };
+
+    if (req.query.tel)
+      $where["tel"] = {
+        [Op.like]: "%" + req.query.tel + "%",
+      };
+
+    if (req.query.fax)
+      $where["fax"] = {
+        [Op.like]: "%" + req.query.fax + "%",
+      };
+
+    if (req.query.email)
+      $where["email"] = {
+        [Op.like]: "%" + req.query.email + "%",
+      };
+
+    if (req.query.faculty_id) $where["faculty_id"] = req.query.faculty_id;
 
     if (req.query.active) $where["active"] = req.query.active;
 
@@ -111,7 +123,7 @@ const methods = {
         const obj = new db(data);
         const inserted = await obj.save();
         const res = methods.findById(inserted.department_id);
-        
+
         resolve(res);
       } catch (error) {
         reject(ErrorBadRequest(error.message));

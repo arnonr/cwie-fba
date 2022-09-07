@@ -1,5 +1,5 @@
 const config = require("../configs/app"),
-  db = require("../models/faculty"),
+  db = require("../models/Faculty"),
   {
     ErrorBadRequest,
     ErrorNotFound,
@@ -12,11 +12,9 @@ const methods = {
     // Where
     $where = {};
 
-    if (req.query.faculty_id)
-      $where["faculty_id"] = req.query.faculty_id;
+    if (req.query.faculty_id) $where["faculty_id"] = req.query.faculty_id;
 
-    if (req.query.faculty_code)
-      $where["faculty_code"] = req.query.faculty_code;
+    if (req.query.faculty_code) $where["faculty_code"] = req.query.faculty_code;
 
     if (req.query.name_th)
       $where["name_th"] = {
@@ -26,6 +24,21 @@ const methods = {
     if (req.query.name_en)
       $where["name_en"] = {
         [Op.like]: "%" + req.query.name_en + "%",
+      };
+
+    if (req.query.tel)
+      $where["tel"] = {
+        [Op.like]: "%" + req.query.tel + "%",
+      };
+
+    if (req.query.fax)
+      $where["fax"] = {
+        [Op.like]: "%" + req.query.fax + "%",
+      };
+
+    if (req.query.email)
+      $where["email"] = {
+        [Op.like]: "%" + req.query.email + "%",
       };
 
     if (req.query.active) $where["active"] = req.query.active;

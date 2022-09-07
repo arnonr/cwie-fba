@@ -1,5 +1,5 @@
 const config = require("../configs/app"),
-    db = require("../models/Teacher"),
+    db = require("../models/Semester"),
     {
         ErrorBadRequest,
         ErrorNotFound,
@@ -12,61 +12,40 @@ const methods = {
         // Where
         $where = {};
 
-        if (req.query.teacher_id) $where["teacher_id"] = req.query.teacher_id;
+        if (req.query.semester_id) $where["semester_id"] = req.query.semester_id;
 
-        if (req.query.user_id) $where["user_id"] = req.query.user_id;
+        if (req.query.semester_year) $where["semester_year"] = req.query.semester_year;
 
-        if (req.query.prefix)
-            $where["prefix"] = {
-                [Op.like]: "%" + req.query.prefix + "%",
+        if (req.query.term) $where["term"] = req.query.term;
+
+        if (req.query.round_no) $where["round_no"] = req.query.round_no;
+
+        if (req.query.chairman_id) $where["chairman_id"] = req.query.chairman_id;
+
+        if (req.query.default_request_doc_no)
+            $where["default_request_doc_no"] = {
+                [Op.like]: "%" + req.query.default_request_doc_no + "%",
             };
 
-        if (req.query.firstname)
-            $where["firstname"] = {
-                [Op.like]: "%" + req.query.firstname + "%",
+        if (req.query.default_request_doc_date)
+            $where["default_request_doc_date"] = {
+                [Op.like]: "%" + req.query.default_request_doc_date + "%",
             };
 
-        if (req.query.surname)
-            $where["surname"] = {
-                [Op.like]: "%" + req.query.surname + "%",
+        if (req.query.start_date)
+            $where["start_date"] = {
+                [Op.like]: "%" + req.query.start_date + "%",
             };
 
-        if (req.query.tel)
-            $where["tel"] = {
-                [Op.like]: "%" + req.query.tel + "%",
+        if (req.query.end_date)
+            $where["end_date"] = {
+                [Op.like]: "%" + req.query.end_date + "%",
             };
 
-        if (req.query.email)
-            $where["email"] = {
-                [Op.like]: "%" + req.query.email + "%",
-            };
-
-        if (req.query.province_id) $where["province_id"] = req.query.province_id;
-
-        if (req.query.amphur_id) $where["amphur_id"] = req.query.amphur_id;
-
-        if (req.query.tumbol_id) $where["tumbol_id"] = req.query.tumbol_id;
-
-        if (req.query.faculty_id) $where["faculty_id"] = req.query.faculty_id;
-
-        if (req.query.department_id) $where["department_id"] = req.query.department_id;
-
-        if (req.query.executive_position)
-            $where["executive_position"] = {
-                [Op.like]: "%" + req.query.executive_position + "%",
-            };
-
-        if (req.query.active) $where["active"] = req.query.active;
-
-        if (req.query.created_by) $where["created_by"] = req.query.created_by;
-
-        if (req.query.updated_at) $where["updated_at"] = req.query.updated_at;
-
-        //
         const query = Object.keys($where).length > 0 ? { where: $where } : {};
 
         // Order
-        $order = [["firstname", "ASC"]];
+        $order = [["semester_id", "ASC"]];
 
         if (req.query.orderByField && req.query.orderBy)
             $order = [
@@ -135,7 +114,7 @@ const methods = {
             try {
                 const obj = new db(data);
                 const inserted = await obj.save();
-                const res = methods.findById(inserted.teacher_id);
+                const res = methods.findById(inserted.semester_id);
 
                 resolve(res);
             } catch (error) {
@@ -153,8 +132,8 @@ const methods = {
 
                 // Update
                 // data.document_type_id  = parseInt(id);
-                await db.update(data, { where: { teacher_id: id } });
-                let res = methods.findById(obj.teacher_id);
+                await db.update(data, { where: { semester_id: id } });
+                let res = methods.findById(obj.semester_id);
 
                 resolve(res);
             } catch (error) {
@@ -170,7 +149,7 @@ const methods = {
                 if (!obj) reject(ErrorNotFound("id: not found"));
 
                 await db.destroy({
-                    where: { teacher_id: id },
+                    where: { semester_id: id },
                 });
 
                 resolve();

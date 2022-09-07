@@ -1,5 +1,5 @@
 const config = require("../configs/app"),
-    db = require("../models/Teacher"),
+    db = require("../models/Form"),
     {
         ErrorBadRequest,
         ErrorNotFound,
@@ -12,49 +12,90 @@ const methods = {
         // Where
         $where = {};
 
-        if (req.query.teacher_id) $where["teacher_id"] = req.query.teacher_id;
+        if (req.query.form_id) $where["form_id"] = req.query.form_id;
 
-        if (req.query.user_id) $where["user_id"] = req.query.user_id;
+        if (req.query.supervision_id) $where["supervision_id"] = req.query.supervision_id;
 
-        if (req.query.prefix)
-            $where["prefix"] = {
-                [Op.like]: "%" + req.query.prefix + "%",
+        if (req.query.semester_id) $where["semester_id"] = req.query.semester_id;
+
+        if (req.query.student_id) $where["student_id"] = req.query.student_id;
+
+        if (req.query.company_id) $where["company_id"] = req.query.company_id;
+
+        if (req.query.status_id) $where["status_id"] = req.query.status_id;
+
+        if (req.query.start_date)
+            $where["start_date"] = {
+                [Op.like]: "%" + req.query.start_date + "%",
             };
 
-        if (req.query.firstname)
-            $where["firstname"] = {
-                [Op.like]: "%" + req.query.firstname + "%",
+        if (req.query.end_date)
+            $where["end_date"] = {
+                [Op.like]: "%" + req.query.end_date + "%",
             };
 
-        if (req.query.surname)
-            $where["surname"] = {
-                [Op.like]: "%" + req.query.surname + "%",
+        if (req.query.co_name)
+            $where["co_name"] = {
+                [Op.like]: "%" + req.query.co_name + "%",
             };
 
-        if (req.query.tel)
-            $where["tel"] = {
-                [Op.like]: "%" + req.query.tel + "%",
+        if (req.query.co_position)
+            $where["co_position"] = {
+                [Op.like]: "%" + req.query.co_position + "%",
             };
 
-        if (req.query.email)
-            $where["email"] = {
-                [Op.like]: "%" + req.query.email + "%",
+        if (req.query.co_tel)
+            $where["co_tel"] = {
+                [Op.like]: "%" + req.query.co_tel + "%",
             };
 
-        if (req.query.province_id) $where["province_id"] = req.query.province_id;
-
-        if (req.query.amphur_id) $where["amphur_id"] = req.query.amphur_id;
-
-        if (req.query.tumbol_id) $where["tumbol_id"] = req.query.tumbol_id;
-
-        if (req.query.faculty_id) $where["faculty_id"] = req.query.faculty_id;
-
-        if (req.query.department_id) $where["department_id"] = req.query.department_id;
-
-        if (req.query.executive_position)
-            $where["executive_position"] = {
-                [Op.like]: "%" + req.query.executive_position + "%",
+        if (req.query.co_email)
+            $where["co_email"] = {
+                [Op.like]: "%" + req.query.co_email + "%",
             };
+
+        if (req.query.request_name)
+            $where["request_name"] = {
+                [Op.like]: "%" + req.query.request_name + "%",
+            };
+
+        if (req.query.request_position)
+            $where["request_position"] = {
+                [Op.like]: "%" + req.query.request_position + "%",
+            };
+
+        if (req.query.request_document_date)
+            $where["request_document_date"] = {
+                [Op.like]: "%" + req.query.request_document_date + "%",
+            };
+
+        if (req.query.request_document_number)
+            $where["request_document_number"] = {
+                [Op.like]: "%" + req.query.request_document_number + "%",
+            };
+
+        if (req.query.max_response_date)
+            $where["max_response_date"] = {
+                [Op.like]: "%" + req.query.max_response_date + "%",
+            };
+
+        if (req.query.send_document_date)
+            $where["send_document_date"] = {
+                [Op.like]: "%" + req.query.send_document_date + "%",
+            };
+
+        if (req.query.send_document_number)
+            $where["send_document_number"] = {
+                [Op.like]: "%" + req.query.send_document_number + "%",
+            };
+
+        if (req.query.response_province_id) $where["response_province_id"] = req.query.response_province_id;
+
+        if (req.query.reject_status_id) $where["reject_status_id"] = req.query.reject_status_id;
+
+        if (req.query.company_rating) $where["company_rating"] = req.query.company_rating;
+
+        if (req.query.next_coop) $where["next_coop"] = req.query.next_coop;
 
         if (req.query.active) $where["active"] = req.query.active;
 
@@ -66,7 +107,7 @@ const methods = {
         const query = Object.keys($where).length > 0 ? { where: $where } : {};
 
         // Order
-        $order = [["firstname", "ASC"]];
+        $order = [["form_id", "ASC"]];
 
         if (req.query.orderByField && req.query.orderBy)
             $order = [
@@ -135,7 +176,7 @@ const methods = {
             try {
                 const obj = new db(data);
                 const inserted = await obj.save();
-                const res = methods.findById(inserted.teacher_id);
+                const res = methods.findById(inserted.form_id);
 
                 resolve(res);
             } catch (error) {
@@ -153,8 +194,8 @@ const methods = {
 
                 // Update
                 // data.document_type_id  = parseInt(id);
-                await db.update(data, { where: { teacher_id: id } });
-                let res = methods.findById(obj.teacher_id);
+                await db.update(data, { where: { form_id: id } });
+                let res = methods.findById(obj.form_id);
 
                 resolve(res);
             } catch (error) {
@@ -170,7 +211,7 @@ const methods = {
                 if (!obj) reject(ErrorNotFound("id: not found"));
 
                 await db.destroy({
-                    where: { teacher_id: id },
+                    where: { form_id: id },
                 });
 
                 resolve();

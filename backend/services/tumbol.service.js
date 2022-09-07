@@ -1,5 +1,5 @@
 const config = require("../configs/app"),
-    db = require("../models/Teacher"),
+    db = require("../models/Tumbol"),
     {
         ErrorBadRequest,
         ErrorNotFound,
@@ -12,49 +12,25 @@ const methods = {
         // Where
         $where = {};
 
-        if (req.query.teacher_id) $where["teacher_id"] = req.query.teacher_id;
-
-        if (req.query.user_id) $where["user_id"] = req.query.user_id;
-
-        if (req.query.prefix)
-            $where["prefix"] = {
-                [Op.like]: "%" + req.query.prefix + "%",
-            };
-
-        if (req.query.firstname)
-            $where["firstname"] = {
-                [Op.like]: "%" + req.query.firstname + "%",
-            };
-
-        if (req.query.surname)
-            $where["surname"] = {
-                [Op.like]: "%" + req.query.surname + "%",
-            };
-
-        if (req.query.tel)
-            $where["tel"] = {
-                [Op.like]: "%" + req.query.tel + "%",
-            };
-
-        if (req.query.email)
-            $where["email"] = {
-                [Op.like]: "%" + req.query.email + "%",
-            };
-
-        if (req.query.province_id) $where["province_id"] = req.query.province_id;
-
-        if (req.query.amphur_id) $where["amphur_id"] = req.query.amphur_id;
-
         if (req.query.tumbol_id) $where["tumbol_id"] = req.query.tumbol_id;
 
-        if (req.query.faculty_id) $where["faculty_id"] = req.query.faculty_id;
-
-        if (req.query.department_id) $where["department_id"] = req.query.department_id;
-
-        if (req.query.executive_position)
-            $where["executive_position"] = {
-                [Op.like]: "%" + req.query.executive_position + "%",
+        if (req.query.tumbol_code)
+            $where["tumbol_code"] = {
+                [Op.like]: "%" + req.query.tumbol_code + "%",
             };
+
+        if (req.query.name_th)
+            $where["name_th"] = {
+                [Op.like]: "%" + req.query.name_th + "%",
+            };
+
+        if (req.query.name_en)
+            $where["name_en"] = {
+                [Op.like]: "%" + req.query.name_en + "%",
+            };
+
+        if (req.query.amphur_id)
+            $where["province_id"] = req.query.amphur_id;
 
         if (req.query.active) $where["active"] = req.query.active;
 
@@ -66,7 +42,7 @@ const methods = {
         const query = Object.keys($where).length > 0 ? { where: $where } : {};
 
         // Order
-        $order = [["firstname", "ASC"]];
+        $order = [["name_th", "ASC"]];
 
         if (req.query.orderByField && req.query.orderBy)
             $order = [
@@ -75,6 +51,7 @@ const methods = {
                     req.query.orderBy.toLowerCase() == "desc" ? "desc" : "asc",
                 ],
             ];
+
         query["order"] = $order;
 
         query["include"] = [{ all: true, required: false }];
@@ -135,7 +112,7 @@ const methods = {
             try {
                 const obj = new db(data);
                 const inserted = await obj.save();
-                const res = methods.findById(inserted.teacher_id);
+                const res = methods.findById(inserted.tumbol_id);
 
                 resolve(res);
             } catch (error) {
@@ -153,8 +130,8 @@ const methods = {
 
                 // Update
                 // data.document_type_id  = parseInt(id);
-                await db.update(data, { where: { teacher_id: id } });
-                let res = methods.findById(obj.teacher_id);
+                await db.update(data, { where: { tumbol_id: id } });
+                let res = methods.findById(obj.tumbol_id);
 
                 resolve(res);
             } catch (error) {
@@ -170,7 +147,7 @@ const methods = {
                 if (!obj) reject(ErrorNotFound("id: not found"));
 
                 await db.destroy({
-                    where: { teacher_id: id },
+                    where: { tumbol_id: id },
                 });
 
                 resolve();

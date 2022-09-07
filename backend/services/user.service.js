@@ -14,21 +14,39 @@ const methods = {
     // Where
     $where = {};
 
-    if (req.query.UserID) $where["UserID"] = req.query.UserID;
-    if (req.query.Username)
-      $where["Username"] = {
-        [Op.like]: "%" + req.query.Username + "%",
+    if (req.query.user_id) $where["user_id"] = req.query.user_id;
+
+    if (req.query.username)
+      $where["username"] = {
+        [Op.like]: "%" + req.query.username + "%",
       };
 
-    if (req.query.CreatedUserID)
-      $where["CreatedUserID"] = req.query.CreatedUserID;
-    if (req.query.UpdatedUserID)
-      $where["UpdatedUserID"] = req.query.UpdatedUserID;
+    if (req.query.name)
+      $where["name"] = {
+        [Op.like]: "%" + req.query.name + "%",
+      };
+
+    if (req.query.tel)
+      $where["tel"] = {
+        [Op.like]: "%" + req.query.tel + "%",
+      };
+
+    if (req.query.email)
+      $where["email"] = {
+        [Op.like]: "%" + req.query.email + "%",
+      };
+
+    if (req.query.citizen_id)
+      $where["citizen_id"] = {
+        [Op.like]: "%" + req.query.citizen_id + "%",
+      };
+
+    if (req.query.account_type) $where["account_type"] = req.query.account_type;
 
     const query = Object.keys($where).length > 0 ? { where: $where } : {};
 
     // Order
-    $order = [["UserID", "ASC"]];
+    $order = [["username", "ASC"]];
     if (req.query.orderByField && req.query.orderBy)
       $order = [
         [
@@ -97,26 +115,26 @@ const methods = {
         obj.Password = obj.passwordHash(obj.Password);
         const inserted = await obj.save();
 
-        let transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-          port: 587,
-          secure: false,
-          auth: {
-            // ข้อมูลการเข้าสู่ระบบ
-            user: "edocument@fba.kmutnb.ac.th", // email user ของเรา
-            pass: "edoc2565", // email password
-          },
-        });
+        // let transporter = nodemailer.createTransport({
+        //   host: "smtp.gmail.com",
+        //   port: 587,
+        //   secure: false,
+        //   auth: {
+        //     // ข้อมูลการเข้าสู่ระบบ
+        //     user: "edocument@fba.kmutnb.ac.th", // email user ของเรา
+        //     pass: "edoc2565", // email password
+        //   },
+        // });
 
-        let info = await transporter.sendMail({
-          from: '"ระบบฐานข้อมูลโคเนื้อ กระบือ แพะ', // อีเมลผู้ส่ง
-          to: obj.Username, // อีเมลผู้รับ สามารถกำหนดได้มากกว่า 1 อีเมล โดยขั้นด้วย ,(Comma)
-          subject: "ระบบฐานข้อมูล โคเนื้อ กระบิอ แพะ", // หัวข้ออีเมล
-          // text: "d", // plain text body
-          html: "<b>คุณได้รับการอนุมัติการเข้าใช้งานระบบฐานข้อมูล โคเนื้อ กระบือ แพะ สามารถเข้าใช้งานได้ที่ <a href='http://178.128.216.177/'>คลิก</a></b>", // html body
-        });
+        // let info = await transporter.sendMail({
+        //   from: '"ระบบฐานข้อมูลโคเนื้อ กระบือ แพะ', // อีเมลผู้ส่ง
+        //   to: obj.Username, // อีเมลผู้รับ สามารถกำหนดได้มากกว่า 1 อีเมล โดยขั้นด้วย ,(Comma)
+        //   subject: "ระบบฐานข้อมูล โคเนื้อ กระบิอ แพะ", // หัวข้ออีเมล
+        //   // text: "d", // plain text body
+        //   html: "<b>คุณได้รับการอนุมัติการเข้าใช้งานระบบฐานข้อมูล โคเนื้อ กระบือ แพะ สามารถเข้าใช้งานได้ที่ <a href='http://178.128.216.177/'>คลิก</a></b>", // html body
+        // });
 
-        let res = methods.findById(inserted.UserID);
+        let res = methods.findById(inserted.user_id);
 
         resolve(res);
       } catch (error) {
@@ -133,15 +151,15 @@ const methods = {
         if (!obj) reject(ErrorNotFound("id: not found"));
 
         // Update
-        data.UserID = parseInt(id);
+        data.user_id = parseInt(id);
 
         if (data.Password) {
           data.Password = obj.passwordHash(data.Password);
         }
 
-        await db.update(data, { where: { UserID: id } });
+        await db.update(data, { where: { user_id: id } });
 
-        let res = methods.findById(obj.UserID);
+        let res = methods.findById(obj.user_id);
 
         resolve(res);
       } catch (error) {
@@ -158,11 +176,11 @@ const methods = {
 
         await db.update(
           { isRemove: 1, isActive: 0 },
-          { where: { UserID: id } }
+          { where: { user_id: id } }
         );
 
         const obj1 = UserToAnimalType.destroy({
-          where: { UserID: id },
+          where: { user_id: id },
           // // truncate: true,
         });
 
@@ -177,12 +195,12 @@ const methods = {
     return new Promise(async (resolve, reject) => {
       try {
         const obj = await db.findOne({
-          where: { username: data.username},
+          where: { username: data.username },
           include: { all: true },
         });
 
         // checkICIT ACCOUNT
-        // 
+        //
 
         // ตรวจสอบว่ามี username
         if (!obj) {
@@ -208,9 +226,9 @@ const methods = {
   register(data) {
     return new Promise(async (resolve, reject) => {
       try {
-      
 
-       
+
+
         const obj = new db(data);
         obj.Password = obj.passwordHash(obj.Password);
         const inserted = await obj.save();
@@ -235,7 +253,7 @@ const methods = {
           html: "<b>ระบบฐานข้อมูล โคเนื้อ กระบิอ แพะ ได้รับข้อมูลของท่านเรียบร้อยแล้ว อยู่ระหว่างรอการอนุมัติ", // html body
         });
 
-        let res = methods.findById(inserted.UserID);
+        let res = methods.findById(inserted.user_id);
 
         resolve(res);
       } catch (error) {

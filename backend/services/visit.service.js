@@ -1,5 +1,5 @@
 const config = require("../configs/app"),
-    db = require("../models/Teacher"),
+    db = require("../models/Visit"),
     {
         ErrorBadRequest,
         ErrorNotFound,
@@ -12,34 +12,43 @@ const methods = {
         // Where
         $where = {};
 
-        if (req.query.teacher_id) $where["teacher_id"] = req.query.teacher_id;
+        if (req.query.visit_id) $where["visit_id"] = req.query.visit_id;
 
-        if (req.query.user_id) $where["user_id"] = req.query.user_id;
+        if (req.query.supervision_id) $where["supervision_id"] = req.query.supervision_id;
 
-        if (req.query.prefix)
-            $where["prefix"] = {
-                [Op.like]: "%" + req.query.prefix + "%",
+        if (req.query.form_id) $where["form_id"] = req.query.form_id;
+
+        if (req.query.visit_date)
+            $where["visit_date"] = {
+                [Op.like]: "%" + req.query.visit_date + "%",
             };
 
-        if (req.query.firstname)
-            $where["firstname"] = {
-                [Op.like]: "%" + req.query.firstname + "%",
+        if (req.query.visit_time)
+            $where["visit_time"] = {
+                [Op.like]: "%" + req.query.visit_time + "%",
             };
 
-        if (req.query.surname)
-            $where["surname"] = {
-                [Op.like]: "%" + req.query.surname + "%",
+        if (req.query.co_name)
+            $where["co_name"] = {
+                [Op.like]: "%" + req.query.co_name + "%",
             };
 
-        if (req.query.tel)
-            $where["tel"] = {
-                [Op.like]: "%" + req.query.tel + "%",
+        if (req.query.co_position)
+            $where["co_position"] = {
+                [Op.like]: "%" + req.query.co_position + "%",
             };
 
-        if (req.query.email)
-            $where["email"] = {
-                [Op.like]: "%" + req.query.email + "%",
+        if (req.query.document_number)
+            $where["document_number"] = {
+                [Op.like]: "%" + req.query.document_number + "%",
             };
+
+        if (req.query.document_date)
+            $where["document_date"] = {
+                [Op.like]: "%" + req.query.document_date + "%",
+            };
+
+        if (req.query.visit_type) $where["visit_type"] = req.query.visit_type;
 
         if (req.query.province_id) $where["province_id"] = req.query.province_id;
 
@@ -47,13 +56,16 @@ const methods = {
 
         if (req.query.tumbol_id) $where["tumbol_id"] = req.query.tumbol_id;
 
-        if (req.query.faculty_id) $where["faculty_id"] = req.query.faculty_id;
+        if (req.query.report_status_id) $where["report_status_id"] = req.query.report_status_id;
 
-        if (req.query.department_id) $where["department_id"] = req.query.department_id;
+        if (req.query.visit_expense)
+            $where["visit_expense"] = {
+                [Op.like]: "%" + req.query.visit_expense + "%",
+            };
 
-        if (req.query.executive_position)
-            $where["executive_position"] = {
-                [Op.like]: "%" + req.query.executive_position + "%",
+        if (req.query.travel_expense)
+            $where["travel_expense"] = {
+                [Op.like]: "%" + req.query.travel_expense + "%",
             };
 
         if (req.query.active) $where["active"] = req.query.active;
@@ -66,7 +78,7 @@ const methods = {
         const query = Object.keys($where).length > 0 ? { where: $where } : {};
 
         // Order
-        $order = [["firstname", "ASC"]];
+        $order = [["visit_id", "ASC"]];
 
         if (req.query.orderByField && req.query.orderBy)
             $order = [
@@ -75,6 +87,7 @@ const methods = {
                     req.query.orderBy.toLowerCase() == "desc" ? "desc" : "asc",
                 ],
             ];
+
         query["order"] = $order;
 
         query["include"] = [{ all: true, required: false }];
@@ -135,7 +148,7 @@ const methods = {
             try {
                 const obj = new db(data);
                 const inserted = await obj.save();
-                const res = methods.findById(inserted.teacher_id);
+                const res = methods.findById(inserted.visit_id);
 
                 resolve(res);
             } catch (error) {
@@ -153,8 +166,8 @@ const methods = {
 
                 // Update
                 // data.document_type_id  = parseInt(id);
-                await db.update(data, { where: { teacher_id: id } });
-                let res = methods.findById(obj.teacher_id);
+                await db.update(data, { where: { visit_id: id } });
+                let res = methods.findById(obj.visit_id);
 
                 resolve(res);
             } catch (error) {
@@ -170,7 +183,7 @@ const methods = {
                 if (!obj) reject(ErrorNotFound("id: not found"));
 
                 await db.destroy({
-                    where: { teacher_id: id },
+                    where: { visit_id: id },
                 });
 
                 resolve();
