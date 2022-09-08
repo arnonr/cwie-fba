@@ -7,7 +7,9 @@ const config = require("../configs/app"),
     ErrorUnauthorized,
   } = require("../configs/errorMethods"),
   { Op } = require("sequelize");
+
 const nodemailer = require("nodemailer");
+const axios = require("axios").default;
 
 const methods = {
   scopeSearch(req, limit, offset) {
@@ -168,26 +170,44 @@ const methods = {
     });
   },
 
-  delete(id) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const obj = await db.findByPk(id);
-        if (!obj) reject(ErrorNotFound("id: not found"));
+  // delete(id) {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const obj = await db.findByPk(id);
+  //       if (!obj) reject(ErrorNotFound("id: not found"));
 
-        await db.update(
-          { isRemove: 1, isActive: 0 },
-          { where: { user_id: id } }
-        );
+  //       await db.update(
+  //         { isRemove: 1, isActive: 0 },
+  //         { where: { user_id: id } }
+  //       );
 
-        const obj1 = UserToAnimalType.destroy({
-          where: { user_id: id },
-          // // truncate: true,
-        });
+  //       const obj1 = UserToAnimalType.destroy({
+  //         where: { user_id: id },
+  //         // // truncate: true,
+  //       });
 
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
+  //       resolve();
+  //     } catch (error) {
+  //       reject(error);
+  //     }
+  //   });
+  // },
+
+  getIcitAccount(data) {
+    let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu";
+    let config = {
+      method: "post",
+      url: "https://api.account.kmutnb.ac.th/api/account-api/user-info",
+      headers: { Authorization: "Bearer " + apiToken },
+      data: { username: data.username },
+    };
+
+    return new Promise((resolve, reject) => {
+      axios(config)
+        .then((response) => {
+          return resolve(JSON.stringify(response.data));
+        })
+        .catch((error) => reject(error));
     });
   },
 
@@ -201,6 +221,7 @@ const methods = {
 
         // checkICIT ACCOUNT
         //
+        //return new Promise((resolve, reject) => { axios.post("/api/position", form_data).then((response) => { return resolve(response); }).catch((error) => reject(error)); });
 
         // ตรวจสอบว่ามี username
         if (!obj) {
@@ -226,9 +247,6 @@ const methods = {
   register(data) {
     return new Promise(async (resolve, reject) => {
       try {
-
-
-
         const obj = new db(data);
         obj.Password = obj.passwordHash(obj.Password);
         const inserted = await obj.save();
@@ -268,9 +286,7 @@ const methods = {
         const decoded = jwt.decode(accessToken);
         const obj = await db.findOne({
           where: { Username: decoded.Username },
-          include: [
-            { all: true, nested: true },
-          ],
+          include: [{ all: true, nested: true }],
         });
 
         if (!obj) {

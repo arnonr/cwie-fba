@@ -7,7 +7,7 @@ const methods = {
   async onGetAll(req, res) {
     try {
       let result = await Service.find(req);
-      
+
       res.success(result);
     } catch (error) {
       res.error(error);
@@ -103,6 +103,16 @@ const methods = {
   async onRefreshToken(req, res) {
     try {
       let result = await Service.refreshToken(req.body.accessToken);
+      res.success(result);
+    } catch (error) {
+      res.error(error);
+    }
+  },
+
+  async onGetIcitAccount(req, res) {
+    try {
+      let result = await Service.getIcitAccount(req.body);
+      // res.success(result);
       res.success(result);
     } catch (error) {
       res.error(error);
