@@ -1,5 +1,6 @@
 const config = require("../configs/app"),
   db = require("../models/User"),
+  dbTeacher = require("../models/Teacher"),
   jwt = require("jsonwebtoken"),
   {
     ErrorBadRequest,
@@ -114,7 +115,8 @@ const methods = {
     return new Promise(async (resolve, reject) => {
       try {
         const obj = new db(data);
-        obj.Password = obj.passwordHash(obj.Password);
+        // obj.Password = obj.passwordHash(obj.Password);
+        // obj.Password = obj.passwordHash("12345678!");
         const inserted = await obj.save();
 
         // let transporter = nodemailer.createTransport({
@@ -202,12 +204,132 @@ const methods = {
       data: { username: data.username },
     };
 
-    return new Promise((resolve, reject) => {
-      axios(config)
-        .then((response) => {
-          return resolve(JSON.stringify(response.data));
-        })
-        .catch((error) => reject(error));
+    return new Promise(async (resolve, reject) => {
+      try {
+        const accountObj = await axios(config)
+          .then((response) => {
+            return response.data;
+          })
+          .catch((error) => reject(error));
+
+        if (accountObj.api_status_code == "201") {
+          resolve(JSON.stringify(accountObj.userInfo));
+        } else if (accountObj.api_status_code == "501") {
+          reject(ErrorNotFound("ไม่พบบัญชีผู้ใช้งาน"));
+        } else {
+          reject(ErrorBadRequest(accountObj));
+        }
+      } catch (error) {
+        // console.error(err);
+        reject(error);
+      }
+    });
+  },
+
+  loginIcit(data) {
+    let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu";
+    let scopes = "personel,student,alumni";
+    let config = {
+      method: "post",
+      url: "https://api.account.kmutnb.ac.th/api/account-api/user-authen",
+      headers: { Authorization: "Bearer " + apiToken },
+      data: {
+        scopes: scopes,
+        username: data.username,
+        password: data.password,
+      },
+    };
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const loginObj = await axios(config)
+          .then((response) => {
+            // return resolve(JSON.stringify(response.data));
+            return response.data;
+          })
+          .catch((error) => error);
+
+        if (typeof loginObj.userInfo !== "undefined") {
+          const account_type = loginObj.userInfo.account_type;
+          const username = loginObj.userInfo.username;
+          const citizen_id = loginObj.userInfo.pid;
+
+          if (account_type == "alumni" || account_type == "student") {
+            /* ตรวจสอบคณะจากรหัสนักศึกษา  */
+            if (username.substring(3, 5) != "14")
+              reject(
+                ErrorUnauthorized(
+                  "ใช้งานได้เฉพาะนักศึกษาคณะบริหารธุรกิจเท่านั้น"
+                )
+              );
+          }
+
+          // console.log(loginObj.userInfo.account_type);
+          let userObj = await db.findOne({
+            where: { username: loginObj.userInfo.username },
+            // include: { all: true },
+          });
+
+          if (!userObj) {
+            /* ไม่มีข้อมูลใน user db จะต้องตรวจสอบว่าเป็นนักศึกษา หรืออาจารย์ */
+            let create_account = false;
+            if (account_type == "alumni" || account_type == "student") {
+              /**
+               * find from student db
+               * ถ้าเป็นนักศึกษา ให้เพิ่มข้อมูล user
+               */
+              create_account = true;
+            } else {
+              /**
+               * find from teacher db
+               * ให้ตรวจสอบว่ามีข้อมูลอาจารย์หรือไม่ ถ้ามีให้เพิ่มข้อมูล user
+               * ถ้าไม่มีให้ปฏิเสธการเข้าใช้งาน
+               *
+               * ถ้าเข้าใช้งานครั้งแรก จะหาข้อมูลอาจารย์ยังไง
+               * */
+              // let teacherObj = await dbTeacher.findOne({
+              //   where: { username: loginObj.userInfo.username },
+              // });
+
+              reject(
+                ErrorUnauthorized(
+                  "ไม่มีสิทธิ์เข้าใช้งาน กรุณาติดต่องานสหกิจศึกษา คณะบริหารธุรกิจ"
+                )
+              );
+            }
+
+            if (create_account == true) {
+              let insertData = {
+                username: loginObj.userInfo.username,
+                name: loginObj.userInfo.displayname,
+                email: loginObj.userInfo.email,
+                citizen_id: loginObj.userInfo.pid,
+                account_type:
+                  loginObj.userInfo.account_type == "personel" ? 3 : 1,
+              };
+              userObj = methods.insert(insertData);
+            }
+          }
+
+          resolve({
+            accessToken: userObj.generateJWT(userObj),
+            userData: userObj,
+            accountData: loginObj,
+          });
+          // return resolve(userObj);
+          // return resolve(login.userInfo);
+        } else if (loginObj.api_status_code == "416") {
+          reject(ErrorUnauthorized(loginObj.api_message));
+        } else if (loginObj.api_status_code == "405") {
+          reject(ErrorUnauthorized("Username or Password invalid"));
+        } else if (loginObj.api_status == "fail") {
+          reject(ErrorUnauthorized(loginObj.api_message));
+        } else {
+          resolve(loginObj);
+        }
+      } catch (error) {
+        reject(ErrorBadRequest(error.message));
+      }
     });
   },
 

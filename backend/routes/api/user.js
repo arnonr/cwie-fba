@@ -62,6 +62,15 @@ router.delete(
 );
 
 router.post(
+  "/login-icit",
+  (req, res, next) => {
+    console.log("Login-icit");
+    next();
+  },
+  controllers.onLoginIcit
+);
+
+router.post(
   "/login",
   (req, res, next) => {
     console.log("FREEDOM2");

@@ -91,6 +91,18 @@ const methods = {
     }
   },
 
+  async onLoginIcit(req, res) {
+    try {
+      let useragent = req.useragent;
+      let detectResult = req.device;
+
+      let result = await Service.loginIcit(req.body, req.ip, detectResult);
+      res.success(result);
+    } catch (error) {
+      res.error(error);
+    }
+  },
+
   async onRegister(req, res) {
     try {
       let result = await Service.insert(req.body);

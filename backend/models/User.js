@@ -66,26 +66,27 @@ User.init(
       type: DataTypes.STRING(50),
       allowNull: false,
       comment: "ชื่อผู้ใช้งาน",
-      validate: {
-        isUnique: function (value, next) {
-          let self = this;
-          User.findOne({ where: { Username: value, isRemove: 0 } })
-            .then(function (data) {
-              console.log(self);
-              if (data && self.UserID !== data.UserID) {
-                throw new Error("Username already in use!");
-              }
-              return next();
-            })
-            .catch(function (err) {
-              return next(err);
-            });
-        },
-      },
+      unique: true,
+      // validate: {
+      //   isUnique: function (value, next) {
+      //     let self = this;
+      //     User.findOne({ where: { Username: value, isRemove: 0 } })
+      //       .then(function (data) {
+      //         console.log(self);
+      //         if (data && self.UserID !== data.UserID) {
+      //           throw new Error("Username already in use!");
+      //         }
+      //         return next();
+      //       })
+      //       .catch(function (err) {
+      //         return next(err);
+      //       });
+      //   },
+      // },
     },
     password: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
       comment: "รหัสผ่าน",
     },
     name: {
@@ -111,7 +112,8 @@ User.init(
     account_type: {
       type: DataTypes.TINYINT(1),
       allowNull: false,
-      comment: "ประเภทผู้ใช้งาน (1 = นักศึกษา, 2 = อาจารย์, 3 = เจ้าหน้าที่, 4 = admin)",
+      comment:
+        "ประเภทผู้ใช้งาน (1 = นักศึกษา, 2 = อาจารย์, 3 = เจ้าหน้าที่, 4 = admin)",
     },
     active: {
       type: DataTypes.TINYINT(1),
@@ -130,11 +132,11 @@ User.init(
       allowNull: false,
       comment: "วัน-เวลาที่เพิ่มข้อมูล",
     },
-    updated_user_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: true,
-      comment: "เลขไอดีอ้างอิง ผู้ใช้งานที่แก้ไขข้อมูลล่าสุด",
-    },
+    // updated_user_id: {
+    //   type: DataTypes.INTEGER(11),
+    //   allowNull: true,
+    //   comment: "เลขไอดีอ้างอิง ผู้ใช้งานที่แก้ไขข้อมูลล่าสุด",
+    // },
     updated_at: {
       field: "UpdatedDatetime",
       type: DataTypes.DATE,
