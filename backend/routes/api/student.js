@@ -4,33 +4,25 @@ const auth = require("../auth");
 const { checkPermission } = require("../accessControl");
 
 router.get(
-    "/",
-    auth.required,
-    controllers.onGetAll
-);
-
-router.get(
-    "/:id",
-    auth.required,
-    controllers.onGetById
+  "/get-reg-student/:id",
+  auth.required,
+  controllers.onGetRegStudent
 );
 
 router.post(
-    "/",
-    auth.required,
-    controllers.onInsert,
+  "/import-reg-student/:id",
+  auth.required,
+  controllers.onInsertRegStudent
 );
 
-router.put(
-    "/:id",
-    auth.required,
-    controllers.onUpdate
-);
+router.get("/", auth.required, controllers.onGetAll);
 
-router.delete(
-    "/:id",
-    auth.required,
-    controllers.onDelete
-);
+router.get("/:id", auth.required, controllers.onGetById);
+
+router.post("/", auth.required, controllers.onInsert);
+
+router.put("/:id", auth.required, controllers.onUpdate);
+
+router.delete("/:id", auth.required, controllers.onDelete);
 
 module.exports = router;

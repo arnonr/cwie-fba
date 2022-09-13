@@ -103,8 +103,8 @@ const methods = {
         });
 
         if (!obj) reject(ErrorNotFound("id: not found"));
-
-        resolve(obj.toJSON());
+        resolve(obj); /* ทดสอบการปรับปรุงข้อมูลจาก ICIT account */
+        // resolve(obj.toJSON());
       } catch (error) {
         reject(ErrorNotFound("id: not found"));
       }
@@ -155,11 +155,11 @@ const methods = {
         if (!obj) reject(ErrorNotFound("id: not found"));
 
         // Update
-        data.user_id = parseInt(id);
+        // data.user_id = parseInt(id);
 
-        if (data.Password) {
-          data.Password = obj.passwordHash(data.Password);
-        }
+        // if (data.Password) {
+        //   data.Password = obj.passwordHash(data.Password);
+        // }
 
         await db.update(data, { where: { user_id: id } });
 
@@ -195,37 +195,6 @@ const methods = {
   //   });
   // },
 
-  getIcitAccount(data) {
-    let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu";
-    let config = {
-      method: "post",
-      url: "https://api.account.kmutnb.ac.th/api/account-api/user-info",
-      headers: { Authorization: "Bearer " + apiToken },
-      data: { username: data.username },
-    };
-
-    return new Promise(async (resolve, reject) => {
-      try {
-        const accountObj = await axios(config)
-          .then((response) => {
-            return response.data;
-          })
-          .catch((error) => reject(error));
-
-        if (accountObj.api_status_code == "201") {
-          resolve(JSON.stringify(accountObj.userInfo));
-        } else if (accountObj.api_status_code == "501") {
-          reject(ErrorNotFound("ไม่พบบัญชีผู้ใช้งาน"));
-        } else {
-          reject(ErrorBadRequest(accountObj));
-        }
-      } catch (error) {
-        // console.error(err);
-        reject(error);
-      }
-    });
-  },
-
   loginIcit(data) {
     let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu";
     let scopes = "personel,student,alumni";
@@ -244,7 +213,6 @@ const methods = {
       try {
         const loginObj = await axios(config)
           .then((response) => {
-            // return resolve(JSON.stringify(response.data));
             return response.data;
           })
           .catch((error) => error);
@@ -264,11 +232,11 @@ const methods = {
               );
           }
 
-          // console.log(loginObj.userInfo.account_type);
           let userObj = await db.findOne({
             where: { username: loginObj.userInfo.username },
-            // include: { all: true },
           });
+
+          // let userObj = await methods.findById(5);
 
           if (!userObj) {
             /* ไม่มีข้อมูลใน user db จะต้องตรวจสอบว่าเป็นนักศึกษา หรืออาจารย์ */
@@ -309,6 +277,14 @@ const methods = {
               };
               userObj = methods.insert(insertData);
             }
+
+          }else{
+              let updateData = {
+                name: loginObj.userInfo.displayname,
+                citizen_id: loginObj.userInfo.pid,
+              };
+              userObj = await methods.update(userObj.user_id, updateData);
+              // console.log("Update : " + updateData.citizen_id);
           }
 
           resolve({
@@ -316,8 +292,7 @@ const methods = {
             userData: userObj,
             accountData: loginObj,
           });
-          // return resolve(userObj);
-          // return resolve(login.userInfo);
+
         } else if (loginObj.api_status_code == "416") {
           reject(ErrorUnauthorized(loginObj.api_message));
         } else if (loginObj.api_status_code == "405") {
@@ -366,41 +341,41 @@ const methods = {
     });
   },
 
-  register(data) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const obj = new db(data);
-        obj.Password = obj.passwordHash(obj.Password);
-        const inserted = await obj.save();
+  // register(data) {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const obj = new db(data);
+  //       obj.Password = obj.passwordHash(obj.Password);
+  //       const inserted = await obj.save();
 
-        // Send mail
-        let transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-          port: 587,
-          secure: false,
-          auth: {
-            // ข้อมูลการเข้าสู่ระบบ
-            user: "edocument@fba.kmutnb.ac.th", // email user ของเรา
-            pass: "edoc2565", // email password
-          },
-        });
+  //       // Send mail
+  //       let transporter = nodemailer.createTransport({
+  //         host: "smtp.gmail.com",
+  //         port: 587,
+  //         secure: false,
+  //         auth: {
+  //           // ข้อมูลการเข้าสู่ระบบ
+  //           user: "edocument@fba.kmutnb.ac.th", // email user ของเรา
+  //           pass: "edoc2565", // email password
+  //         },
+  //       });
 
-        let info = await transporter.sendMail({
-          from: '"ระบบฐานข้อมูลโคเนื้อ กระบือ แพะ', // อีเมลผู้ส่ง
-          to: inserted.Username, // อีเมลผู้รับ สามารถกำหนดได้มากกว่า 1 อีเมล โดยขั้นด้วย ,(Comma)
-          subject: "ระบบฐานข้อมูล โคเนื้อ กระบือ แพะ", // หัวข้ออีเมล
-          // text: "d", // plain text body
-          html: "<b>ระบบฐานข้อมูล โคเนื้อ กระบิอ แพะ ได้รับข้อมูลของท่านเรียบร้อยแล้ว อยู่ระหว่างรอการอนุมัติ", // html body
-        });
+  //       let info = await transporter.sendMail({
+  //         from: '"ระบบฐานข้อมูลโคเนื้อ กระบือ แพะ', // อีเมลผู้ส่ง
+  //         to: inserted.Username, // อีเมลผู้รับ สามารถกำหนดได้มากกว่า 1 อีเมล โดยขั้นด้วย ,(Comma)
+  //         subject: "ระบบฐานข้อมูล โคเนื้อ กระบือ แพะ", // หัวข้ออีเมล
+  //         // text: "d", // plain text body
+  //         html: "<b>ระบบฐานข้อมูล โคเนื้อ กระบิอ แพะ ได้รับข้อมูลของท่านเรียบร้อยแล้ว อยู่ระหว่างรอการอนุมัติ", // html body
+  //       });
 
-        let res = methods.findById(inserted.user_id);
+  //       let res = methods.findById(inserted.user_id);
 
-        resolve(res);
-      } catch (error) {
-        reject(ErrorBadRequest(error.message));
-      }
-    });
-  },
+  //       resolve(res);
+  //     } catch (error) {
+  //       reject(ErrorBadRequest(error.message));
+  //     }
+  //   });
+  // },
 
   refreshToken(accessToken) {
     return new Promise(async (resolve, reject) => {
@@ -420,6 +395,74 @@ const methods = {
       }
     });
   },
+
+    getIcitAccount(id) {
+    let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu";
+    let config = {
+      method: "post",
+      url: "https://api.account.kmutnb.ac.th/api/account-api/user-info",
+      headers: { Authorization: "Bearer " + apiToken },
+      data: { username: id },
+    };
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const accountObj = await axios(config)
+          .then((response) => {
+            return response.data;
+          })
+          .catch((error) => reject(error));
+
+        if (accountObj.api_status_code == "201") {
+          let accountData = {
+            username: accountObj.userInfo.username,
+            name: accountObj.userInfo.displayname,
+            email: accountObj.userInfo.email,
+            citizen_id: "",
+            account_type: accountObj.userInfo.account_type == "personel" ? 3 : 1,
+            icit_account_type: accountObj.userInfo.account_type
+
+          };
+          // resolve(accountObj.userInfo);
+          resolve(accountData);
+        } else if (accountObj.api_status_code == "501") {
+          reject(ErrorNotFound("ไม่พบบัญชีผู้ใช้งาน"));
+        } else {
+          reject(ErrorBadRequest(accountObj));
+        }
+      } catch (error) {
+        // console.error(err);
+        reject(error);
+      }
+    });
+  },
+
+  importIcitAccount(id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+          const accountObj = await methods.getIcitAccount(id);
+
+          const obj = await db.findOne({
+              where: { username : accountObj.username },
+          });
+
+          let saveObj = null;
+          // resolve(accountObj.username);
+          if (!obj) {
+              saveObj = methods.insert(accountObj);
+          }else{
+              saveObj = methods.update(obj.user_id, accountObj);
+          }
+          // resolve(accountObj.username);
+          resolve(saveObj);
+      } catch (error) {
+          reject(ErrorBadRequest(error.message));
+      }
+    });
+  },
+
+
+
 };
 
 module.exports = { ...methods };

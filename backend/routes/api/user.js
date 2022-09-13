@@ -6,11 +6,19 @@ const { checkPermission } = require("../accessControl");
 let resource = "user";
 
 router.get(
-  "/get-icit-account",
+  "/get-icit-account/:id",
   auth.required,
   checkPermission(resource, "read"),
   controllers.onGetIcitAccount
 );
+
+router.post(
+  "/import-icit-account/:id",
+  auth.required,
+  checkPermission(resource, "read"),
+  controllers.onImportIcitAccount
+);
+
 
 router.get(
   "/",

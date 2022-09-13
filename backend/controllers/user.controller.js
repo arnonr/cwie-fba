@@ -123,13 +123,22 @@ const methods = {
 
   async onGetIcitAccount(req, res) {
     try {
-      let result = await Service.getIcitAccount(req.body);
-      // res.success(result);
+      let result = await Service.getIcitAccount(req.params.id);
       res.success(result);
     } catch (error) {
       res.error(error);
     }
   },
+
+  async onImportIcitAccount(req, res) {
+      try {
+      let result = await Service.importIcitAccount(req.params.id);
+          res.success(result);
+      } catch (error) {
+          res.error(error);
+      }
+  },
+
 };
 
 module.exports = { ...methods };

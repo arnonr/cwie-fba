@@ -55,6 +55,24 @@ const methods = {
             res.error(error);
         }
     },
+
+    async onGetRegStudent(req, res) {
+        try {
+        let result = await Service.getRegStudent(req.params.id);
+            res.success(result);
+        } catch (error) {
+            res.error(error);
+        }
+    },
+
+    async onInsertRegStudent(req, res) {
+        try {
+        let result = await Service.insertRegStudent(req.params.id);
+            res.success(result);
+        } catch (error) {
+            res.error(error);
+        }
+    },
 };
 
 module.exports = { ...methods };

@@ -1,3 +1,4 @@
+const axios = require("axios").default;
 const config = require("../configs/app"),
     db = require("../models/Student"),
     {
@@ -211,6 +212,72 @@ const methods = {
             }
         });
     },
+
+    getRegStudent(id) {
+        let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu";
+        let config = {
+        method: "post",
+        url: "https://api.account.kmutnb.ac.th/api/account-api/student-info",
+        headers: { Authorization: "Bearer " + apiToken },
+        data: { id: id },
+        };
+
+        return new Promise(async (resolve, reject) => {
+            try {
+                const regObj = await axios(config)
+                .then((response) => {
+                    return response.data;
+                })
+                .catch((error) => reject(error));
+
+                if (typeof regObj.STU_CODE === "undefined") {
+                    reject(ErrorNotFound("ไม่พบข้อมูลนักศึกษา"));
+                }
+
+                let studentData = {
+                    student_code: regObj.STU_CODE,
+                    prefix: regObj.STU_PRE_NAME,
+                    firstname: regObj.STU_FIRST_NAME_THAI,
+                    surname: regObj.STU_LAST_NAME_THAI,
+                    citizen_id: regObj.ID_CARD,
+                    faculty_code: regObj.FAC_CODE,
+                    faculty_name: regObj.FAC_NAME_THAI,
+                    department_code: regObj.DEPT_CODE,
+                    department_name: regObj.DEPT_NAME_THAI,
+                    division_code: regObj.DIV_CODE,
+                    division_name: regObj.DIV_NAME_THAI,
+                };
+
+                resolve(studentData);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    },
+
+    insertRegStudent(id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const studentObj = await methods.getRegStudent(id);
+
+                const obj = await db.findOne({
+                    where: { student_code : studentObj.student_code },
+                });
+
+                let saveObj = null;
+                if (!obj) {
+                    saveObj = methods.insert(studentObj);
+                }else{
+                    saveObj = methods.update(obj.student_id, studentObj);
+                }
+
+                resolve(saveObj);
+            } catch (error) {
+                reject(ErrorBadRequest(error.message));
+            }
+        });
+    },
+
 };
 
 module.exports = { ...methods };
