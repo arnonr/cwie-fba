@@ -1,4 +1,5 @@
 const axios = require("axios").default;
+const apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu"; /* ICIT Account Access token */
 const config = require("../configs/app"),
     db = require("../models/Student"),
     {
@@ -213,8 +214,8 @@ const methods = {
         });
     },
 
-    getRegStudent(id) {
-        let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu";
+    regStudentInfo(id) {
+
         let config = {
         method: "post",
         url: "https://api.account.kmutnb.ac.th/api/account-api/student-info",
@@ -240,10 +241,13 @@ const methods = {
                     firstname: regObj.STU_FIRST_NAME_THAI,
                     surname: regObj.STU_LAST_NAME_THAI,
                     citizen_id: regObj.ID_CARD,
+                    faculty_id: "-",
                     faculty_code: regObj.FAC_CODE,
                     faculty_name: regObj.FAC_NAME_THAI,
+                    department_id: '-',
                     department_code: regObj.DEPT_CODE,
                     department_name: regObj.DEPT_NAME_THAI,
+                    division_id: '-',
                     division_code: regObj.DIV_CODE,
                     division_name: regObj.DIV_NAME_THAI,
                 };
@@ -258,7 +262,7 @@ const methods = {
     insertRegStudent(id) {
         return new Promise(async (resolve, reject) => {
             try {
-                const studentObj = await methods.getRegStudent(id);
+                const studentObj = await methods.regStudentInfo(id);
 
                 const obj = await db.findOne({
                     where: { student_code : studentObj.student_code },

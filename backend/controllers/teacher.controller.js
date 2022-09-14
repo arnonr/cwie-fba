@@ -55,6 +55,25 @@ const methods = {
             res.error(error);
         }
     },
+
+    async onHrisPersonnelInfo(req, res) {
+        try {
+        let result = await Service.hrisPersonnelInfo(req.params.id);
+            res.success(result);
+        } catch (error) {
+            res.error(error);
+        }
+    },
+
+    async onHrisFindPersonnel(req, res) {
+        try {
+        let result = await Service.hrisFindPersonnel(req.body);
+            res.success(result);
+        } catch (error) {
+            res.error(error);
+        }
+    },
+
 };
 
 module.exports = { ...methods };

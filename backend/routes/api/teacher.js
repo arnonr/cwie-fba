@@ -4,6 +4,18 @@ const auth = require("../auth");
 const { checkPermission } = require("../accessControl");
 
 router.get(
+  "/hris-find-personnel",
+  auth.required,
+  controllers.onHrisFindPersonnel
+);
+
+router.get(
+  "/hris-personnel-info/:id",
+  auth.required,
+  controllers.onHrisPersonnelInfo
+);
+
+router.get(
     "/",
     auth.required,
     controllers.onGetAll

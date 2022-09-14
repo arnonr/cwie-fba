@@ -1,3 +1,5 @@
+const apiToken = "rn7496A7JE7jEnstEbAQDsm2bstbKhaW"; /* HRIS API Access token */
+const axios = require("axios").default;
 const config = require("../configs/app"),
     db = require("../models/Teacher"),
     {
@@ -179,6 +181,111 @@ const methods = {
             }
         });
     },
+
+    hrisPersonnelInfo(id) {
+
+        console.log(id);
+        let config = {
+        method: "post",
+        url: "https://api.hris.kmutnb.ac.th/api/personnel-api/personnel-detail",
+        headers: { Authorization: "Bearer " + apiToken },
+        data: { citizen_id: id, get_work_info : 1 },
+        };
+
+        return new Promise(async (resolve, reject) => {
+            try {
+                const apiObj = await axios(config)
+                .then((response) => {
+                    return response.data;
+                }).catch(error => {
+                    if(error.response.status === 404){
+                        reject(ErrorNotFound("ไม่พบข้อมูลบุคลากรในระบบ HRIS"));
+                    }
+                    reject(error)
+                });
+
+                let apiData = {
+                    person_key: apiObj.person_key,
+                    person_photo: apiObj.person_photo,
+                    last_updated_at: apiObj.last_updated_at,
+                    prefix: apiObj.person_info.full_prefix_name_th,
+                    firstname: apiObj.person_info.firstname_th,
+                    surname: apiObj.person_info.lastname_th,
+                    faculty_id: '-',
+                    faculty_code: apiObj.work_info.faculty_code,
+                    faculty_name: apiObj.work_info.faculty_name_th,
+                    department_id: '-',
+                    department_code: apiObj.work_info.department_code,
+                    department_name: apiObj.work_info.department_name_th,
+                    position_id: apiObj.work_info.position_id,
+                    position_th: apiObj.work_info.position_th,
+                };
+                resolve(apiData);
+                // resolve(apiObj);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    },
+
+    hrisFindPersonnel(data) {
+
+        dataParams = {}
+        dataParams['faculty_code'] = 14;
+
+        if (data.firstname)
+            dataParams['firstname'] = data.firstname;
+
+        if (data.lastname)
+            dataParams['lastname'] = data.lastname;
+
+        let config = {
+        method: "post",
+        url: "https://api.hris.kmutnb.ac.th/api/personnel-api/list-personnel",
+        headers: { Authorization: "Bearer " + apiToken },
+        data: dataParams,
+        };
+
+        return new Promise(async (resolve, reject) => {
+            try {
+                const apiObj = await axios(config)
+                .then((response) => {
+                    // console.log('response.status: ', response.status)
+                    return response.data;
+                }).catch(error => {
+                    // console.log(error.response.status);
+                    if(error.response.status === 404){
+                        reject(ErrorNotFound("ไม่พบข้อมูลบุคลากรในระบบ HRIS"));
+                    }
+                    reject(error)
+                });
+                // .catch((error) => reject(error));
+
+                // if (typeof apiObj.person_key === "undefined") {
+                //     reject(ErrorNotFound("ไม่พบข้อมูลบุคลากรจากระบบ HRIS"));
+                // }
+
+                let apiData = new Array();
+                Object.keys(apiObj.data).forEach(function(key){
+                    console.log(key + ' - ' + apiObj.data[key].person_key);
+                    apiData.push({
+                        person_key: apiObj.data[key].person_key,
+                        last_updated_at: apiObj.data[key].last_updated_at,
+                        firstname: apiObj.data[key].firstname_th,
+                        surname: apiObj.data[key].lastname_th,
+                        faculty_id: '-',
+                        department_id: '-',
+                    });
+                });
+
+                resolve(apiData);
+                resolve(apiObj.data);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    },
+
 };
 
 module.exports = { ...methods };

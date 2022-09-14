@@ -56,9 +56,9 @@ const methods = {
         }
     },
 
-    async onGetRegStudent(req, res) {
+    async onRegStudentInfo(req, res) {
         try {
-        let result = await Service.getRegStudent(req.params.id);
+        let result = await Service.regStudentInfo(req.params.id);
             res.success(result);
         } catch (error) {
             res.error(error);

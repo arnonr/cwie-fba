@@ -4,9 +4,9 @@ const auth = require("../auth");
 const { checkPermission } = require("../accessControl");
 
 router.get(
-  "/get-reg-student/:id",
+  "/reg-student-info/:id",
   auth.required,
-  controllers.onGetRegStudent
+  controllers.onRegStudentInfo
 );
 
 router.post(

@@ -1,3 +1,5 @@
+let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu"; /* ICIT Account API access token */
+
 const config = require("../configs/app"),
   db = require("../models/User"),
   dbTeacher = require("../models/Teacher"),
@@ -196,7 +198,6 @@ const methods = {
   // },
 
   loginIcit(data) {
-    let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu";
     let scopes = "personel,student,alumni";
     let config = {
       method: "post",
@@ -397,43 +398,42 @@ const methods = {
   },
 
     getIcitAccount(id) {
-    let apiToken = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu";
-    let config = {
-      method: "post",
-      url: "https://api.account.kmutnb.ac.th/api/account-api/user-info",
-      headers: { Authorization: "Bearer " + apiToken },
-      data: { username: id },
-    };
+      let config = {
+        method: "post",
+        url: "https://api.account.kmutnb.ac.th/api/account-api/user-info",
+        headers: { Authorization: "Bearer " + apiToken },
+        data: { username: id },
+      };
 
-    return new Promise(async (resolve, reject) => {
-      try {
-        const accountObj = await axios(config)
-          .then((response) => {
-            return response.data;
-          })
-          .catch((error) => reject(error));
+      return new Promise(async (resolve, reject) => {
+        try {
+          const accountObj = await axios(config)
+            .then((response) => {
+              return response.data;
+            })
+            .catch((error) => reject(error));
 
-        if (accountObj.api_status_code == "201") {
-          let accountData = {
-            username: accountObj.userInfo.username,
-            name: accountObj.userInfo.displayname,
-            email: accountObj.userInfo.email,
-            citizen_id: "",
-            account_type: accountObj.userInfo.account_type == "personel" ? 3 : 1,
-            icit_account_type: accountObj.userInfo.account_type
+          if (accountObj.api_status_code == "201") {
+            let accountData = {
+              username: accountObj.userInfo.username,
+              name: accountObj.userInfo.displayname,
+              email: accountObj.userInfo.email,
+              citizen_id: "",
+              account_type: accountObj.userInfo.account_type == "personel" ? 3 : 1,
+              icit_account_type: accountObj.userInfo.account_type
 
-          };
-          // resolve(accountObj.userInfo);
-          resolve(accountData);
-        } else if (accountObj.api_status_code == "501") {
-          reject(ErrorNotFound("ไม่พบบัญชีผู้ใช้งาน"));
-        } else {
-          reject(ErrorBadRequest(accountObj));
+            };
+            // resolve(accountObj.userInfo);
+            resolve(accountData);
+          } else if (accountObj.api_status_code == "501") {
+            reject(ErrorNotFound("ไม่พบบัญชีผู้ใช้งาน"));
+          } else {
+            reject(ErrorBadRequest(accountObj));
+          }
+        } catch (error) {
+          // console.error(err);
+          reject(error);
         }
-      } catch (error) {
-        // console.error(err);
-        reject(error);
-      }
     });
   },
 
