@@ -12,7 +12,7 @@ router.get(
 router.post(
   "/import-reg-student/:id",
   auth.required,
-  controllers.onInsertRegStudent
+  controllers.onImportRegStudent
 );
 
 router.get("/", auth.required, controllers.onGetAll);

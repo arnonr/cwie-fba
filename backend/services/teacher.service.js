@@ -1,5 +1,6 @@
 const apiToken = "rn7496A7JE7jEnstEbAQDsm2bstbKhaW"; /* HRIS API Access token */
 const axios = require("axios").default;
+const facultyService = require("../services/faculty.service")
 const config = require("../configs/app"),
     db = require("../models/Teacher"),
     {
@@ -183,8 +184,6 @@ const methods = {
     },
 
     hrisPersonnelInfo(id) {
-
-        console.log(id);
         let config = {
         method: "post",
         url: "https://api.hris.kmutnb.ac.th/api/personnel-api/personnel-detail",
@@ -211,15 +210,16 @@ const methods = {
                     prefix: apiObj.person_info.full_prefix_name_th,
                     firstname: apiObj.person_info.firstname_th,
                     surname: apiObj.person_info.lastname_th,
-                    faculty_id: '-',
+                    // faculty_id: '-',
                     faculty_code: apiObj.work_info.faculty_code,
                     faculty_name: apiObj.work_info.faculty_name_th,
-                    department_id: '-',
+                    // department_id: '-',
                     department_code: apiObj.work_info.department_code,
                     department_name: apiObj.work_info.department_name_th,
                     position_id: apiObj.work_info.position_id,
                     position_th: apiObj.work_info.position_th,
                 };
+                console.log("service fac = " +apiObj.work_info.faculty_code);
                 resolve(apiData);
                 // resolve(apiObj);
             } catch (error) {

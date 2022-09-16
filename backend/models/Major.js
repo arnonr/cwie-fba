@@ -20,7 +20,7 @@ Major.init(
             comment: "รหัสอ้างอิงสาขาวิชา",
         },
         major_code: {
-            type: DataTypes.STRING(4),
+            type: DataTypes.STRING(6),
             allowNull: false,
             unique: true,
             comment: "รหัสสาขาวิชา",

@@ -241,13 +241,10 @@ const methods = {
                     firstname: regObj.STU_FIRST_NAME_THAI,
                     surname: regObj.STU_LAST_NAME_THAI,
                     citizen_id: regObj.ID_CARD,
-                    faculty_id: "-",
                     faculty_code: regObj.FAC_CODE,
                     faculty_name: regObj.FAC_NAME_THAI,
-                    department_id: '-',
                     department_code: regObj.DEPT_CODE,
                     department_name: regObj.DEPT_NAME_THAI,
-                    division_id: '-',
                     division_code: regObj.DIV_CODE,
                     division_name: regObj.DIV_NAME_THAI,
                 };
@@ -259,28 +256,28 @@ const methods = {
         });
     },
 
-    insertRegStudent(id) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const studentObj = await methods.regStudentInfo(id);
+    // insertRegStudent(id) {
+    //     return new Promise(async (resolve, reject) => {
+    //         try {
+    //             const studentObj = await methods.regStudentInfo(id);
 
-                const obj = await db.findOne({
-                    where: { student_code : studentObj.student_code },
-                });
+    //             const obj = await db.findOne({
+    //                 where: { student_code : studentObj.student_code },
+    //             });
 
-                let saveObj = null;
-                if (!obj) {
-                    saveObj = methods.insert(studentObj);
-                }else{
-                    saveObj = methods.update(obj.student_id, studentObj);
-                }
+    //             let saveObj = null;
+    //             if (!obj) {
+    //                 saveObj = methods.insert(studentObj);
+    //             }else{
+    //                 saveObj = methods.update(obj.student_id, studentObj);
+    //             }
 
-                resolve(saveObj);
-            } catch (error) {
-                reject(ErrorBadRequest(error.message));
-            }
-        });
-    },
+    //             resolve(saveObj);
+    //         } catch (error) {
+    //             reject(ErrorBadRequest(error.message));
+    //         }
+    //     });
+    // },
 
 };
 
