@@ -21,6 +21,8 @@ router.use("/tumbol", require("./tumbol"));
 router.use("/user", require("./user"));
 router.use("/visit", require("./visit"));
 router.use("/visit-image", require("./visitImage"));
+router.use("/news-category", require("./newsCategory"));
+router.use("/news", require("./news"));
 
 module.exports = router;
 
