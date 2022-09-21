@@ -59,6 +59,17 @@ Semester.init(
             allowNull: true,
             comment: "วันปิดเทอม",
         },
+        regis_start_date: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+            comment: "วันเปิดลงทะเบียนสหกิจ",
+        },
+        regis_end_date: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+            comment: "วันปิดลงทะเบียนสหกิจ",
+        },
+
         active: {
             type: DataTypes.TINYINT(1),
             allowNull: false,
