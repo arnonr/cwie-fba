@@ -3,7 +3,8 @@ const Service = require("../services/teacher.service"),
     dbDepartment = require("../models/Department"),
     facultyService = require("../services/faculty.service"),
     departmentService = require("../services/department.service"),
-    jwt = require("jsonwebtoken");
+    jwt = require("jsonwebtoken"),
+    db = require("../models/Teacher");
 
 const methods = {
     async onGetAll(req, res) {
@@ -119,8 +120,51 @@ const methods = {
 
     async onHrisFindPersonnel(req, res) {
         try {
-        let result = await Service.hrisFindPersonnel(req.body);
+            let result = await Service.hrisFindPersonnel(req.body);
+            res.success(result);
+        } catch (error) {
+            res.error(error);
+        }
+    },
 
+    async onHrisSyncAllTeacher(req, res) {
+        const decoded = jwt.decode(req.headers.authorization.split(" ")[1]);
+        let user_id = decoded.user_id;
+        try {
+            // let result = await Service.hrisFindPersonnel({position_type_id : 1, person_key:2009985010791});
+            let result = await Service.hrisFindPersonnel({position_type_id : 1});
+            for(var key in result) {
+                console.log(key, result[key]['person_key']);
+
+                let person_key = result[key]['person_key'];
+                let resultInfo = await Service.hrisPersonnelInfo({person_key:person_key});
+
+                const faculty = await facultyService.importFaculty({faculty_code:resultInfo.faculty_code, faculty_name:resultInfo.faculty_name_th, user_id:user_id});
+                let faculty_id = faculty.faculty_id;
+
+                const department = await departmentService.importDepartment({department_code:resultInfo.department_code, department_name:resultInfo.departement_name_th, faculty_id:faculty_id, user_id:user_id});
+
+                let department_id = department.department_id;
+
+                const teacherObj = await db.findOne({
+                    where: { citizen_id : resultInfo.citizen_id },
+                });
+
+                resultInfo['person_key'] = resultInfo.person_key;
+                resultInfo['citizen_id'] = resultInfo.citizen_id;
+                resultInfo['faculty_id'] = faculty_id;
+                resultInfo['department_id'] = department_id;
+
+                let saveObj = null;
+                if (!teacherObj) {
+                    resultInfo['created_by'] = user_id;
+                    saveObj = await Service.insert(resultInfo);
+
+                }else{
+                    saveObj = await Service.update(teacherObj.teacher_id, resultInfo);
+                }
+                // console.log(resultInfo);
+            }
             res.success(result);
         } catch (error) {
             res.error(error);

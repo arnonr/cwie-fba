@@ -3,6 +3,12 @@ const controllers = require("../../controllers/teacher.controller");
 const auth = require("../auth");
 const { checkPermission } = require("../accessControl");
 
+router.post(
+  "/hris-sync-all-teacher",
+  auth.required,
+  controllers.onHrisSyncAllTeacher
+);
+
 router.get(
   "/hris-find-personnel",
   auth.required,

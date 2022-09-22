@@ -166,6 +166,39 @@ const methods = {
       }
     });
   },
+
+  importDepartment(data){
+    return new Promise(async (resolve, reject) => {
+      try {
+        let deptObj = await db.findOne({
+          where: { department_code: data.department_code },
+        });
+
+          if(deptObj === null){
+              try {
+                  let insertObj = await methods.insert({
+                      department_code: data.department_code,
+                      name_th: data.department_name,
+                      name_en: data.department_name,
+                      created_by: data.user_id,
+                      faculty_id: data.faculty_id
+                  });
+                  department_id = insertObj.department_id
+              }catch (error) {
+                  reject(error);
+              }
+          }else{
+              department_id = deptObj.department_id;
+              // console.log("dept = "+department_id);
+          }
+        let res = await methods.findById(department_id);
+        // console.log("dept = "+res.department_id);
+        resolve(res);
+      }catch (error) {
+        reject(error);
+      }
+    });
+  },
 };
 
 module.exports = { ...methods };

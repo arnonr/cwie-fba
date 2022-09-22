@@ -108,7 +108,8 @@ const methods = {
 
         if (!obj) reject(ErrorNotFound("id: not found"));
 
-        resolve(obj.toJSON());
+        resolve(obj);
+        // resolve(obj.toJSON());
       } catch (error) {
         reject(ErrorNotFound(error));
       }
@@ -164,6 +165,41 @@ const methods = {
       }
     });
   },
+
+  importFaculty(data){
+    return new Promise(async (resolve, reject) => {
+      try {
+        let facObj = await db.findOne({
+            where: { faculty_code: data.faculty_code },
+        });
+
+        if(facObj === null){
+            try {
+                let InsertObj = await methods.insert({
+                    faculty_code: data.faculty_code,
+                    name_th: data.faculty_name,
+                    name_en: data.faculty_name,
+                    created_by: data.user_id
+                });
+                faculty_id = InsertObj.faculty_id;
+            } catch (error) {
+                console.log(error);
+                reject(error);
+            }
+        }else{
+            faculty_id = facObj.faculty_id;
+        }
+        let res = await methods.findById(faculty_id);
+        resolve(res);
+      }catch (error) {
+        reject(error);
+      }
+    });
+  },
 };
 
 module.exports = { ...methods };
+
+
+
+            /* !-- Faculty check */

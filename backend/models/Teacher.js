@@ -28,6 +28,11 @@ Teacher.init(
             allowNull: true,
             comment: "รหัสผู้ใช้งาน",
         },
+        person_key: {
+            type: DataTypes.STRING(20),
+            allowNull: true,
+            comment: "HRIS person_key",
+        },
         prefix: {
             type: DataTypes.STRING(100),
             allowNull: false,
@@ -42,6 +47,11 @@ Teacher.init(
             type: DataTypes.STRING(100),
             allowNull: false,
             comment: "นามสกุล",
+        },
+        citizen_id: {
+            type: DataTypes.STRING(20),
+            allowNull: false,
+            comment: "รหัสบัตรประชาชน",
         },
         tel: {
             type: DataTypes.STRING(32),

@@ -1,6 +1,7 @@
 const apiToken = "rn7496A7JE7jEnstEbAQDsm2bstbKhaW"; /* HRIS API Access token */
 const axios = require("axios").default;
-const facultyService = require("../services/faculty.service")
+const facultyService = require("../services/faculty.service");
+const jwt = require("jsonwebtoken");
 const config = require("../configs/app"),
     db = require("../models/Teacher"),
     {
@@ -183,12 +184,24 @@ const methods = {
         });
     },
 
-    hrisPersonnelInfo(id) {
+    hrisPersonnelInfo(data) {
+
+        let dataParams = {}
+        if (data.person_key)
+            dataParams['person_key'] = data.person_key;
+
+        if (data.citizen_id)
+            dataParams['citizen_id'] = data.citizen_id;
+
+        dataParams['get_work_info'] = 1;
+        dataParams['get_citizen_id'] = 1;
+
         let config = {
         method: "post",
         url: "https://api.hris.kmutnb.ac.th/api/personnel-api/personnel-detail",
         headers: { Authorization: "Bearer " + apiToken },
-        data: { citizen_id: id, get_work_info : 1 },
+        data: dataParams,
+        // data: { person_key: id, get_work_info : 1 },
         };
 
         return new Promise(async (resolve, reject) => {
@@ -198,19 +211,21 @@ const methods = {
                     return response.data;
                 }).catch(error => {
                     if(error.response.status === 404){
-                        reject(ErrorNotFound("ไม่พบข้อมูลบุคลากรในระบบ HRIS"));
+                        //reject(ErrorNotFound("ไม่พบข้อมูลบุคลากรในระบบ HRIS"));
+                        reject("ไม่พบข้อมูลบุคลากรในระบบ HRIS");
                     }
                     reject(error)
                 });
 
                 let apiData = {
                     person_key: apiObj.person_key,
+                    citizen_id: apiObj.person_info.citizen_id,
                     person_photo: apiObj.person_photo,
                     last_updated_at: apiObj.last_updated_at,
                     prefix: apiObj.person_info.full_prefix_name_th,
                     firstname: apiObj.person_info.firstname_th,
                     surname: apiObj.person_info.lastname_th,
-                    // faculty_id: '-',
+                    // faculty_id: faculty_id,
                     faculty_code: apiObj.work_info.faculty_code,
                     faculty_name: apiObj.work_info.faculty_name_th,
                     // department_id: '-',
@@ -218,8 +233,9 @@ const methods = {
                     department_name: apiObj.work_info.department_name_th,
                     position_id: apiObj.work_info.position_id,
                     position_th: apiObj.work_info.position_th,
+
                 };
-                console.log("service fac = " +apiObj.work_info.faculty_code);
+                //console.log("service fac = " +apiObj.work_info.faculty_code);
                 resolve(apiData);
                 // resolve(apiObj);
             } catch (error) {
@@ -238,6 +254,12 @@ const methods = {
 
         if (data.lastname)
             dataParams['lastname'] = data.lastname;
+
+        if (data.position_type_id)
+            dataParams['position_type_id'] = data.position_type_id;
+
+        if (data.person_key)
+            dataParams['person_key'] = data.person_key;
 
         let config = {
         method: "post",
@@ -273,13 +295,14 @@ const methods = {
                         last_updated_at: apiObj.data[key].last_updated_at,
                         firstname: apiObj.data[key].firstname_th,
                         surname: apiObj.data[key].lastname_th,
-                        faculty_id: '-',
-                        department_id: '-',
+                        position_type_id: apiObj.data[key].position_type_id,
+                        // faculty_id: '-',
+                        // department_id: '-',
                     });
                 });
-
+                // resolve(apiObj.data);
                 resolve(apiData);
-                resolve(apiObj.data);
+                // resolve(apiObj.data);
             } catch (error) {
                 reject(error);
             }
