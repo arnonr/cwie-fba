@@ -197,7 +197,7 @@ const methods = {
   //   });
   // },
 
-  loginIcit(data) {
+  loginIcitAccount(data) {
     let scopes = "personel,student,alumni";
     let config = {
       method: "post",
@@ -256,15 +256,16 @@ const methods = {
                *
                * ถ้าเข้าใช้งานครั้งแรก จะหาข้อมูลอาจารย์ยังไง
                * */
-              // let teacherObj = await dbTeacher.findOne({
-              //   where: { username: loginObj.userInfo.username },
-              // });
+              let teacherObj = await dbTeacher.findOne({
+                where: { citizen_id: loginObj.userInfo.pid },
+              });
+              console.log(loginObj.userInfo.pid);
 
-              reject(
-                ErrorUnauthorized(
-                  "ไม่มีสิทธิ์เข้าใช้งาน กรุณาติดต่องานสหกิจศึกษา คณะบริหารธุรกิจ"
-                )
-              );
+              if (!teacherObj) {
+                reject(ErrorUnauthorized("ไม่มีสิทธิ์เข้าใช้งาน กรุณาติดต่องานสหกิจศึกษา คณะบริหารธุรกิจ"));
+              }else{
+                create_account = true;
+              }
             }
 
             if (create_account == true) {
@@ -276,16 +277,17 @@ const methods = {
                 account_type:
                   loginObj.userInfo.account_type == "personel" ? 3 : 1,
               };
-              userObj = methods.insert(insertData);
+              userObj = await methods.insert(insertData);
             }
 
-          }else{
+          }else{ /* มีข้อมูลในตาราง User แล้ว (เจ้าหน้าที่คณะ) */
               let updateData = {
                 name: loginObj.userInfo.displayname,
                 citizen_id: loginObj.userInfo.pid,
               };
-              userObj = await methods.update(userObj.user_id, updateData);
-              // console.log("Update : " + updateData.citizen_id);
+
+              // userObj = await methods.update(userObj.user_id, updateData);
+              userObj = await methods.findById(userObj.user_id);
           }
 
           resolve({

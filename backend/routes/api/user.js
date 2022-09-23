@@ -70,12 +70,12 @@ router.delete(
 );
 
 router.post(
-  "/login-icit",
+  "/login-icit-account",
   (req, res, next) => {
-    console.log("Login-icit");
+    // console.log("Login-icit");
     next();
   },
-  controllers.onLoginIcit
+  controllers.onLoginIcitAccount
 );
 
 router.post(
