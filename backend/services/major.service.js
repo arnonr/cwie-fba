@@ -151,6 +151,37 @@ const methods = {
             }
         });
     },
+
+  importMajor(data){
+    return new Promise(async (resolve, reject) => {
+      try {
+        let majorObj = await db.findOne({
+          where: { major_code: data.major_code },
+        });
+
+          if(majorObj === null){
+              try {
+                  let insertObj = await methods.insert({
+                      major_code: data.major_code,
+                      name_th: data.major_name,
+                      name_en: data.major_name,
+                      created_by: data.user_id,
+                      department_id: data.department_id
+                  });
+                  major_id = insertObj.major_id
+              }catch (error) {
+                  reject(error);
+              }
+          }else{
+              major_id = majorObj.major_id;
+          }
+        let res = await methods.findById(major_id);
+        resolve(res);
+      }catch (error) {
+        reject(error);
+      }
+    });
+  },
 };
 
 module.exports = { ...methods };

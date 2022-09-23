@@ -195,6 +195,7 @@ const methods = {
 
         dataParams['get_work_info'] = 1;
         dataParams['get_citizen_id'] = 1;
+        // dataParams['get_icit_account'] = 1;
 
         let config = {
         method: "post",
@@ -225,15 +226,13 @@ const methods = {
                     prefix: apiObj.person_info.full_prefix_name_th,
                     firstname: apiObj.person_info.firstname_th,
                     surname: apiObj.person_info.lastname_th,
-                    // faculty_id: faculty_id,
                     faculty_code: apiObj.work_info.faculty_code,
                     faculty_name: apiObj.work_info.faculty_name_th,
-                    // department_id: '-',
                     department_code: apiObj.work_info.department_code,
                     department_name: apiObj.work_info.department_name_th,
                     position_id: apiObj.work_info.position_id,
                     position_th: apiObj.work_info.position_th,
-
+                    // icit_account: apiObj.icit_account,
                 };
                 //console.log("service fac = " +apiObj.work_info.faculty_code);
                 resolve(apiData);

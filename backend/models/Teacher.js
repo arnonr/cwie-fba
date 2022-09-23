@@ -103,6 +103,11 @@ Teacher.init(
             allowNull: true,
             comment: "ตำแหน่งบริหาร",
         },
+        hris_last_updated_at: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            comment: "เวลาอัพเดทข้อมูลของ HRIS ล่าสุด",
+        },
         active: {
             type: DataTypes.TINYINT(1),
             allowNull: false,

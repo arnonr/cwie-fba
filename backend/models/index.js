@@ -26,8 +26,11 @@ const User = require("./User");
 const Visit = require("./Visit");
 const VisitImage = require("./VisitImage");
 
-// StudentDocument.sync({ force: true });
+// RejectLog.sync({ force: true });
+// Form.sync({ force: true });
 // Semester.sync({ force: true });
+// Teacher.sync({ force: true });
+
 // Department.sync({ force: true });
 // Major.sync({ force: true });
 // Student.sync({ force: true });

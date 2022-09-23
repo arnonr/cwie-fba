@@ -63,51 +63,18 @@ const methods = {
 
     async onHrisPersonnelInfo(req, res) {
         const decoded = jwt.decode(req.headers.authorization.split(" ")[1]);
+        let user_id = decoded.user_id;
 
         try {
-            let result = await Service.hrisPersonnelInfo(req.params.id);
+            let result = await Service.hrisPersonnelInfo({citizen_id:req.params.id});
 
-            let faculty_id = null;
-            let department_id = null;
-            let facObj = await dbFaculty.findOne({
-                where: { faculty_code: result.faculty_code },
-            });
+            /* get faculty and create if not exists */
+            const faculty = await facultyService.importFaculty({faculty_code:result.faculty_code, faculty_name:result.faculty_name, user_id:user_id});
+            let faculty_id = faculty.faculty_id;
 
-            if(facObj === null){
-                try {
-                    let facultyInsertObj = await facultyService.insert({
-                        faculty_code: result.faculty_code,
-                        name_th: result.faculty_name,
-                        name_en: result.faculty_name,
-                        created_by: decoded.user_id
-                    });
-                    faculty_id = facultyInsertObj.faculty_id;
-                } catch (error) {
-                    console.log(error);
-                }
-            }else{
-                faculty_id = facObj.faculty_id;
-            }
-
-            let deptObj = await dbDepartment.findOne({
-                where: { department_code: result.department_code },
-            });
-            if(deptObj === null){
-                try {
-                    let deptInsertObj = await departmentService.insert({
-                        department_code: result.department_code,
-                        name_th: result.department_name,
-                        name_en: result.department_name,
-                        created_by: decoded.user_id,
-                        faculty_id: faculty_id
-                    });
-                    department_id = deptInsertObj.department_id
-                }catch (error) {
-                    console.log(error);
-                }
-            }else{
-                department_id = deptObj.department_id;
-            }
+                /* get department and create if not exists */
+            const department = await departmentService.importDepartment({department_code:result.department_code, department_name:result.department_name, faculty_id:faculty_id, user_id:user_id});
+            let department_id = department.department_id;
 
             result['faculty_id'] = faculty_id;
             result['department_id'] = department_id;
@@ -132,36 +99,61 @@ const methods = {
         let user_id = decoded.user_id;
         try {
             // let result = await Service.hrisFindPersonnel({position_type_id : 1, person_key:2009985010791});
+
+            /* ดึงข้อมูลสายวิชาการทั้งหมด */
             let result = await Service.hrisFindPersonnel({position_type_id : 1});
             for(var key in result) {
-                console.log(key, result[key]['person_key']);
 
                 let person_key = result[key]['person_key'];
-                let resultInfo = await Service.hrisPersonnelInfo({person_key:person_key});
-
-                const faculty = await facultyService.importFaculty({faculty_code:resultInfo.faculty_code, faculty_name:resultInfo.faculty_name_th, user_id:user_id});
-                let faculty_id = faculty.faculty_id;
-
-                const department = await departmentService.importDepartment({department_code:resultInfo.department_code, department_name:resultInfo.departement_name_th, faculty_id:faculty_id, user_id:user_id});
-
-                let department_id = department.department_id;
+                let api_updated_time = new Date(result[key]['last_updated_at']).getTime();
+                let person_name = result[key]['firstname']+' '+result[key]['surname'];
 
                 const teacherObj = await db.findOne({
-                    where: { citizen_id : resultInfo.citizen_id },
+                    where: { person_key : person_key },
                 });
 
+                let db_updated_time = null;
+                if (teacherObj) {
+                    db_updated_time = new Date(teacherObj.hris_last_updated_at).getTime();
+                    if(db_updated_time === api_updated_time){
+                        console.log(person_key+' '+person_name + ' up to date - continue')
+                        continue;
+                    }
+                }
+
+                let resultInfo = await Service.hrisPersonnelInfo({person_key:person_key});
+
+                /* get faculty and create if not exists */
+                const faculty = await facultyService.importFaculty({faculty_code:resultInfo.faculty_code, faculty_name:resultInfo.faculty_name, user_id:user_id});
+                let faculty_id = faculty.faculty_id;
+
+                 /* get department and create if not exists */
+                const department = await departmentService.importDepartment({department_code:resultInfo.department_code, department_name:resultInfo.department_name, faculty_id:faculty_id, user_id:user_id});
+                let department_id = department.department_id;
+
+                // const teacherObj = await db.findOne({
+                //     where: { citizen_id : resultInfo.citizen_id },
+                // });
+
                 resultInfo['person_key'] = resultInfo.person_key;
+                // resultInfo['icit_account'] = resultInfo.icit_account;
                 resultInfo['citizen_id'] = resultInfo.citizen_id;
                 resultInfo['faculty_id'] = faculty_id;
                 resultInfo['department_id'] = department_id;
+                resultInfo['hris_last_updated_at'] = resultInfo.last_updated_at;
 
                 let saveObj = null;
                 if (!teacherObj) {
                     resultInfo['created_by'] = user_id;
                     saveObj = await Service.insert(resultInfo);
-
+                    console.log("insert");
                 }else{
-                    saveObj = await Service.update(teacherObj.teacher_id, resultInfo);
+                    if(db_updated_time !== api_updated_time){
+                        saveObj = await Service.update(teacherObj.teacher_id, resultInfo);
+                        console.log("Update");
+                    }else{
+                        console.log("Up to date");
+                    }
                 }
                 // console.log(resultInfo);
             }
