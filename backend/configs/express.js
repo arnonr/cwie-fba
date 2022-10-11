@@ -17,6 +17,8 @@ module.exports = async (app) => {
   const allowedOrigins = [
     "*",
     "http://localhost:8085",
+    "http://localhost:8088",
+    "http://178.128.216.177:8088"
   ];
   const corsOptions = {
     origin: function (origin, callback) {
