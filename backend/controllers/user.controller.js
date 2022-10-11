@@ -139,6 +139,15 @@ const methods = {
       }
   },
 
+  async onVerifyToken(req, res) {
+      try {
+      let result = await Service.verifyToken(req.body.accessToken);
+          res.success(result);
+      } catch (error) {
+          res.error(error);
+      }
+  },
+
 };
 
 module.exports = { ...methods };

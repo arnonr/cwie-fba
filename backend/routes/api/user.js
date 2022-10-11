@@ -89,5 +89,6 @@ router.post(
 
 router.post("/register", controllers.onRegister);
 router.post("/refresh-token", controllers.onRefreshToken);
+router.post("/verify-token", controllers.onVerifyToken);
 
 module.exports = router;

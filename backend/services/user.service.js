@@ -399,15 +399,44 @@ const methods = {
     });
   },
 
-    getIcitAccount(id) {
-      let config = {
-        method: "post",
-        url: "https://api.account.kmutnb.ac.th/api/account-api/user-info",
-        headers: { Authorization: "Bearer " + apiToken },
-        data: { username: id },
-      };
+  verifyToken(accessToken) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const decoded = jwt.decode(accessToken);
 
-      return new Promise(async (resolve, reject) => {
+        if (decoded === null){
+          reject(ErrorUnauthorized("accessToken is invalid"));
+        }
+
+        if (decoded.exp < (new Date().getTime() + 1) / 1000) {
+          console.log('expired');
+          reject(ErrorUnauthorized("accessToken expired"));
+        }
+
+        const obj = await db.findOne({
+          where: { username: decoded.username },
+          include: [{ all: true, nested: true }],
+        });
+
+        if (!obj) {
+          reject(ErrorUnauthorized("Username not found"));
+        }
+        resolve({ accessToken: accessToken, userData: obj });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  getIcitAccount(id) {
+    let config = {
+      method: "post",
+      url: "https://api.account.kmutnb.ac.th/api/account-api/user-info",
+      headers: { Authorization: "Bearer " + apiToken },
+      data: { username: id },
+    };
+
+    return new Promise(async (resolve, reject) => {
         try {
           const accountObj = await axios(config)
             .then((response) => {
