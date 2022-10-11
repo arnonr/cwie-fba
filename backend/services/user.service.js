@@ -225,12 +225,14 @@ const methods = {
 
           if (account_type == "alumni" || account_type == "student") {
             /* ตรวจสอบคณะจากรหัสนักศึกษา  */
-            if (username.substring(3, 5) != "14")
-              reject(
-                ErrorUnauthorized(
-                  "ใช้งานได้เฉพาะนักศึกษาคณะบริหารธุรกิจเท่านั้น"
-                )
-              );
+            if (username.substring(3, 5) != "14"){
+              // reject(
+              //   ErrorUnauthorized(
+              //     "ใช้งานได้เฉพาะนักศึกษาคณะบริหารธุรกิจเท่านั้น"
+              //   )
+              // );
+            }
+
           }
 
           let userObj = await db.findOne({
