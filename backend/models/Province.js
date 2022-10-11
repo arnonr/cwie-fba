@@ -56,12 +56,12 @@ Province.init(
         createdAt: {
             field: "created_at",
             type: DataTypes.DATE,
-            allowNull: false,
+            allowNull: true,
             comment: "วันที่เพิ่มข้อมูล",
         },
         created_by: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             comment: "ผู้เพิ่มข้อมูล",
         },
         updatedAt: {
