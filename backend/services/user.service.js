@@ -387,7 +387,7 @@ const methods = {
       try {
         const decoded = jwt.decode(accessToken);
         const obj = await db.findOne({
-          where: { Username: decoded.Username },
+          where: { username: decoded.username },
           include: [{ all: true, nested: true }],
         });
 
