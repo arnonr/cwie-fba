@@ -22,7 +22,16 @@ NewsCategory.init(
         news_cate_name: {
             type: DataTypes.STRING(100),
             allowNull: false,
+            unique: true,
             comment: "ประเภทข่าว",
+            validate: {
+                async isUnique(value) {
+                  const name = await NewsCategory.findOne({ where: { news_cate_name: value } });
+                  if (name) {
+                    throw new Error('news_category.news_cate_name already exist');
+                  }
+                }
+            }
         },
         active: {
             type: DataTypes.TINYINT(1),

@@ -24,16 +24,42 @@ Department.init(
       allowNull: false,
       unique: true,
       comment: "รหัสภาควิชา",
+      validate: {
+        async isUnique(value) {
+          const name = await Department.findOne({ where: { department_code: value } });
+          if (name) {
+            throw new Error('department.department_code already exist');
+          }
+        }
+      }
     },
     name_th: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      unique: true,
       comment: "ชื่อภาควิชา (ไทย)",
+      validate: {
+        async isUnique(value) {
+          const name = await Department.findOne({ where: { name_th: value } });
+          if (name) {
+            throw new Error('department.name_th already exist');
+          }
+        }
+      }
     },
     name_en: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      unique: true,
       comment: "ชื่อภาควิชา (อังกฤษ)",
+      validate: {
+        async isUnique(value) {
+          const name = await Department.findOne({ where: { name_en: value } });
+          if (name) {
+            throw new Error('department.name_en already exist');
+          }
+        }
+      }
     },
     tel: {
       type: DataTypes.STRING(32),

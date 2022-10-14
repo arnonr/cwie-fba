@@ -24,16 +24,42 @@ Major.init(
             allowNull: false,
             unique: true,
             comment: "รหัสสาขาวิชา",
+            validate: {
+                async isUnique(value) {
+                  const name = await Major.findOne({ where: { major_code: value } });
+                  if (name) {
+                    throw new Error('major.major_code already exist');
+                  }
+                }
+            }
         },
         name_th: {
             type: DataTypes.STRING(100),
             allowNull: false,
+            unique: true,
             comment: "ชื่อสาขาวิชา (ไทย)",
+            validate: {
+                async isUnique(value) {
+                  const name = await Major.findOne({ where: { name_th: value } });
+                  if (name) {
+                    throw new Error('major.name_th already exist');
+                  }
+                }
+            }
         },
         name_en: {
             type: DataTypes.STRING(100),
             allowNull: false,
+            unique: true,
             comment: "ชื่อสาขาวิชา (อังกฤษ)",
+            validate: {
+                async isUnique(value) {
+                  const name = await Major.findOne({ where: { name_en: value } });
+                  if (name) {
+                    throw new Error('major.name_en already exist');
+                  }
+                }
+            }
         },
         department_id: {
             type: DataTypes.INTEGER,

@@ -24,7 +24,16 @@ DocumentType.init(
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      unique: true,
       comment: "ชื่อประเภทเอกสาร",
+      validate: {
+        async isUnique(value) {
+          const name = await DocumentType.findOne({ where: { name: value } });
+          if (name) {
+            throw new Error('document_type.name already exist');
+          }
+        }
+      }
     },
     description: {
       type: DataTypes.STRING(255),

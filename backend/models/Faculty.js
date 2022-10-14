@@ -30,7 +30,7 @@ Faculty.init(
         async isUnique(value) {
           const name = await Faculty.findOne({ where: { faculty_code: value } });
           if (name) {
-            throw new Error('faculty_code already exist');
+            throw new Error('faculty.faculty_code already exist');
           }
         }
       }
@@ -44,7 +44,7 @@ Faculty.init(
         async isUnique(value) {
           const name = await Faculty.findOne({ where: { name_th: value } });
           if (name) {
-            throw new Error('name_th already exist');
+            throw new Error('faculty.name_th already exist');
           }
         }
       }
@@ -58,7 +58,7 @@ Faculty.init(
         async isUnique(value) {
           const name = await Faculty.findOne({ where: { name_en: value } });
           if (name) {
-            throw new Error('name_en already exist');
+            throw new Error('faculty.name_en already exist');
           }
         }
       }
