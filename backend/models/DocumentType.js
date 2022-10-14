@@ -27,11 +27,18 @@ DocumentType.init(
       unique: true,
       comment: "ชื่อประเภทเอกสาร",
       validate: {
-        async isUnique(value) {
-          const name = await DocumentType.findOne({ where: { name: value } });
-          if (name) {
-            throw new Error('document_type.name already exist');
-          }
+        isUnique: async function (value, next) {
+          let self = this;
+          await DocumentType.findOne({ where: { name: value } })
+          .then(function (data) {
+                if (data && self.document_type_id !== data.document_type_id) {
+                  throw new Error("document_type.name already exist");
+                }
+                return next();
+          })
+          .catch(function (err) {
+            return next(err);
+          });
         }
       }
     },
