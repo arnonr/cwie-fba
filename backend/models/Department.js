@@ -25,11 +25,18 @@ Department.init(
       unique: true,
       comment: "รหัสภาควิชา",
       validate: {
-        async isUnique(value) {
-          const name = await Department.findOne({ where: { department_code: value } });
-          if (name) {
-            throw new Error('department.department_code already exist');
-          }
+        isUnique: async function (value, next) {
+          let self = this;
+          await Department.findOne({ where: { department_code: value } })
+          .then(function (data) {
+                if (data && self.department_id !== data.department_id) {
+                  throw new Error("department.department_code already exist");
+                }
+                return next();
+          })
+          .catch(function (err) {
+            return next(err);
+          });
         }
       }
     },
@@ -39,11 +46,18 @@ Department.init(
       unique: true,
       comment: "ชื่อภาควิชา (ไทย)",
       validate: {
-        async isUnique(value) {
-          const name = await Department.findOne({ where: { name_th: value } });
-          if (name) {
-            throw new Error('department.name_th already exist');
-          }
+        isUnique: async function (value, next) {
+          let self = this;
+          await Department.findOne({ where: { name_th: value } })
+          .then(function (data) {
+                if (data && self.department_id !== data.department_id) {
+                  throw new Error("department.name_th already exist");
+                }
+                return next();
+          })
+          .catch(function (err) {
+            return next(err);
+          });
         }
       }
     },
@@ -53,11 +67,18 @@ Department.init(
       unique: true,
       comment: "ชื่อภาควิชา (อังกฤษ)",
       validate: {
-        async isUnique(value) {
-          const name = await Department.findOne({ where: { name_en: value } });
-          if (name) {
-            throw new Error('department.name_en already exist');
-          }
+        isUnique: async function (value, next) {
+          let self = this;
+          await Department.findOne({ where: { name_en: value } })
+          .then(function (data) {
+                if (data && self.department_id !== data.department_id) {
+                  throw new Error("department.name_en already exist");
+                }
+                return next();
+          })
+          .catch(function (err) {
+            return next(err);
+          });
         }
       }
     },

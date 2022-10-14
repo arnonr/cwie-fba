@@ -47,28 +47,42 @@ Faculty.init(
       unique: true,
       allowNull: false,
       comment: "ชื่อคณะ (ไทย)",
-      // validate: {
-      //   async isUnique(value) {
-      //     const name = await Faculty.findOne({ where: { name_th: value } });
-      //     if (name) {
-      //       throw new Error('faculty.name_th already exist');
-      //     }
-      //   }
-      // }
+      validate: {
+        isUnique: async function (value, next) {
+          let self = this;
+          await Faculty.findOne({ where: { name_th: value } })
+          .then(function (data) {
+                if (data && self.faculty_id !== data.faculty_id) {
+                  throw new Error("faculty.name_th already exist");
+                }
+                return next();
+          })
+          .catch(function (err) {
+            return next(err);
+          });
+        }
+      }
     },
     name_en: {
       type: DataTypes.STRING(100),
       allowNull: false,
       unique: true,
       comment: "ชื่อคณะ (อังกฤษ)",
-    //   validate: {
-    //     async isUnique(value) {
-    //       const name = await Faculty.findOne({ where: { name_en: value } });
-    //       if (name) {
-    //         throw new Error('faculty.name_th already exist');
-    //       }
-    //     }
-    //   }
+      validate: {
+        isUnique: async function (value, next) {
+          let self = this;
+          await Faculty.findOne({ where: { name_en: value } })
+          .then(function (data) {
+                if (data && self.faculty_id !== data.faculty_id) {
+                  throw new Error("faculty.name_en already exist");
+                }
+                return next();
+          })
+          .catch(function (err) {
+            return next(err);
+          });
+        }
+      }
     },
     tel: {
       type: DataTypes.STRING(32),

@@ -25,11 +25,18 @@ Major.init(
             unique: true,
             comment: "รหัสสาขาวิชา",
             validate: {
-                async isUnique(value) {
-                  const name = await Major.findOne({ where: { major_code: value } });
-                  if (name) {
-                    throw new Error('major.major_code already exist');
-                  }
+                isUnique: async function (value, next) {
+                  let self = this;
+                  await Major.findOne({ where: { major_code: value } })
+                  .then(function (data) {
+                        if (data && self.major_id !== data.major_id) {
+                          throw new Error("major.major_code already exist");
+                        }
+                        return next();
+                  })
+                  .catch(function (err) {
+                    return next(err);
+                  });
                 }
             }
         },
@@ -39,11 +46,18 @@ Major.init(
             unique: true,
             comment: "ชื่อสาขาวิชา (ไทย)",
             validate: {
-                async isUnique(value) {
-                  const name = await Major.findOne({ where: { name_th: value } });
-                  if (name) {
-                    throw new Error('major.name_th already exist');
-                  }
+                isUnique: async function (value, next) {
+                  let self = this;
+                  await Major.findOne({ where: { name_th: value } })
+                  .then(function (data) {
+                        if (data && self.major_id !== data.major_id) {
+                          throw new Error("major.name_th already exist");
+                        }
+                        return next();
+                  })
+                  .catch(function (err) {
+                    return next(err);
+                  });
                 }
             }
         },
@@ -53,11 +67,18 @@ Major.init(
             unique: true,
             comment: "ชื่อสาขาวิชา (อังกฤษ)",
             validate: {
-                async isUnique(value) {
-                  const name = await Major.findOne({ where: { name_en: value } });
-                  if (name) {
-                    throw new Error('major.name_en already exist');
-                  }
+                isUnique: async function (value, next) {
+                  let self = this;
+                  await Major.findOne({ where: { name_en: value } })
+                  .then(function (data) {
+                        if (data && self.major_id !== data.major_id) {
+                          throw new Error("major.name_en already exist");
+                        }
+                        return next();
+                  })
+                  .catch(function (err) {
+                    return next(err);
+                  });
                 }
             }
         },

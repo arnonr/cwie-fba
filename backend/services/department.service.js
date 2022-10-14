@@ -139,7 +139,7 @@ const methods = {
         if (!obj) reject(ErrorNotFound("id: not found"));
 
         // Update
-        // data.document_type_id  = parseInt(id);
+        data.department_id = parseInt(id);
         await db.update(data, { where: { department_id: id } });
         let res = methods.findById(obj.department_id);
 
