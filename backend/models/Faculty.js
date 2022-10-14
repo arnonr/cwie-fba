@@ -26,16 +26,42 @@ Faculty.init(
       allowNull: false,
       unique: true,
       comment: "รหัสคณะ",
+      validate: {
+        async isUnique(value) {
+          const name = await Faculty.findOne({ where: { faculty_code: value } });
+          if (name) {
+            throw new Error('faculty_code already exist');
+          }
+        }
+      }
     },
     name_th: {
       type: DataTypes.STRING(100),
+      unique: true,
       allowNull: false,
       comment: "ชื่อคณะ (ไทย)",
+      validate: {
+        async isUnique(value) {
+          const name = await Faculty.findOne({ where: { name_th: value } });
+          if (name) {
+            throw new Error('name_th already exist');
+          }
+        }
+      }
     },
     name_en: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      unique: true,
       comment: "ชื่อคณะ (อังกฤษ)",
+      validate: {
+        async isUnique(value) {
+          const name = await Faculty.findOne({ where: { name_en: value } });
+          if (name) {
+            throw new Error('name_en already exist');
+          }
+        }
+      }
     },
     tel: {
       type: DataTypes.STRING(32),
