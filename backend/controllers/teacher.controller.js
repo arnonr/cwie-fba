@@ -87,7 +87,7 @@ const methods = {
 
     async onHrisFindPersonnel(req, res) {
         try {
-            let result = await Service.hrisFindPersonnel(req.body);
+            let result = await Service.hrisFindPersonnel(req.query);
             res.success(result);
         } catch (error) {
             res.error(error);

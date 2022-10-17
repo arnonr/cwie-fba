@@ -252,7 +252,7 @@ const methods = {
             dataParams['firstname'] = data.firstname;
 
         if (data.lastname)
-            dataParams['lastname'] = data.lastname;
+            dataParams['lastname'] = data.surname;
 
         if (data.position_type_id)
             dataParams['position_type_id'] = data.position_type_id;
