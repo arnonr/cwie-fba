@@ -23,6 +23,7 @@ router.use("/visit", require("./visit"));
 router.use("/visit-image", require("./visitImage"));
 router.use("/news-category", require("./newsCategory"));
 router.use("/news", require("./news"));
+router.use("/prefix-name", require("./prefixName"));
 
 module.exports = router;
 

@@ -29,8 +29,8 @@ Student.init(
       unique: true,
       comment: "รหัสนักศึกษา",
     },
-    prefix: {
-      type: DataTypes.STRING(100),
+    prefix_id: {
+      type: DataTypes.STRING(2),
       allowNull: false,
       comment: "คำนำหน้าชื่อ",
     },
@@ -225,6 +225,7 @@ const Faculty = require("./Faculty");
 const Department = require("./Department");
 const Major = require("./Major");
 const Teacher = require("./Teacher");
+const PrefixName = require("./PrefixName");
 
 Student.belongsTo(Province, { foreignKey: "province_id" });
 Student.belongsTo(Amphur, { foreignKey: "amphur_id" });
@@ -233,5 +234,6 @@ Student.belongsTo(Faculty, { foreignKey: "faculty_id" });
 Student.belongsTo(Department, { foreignKey: "department_id" });
 Student.belongsTo(Major, { foreignKey: "major_id" });
 Student.belongsTo(Teacher, { foreignKey: "teacher_id" });
+Student.belongsTo(PrefixName, { foreignKey: "prefix_id" });
 
 module.exports = Student;
