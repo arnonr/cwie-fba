@@ -34,6 +34,11 @@ module.exports = async (app) => {
   };
   app.use(cors(corsOptions));
 
+  // for parsing multipart/form-data
+  // const multer = require('multer');
+  // const upload = multer();
+  // app.use(upload.single('file_upload'));
+  // app.use(express.static('public'));
   // Parser Body
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
