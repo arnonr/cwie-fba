@@ -2,8 +2,13 @@ const router = require("express").Router();
 const controllers = require("../../controllers/company.controller");
 const auth = require("../auth");
 const { checkPermission } = require("../accessControl");
-const multer = require('multer');
+const {
+    ErrorBadRequest,
+    ErrorNotFound,
+    ErrorUnauthorized,
+} = require("../../configs/errorMethods");
 
+const multer = require('multer');
 const storage = multer.diskStorage({
     destination: "public/uploads/company/",
     filename: function (req, file, callback) {
@@ -11,7 +16,20 @@ const storage = multer.diskStorage({
         filename = filename.toLowerCase();
         callback(null, filename.toLowerCase())
     },
-  })
+});
+
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, callback) => {
+        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+            callback(null, true);
+        } else {
+            callback(null, false);
+            return callback(ErrorBadRequest("Only .png, .jpg and .jpeg format allowed!"));
+        }
+    },
+    limits: { fieldSize: 10 * 1024 * 1024 }, //10MB
+});
 
 // const upload = multer({ storage })
 
@@ -30,19 +48,6 @@ const storage = multer.diskStorage({
 //     },
 //   });
 
-const upload = multer({
-    storage: storage,
-    fileFilter: (req, file, callback) => {
-        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
-            callback(null, true);
-        } else {
-            callback(null, false);
-            return cb(ErrorBadRequest("Only .png, .jpg and .jpeg format allowed!"));
-        }
-    },
-    limits: { fieldSize: 10 * 1024 * 1024 }, //10MB
-});
-
 router.get(
     "/",
     auth.required,
@@ -58,14 +63,14 @@ router.get(
 router.post(
     "/",
     auth.required,
-    upload.single('file_upload'),
+    upload.single('namecard_upload'),
     controllers.onInsert,
 );
 
 router.put(
     "/:id",
     auth.required,
-    upload.single('file_upload'),
+    upload.single('namecard_upload'),
     controllers.onUpdate
 );
 

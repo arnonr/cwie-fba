@@ -47,7 +47,9 @@ const VisitImage = require("./VisitImage");
 
 (async () => {
     await sequelize.sync().then(() => {
-        console.log('models done!')
+        console.log('-------------------------------------');
+        console.log('-----------> API Started <-----------');
+        console.log('-------------------------------------');
     });
     // Code here
 })();

@@ -5,7 +5,7 @@ const methods = {
   async onGetAll(req, res) {
     try {
       let result = await Service.find(req);
-      
+
       res.success(result);
     } catch (error) {
       res.error(error);
@@ -26,6 +26,10 @@ const methods = {
       const decoded = jwt.decode(req.headers.authorization.split(" ")[1]);
         // console.log(decoded)
       req.body.created_by = decoded.user_id;
+
+      if (typeof(req.file) != "undefined"){
+        req.body.document_file = req.file.filename;
+      }
     //   req.body.created_by = 1;
       let result = await Service.insert(req.body);
 
@@ -39,6 +43,10 @@ const methods = {
     try {
       const decoded = jwt.decode(req.headers.authorization.split(" ")[1]);
       req.body.updated_by = decoded.id;
+
+      if (typeof(req.file) != "undefined"){
+        req.body.document_file = req.file.filename;
+      }
 
       const result = await Service.update(req.params.id, req.body);
       res.success(result);
