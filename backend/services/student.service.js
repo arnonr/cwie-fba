@@ -237,7 +237,7 @@ const methods = {
 
                 let studentData = {
                     student_code: regObj.STU_CODE,
-                    prefix: regObj.STU_PRE_NAME,
+                    prefix_id: regObj.STU_PRE_NAME,
                     firstname: regObj.STU_FIRST_NAME_THAI,
                     surname: regObj.STU_LAST_NAME_THAI,
                     citizen_id: regObj.ID_CARD,

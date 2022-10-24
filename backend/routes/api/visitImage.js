@@ -13,7 +13,7 @@ const {
   const storage = multer.diskStorage({
     destination: "public/uploads/visit_image/",
     filename: function (req, file, callback) {
-        let filename = "teacher-" + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
+        let filename = "visit_image-" + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
         filename = filename.toLowerCase();
         callback(null, filename.toLowerCase())
     },
@@ -47,14 +47,14 @@ router.get(
 router.post(
     "/",
     auth.required,
-    upload.single('image_upload'),
+    upload.single('image_file_upload'),
     controllers.onInsert,
 );
 
 router.put(
     "/:id",
     auth.required,
-    upload.single('image_upload'),
+    upload.single('image_file_upload'),
     controllers.onUpdate
 );
 

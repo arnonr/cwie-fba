@@ -63,14 +63,14 @@ router.get(
 router.post(
     "/",
     auth.required,
-    upload.single('namecard_upload'),
+    upload.single('namecard_file_upload'),
     controllers.onInsert,
 );
 
 router.put(
     "/:id",
     auth.required,
-    upload.single('namecard_upload'),
+    upload.single('namecard_file_upload'),
     controllers.onUpdate
 );
 

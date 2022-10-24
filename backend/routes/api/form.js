@@ -9,6 +9,9 @@ const {
     ErrorUnauthorized,
 } = require("../../configs/errorMethods");
 
+/**
+ * https://stackoverflow.com/questions/36096805/uploading-multiple-files-with-multer-but-from-different-fields
+ */
 const multer = require('multer');
 const storage = multer.diskStorage({
 destination: "public/uploads/form/",
@@ -47,15 +50,14 @@ router.get(
 router.post(
     "/",
     auth.required,
-    controllers.onInsert,
+    upload.fields([{name: "response_document_file_upload", maxCount: 1 }, {name: "workplace_googlemap_file_upload", maxCount: 1 }, {name: "plan_document_file_upload", maxCount: 1 }]),
+    controllers.onInsert
 );
 
 router.put(
     "/:id",
     auth.required,
-    // upload.single('response_document_upload'),
-    // upload.single('workplace_googlemap_upload'),
-    // upload.single('plan_document_upload'),
+    upload.fields([{name: "response_document_file_upload", maxCount: 1 }, {name: "workplace_googlemap_file_upload", maxCount: 1 }, {name: "plan_document_file_upload", maxCount: 1 }]),
     controllers.onUpdate
 );
 

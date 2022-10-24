@@ -24,10 +24,11 @@ const methods = {
     async onInsert(req, res) {
         try {
             const decoded = jwt.decode(req.headers.authorization.split(" ")[1]);
-            // console.log(decoded)
+
             if (typeof(req.file) != "undefined"){
-                req.body.namecard_file = req.file.filename;
+                req.body.namecard_file = req.file.path;
             }
+
             req.body.created_by = decoded.user_id;
             let result = await Service.insert(req.body);
 
@@ -42,7 +43,7 @@ const methods = {
             const decoded = jwt.decode(req.headers.authorization.split(" ")[1]);
 
             if (typeof(req.file) != "undefined"){
-                req.body.namecard_file = req.file.filename;
+                req.body.namecard_file = req.file.path;
             }
 
             req.body.updated_by = decoded.id;

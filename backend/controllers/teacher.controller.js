@@ -33,8 +33,7 @@ const methods = {
             req.body.created_by = decoded.user_id;
 
             if (typeof(req.file) != "undefined"){
-                // post Field = signature_upload
-                req.body.signature_file = req.file.filename;
+                req.body.signature_file = req.file.path;
             }
 
             let result = await Service.insert(req.body);
@@ -52,8 +51,7 @@ const methods = {
 
 
             if (typeof(req.file) != "undefined"){
-                // post Field = signature_upload
-                req.body.signature_file = req.file.filename;
+                req.body.signature_file = req.file.path;
             }
 
             const result = await Service.update(req.params.id, req.body);

@@ -11,9 +11,9 @@ const {
 
 const multer = require('multer');
 const storage = multer.diskStorage({
-destination: "public/uploads/form/",
+destination: "public/uploads/student_document/",
 filename: function (req, file, callback) {
-    let filename = "form-" + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
+    let filename = "student_document-" + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
     filename = filename.toLowerCase();
     callback(null, filename.toLowerCase())
 },
@@ -47,14 +47,14 @@ router.get(
 router.post(
     "/",
     auth.required,
-    upload.single('document_upload'),
+    upload.single('document_file_upload'),
     controllers.onInsert,
 );
 
 router.put(
     "/:id",
     auth.required,
-    upload.single('document_upload'),
+    upload.single('document_file_upload'),
     controllers.onUpdate
 );
 

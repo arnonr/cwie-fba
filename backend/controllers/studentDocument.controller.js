@@ -28,7 +28,7 @@ const methods = {
             req.body.created_by = decoded.user_id;
 
             if (typeof(req.file) != "undefined"){
-                req.body.document_file = req.file.filename;
+                req.body.document_file = req.file.path;
             }
 
             let result = await Service.insert(req.body);
@@ -45,7 +45,7 @@ const methods = {
             req.body.updated_by = decoded.id;
 
             if (typeof(req.file) != "undefined"){
-                req.body.document_file = req.file.filename;
+                req.body.document_file = req.file.path;
             }
 
             const result = await Service.update(req.params.id, req.body);

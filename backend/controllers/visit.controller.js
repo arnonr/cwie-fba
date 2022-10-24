@@ -26,7 +26,17 @@ const methods = {
             const decoded = jwt.decode(req.headers.authorization.split(" ")[1]);
             // console.log(decoded)
             req.body.created_by = decoded.user_id;
-            //   req.body.created_by = 1;
+
+            if(typeof(req.files) != "undefined"){
+                if (typeof(req.files['googlemap_file_upload']) != "undefined"){
+                    req.body.googlemap_file = req.files['googlemap_file_upload'][0].path;
+                }
+
+                if (typeof(req.files['report_file_upload']) != "undefined"){
+                    req.body.report_file = req.files['report_file_upload'][0].path;
+                }
+            }
+
             let result = await Service.insert(req.body);
 
             res.success(result, 201);
@@ -39,6 +49,16 @@ const methods = {
         try {
             const decoded = jwt.decode(req.headers.authorization.split(" ")[1]);
             req.body.updated_by = decoded.id;
+
+            if(typeof(req.files) != "undefined"){
+                if (typeof(req.files['googlemap_file_upload']) != "undefined"){
+                    req.body.googlemap_file = req.files['googlemap_file_upload'][0].path;
+                }
+
+                if (typeof(req.files['report_file_upload']) != "undefined"){
+                    req.body.report_file = req.files['report_file_upload'][0].path;
+                }
+            }
 
             const result = await Service.update(req.params.id, req.body);
             res.success(result);

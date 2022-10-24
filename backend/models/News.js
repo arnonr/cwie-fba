@@ -29,6 +29,11 @@ News.init(
             allowNull: false,
             comment: "รายละเอียดประกาศ",
         },
+        news_file: {
+            type: DataTypes.STRING(100),
+            allowNull: true,
+            comment: "ไฟล์ประกอบข่าว",
+        },
         pinned: {
             type: DataTypes.TINYINT(1),
             allowNull: false,

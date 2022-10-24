@@ -65,14 +65,14 @@ router.get(
 router.post(
     "/",
     auth.required,
-    upload.single('signature_upload'),
+    upload.single('signature_file_upload'),
     controllers.onInsert,
 );
 
 router.put(
     "/:id",
     auth.required,
-    upload.single('signature_upload'),
+    upload.single('signature_file_upload'),
     controllers.onUpdate
 );
 
