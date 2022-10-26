@@ -25,6 +25,7 @@ const Tumbol = require("./Tumbol");
 const User = require("./User");
 const Visit = require("./Visit");
 const VisitImage = require("./VisitImage");
+const MajorHead = require("./MajorHead");
 
 // RejectLog.sync({ force: true });
 // Form.sync({ force: true });
