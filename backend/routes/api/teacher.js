@@ -50,6 +50,12 @@ router.get(
   controllers.onHrisPersonnelInfo
 );
 
+router.post(
+  "/import-hris-personnel/:id",
+  auth.required,
+  controllers.onImportHrisPersonnel
+);
+
 router.get(
     "/",
     auth.required,

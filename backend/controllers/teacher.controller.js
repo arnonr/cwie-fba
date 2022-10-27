@@ -5,7 +5,11 @@ const Service = require("../services/teacher.service"),
     departmentService = require("../services/department.service"),
     jwt = require("jsonwebtoken"),
     db = require("../models/Teacher");
-
+const {
+    ErrorBadRequest,
+    ErrorNotFound,
+    ErrorUnauthorized,
+} = require("../configs/errorMethods");
 const methods = {
     async onGetAll(req, res) {
         try {
@@ -166,12 +170,52 @@ const methods = {
                 }
                 // console.log(resultInfo);
             }
-            res.success(result);
+            res.success(saveObj);
         } catch (error) {
             res.error(error);
         }
     },
 
+    async onImportHrisPersonnel(req, res) {
+        const decoded = jwt.decode(req.headers.authorization.split(" ")[1]);
+        let user_id = decoded.user_id;
+
+        try {
+            const teacherObj = await db.findOne({
+                where: { person_key : req.params.id },
+            });
+
+            if (teacherObj) {
+                return res.error(ErrorBadRequest("Teacher already exists"));
+            }
+
+            let resultInfo = await Service.hrisPersonnelInfo({person_key:req.params.id});
+
+           /* get faculty and create if not exists */
+           const faculty = await facultyService.importFaculty({faculty_code:resultInfo.faculty_code, faculty_name:resultInfo.faculty_name, user_id:user_id});
+           let faculty_id = faculty.faculty_id;
+
+            /* get department and create if not exists */
+           const department = await departmentService.importDepartment({department_code:resultInfo.department_code, department_name:resultInfo.department_name, faculty_id:faculty_id, user_id:user_id});
+           let department_id = department.department_id;
+
+           resultInfo['person_key'] = resultInfo.person_key;
+           // resultInfo['icit_account'] = resultInfo.icit_account;
+           resultInfo['citizen_id'] = resultInfo.citizen_id;
+           resultInfo['faculty_id'] = faculty_id;
+           resultInfo['department_id'] = department_id;
+           resultInfo['hris_last_updated_at'] = resultInfo.last_updated_at;
+
+           let saveObj = null;
+           if (!teacherObj) {
+               resultInfo['created_by'] = user_id;
+               saveObj = await Service.insert(resultInfo);
+           }
+           res.success(saveObj);
+        } catch (error) {
+            res.error(error);
+        }
+    }
 };
 
 module.exports = { ...methods };
