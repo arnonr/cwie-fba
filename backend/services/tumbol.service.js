@@ -6,7 +6,8 @@ const config = require("../configs/app"),
         ErrorUnauthorized,
     } = require("../configs/errorMethods"),
     { Op } = require("sequelize");
-
+const Amphur = require("../models/Amphur");
+const Province = require("../models/Province");
 const methods = {
     scopeSearch(req, limit, offset) {
         // Where
@@ -30,7 +31,7 @@ const methods = {
             };
 
         if (req.query.amphur_id)
-            $where["province_id"] = req.query.amphur_id;
+            $where["amphur_id"] = req.query.amphur_id;
 
         if (req.query.active) $where["active"] = req.query.active;
 
@@ -70,6 +71,49 @@ const methods = {
 
         return new Promise(async (resolve, reject) => {
             try {
+                console.log(_q.query)
+                Promise.all([db.findAll(_q.query)])
+                    .then((result) => {
+                        let rows = result[0],
+                            count = rows.length;
+                        resolve({
+                            total: count,
+                            lastPage: Math.ceil(count / limit),
+                            currPage: +req.query.page || 1,
+                            rows: rows,
+                        });
+                    })
+                    .catch((error) => {
+                        reject(error);
+                    });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    },
+
+    findList(req) {
+        const limit = +(req.query.size || config.pageLimit);
+        const offset = +(limit * ((req.query.page || 1) - 1));
+        let _q = methods.scopeSearch(req, limit, offset);
+
+        _q.query["attributes"] = ['tumbol_id', 'name_th', 'postcode'];
+        _q.query["include"] = [
+            {
+                model: Amphur, as: 'amphur',
+                attributes: ['amphur_id', 'name_th'],
+                include: [
+                    {
+                        model: Province, as: 'province',
+                        attributes: ['province_id', 'name_th']
+                    }
+                ]
+            },
+        ];
+
+        return new Promise(async (resolve, reject) => {
+            try {
+                console.log(_q.query)
                 Promise.all([db.findAll(_q.query)])
                     .then((result) => {
                         let rows = result[0],

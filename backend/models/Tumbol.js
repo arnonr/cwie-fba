@@ -92,7 +92,9 @@ Tumbol.init(
 );
 
 const Amphur = require("./Amphur");
+const Province = require("./Province");
 
 Tumbol.belongsTo(Amphur, { foreignKey: "amphur_id" });
+Amphur.belongsTo(Province, { foreignKey: "province_id" ,through: 'tumbol'});
 
 module.exports = Tumbol;

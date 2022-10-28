@@ -12,6 +12,16 @@ const methods = {
         }
     },
 
+    async onGetAllList(req, res) {
+        try {
+            let result = await Service.findList(req);
+
+            res.success(result);
+        } catch (error) {
+            res.error(error);
+        }
+    },
+
     async onGetById(req, res) {
         try {
             let result = await Service.findById(req.params.id);
