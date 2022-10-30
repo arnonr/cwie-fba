@@ -4,6 +4,12 @@ const auth = require("../auth");
 const { checkPermission } = require("../accessControl");
 
 router.get(
+    "/list-tumbol",
+    auth.required,
+    controllers.onGetAllList
+);
+
+router.get(
     "/",
     auth.required,
     controllers.onGetAll
