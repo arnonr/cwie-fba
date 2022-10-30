@@ -170,7 +170,7 @@ const methods = {
                 }
                 // console.log(resultInfo);
             }
-            res.success(saveObj);
+            res.success(result);
         } catch (error) {
             res.error(error);
         }
