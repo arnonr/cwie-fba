@@ -233,7 +233,7 @@ Student.belongsTo(Tumbol, { foreignKey: "tumbol_id" });
 Student.belongsTo(Faculty, { foreignKey: "faculty_id" });
 Student.belongsTo(Department, { foreignKey: "department_id" });
 Student.belongsTo(Major, { foreignKey: "major_id" });
-Student.belongsTo(Teacher, { foreignKey: "teacher_id" });
+Student.belongsTo(Teacher, {as: 'advisor', foreignKey: "advisor_id" });
 Student.belongsTo(PrefixName, { foreignKey: "prefix_id" });
 
 module.exports = Student;
