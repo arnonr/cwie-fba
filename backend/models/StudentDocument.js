@@ -21,6 +21,11 @@ StudentDocument.init(
             allowNull: false,
             comment: "รหัสเอกสาร",
         },
+        document_name: {
+            type: DataTypes.STRING(100),
+            allowNull: true,
+            comment: "ชื่อเอกสาร",
+        },
         document_file: {
             type: DataTypes.STRING(100),
             allowNull: false,
