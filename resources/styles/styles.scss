@@ -1,0 +1,8 @@
+// Write your overrides
+@use "vuetify/styles" as * with (
+  $body-font-family: "Noto Sans Thai",
+);
+
+.header-action {
+  color: #7367F0
+}
