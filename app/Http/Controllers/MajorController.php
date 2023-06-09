@@ -58,7 +58,7 @@ class MajorController extends Controller
         }else{
             $items = $items->orderBy('id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -67,7 +67,7 @@ class MajorController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -112,5 +112,24 @@ class MajorController extends Controller
         ];
 
         return response()->json($responseData, 200);
+    }
+
+    public function import($code,$name){
+        $item = Major::where('major_code',$code)->first();
+        if(!$item){
+            $item = new Major;
+            $item->major_code = $code;
+            $item->name_th = $name;
+            $item->name_en = $name;
+            $item->created_by = 'arnonr';
+            $item->save();
+        }
+
+        // $responseData = [
+        //     'message' => 'success',
+        //     'data' =>  $item,
+        // ];
+
+        return $item;
     }
 }

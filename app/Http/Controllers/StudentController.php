@@ -19,7 +19,7 @@ class StudentController extends Controller
     const ERROR_API_FAIL = 1;
     const ERROR_INVALID_CREDENTIALS = 2;
     const ERROR_INTERNAL = 3;
-    const ERROR_CREATE_USER = 4;  
+    const ERROR_CREATE_USER = 4;
     const ERROR_UPDATE_USER = 5;
     const ERROR_NOT_FOUND_STUDENT_CODE = 6;
 
@@ -83,7 +83,7 @@ class StudentController extends Controller
             ->leftJoin('major','major.id','=','student.major_id')
             ->leftJoin('teacher','teacher.id','=','student.advisor_id');
         }
-        
+
         if($request->includeAdvisor){
             $items->addSelect(DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'));
             $items->leftJoin('teacher','teacher.id','=','student.advisor_id');;
@@ -190,7 +190,7 @@ class StudentController extends Controller
         if($request->advisor_id){
             $items->where('student.advisor_id',$request->advisor_id);
         }
-        
+
         if ($request->active) {
             $items->where('student.active',$request->active);
         }
@@ -269,7 +269,7 @@ class StudentController extends Controller
         ->leftJoin('teacher','teacher.id','=','student.advisor_id')
         ->where('student.id', $id)
         ->first();
-        
+
         return response()->json([
             'message' => 'success',
             'data' => $item,
@@ -279,13 +279,13 @@ class StudentController extends Controller
     public function add(Request $request)
     {
         $item = new Student;
-
         $item->student_code = $request->student_code;
         $item->prefix_id = $request->prefix_id;
         $item->firstname = $request->firstname;
         $item->surname = $request->surname;
         $item->citizen_id = $request->citizen_id;
         $item->faculty_id = $request->faculty_id;
+        $item->major_id = $request->major_id;
         // $item->department_id = $request->department_id;
         $item->created_by = 'arnonr';
         $item->save();
@@ -294,7 +294,7 @@ class StudentController extends Controller
             'message' => 'success',
             'data' => $item,
         ];
-        
+
         return response()->json($responseData, 200);
     }
 
@@ -319,21 +319,21 @@ class StudentController extends Controller
         }else{
             $pathTeam  = $item->team_file;
         }
-        
+
         $item->team_file = $pathTeam;
-        $item->department_id = $request->has('department_id') ? $request->department_id : $item->department_id; 
-        $item->prefix = $request->has('prefix') ? $request->prefix : $item->prefix; 
-        $item->firstname = $request->has('firstname') ? $request->firstname : $item->firstname; 
-        $item->surname = $request->has('surname') ? $request->surname : $item->surname; 
-        $item->email = $request->has('email') ? $request->email : $item->email; 
-        $item->position_type = $request->has('position_type') ? $request->position_type : $item->position_type; 
-        $item->position = $request->has('position') ? $request->position : $item->position; 
+        $item->department_id = $request->has('department_id') ? $request->department_id : $item->department_id;
+        $item->prefix = $request->has('prefix') ? $request->prefix : $item->prefix;
+        $item->firstname = $request->has('firstname') ? $request->firstname : $item->firstname;
+        $item->surname = $request->has('surname') ? $request->surname : $item->surname;
+        $item->email = $request->has('email') ? $request->email : $item->email;
+        $item->position_type = $request->has('position_type') ? $request->position_type : $item->position_type;
+        $item->position = $request->has('position') ? $request->position : $item->position;
         $item->detail =  $request->has('detail') ? $request->detail : $item->detail;
-        $item->prefix_en = $request->has('prefix_en') ? $request->prefix_en : $item->prefix_en; 
-        $item->firstname_en = $request->has('firstname_en') ? $request->firstname_en : $item->firstname_en; 
-        $item->surname_en = $request->has('surname_en') ? $request->surname_en : $item->surname_en; 
-        $item->position_type_en = $request->has('position_type_en') ? $request->position_type_en : $item->position_type_en; 
-        $item->position_en = $request->has('position_en') ? $request->position_en : $item->position_en; 
+        $item->prefix_en = $request->has('prefix_en') ? $request->prefix_en : $item->prefix_en;
+        $item->firstname_en = $request->has('firstname_en') ? $request->firstname_en : $item->firstname_en;
+        $item->surname_en = $request->has('surname_en') ? $request->surname_en : $item->surname_en;
+        $item->position_type_en = $request->has('position_type_en') ? $request->position_type_en : $item->position_type_en;
+        $item->position_en = $request->has('position_en') ? $request->position_en : $item->position_en;
         $item->detail_en = $request->has('detail_en') ? $request->detail_en : $item->detail_en;
         $item->is_publish = $request->has('is_publish') ? $request->is_publish : $item->is_publish;
         $item->updated_by = 'arnonr';
@@ -343,7 +343,7 @@ class StudentController extends Controller
             'message' => 'success',
             'data' => $item,
         ];
-        
+
         return response()->json($responseData, 200);
     }
 
@@ -358,7 +358,7 @@ class StudentController extends Controller
 
         $items = Team::where('deleted_at', null)->orderBy('level', 'asc')->get();
 
-        $i = 1; 
+        $i = 1;
         foreach($items as $it){
             $it->level = $i;
             $i++;
@@ -408,7 +408,7 @@ class StudentController extends Controller
             'message' => 'success',
             // 'data' => $item,
         ];
-        
+
         return response()->json($responseData, 200);
     }
 
@@ -417,7 +417,7 @@ class StudentController extends Controller
         $this->errorCode = self::ERROR_NONE;
 
         $access_token = 'v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu'; // <----- API - Access Token Here
-        
+
         $data = [
             'id' => $student_code,
         ];
@@ -427,7 +427,7 @@ class StudentController extends Controller
         $response = Http::timeout(50)->withToken($access_token)->post($api_url, $data);
 
         // return $response->json();
-        
+
         if($response == false){
             $this->errorCode = self::ERROR_API_FAIL;
             $this->errorMessage = 'HTTP Guzzle error';
@@ -449,8 +449,8 @@ class StudentController extends Controller
             $req->faculty_name = $json_data['FAC_NAME_THAI'];
             $req->department_code = $json_data['DEPT_CODE'];
             $req->department_name = $json_data['DEPT_NAME_THAI'];
-            $req->division_code = $json_data['DIV_CODE'];
-            $req->division_name = $json_data['DIV_NAME_THAI'];
+            $req->major_code = $json_data['DIV_CODE'];
+            $req->major_name = $json_data['DIV_NAME_THAI'];
 
             return  $req;
             // return [
@@ -476,22 +476,26 @@ class StudentController extends Controller
     {
         $message = 'Student already exists';
         $item = Student::where('student_code', $student_code)->first();
+
         if(!$item){
             $result = $this->icitAccountApiStudentInfo($student_code);
-
-            // $faculty = (new FacultyController)->import($result->faculty_code,$result->faculty_name);
+            // print_r($result);
 
             $faculty = app('App\Http\Controllers\FacultyController')->import($result->faculty_code,$result->faculty_name);
+            $major = app('App\Http\Controllers\MajorController')->import($result->major_code,$result->major_name);
 
             $result['faculty_id'] = $faculty->id;
+            $result['major_id'] = $major->id;
 
+            // var_dump($result);
+            print_r($result);
             $message = 'Updated student';
             if (!$item) {
                 $this->add($result);
                 $message = 'Inserted student';
             }
         }
-        
+
         return response()->json(['message' => $message], 200);
     }
 }

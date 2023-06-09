@@ -49,7 +49,7 @@ class FacultyController extends Controller
         }else{
             $items = $items->orderBy('id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -58,7 +58,7 @@ class FacultyController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -103,7 +103,7 @@ class FacultyController extends Controller
         return response()->json($responseData, 200);
     }
 
-    public function  import($code,$name){
+    public function import($code,$name){
         $item = Faculty::where('faculty_code',$code)->first();
         if(!$item){
             $item = new Faculty;
@@ -120,6 +120,5 @@ class FacultyController extends Controller
         // ];
 
         return $item;
-
     }
 }

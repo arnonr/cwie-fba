@@ -4,35 +4,35 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
-// 
+//
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\AmphurController;
 use App\Http\Controllers\TumbolController;
-// 
+//
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\MajorController;
-// 
+//
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\SemesterController;
-// 
+//
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\MajorHeadController;
-// 
+//
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormStatusController;
 use App\Http\Controllers\RejectLogController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\VisitImageController;
-// 
+//
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NewsCategoryController;
 use App\Http\Controllers\PrefixNameController;
-// 
+//
 use App\Http\Controllers\FroalaController;
 
 
@@ -92,7 +92,7 @@ Route::group(['prefix' => 'tumbol'], function () {
 
 
 Route::group(['prefix' => 'teacher'], function () {
-  
+
   Route::get('/hris-find-personnel', [TeacherController::class, 'getHrisPersonel']);
   Route::get('/{id}', [TeacherController::class, 'get']);
   Route::get('/', [TeacherController::class, 'getAll']);
@@ -144,11 +144,13 @@ Route::group(['prefix' => 'semester'], function () {
 });
 
 Route::group(['prefix' => 'student'], function () {
+  Route::post('/import/{id}', [StudentController::class, 'import']);
   Route::get('/{id}', [StudentController::class, 'get']);
   Route::get('/', [StudentController::class, 'getAll']);
   Route::post('/', [StudentController::class, 'add']);
   Route::put('/{id}', [StudentController::class, 'edit']);
   Route::delete('/{id}', [StudentController::class, 'delete']);
+
 });
 
 // Route::group(['prefix' => ''], function () {

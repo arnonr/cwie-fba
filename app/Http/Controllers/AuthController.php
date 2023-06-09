@@ -30,15 +30,15 @@ class AuthController extends Controller
             'password' => 'required|string',
             'remember_me' => 'boolean'
         ]);
-        
+
         $icitAccount = $this->icitAccountApi($request->username, $request->password);
-        
+
         if(($this->errorCode == self::ERROR_NONE) || ($request->password == '2023@MOU')){
-            
+
             $credentials = [
                 'username' => $request->username,
                 'password' => $request->password,
-            ]; 
+            ];
 
             if((!Auth::attempt($credentials)) && ($request->password != '2023@MOU'))
             return response()->json([
@@ -88,7 +88,7 @@ class AuthController extends Controller
     public function icitAccountApi($username, $password)
     {
         $access_token = 'v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu'; // <----- API - Access Token Here
-        // 
+        //
         $data = [
             'scopes' => "personel,student,exchange_student,alumni",  // <----- Scopes for search account type
             'username' => $username, // <----- Username for authen
@@ -132,14 +132,14 @@ class AuthController extends Controller
                       //   )
                       // );
                     // }
-                    
+
                     /* เพิ่มข้อมูลนักศึกษาเข้าตาราง Student */
                     $student_code = substr($username, 1);
                     $result = (new StudentController)->import($student_code);
                 }
 
                 $userDB = User::where('username', $json_data['userInfo']['username'])->first();
-                
+
                 $teacherDB = null;
                 // New User
                 if(!$userDB){
@@ -149,7 +149,7 @@ class AuthController extends Controller
                         $create_account_type = 1; //Student
                     }else{
                         $teacherDB = Teacher::where('citizen_id', $citizen_id)->first();
-        
+
                         if (!$teacherDB) {
                             $this->errorCode = self::ERROR_INVALID_CREDENTIALS;
                             $this->errorMessage = "ไม่มีสิทธิ์เข้าใช้งาน กรุณาติดต่องานสหกิจศึกษา คณะบริหารธุรกิจ";
@@ -169,14 +169,14 @@ class AuthController extends Controller
                         $userDB->account_type = $create_account_type;
                         $userDB->password = bcrypt($password);
                         $userDB->save();
-          
+
                         /* มีข้อมูลอาจารย์ในตาราง Teacher และยังไม่มี user_id */
                         if($teacherDB &&  $teacherDB->user_id === null){
                           /* ยังไม่มี user_id */
                           $teacherDB->user_id = $userDB->id;
                           $teacherDB->save();
                         }
-          
+
                       }
 
                 }else{
@@ -191,7 +191,7 @@ class AuthController extends Controller
                 $this->errorMessage = 'Unable to Authenticate';
             }
         }
-        
+
         return $this->errorCode;
 
     }
