@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Student;
+use App\Http\Controllers\FacultyController;
 use Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -25,110 +26,179 @@ class StudentController extends Controller
     public $errorCode;
     public $errorMessage;
 
-    protected $uploadUrl = 'http://143.198.208.110:8115/storage/';
 
     public function getAll(Request $request)
     {
-        if(in_array($_SERVER['HTTP_HOST'], whitelist)){
-            $this->uploadUrl = 'http://localhost:8115/storage/';
+        $items = Student::select(
+            'student.id as id',
+            'student.student_code as student_code',
+            'student.prefix_id as prefix_id',
+            'student.firstname as firstname',
+            'student.surname as surname',
+            'student.citizen_id as citizen_id',
+            'student.address as address',
+            'student.province_id as province_id',
+            'student.amphur_id as amphur_id',
+            'student.tumbol_id as tumbol_id',
+            'student.tel as tel',
+            'student.email as email',
+            'student.faculty_id as faculty_id',
+            'student.department_id as department_id',
+            'student.major_id as major_id',
+            'student.class_year as class_year',
+            'student.class_room as class_room',
+            'student.advisor_id as advisor_id',
+            'student.gpa as gpa',
+            'student.contact1_name as contact1_name',
+            'student.contact1_relation as contact1_relation',
+            'student.contact1_tel as contact1_tel',
+            'student.contact2_name as contact2_name',
+            'student.contact2_relation as contact2_relation',
+            'student.contact2_tel as contact2_tel',
+            'student.blood_group as blood_group',
+            'student.congenital_disease as congenital_disease',
+            'student.drug_allergy as drug_allergy',
+            'student.emergency_tel as emergency_tel',
+            'student.height as height',
+            'student.weight as weight',
+            'student.active as active',
+        )
+        ->where('student.deleted_at', null);
+
+        // Include
+        if($request->includeAll){
+
+            $items->addSelect('province.name_th as province_name',
+            'amphur.name_th as amphur_name',
+            'tumbol.name_th as tumbol_name',
+            'faculty.name_th as faculty_name',
+            'department.name_th as department_name',
+            'major.name_th as major_name',
+            DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'));
+            $items->leftJoin('province','province.province_id','=','student.province_id')
+            ->leftJoin('amphur','amphur.amphur_id','=','student.amphur_id')
+            ->leftJoin('tumbol','tumbol.tumbol_id','=','student.tumbol_id')
+            ->leftJoin('faculty','faculty.id','=','student.faculty_id')
+            ->leftJoin('department','department.id','=','student.department_id')
+            ->leftJoin('major','major.id','=','student.major_id')
+            ->leftJoin('teacher','teacher.id','=','student.advisor_id');
+        }
+        
+        if($request->includeAdvisor){
+            $items->addSelect(DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'));
+            $items->leftJoin('teacher','teacher.id','=','student.advisor_id');;
         }
 
-        $items = Team::select(
-            'team.id as id',
-            'team.department_id as department_id',
-            'team.prefix as prefix',
-            'team.firstname as firstname',
-            'team.surname as surname',
-            'team.email as email',
-            'team.position_type as position_type',
-            'team.position as position',
-            'team.detail as detail',
-            DB::raw("(CASE WHEN team_file = NULL THEN 'http://localhost:8115/storage/team/scg.png'
-            ELSE CONCAT('".$this->uploadUrl."',team_file) END) AS team_file"),
-            'team.prefix_en as prefix_en',
-            'team.firstname_en as firstname_en',
-            'team.surname_en as surname_en',
-            'team.position_type_en as position_type_en',
-            'team.position_en as position_en',
-            'team.detail_en as detail_en',
-            'team.level as level',
-            'team.is_publish as is_publish',
-            'team.deleted_at as delete_at',
-            'team.created_at as created_at',
-            'team.created_by as created_by',
-            'team.updated_at as updated_at',
-            'team.updated_by as updated_by',
-            'department.title as department_name',
-        )
-        ->join('department','department.id','=','team.department_id')
-        ->where('team.deleted_at', null);
+        if($request->includeFaculty){
+            $items->addSelect('faculty.name_th as faculty_name');
+            $items->leftJoin('faculty','faculty.id','=','student.faculty_id');;
+        }
+
+        if($request->includeDepartment){
+            $items->addSelect('department.name_th as department_name');
+            $items->leftJoin('department','department.id','=','student.department_id');;
+        }
+
+        if($request->includeMajor){
+            $items->addSelect('major.name_th as major_name');
+            $items->leftJoin('major','major.id','=','student.major_id');;
+        }
+
+        if($request->includeProvince){
+            $items->addSelect('province.name_th as province_name');
+            $items->leftJoin('province','province.province_id','=','student.province_id');;
+        }
+
+        if($request->includeAmphur){
+            $items->addSelect('amphur.name_th as amphur_name');
+            $items->leftJoin('amphur','amphur.amphur_id','=','student.amphur_id');;
+        }
+
+        if($request->includeTumbol){
+            $items->addSelect('tumbol.name_th as tumbol_name');
+            $items->leftJoin('tumbol','tumbol.tumbol_id','=','student.tumbol_id');;
+        }
+
+        if($request->includeAdvisor){
+            $items->addSelect(DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'));
+            $items->leftJoin('teacher','teacher.id','=','student.advisor_id');;
+        }
+
 
         if ($request->id) {
-            $items->where('team.id',$request->id);
+            $items->where('student.id',$request->id);
         }
 
-        if ($request->department_id) {
-            $items->where('team.department_id',$request->department_id);
+        if ($request->student_code) {
+            $items->where('student.student_code',$request->student_code);
         }
 
-        if ($request->prefix) {
-            $items->where('team.prefix','LIKE',"%".$request->prefix."%");
+        if ($request->prefix_id) {
+            $items->where('student.prefix_id',$request->prefix_id);
         }
 
         if ($request->firstname) {
-            $items->where('team.firstname','LIKE',"%".$request->firstname."%");
+            $items->where('student.firstname','LIKE',"%".$request->firstname."%");
         }
 
         if ($request->surname) {
-            $items->where('team.surname','LIKE',"%".$request->surname."%");
+            $items->where('student.surname','LIKE',"%".$request->surname."%");
         }
 
         if ($request->email) {
-            $items->where('team.email','LIKE',"%".$request->email."%");
+            $items->where('student.email','LIKE',"%".$request->email."%");
         }
 
-        if ($request->position_type) {
-            $items->where('team.position_type','LIKE',"%".$request->position_type."%");
+        if ($request->citizen_id) {
+            $items->where('student.citizen_id','LIKE',"%".$request->citizen_id."%");
         }
 
-        if ($request->position) {
-            $items->where('team.position','LIKE',"%".$request->position."%");
+        if ($request->province_id) {
+            $items->where('student.province_id',$request->province_id);
         }
 
-        // 
-
-        if ($request->prefix_en) {
-            $items->where('team.prefix_en','LIKE',"%".$request->prefix_en."%");
+        if ($request->amphur_id) {
+            $items->where('student.amphur_id',$request->amphur_id);
         }
 
-        if ($request->firstname_en) {
-            $items->where('team.firstname_en','LIKE',"%".$request->firstname_en."%");
+        if ($request->tumbol_id) {
+            $items->where('student.tumbol_id',$request->tumbolid);
         }
 
-        if ($request->surname_en) {
-            $items->where('team.surname_en','LIKE',"%".$request->surname_en."%");
+        if ($request->faculty_id) {
+            $items->where('student.faculty_id',$request->faculty_id);
         }
 
-        if ($request->position_type_en) {
-            $items->where('team.position_type_en','LIKE',"%".$request->position_type_en."%");
+        if ($request->department_id) {
+            $items->where('student.department_id',$request->department_id);
         }
 
-        if ($request->position_en) {
-            $items->where('team.position_en','LIKE',"%".$request->position_en."%");
+        if ($request->major_id) {
+            $items->where('student.major_id',$request->major_id);
         }
 
-        if ($request->level) {
-            $items->where('level',$request->level);
+        if($request->class_year){
+            $items->where('student.class_year',$request->class_year);
+
+        }
+
+        if($request->class_room){
+            $items->where('student.class_room',$request->class_room);
+
+        }
+
+        if($request->advisor_id){
+            $items->where('student.advisor_id',$request->advisor_id);
         }
         
-        if ($request->is_publish) {
-            $items->where('team.is_publish',$request->is_publish);
+        if ($request->active) {
+            $items->where('student.active',$request->active);
         }
 
         if($request->orderBy){
             $items = $items->orderBy($request->orderBy, $request->order);
         }else{
-            $items = $items->orderBy('level', 'asc');
+            $items = $items->orderBy('id', 'asc');
         }
 
         $count = $items->count();
@@ -150,39 +220,54 @@ class StudentController extends Controller
 
     public function get($id)
     {
-        if(in_array($_SERVER['HTTP_HOST'], whitelist)){
-            $this->uploadUrl = 'http://localhost:8115/storage/';
-        }
-
-        $item = Team::select(
-            'team.id as id',
-            'team.department_id as department_id',
-            'team.prefix as prefix',
-            'team.firstname as firstname',
-            'team.surname as surname',
-            'team.email as email',
-            'team.position_type as position_type',
-            'team.position as position',
-            'team.detail as detail',
-            DB::raw("(CASE WHEN team_file = NULL THEN 'http://localhost:8115/storage/team/scg.png'
-            ELSE CONCAT('".$this->uploadUrl."',team_file) END) AS team_file"),
-            'team.prefix_en as prefix_en',
-            'team.firstname_en as firstname_en',
-            'team.surname_en as surname_en',
-            'team.position_type_en as position_type_en',
-            'team.position_en as position_en',
-            'team.detail_en as detail_en',
-            'team.level as level',
-            'team.is_publish as is_publish',
-            'team.deleted_at as delete_at',
-            'team.created_at as created_at',
-            'team.created_by as created_by',
-            'team.updated_at as updated_at',
-            'team.updated_by as updated_by',
-            'department.title as department_name',
-        )
-        ->join('department','department.id','=','team.department_id')
-        ->where('team.id', $id)
+        $item = Student::select(
+            'student.id as id',
+            'student.student_code as student_code',
+            'student.prefix_id as prefix_id',
+            'student.firstname as firstname',
+            'student.surname as surname',
+            'student.citizen_id as citizen_id',
+            'student.address as address',
+            'student.province_id as province_id',
+            'student.amphur_id as amphur_id',
+            'student.tumbol_id as tumbol_id',
+            'student.tel as tel',
+            'student.email as email',
+            'student.faculty_id as faculty_id',
+            'student.department_id as department_id',
+            'student.major_id as major_id',
+            'student.class_year as class_year',
+            'student.class_room as class_room',
+            'student.advisor_id as advisor_id',
+            'student.gpa as gpa',
+            'student.contact1_name as contact1_name',
+            'student.contact1_relation as contact1_relation',
+            'student.contact1_tel as contact1_tel',
+            'student.contact2_name as contact2_name',
+            'student.contact2_relation as contact2_relation',
+            'student.contact2_tel as contact2_tel',
+            'student.blood_group as blood_group',
+            'student.congenital_disease as congenital_disease',
+            'student.drug_allergy as drug_allergy',
+            'student.emergency_tel as emergency_tel',
+            'student.height as height',
+            'student.weight as weight',
+            'student.active as active',
+            'province.name_th as province_name',
+            'amphur.name_th as amphur_name',
+            'tumbol.name_th as tumbol_name',
+            'faculty.name_th as faculty_name',
+            'department.name_th as department_name',
+            'major.name_th as major_name',
+            DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'))
+        ->leftJoin('province','province.province_id','=','student.province_id')
+        ->leftJoin('amphur','amphur.amphur_id','=','student.amphur_id')
+        ->leftJoin('tumbol','tumbol.tumbol_id','=','student.tumbol_id')
+        ->leftJoin('faculty','faculty.id','=','student.faculty_id')
+        ->leftJoin('department','department.id','=','student.department_id')
+        ->leftJoin('major','major.id','=','student.major_id')
+        ->leftJoin('teacher','teacher.id','=','student.advisor_id')
+        ->where('student.id', $id)
         ->first();
         
         return response()->json([
@@ -334,7 +419,7 @@ class StudentController extends Controller
         $access_token = 'v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu'; // <----- API - Access Token Here
         
         $data = [
-            'id' => student_code,
+            'id' => $student_code,
         ];
 
         $api_url = 'https://api.account.kmutnb.ac.th/api/account-api/student-info'; // <----- API URL
@@ -394,17 +479,19 @@ class StudentController extends Controller
         if(!$item){
             $result = $this->icitAccountApiStudentInfo($student_code);
 
-            $faculty = (new FacultyController)->import(result.faculty_code,result.faculty_name);
+            // $faculty = (new FacultyController)->import($result->faculty_code,$result->faculty_name);
+
+            $faculty = app('App\Http\Controllers\FacultyController')->import($result->faculty_code,$result->faculty_name);
 
             $result['faculty_id'] = $faculty->id;
 
             $message = 'Updated student';
             if (!$item) {
-                $this->add($req);
+                $this->add($result);
                 $message = 'Inserted student';
             }
         }
         
-        return response()->json(['message' => message], 200);
+        return response()->json(['message' => $message], 200);
     }
 }

@@ -179,10 +179,11 @@ class CompanyController extends Controller
         
         $pathNamecard = null;
         if(($request->namecard_file != "") && ($request->namecard_file != 'null') && ($request->namecard_file != 'undefined')){
+
             $fileNamecard = 'namecard-'.rand(10,100).'-'.$request->file('namecard_file')->getClientOriginalName();
             $pathNamecard = '/company/namecard/'.$fileNamecard;
             Storage::disk('public')->put($pathNamecard, file_get_contents($request->namecard_file));
-            $request->namecard_file = $pathNamecard;
+            // $request->namecard_file = $pathNamecard;
         }
 
         $pathLocation = null;
@@ -190,21 +191,21 @@ class CompanyController extends Controller
             $fileLocation = 'location-'.rand(10,100).'-'.$request->file('location_file')->getClientOriginalName();
             $pathLocation = '/company/location/'.$fileLocation;
             Storage::disk('public')->put($pathLocation, file_get_contents($request->location_file));
-            $request->location_file = $pathLocation;
+            // $request->location_file = $pathLocation;
         }
 
-        $data = $request->all();
+        // $data = $request->all();
 
-        foreach ($data as $key => $value) {
-            if($value == 'null'){
-                $data[$key] = null;
-            }
-        }
+        // foreach ($data as $key => $value) {
+        //     if($value == 'null'){
+        //         $data[$key] = null;
+        //     }
+        // }
     
         $item = new Company;
-        $item->name_th = $request->has('name_th') ? $request->name_th : $item->name_th;
-        $item->name_en = $request->has('name_en') ? $request->name_en : $item->name_en;
-        $item->tel = $request->has('tel') ? $request->tel : $item->tel;
+        $item->name_th = $request->has('name_th') ? $request->name_th : '';
+        $item->name_en = $request->has('name_en') ? $request->name_en : '';
+        $item->tel = $request->has('tel') ? $request->tel : '';
         $item->fax = $request->has('fax') ? $request->fax : $item->fax;
         $item->email = $request->has('email') ? $request->email : $item->email;
         $item->website = $request->has('website') ? $request->website : $item->website;
@@ -256,7 +257,6 @@ class CompanyController extends Controller
         }else{
             $pathLocation  = $item->location_file;
         }
-
         
         $item->name_th = $request->has('name_th') ? $request->name_th : $item->name_th;
         $item->name_en = $request->has('name_en') ? $request->name_en : $item->name_en;

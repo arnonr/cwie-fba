@@ -125,13 +125,13 @@ class AuthController extends Controller
 
                 if ($account_type == "alumni" || $account_type == "student") {
                     /* ตรวจสอบคณะจากรหัสนักศึกษา  */
-                    if (substr(username, 3, 5) != "14"){
+                    // if (substr($username, 3, 5) != "14"){
                       // reject(
                       //   ErrorUnauthorized(
                       //     "ใช้งานได้เฉพาะนักศึกษาคณะบริหารธุรกิจเท่านั้น"
                       //   )
                       // );
-                    }
+                    // }
                     
                     /* เพิ่มข้อมูลนักศึกษาเข้าตาราง Student */
                     $student_code = substr($username, 1);
@@ -139,7 +139,8 @@ class AuthController extends Controller
                 }
 
                 $userDB = User::where('username', $json_data['userInfo']['username'])->first();
-        
+                
+                $teacherDB = null;
                 // New User
                 if(!$userDB){
                     $create_account = false;
@@ -162,11 +163,10 @@ class AuthController extends Controller
                     if ($create_account == true) {
                         $userDB = new User;
                         $userDB->username = $username;
-                        $userDB->name = $displayname;
+                        $userDB->name = $display_name;
                         $userDB->email = $email;
-                        $userDB->pid = $pid;
-                        $userDB->status = 2;
-                        $userDB->account_type = create_account_type;
+                        $userDB->citizen_id = $citizen_id;
+                        $userDB->account_type = $create_account_type;
                         $userDB->password = bcrypt($password);
                         $userDB->save();
           

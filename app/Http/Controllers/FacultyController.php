@@ -102,4 +102,24 @@ class FacultyController extends Controller
 
         return response()->json($responseData, 200);
     }
+
+    public function  import($code,$name){
+        $item = Faculty::where('faculty_code',$code)->first();
+        if(!$item){
+            $item = new Faculty;
+            $item->faculty_code = $code;
+            $item->name_th = $name;
+            $item->name_en = $name;
+            $item->created_by = 'arnonr';
+            $item->save();
+        }
+
+        // $responseData = [
+        //     'message' => 'success',
+        //     'data' =>  $item,
+        // ];
+
+        return $item;
+
+    }
 }

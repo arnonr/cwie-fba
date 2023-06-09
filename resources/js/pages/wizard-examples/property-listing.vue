@@ -1,46 +1,46 @@
 <script setup>
-import PersonalDetails from '@/views/wizard-examples/property-listing/PersonalDetails.vue'
-import PriceDetails from '@/views/wizard-examples/property-listing/PriceDetails.vue'
-import PropertyArea from '@/views/wizard-examples/property-listing/PropertyArea.vue'
-import PropertyDetails from '@/views/wizard-examples/property-listing/PropertyDetails.vue'
-import PropertyFeatures from '@/views/wizard-examples/property-listing/PropertyFeatures.vue'
+import PersonalDetails from "@/views/wizard-examples/property-listing/PersonalDetails.vue";
+import PriceDetails from "@/views/wizard-examples/property-listing/PriceDetails.vue";
+import PropertyArea from "@/views/wizard-examples/property-listing/PropertyArea.vue";
+import PropertyDetails from "@/views/wizard-examples/property-listing/PropertyDetails.vue";
+import PropertyFeatures from "@/views/wizard-examples/property-listing/PropertyFeatures.vue";
 
 const propertyListingSteps = [
   {
-    title: 'Personal Details',
-    subtitle: 'Your Name/Email',
-    icon: 'tabler-users',
+    title: "Personal Details",
+    subtitle: "Your Name/Email",
+    icon: "tabler-users",
   },
   {
-    title: 'Property Details',
-    subtitle: 'Property Type',
-    icon: 'tabler-home',
+    title: "Property Details",
+    subtitle: "Property Type",
+    icon: "tabler-home",
   },
   {
-    title: 'Property Features',
-    subtitle: 'Bedrooms/Floor No',
-    icon: 'tabler-bookmarks',
+    title: "Property Features",
+    subtitle: "Bedrooms/Floor No",
+    icon: "tabler-bookmarks",
   },
   {
-    title: 'Property Area',
-    subtitle: 'covered Area',
-    icon: 'tabler-map-pin',
+    title: "Property Area",
+    subtitle: "covered Area",
+    icon: "tabler-map-pin",
   },
   {
-    title: 'Price Details',
-    subtitle: 'Expected Price',
-    icon: 'tabler-currency-dollar',
+    title: "Price Details",
+    subtitle: "Expected Price",
+    icon: "tabler-currency-dollar",
   },
-]
+];
 
 const propertyListingData = ref({
   personalDetails: {
-    userType: 'builder',
-    firstName: '',
-    lastName: '',
-    username: '',
-    password: '',
-    email: '',
+    userType: "builder",
+    firstName: "",
+    lastName: "",
+    username: "",
+    password: "",
+    email: "",
     contact: null,
   },
   priceDetails: {
@@ -50,50 +50,46 @@ const propertyListingData = ref({
     maintenancePeriod: null,
     bookingAmount: null,
     otherAmount: null,
-    priceDisplayType: 'Negotiable',
-    priceIncludes: ['Car Parking'],
+    priceDisplayType: "Negotiable",
+    priceIncludes: ["Car Parking"],
   },
   propertyFeatures: {
-    bedroomCount: '',
-    floorNo: '',
-    bathroomCount: '',
+    bedroomCount: "",
+    floorNo: "",
+    bathroomCount: "",
     isCommonArea: true,
     furnishedStatus: null,
-    furnishingDetails: [
-      'AC',
-      'TV',
-      'Fridge',
-    ],
-    isCommonArea1: 'true',
-    isCommonArea2: 'false',
+    furnishingDetails: ["AC", "TV", "Fridge"],
+    isCommonArea1: "true",
+    isCommonArea2: "false",
   },
   propertyArea: {
     totalArea: null,
     carpetArea: null,
     plotArea: null,
     availableFrom: null,
-    possessionStatus: 'Under Construciton',
-    transactionType: 'New Property',
-    isOnMainRoad: 'No',
-    isGatedColony: 'No',
+    possessionStatus: "Under Construciton",
+    transactionType: "New Property",
+    isOnMainRoad: "No",
+    isGatedColony: "No",
   },
   propertyDetails: {
-    propertyDealType: 'sell',
+    propertyDealType: "sell",
     propertyType: null,
     zipCode: null,
     country: null,
-    state: '',
-    city: '',
-    landmark: '',
-    address: '',
+    state: "",
+    city: "",
+    landmark: "",
+    address: "",
   },
-})
+});
 
-const currentStep = ref(0)
+const currentStep = ref(0);
 
 const onSubmit = () => {
-  console.log('propertyListingData :>> ', propertyListingData.value)
-}
+  console.log("propertyListingData :>> ", propertyListingData.value);
+};
 </script>
 
 <template>
@@ -108,40 +104,44 @@ const onSubmit = () => {
           <AppStepper
             v-model:current-step="currentStep"
             :items="propertyListingSteps"
-            direction="vertical"
+            direction="horizontal"
             icon-size="24"
             class="stepper-icon-step-bg"
           />
         </VCardText>
       </VCol>
 
-      <VCol
-        cols="12"
-        md="8"
-      >
+      <VCol cols="12" md="8">
         <VCardText>
-          <VWindow
-            v-model="currentStep"
-            class="disable-tab-transition"
-          >
+          <VWindow v-model="currentStep" class="disable-tab-transition">
             <VWindowItem>
-              <PersonalDetails v-model:form-data="propertyListingData.personalDetails" />
+              <PersonalDetails
+                v-model:form-data="propertyListingData.personalDetails"
+              />
             </VWindowItem>
 
             <VWindowItem>
-              <PropertyDetails v-model:form-data="propertyListingData.propertyDetails" />
+              <PropertyDetails
+                v-model:form-data="propertyListingData.propertyDetails"
+              />
             </VWindowItem>
 
             <VWindowItem>
-              <PropertyFeatures v-model:form-data="propertyListingData.propertyFeatures" />
+              <PropertyFeatures
+                v-model:form-data="propertyListingData.propertyFeatures"
+              />
             </VWindowItem>
 
             <VWindowItem>
-              <PropertyArea v-model:form-data="propertyListingData.propertyArea" />
+              <PropertyArea
+                v-model:form-data="propertyListingData.propertyArea"
+              />
             </VWindowItem>
 
             <VWindowItem>
-              <PriceDetails v-model:form-data="propertyListingData.priceDetails" />
+              <PriceDetails
+                v-model:form-data="propertyListingData.priceDetails"
+              />
             </VWindowItem>
           </VWindow>
 
@@ -152,11 +152,7 @@ const onSubmit = () => {
               :disabled="currentStep === 0"
               @click="currentStep--"
             >
-              <VIcon
-                icon="tabler-arrow-left"
-                start
-                class="flip-in-rtl"
-              />
+              <VIcon icon="tabler-arrow-left" start class="flip-in-rtl" />
               Previous
             </VBtn>
 
@@ -169,17 +165,10 @@ const onSubmit = () => {
               submit
             </VBtn>
 
-            <VBtn
-              v-else
-              @click="currentStep++"
-            >
+            <VBtn v-else @click="currentStep++">
               Next
 
-              <VIcon
-                icon="tabler-arrow-right"
-                end
-                class="flip-in-rtl"
-              />
+              <VIcon icon="tabler-arrow-right" end class="flip-in-rtl" />
             </VBtn>
           </div>
         </VCardText>

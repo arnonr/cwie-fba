@@ -127,7 +127,6 @@ Route::group(['prefix' => 'major-head'], function () {
   Route::delete('/{id}', [MajorHeadController::class, 'delete']);
 });
 
-
 Route::group(['prefix' => 'company'], function () {
   Route::get('/{id}', [CompanyController::class, 'get']);
   Route::get('/', [CompanyController::class, 'getAll']);
@@ -144,7 +143,13 @@ Route::group(['prefix' => 'semester'], function () {
   Route::delete('/{id}', [SemesterController::class, 'delete']);
 });
 
-
+Route::group(['prefix' => 'student'], function () {
+  Route::get('/{id}', [StudentController::class, 'get']);
+  Route::get('/', [StudentController::class, 'getAll']);
+  Route::post('/', [StudentController::class, 'add']);
+  Route::put('/{id}', [StudentController::class, 'edit']);
+  Route::delete('/{id}', [StudentController::class, 'delete']);
+});
 
 // Route::group(['prefix' => ''], function () {
 //   Route::put('/level/{id}', [Controller::class, 'editLevel']);
