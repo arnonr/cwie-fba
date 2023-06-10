@@ -302,40 +302,44 @@ class StudentController extends Controller
     {
         $request->validate([
             'id as required',
-            'department_id as required',
-            'prefix as required',
-            'firstname as required',
-            'surname as required',
         ]);
 
         $id = $request->id;
-        $item = Team::where('id', $id)->first();
+        $item = Student::where('id', $id)->first();
 
-        $pathTeam = null;
-        if(($request->team_file != "") && ($request->team_file != 'null') && ($request->team_file != 'undefined')){
-            $fileNameTeam = 'team-'.rand(10,100).'-'.$request->file('team_file')->getClientOriginalName();
-            $pathTeam = '/team/'.$fileNameTeam;
-            Storage::disk('public')->put($pathTeam, file_get_contents($request->team_file));
-        }else{
-            $pathTeam  = $item->team_file;
-        }
+        $item->student_code = $request->has('student_code') ? $request->student_code : $item->student_code;
 
-        $item->team_file = $pathTeam;
-        $item->department_id = $request->has('department_id') ? $request->department_id : $item->department_id;
-        $item->prefix = $request->has('prefix') ? $request->prefix : $item->prefix;
+        $item->prefix_id = $request->has('prefix_id') ? $request->prefix_id : $item->prefix_id;
         $item->firstname = $request->has('firstname') ? $request->firstname : $item->firstname;
         $item->surname = $request->has('surname') ? $request->surname : $item->surname;
+        $item->citizen_id = $request->has('citizen_id') ? $request->citizen_id : $item->citizen_id;
+        $item->address = $request->has('address') ? $request->address : $item->address;
+        $item->province_id = $request->has('province_id') ? $request->province_id : $item->province_id;
+        $item->amphur_id = $request->has('amphur_id') ? $request->amphur_id : $item->amphur_id;
+        $item->tumbol_id = $request->has('tumbol_id') ? $request->tumbol_id : $item->tumbol_id;
+        $item->tel = $request->has('tel') ? $request->tel : $item->tel;
         $item->email = $request->has('email') ? $request->email : $item->email;
-        $item->position_type = $request->has('position_type') ? $request->position_type : $item->position_type;
-        $item->position = $request->has('position') ? $request->position : $item->position;
-        $item->detail =  $request->has('detail') ? $request->detail : $item->detail;
-        $item->prefix_en = $request->has('prefix_en') ? $request->prefix_en : $item->prefix_en;
-        $item->firstname_en = $request->has('firstname_en') ? $request->firstname_en : $item->firstname_en;
-        $item->surname_en = $request->has('surname_en') ? $request->surname_en : $item->surname_en;
-        $item->position_type_en = $request->has('position_type_en') ? $request->position_type_en : $item->position_type_en;
-        $item->position_en = $request->has('position_en') ? $request->position_en : $item->position_en;
-        $item->detail_en = $request->has('detail_en') ? $request->detail_en : $item->detail_en;
-        $item->is_publish = $request->has('is_publish') ? $request->is_publish : $item->is_publish;
+        $item->faculty_id = $request->has('faculty_id') ? $request->faculty_id : $item->faculty_id;
+        $item->department_id = $request->has('department_id') ? $request->department_id : $item->department_id;
+        $item->major_id = $request->has('major_id') ? $request->major_id : $item->major_id;
+        $item->class_year = $request->has('class_year') ? $request->class_year: $item->class_year;
+        $item->class_room = $request->has('class_room') ? $request->class_room : $item->class_room;
+        $item->advisor_id = $request->has('advisor_id') ? $request->advisor_id : $item->advisor_id;
+        $item->gpa = $request->has('gpa') ? $request->gpa : $item->gpa;
+        $item->contact1_name = $request->has('contact1_name') ? $request->contact1_name : $item->contact1_name;
+        $item->contact1_relation = $request->has('contact1_relation') ? $request->contact1_relation : $item->contact1_relation;
+        $item->contact1_tel = $request->has('contact1_tel') ? $request->contact1_tel : $item->contact1_tel;
+        $item->contact2_name = $request->has('contact2_name') ? $request->contact2_name : $item->contact2_name;
+        $item->contact2_relation = $request->has('contact2_relation') ? $request->contact2_relation : $item->contact2_relation;
+        $item->contact2_tel = $request->has('contact2_tel') ? $request->contact2_tel : $item->contact2_tel;
+        $item->blood_group = $request->has('blood_group') ? $request->blood_group : $item->blood_group;
+        $item->congenital_disease = $request->has('congenital_disease') ? $request->congenital_disease : $item->congenital_disease;
+        $item->	drug_allergy = $request->has('drug_allergy') ? $request->drug_allergy : $item->drug_allergy;
+        $item->emergency_tel = $request->has('emergency_tel') ? $request->emergency_tel : $item->emergency_tel;
+        $item->height = $request->has('height') ? $request->height : $item->height;
+        $item->weight = $request->has('weight') ? $request->weight: $item->weight;
+        $item->active = $request->has('active') ? $request->active : $item->active;
+
         $item->updated_by = 'arnonr';
         $item->save();
 
@@ -367,46 +371,6 @@ class StudentController extends Controller
 
         $responseData = [
             'message' => 'success'
-        ];
-
-        return response()->json($responseData, 200);
-    }
-
-    public function editLevel($id, Request $request)
-    {
-        $request->validate([
-            'id as required',
-            'type as required',
-        ]);
-
-        $id = $request->id;
-        $type = $request->type;
-
-        $item = Team::where('id', $id)->first();
-
-        $item1 = null;
-        if($type == 'IC'){
-            $item1 = Team::where('level', $item->level + 1)->first();
-        }
-
-        if($type == 'DC'){
-            $item1 = Team::where('level', $item->level - 1)->first();
-        }
-
-        if($item1 != null){
-            $level = $item1->level;
-            $level1 = $item->level;
-
-            $item->level = $level;
-            $item->save();
-
-            $item1->level = $level1;
-            $item1->save();
-        }
-
-        $responseData = [
-            'message' => 'success',
-            // 'data' => $item,
         ];
 
         return response()->json($responseData, 200);

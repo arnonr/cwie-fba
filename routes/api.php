@@ -153,6 +153,22 @@ Route::group(['prefix' => 'student'], function () {
 
 });
 
+Route::group(['prefix' => 'document-type'], function () {
+  Route::get('/{id}', [DocumentTypeController::class, 'get']);
+  Route::get('/', [DocumentTypeController::class, 'getAll']);
+  Route::post('/', [DocumentTypeController::class, 'add']);
+  Route::put('/{id}', [DocumentTypeController::class, 'edit']);
+  Route::delete('/{id}', [DocumentTypeController::class, 'delete']);
+});
+
+Route::group(['prefix' => 'student-document'], function () {
+  Route::get('/{id}', [StudentDocumentController::class, 'get']);
+  Route::get('/', [StudentDocumentController::class, 'getAll']);
+  Route::post('/', [StudentDocumentController::class, 'add']);
+  Route::put('/{id}', [StudentDocumentController::class, 'edit']);
+  Route::delete('/{id}', [StudentDocumentController::class, 'delete']);
+});
+
 // Route::group(['prefix' => ''], function () {
 //   Route::put('/level/{id}', [Controller::class, 'editLevel']);
 //   Route::get('/{id}', [Controller::class, 'get']);

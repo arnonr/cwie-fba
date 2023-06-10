@@ -81,5 +81,68 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         }
       );
     },
+
+    fetchDocumentTypes(params) {
+      return axios.get(
+        `/document-type`,
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    fetchStudentDocuments(params) {
+      return axios.get(
+        `/student-document`,
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    async deleteStudentDocument({ id }) {
+      return await axios.delete(`/student-document/${id}`, {
+        validateStatus: () => true,
+      });
+    },
+
+    async addStudentDocument(dataSend) {
+      var form_data = new FormData();
+
+      for (var key in dataSend) {
+        if (dataSend[key] == null) {
+          dataSend[key] = "";
+        }
+        form_data.append(key, dataSend[key]);
+      }
+
+      return await axios.post(`/student-document`, form_data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        validateStatus: () => true,
+      });
+    },
+
+    async editStudentDocument(dataSend) {
+      var form_data = new FormData();
+
+      for (var key in dataSend) {
+        if (dataSend[key] == null) {
+          dataSend[key] = "";
+        }
+        form_data.append(key, dataSend[key]);
+      }
+      form_data.append("_method", "PUT");
+
+      return await axios.post(`/student-document/${dataSend.id}`, form_data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        validateStatus: () => true,
+      });
+    },
   },
 });

@@ -17,12 +17,12 @@ const whitelist = ['127.0.0.1', "::1","localhost:8117"];
 class TeacherController extends Controller
 {
 
-    protected $uploadUrl = 'http://143.198.208.110:8117/storage/';
+    protected $uploadUrl = 'http://143.198.208.110:8117/storage';
 
     public function getAll(Request $request)
     {
         if(in_array($_SERVER['HTTP_HOST'], whitelist)){
-            $this->uploadUrl = 'http://localhost:8117/storage/';
+            $this->uploadUrl = 'http://localhost:8117/storage';
         }
 
         $items = Teacher::select(
@@ -168,7 +168,7 @@ class TeacherController extends Controller
     public function get($id)
     {
         if(in_array($_SERVER['HTTP_HOST'], whitelist)){
-            $this->uploadUrl = 'http://localhost:8117/storage/';
+            $this->uploadUrl = 'http://localhost:8117/storage';
         }
         $item = Teacher::select(
                 DB::raw("(CASE WHEN signature_file = NULL THEN ''
