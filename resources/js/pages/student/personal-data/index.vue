@@ -52,12 +52,12 @@ const studentSteps = [
   {
     title: "ข้อมูลสุขภาพ",
     size: 24,
-    icon: "tabler-vaccine",
+    icon: "tabler-heart",
   },
   {
     title: "เอกสาร",
     size: 24,
-    icon: "tabler-file",
+    icon: "tabler-books",
   },
 ];
 
@@ -960,7 +960,7 @@ const repeateAgain = () => {
             <VWindowItem>
               <VRow>
                 <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-user" style="opacity: 1" />
+                  <VIcon size="22" icon="tabler-heart" style="opacity: 1" />
                   <h4 class="pt-1 pl-1">ข้อมูลสุขภาพ</h4>
                 </VCol>
                 <VCol style="margin-top: -1.5em">
@@ -1072,7 +1072,7 @@ const repeateAgain = () => {
               <!-- ใบประกาศ -->
               <VRow>
                 <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-file" style="opacity: 1" />
+                  <VIcon size="22" icon="tabler-books" style="opacity: 1" />
                   <h4 class="pt-1 pl-1">ใบประกาศนียบัตร</h4>
                 </VCol>
                 <!-- <VCol style="margin-top: -1.5em">
@@ -1161,7 +1161,7 @@ const repeateAgain = () => {
               <!-- ใบอื่นๆ -->
               <VRow>
                 <VCol cols="12" md="12" class="d-flex align-self-center">
-                  <VIcon size="22" icon="tabler-file" style="opacity: 1" />
+                  <VIcon size="22" icon="tabler-books" style="opacity: 1" />
                   <h4 class="pt-1 pl-1">เอกสาร</h4>
                 </VCol>
               </VRow>

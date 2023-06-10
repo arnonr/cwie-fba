@@ -67,13 +67,13 @@ class StudentController extends Controller
 
         // Include
         if($request->includeAll){
-
             $items->addSelect('province.name_th as province_name',
             'amphur.name_th as amphur_name',
             'tumbol.name_th as tumbol_name',
             'faculty.name_th as faculty_name',
             'department.name_th as department_name',
             'major.name_th as major_name',
+            'prefix_name.prefix_name as prefix_name',
             DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'));
             $items->leftJoin('province','province.province_id','=','student.province_id')
             ->leftJoin('amphur','amphur.amphur_id','=','student.amphur_id')
@@ -81,7 +81,13 @@ class StudentController extends Controller
             ->leftJoin('faculty','faculty.id','=','student.faculty_id')
             ->leftJoin('department','department.id','=','student.department_id')
             ->leftJoin('major','major.id','=','student.major_id')
-            ->leftJoin('teacher','teacher.id','=','student.advisor_id');
+            ->leftJoin('teacher','teacher.id','=','student.advisor_id')
+            ->leftJoin('prefix_name','prefix_name.id','=','student.prefix_id');
+        }
+
+        if($request->includePrefixName){
+            $items->addSelect('prefix_name.prefix_name as prefix_name');
+            $items->leftJoin('prefix_name','prefix_name.id','=','student.prefix_id');
         }
 
         if($request->includeAdvisor){
