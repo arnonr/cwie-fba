@@ -94,6 +94,7 @@ Route::group(['prefix' => 'tumbol'], function () {
 Route::group(['prefix' => 'teacher'], function () {
 
   Route::get('/hris-find-personnel', [TeacherController::class, 'getHrisPersonel']);
+  Route::get('/hris-sync-all-teacher', [TeacherController::class, 'hrisSyncAllTeacher']);
   Route::get('/{id}', [TeacherController::class, 'get']);
   Route::get('/', [TeacherController::class, 'getAll']);
   Route::post('/', [TeacherController::class, 'add']);

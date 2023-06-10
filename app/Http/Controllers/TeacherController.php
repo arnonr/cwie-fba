@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\DepartmentController;
 
 const whitelist = ['127.0.0.1', "::1","localhost:8117"];
 
@@ -303,63 +305,60 @@ class TeacherController extends Controller
     }
 
 
-    // public function hrisPersonnelInfo($data) {
-    //     let dataParams = {};
-    //     if (data.person_key) dataParams["person_key"] = data.person_key;
+    public function hrisPersonnelInfo(Request $request) {
+        $dataParams = [];
+
+        if ($request->person_key) $dataParams["person_key"] = $request->person_key;
     
-    //     if (data.citizen_id) dataParams["citizen_id"] = data.citizen_id;
+        if ($request->citizen_id) $dataParams["citizen_id"] = $request->citizen_id;
     
-    //     dataParams["get_work_info"] = 1;
-    //     dataParams["get_citizen_id"] = 1;
-    //     // dataParams['get_icit_account'] = 1;
-    
-    //     let config = {
-    //       method: "post",
-    //       url: "https://api.hris.kmutnb.ac.th/api/personnel-api/personnel-detail",
-    //       headers: { Authorization: "Bearer " + apiToken },
-    //       data: dataParams,
-    //       // data: { person_key: id, get_work_info : 1 },
-    //     };
-    
-    //     return new Promise(async (resolve, reject) => {
-    //       try {
-    //         const apiObj = await axios(config)
-    //           .then((response) => {
-    //             return response.data;
-    //           })
-    //           .catch((error) => {
-    //             if (error.response.status === 404) {
-    //               //reject(ErrorNotFound("ไม่พบข้อมูลบุคลากรในระบบ HRIS"));
-    //               reject("ไม่พบข้อมูลบุคลากรในระบบ HRIS");
-    //             }
-    //             reject(error);
-    //           });
-    
-    //         let apiData = {
-    //           person_key: apiObj.person_key,
-    //           citizen_id: apiObj.person_info.citizen_id,
-    //           person_photo: apiObj.person_photo,
-    //           last_updated_at: apiObj.last_updated_at,
-    //           prefix: apiObj.person_info.full_prefix_name_th,
-    //           firstname: apiObj.person_info.firstname_th,
-    //           surname: apiObj.person_info.lastname_th,
-    //           faculty_code: apiObj.work_info.faculty_code,
-    //           faculty_name: apiObj.work_info.faculty_name_th,
-    //           department_code: apiObj.work_info.department_code,
-    //           department_name: apiObj.work_info.department_name_th,
-    //           position_id: apiObj.work_info.position_id,
-    //           position_th: apiObj.work_info.position_th,
-    //           // icit_account: apiObj.icit_account,
-    //         };
-    //         //console.log("service fac = " +apiObj.work_info.faculty_code);
-    //         resolve(apiData);
-    //         // resolve(apiObj);
-    //       } catch (error) {
-    //         reject(error);
-    //       }
-    //     });
-    //   }
-      public function getHrisPersonel(Request $request) {
+        $dataParams["get_work_info"] = 1;
+        $dataParams["get_citizen_id"] = 1;
+        // dataParams['get_icit_account'] = 1;
+
+        $access_token = 'rn7496A7JE7jEnstEbAQDsm2bstbKhaW'; // <----- API - Access Token Here
+
+        $api_url = 'https://api.hris.kmutnb.ac.th/api/personnel-api/personnel-detail'; // <----- API URL
+
+        $response = Http::timeout(50)->withToken($access_token)->post($api_url, $dataParams);
+
+        if($response != false){
+            console.log($response);
+
+            $apiData = [
+                'person_key' => $response['person_key'],
+                'citizen_id' => $response['person_info']['citizen_id'],
+                'person_photo' => $response['person_photo'],
+                'last_updated_at' => $response['last_updated_at'],
+                'prefix' => $response['person_info']['full_prefix_name_th'],
+                'firstname' => $response['person_info']['firstname_th'],
+                'surname' => $response['person_info']['lastname_th'],
+                'faculty_code' => $response['work_info']['faculty_code'],
+                'faculty_name' => $response['work_info']['faculty_name_th'],
+                'department_code' => $response['work_info']['department_code'],
+                'department_name' => $response['work_info']['department_name_th'],
+                'position_id' => $response['work_info']['position_id'],
+                'position_th' => $response['work_info']['position_th'],
+                // icit_account: apiObj.icit_account,
+            ];
+              //console.log("service fac = " +apiObj.work_info.faculty_code);
+
+            //   return response()->json([
+            //     'message' => 'success',
+            //     'apiData' => $apiData
+            // ], 200);
+
+            return response()->json($apiData, 200);
+
+        }else{
+            return response()->json([
+                'message' => 'ไม่พบข้อมูลบุคลากรในระบบ HRIS',
+            ], 404);
+        }
+    }
+
+
+    public function getHrisPersonel(Request $request) {
 
         $request->validate([
             'firstname as required',
@@ -391,18 +390,23 @@ class TeacherController extends Controller
         $api_url = "https://api.hris.kmutnb.ac.th/api/personnel-api/list-personnel"; // <----- API URL
 
         $response = Http::timeout(50)->withToken($access_token)->post($api_url, $data);
-
+     
         if($response != false){
-            $get_response = json_decode($response->getBody());
-            if (property_exists($get_response, 'data')) {
-                return response()->json([
-                    'message' => 'success',
-                    'person_key' => $get_response->data[0]->person_key,
-                    'last_updated_at' =>$get_response->data[0]->last_updated_at,
-                    'firstname' =>$get_response->data[0]->firstname_th,
-                    'surname' => $get_response->data[0]->lastname_th,
-                    'position_type_id' => $get_response->data[0]->position_type_id,
-                ], 200);
+            if (!empty($response['data'])) {
+                $api_data = [];
+                foreach($response['data'] as $value){
+                    array_push($api_data,[
+                        'person_key' => $value['person_key'],
+                        'last_updated_at' => $value['last_updated_at'],
+                        'firstname' => $value['firstname_th'],
+                        'surname' => $value['lastname_th'],
+                        'position_type_id' => $value['position_type_id'],
+                    ]);
+                }
+
+                // return $api_data;
+                return response()->json($api_data, 200);
+
             } else if ($get_response->status == 404) {
                 return response()->json([
                     'message' => 'ไม่พบข้อมูลบุคลากรในระบบ HRIS',
@@ -415,6 +419,74 @@ class TeacherController extends Controller
                 'message' => 'API ICIT HRIS ERROR',
             ], 503);
         }
-      }
+    }
+
+
+    public function hrisSyncAllTeacher(Request $req) {
+            /* ดึงข้อมูลสายวิชาการทั้งหมด */
+
+            $req = new Request();
+            $req->position_type_id = 1;
+            // 
+            $result = $this->getHrisPersonel($req);
+        
+            foreach($result as $key => $value){
+                
+                print_r($value);
+
+                $person_key = $result[$key]['person_key'];
+
+                $api_updated_time = $result[$key]['last_updated_at'];
+
+                $person_name = $result[$key]['firstname'].' '.$result[$key]['surname'];
+
+                $teacher_data = Teacher::where('person_key', $person_key)->first();
+
+                $db_updated_time = null;
+                
+                if ($teacher_data) {
+                    $db_updated_time = $api_updated_time;
+
+                    if($db_updated_time == $api_updated_time){
+                        continue;
+                    }
+                }
+
+                $req1 = new Request();
+                $req1->person_key = person_key;
+
+                $resultInfo = $this->hrisPersonnelInfo($req1);
+
+                $faculty = app('App\Http\Controllers\FacultyController')->import($result->faculty_code,$result->faculty_name);
+                $major = app('App\Http\Controllers\DepartmentController')->import($result->department_code,$result->department_name);
+    
+                $result['faculty_id'] = $faculty->id;
+                $result['department_id'] = $department->id;
+
+                $teacher_data = Teacher::where('citizen_id',$resultInfo->citizen_id)->first();
+
+                $resultInfo['person_key'] = resultInfo->person_key;
+                // resultInfo['icit_account'] = resultInfo.icit_account;
+                $resultInfo['citizen_id'] = resultInfo->citizen_id;
+                $resultInfo['faculty_id'] = faculty_id;
+                $resultInfo['department_id'] = department_id;
+                $resultInfo['hris_last_updated_at'] = resultInfo->last_updated_at;
+
+                $save_data = null;
+                if (!$teacher_data) {
+                    $resultInfo['created_by'] = 'arnonr';
+                    $save_data = $this->add($resultInfo);
+                    console.log("insert");
+                }else{
+                    if($db_updated_time !== $api_updated_time){
+                        $save_data = $this->update($teacher_data.id, $resultInfo);
+                        console.log("Update");
+                    }else{
+                        console.log("Up to date");
+                    }
+                }
+            }
+            // res.success(result);
+    }
     
 }

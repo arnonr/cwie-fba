@@ -113,4 +113,23 @@ class DepartmentController extends Controller
 
         return response()->json($responseData, 200);
     }
+
+    public function import($code,$name){
+        $item = Department::where('department_code',$code)->first();
+        if(!$item){
+            $item = new Department;
+            $item->department_code = $code;
+            $item->name_th = $name;
+            $item->name_en = $name;
+            $item->created_by = 'arnonr';
+            $item->save();
+        }
+
+        // $responseData = [
+        //     'message' => 'success',
+        //     'data' =>  $item,
+        // ];
+
+        return $item;
+    }
 }
