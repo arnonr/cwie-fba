@@ -30,5 +30,6 @@ class Semester extends Model
         'updated_at',
         'updated_by',
         'deleted_at',
+        'is_current'
     ];
 }

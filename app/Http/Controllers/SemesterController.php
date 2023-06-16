@@ -27,6 +27,7 @@ class SemesterController extends Controller
             'semester.regis_start_date',
             'semester.regis_end_date',
             'semester.active as active',
+            'semester.is_current as is_current',
         )
         ->where('semester.deleted_at', null);
 
@@ -35,18 +36,16 @@ class SemesterController extends Controller
             $items->addSelect(DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS chairman_name'));
             $items->leftJoin('teacher','teacher.id','=','semester.chairman_id');;
         }
-        
+
         if($request->includeChairman){
             $items->addSelect(DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS chairman_name'));
             $items->leftJoin('teacher','teacher.id','=','semester.chairman_id');;
         }
 
-
         if ($request->id_array) {
             $items->whereIn('semester.id', $request->id_array);
         }
 
-        
         // Where
         if ($request->id) {
             $items->where('semester.id', $request->id);
@@ -76,13 +75,17 @@ class SemesterController extends Controller
             $items->where('semester.active', $request->active);
         }
 
+        if ($request->is_current) {
+            $items->where('semester.is_current', $request->is_current);
+        }
+
         // Order
         if($request->orderBy){
             $items = $items->orderBy($request->orderBy, $request->order);
         }else{
             $items = $items->orderBy('id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -91,7 +94,7 @@ class SemesterController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -119,6 +122,7 @@ class SemesterController extends Controller
             'semester.regis_start_date',
             'semester.regis_end_date',
             'semester.active as active',
+            'semester.is_current as is_current',
             DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS chairman_name'))
             ->where('semester.id', $id)
             ->leftJoin('teacher','teacher.id','=','semester.chairman_id')
@@ -137,30 +141,34 @@ class SemesterController extends Controller
             'term as required',
             'round_no as required',
         ]);
-    
+
         $item = new Semester;
-        $item->semester_year = $request->has('semester_year') ? $request->semester_year : $item->semester_year;
-        $item->term = $request->has('term') ? $request->term : $item->term;
-        $item->round_no = $request->has('round_no') ? $request->round_no : $item->round_no;
-        $item->chairman_id = $request->has('chairman_id') ? $request->chairman_id : $item->chairman_id;
-        $item->default_request_doc_no = $request->has('default_request_doc_no') ? $request->default_request_doc_no : $item->default_request_doc_no;
-        $item->default_request_doc_date = $request->has('default_request_doc_date') ? $request->default_request_doc_date : $item->default_request_doc_date;
-        $item->start_date = $request->has('start_date') ? $request->start_date : $item->start_date;
-        $item->end_date = $request->has('end_date') ? $request->end_date : $item->end_date;
-        $item->regis_start_date = $request->has('regis_start_date') ? $request->regis_start_date : $item->regis_start_date;
-        $item->regis_end_date = $request->has('regis_end_date') ? $request->regis_end_date : $item->regis_end_date;
-        $item->active = $request->has('active') ? $request->active : $item->active;
+        $item->semester_year = $request->semester_year;
+        $item->term = $request->term;
+        $item->round_no = $request->round_no;
+        $item->chairman_id = $request->chairman_id;
+        $item->default_request_doc_no = $request->default_request_doc_no;
+        $item->default_request_doc_date = $request->default_request_doc_date;
+        $item->start_date = $request->start_date;
+        $item->end_date = $request->end_date;
+        $item->regis_start_date = $request->regis_start_date;
+        $item->regis_end_date = $request->regis_end_date;
+        $item->active = $request->active;
+        $item->is_current = $request->is_current;
         $item->created_by = 'arnonr';
         $item->save();
+
+        if($item->is_current == 1){
+            Semester::where('id', '<>', $request->id)->update(['is_current' => 0]);
+        }
 
         $responseData = [
             'message' => 'success',
             'data' => $item,
         ];
-        
+
         return response()->json($responseData, 200);
     }
-
 
     public function edit($id, Request $request)
     {
@@ -169,7 +177,7 @@ class SemesterController extends Controller
         ]);
 
         $item = Semester::where('id', $request->id)->first();
-        
+
         $item->semester_year = $request->has('semester_year') ? $request->semester_year : $item->semester_year;
         $item->term = $request->has('term') ? $request->term : $item->term;
         $item->round_no = $request->has('round_no') ? $request->round_no : $item->round_no;
@@ -181,8 +189,13 @@ class SemesterController extends Controller
         $item->regis_start_date = $request->has('regis_start_date') ? $request->regis_start_date : $item->regis_start_date;
         $item->regis_end_date = $request->has('regis_end_date') ? $request->regis_end_date : $item->regis_end_date;
         $item->active = $request->has('active') ? $request->active : $item->active;
+        $item->is_current = $request->has('is_current') ? $request->is_current : $item->is_current;
         $item->updated_by = 'arnonr';
         $item->save();
+
+        if($item->is_current == 1){
+            Semester::where('id', '<>', $request->id)->update(['is_current' => 0]);
+        }
 
         $responseData = [
             'message' => 'success',
