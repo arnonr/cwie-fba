@@ -28,6 +28,7 @@ class Company extends Model
         'amphur_id',
         'tumbol_id',
         'active',
+        'status',
         'created_at',
         'created_by',
         'updated_at',

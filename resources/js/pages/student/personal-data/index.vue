@@ -43,6 +43,7 @@ const isOverlay = ref(false);
 const isFormValid = ref(false);
 const refForm = ref();
 const currentStep = ref(0);
+const disabled = ref(false);
 const studentSteps = [
   {
     title: "ข้อมูลทั่วไป",
@@ -99,7 +100,6 @@ const fetchProvinces = () => {
       isOverlay.value = false;
     });
 };
-fetchProvinces();
 
 const fetchAmphurs = () => {
   personalDataStore
@@ -164,7 +164,6 @@ const fetchTeachers = () => {
       isOverlay.value = false;
     });
 };
-fetchTeachers();
 
 const fetchDocumentTypes = () => {
   personalDataStore
@@ -192,7 +191,6 @@ const fetchDocumentTypes = () => {
       isOverlay.value = false;
     });
 };
-fetchDocumentTypes();
 
 const fetchStudentDocuments = () => {
   personalDataStore
@@ -267,11 +265,10 @@ const fetchStudent = () => {
         const { data } = response.data;
         item.value = { ...data[0] };
 
-        //   item.value.namecard_file_old = null;
-        //   if (data.namecard_file != null) {
-        //     item.value.namecard_file_old = data.namecard_file;
-        //   }
-        //   item.value.namecard_file = [];
+        if (item.value.status_id < 2) {
+          disabled.value = true;
+        }
+
         item.value.documents = selectOptions.value.document_types.map((d) => {
           return {
             id: null,
@@ -282,8 +279,6 @@ const fetchStudent = () => {
             student_id: item.value.id,
           };
         });
-
-        console.log(item.value.documents);
         fetchStudentDocuments();
       } else {
         console.log("error");
@@ -465,7 +460,7 @@ const onStudentDocumentSubmit = async () => {
     },
   }).then(() => {
     isOverlay.value = false;
-    router.push({ name: "basic-settings-user" });
+    router.push({ name: "student-cwie-data" });
   });
 };
 
@@ -525,6 +520,9 @@ const removeCertificateItem = (index) => {
 
 onMounted(() => {
   window.scrollTo(0, 0);
+  fetchProvinces();
+  fetchTeachers();
+  fetchDocumentTypes();
 });
 
 const nextTodoId = ref(1);
@@ -615,6 +613,7 @@ const repeateAgain = () => {
                     :rules="[requiredValidator]"
                     variant="outlined"
                     placeholder="Prefix"
+                    :disabled="!disabled"
                     clearable
                   />
                 </VCol>
@@ -630,6 +629,7 @@ const repeateAgain = () => {
                     id="firstname"
                     v-model="item.firstname"
                     :rules="[requiredValidator]"
+                    :disabled="!disabled"
                     persistent-placeholder
                   />
                 </VCol>
@@ -645,6 +645,7 @@ const repeateAgain = () => {
                     id="surname"
                     v-model="item.surname"
                     :rules="[requiredValidator]"
+                    :disabled="!disabled"
                     persistent-placeholder
                   />
                 </VCol>
@@ -693,6 +694,7 @@ const repeateAgain = () => {
                     :rules="[requiredValidator]"
                     variant="outlined"
                     placeholder="Class Year"
+                    :disabled="!disabled"
                     clearable
                   />
                 </VCol>
@@ -710,6 +712,7 @@ const repeateAgain = () => {
                     v-model="item.class_room"
                     :rules="[requiredValidator]"
                     variant="outlined"
+                    :disabled="!disabled"
                     placeholder="Class Room"
                     clearable
                   />
@@ -727,6 +730,7 @@ const repeateAgain = () => {
                     v-model="item.advisor_id"
                     :rules="[requiredValidator]"
                     variant="outlined"
+                    :disabled="!disabled"
                     placeholder="Advisor"
                     clearable
                   />
@@ -745,6 +749,7 @@ const repeateAgain = () => {
                     v-model="item.gpa"
                     :rules="[requiredValidator]"
                     persistent-placeholder
+                    :disabled="!disabled"
                     type="number"
                   />
                 </VCol>
@@ -768,6 +773,7 @@ const repeateAgain = () => {
                     id="address"
                     v-model="item.address"
                     :rules="[requiredValidator]"
+                    :disabled="!disabled"
                     persistent-placeholder
                   />
                 </VCol>
@@ -785,6 +791,7 @@ const repeateAgain = () => {
                     v-model="item.province_id"
                     :rules="[requiredValidator]"
                     variant="outlined"
+                    :disabled="!disabled"
                     placeholder="Province"
                     clearable
                   />
@@ -801,6 +808,7 @@ const repeateAgain = () => {
                   <AppSelect
                     :items="selectOptions.amphurs"
                     v-model="item.amphur_id"
+                    :disabled="!disabled"
                     :rules="[requiredValidator]"
                     variant="outlined"
                     placeholder="Amphur"
@@ -817,6 +825,7 @@ const repeateAgain = () => {
                     v-model="item.tumbol_id"
                     :rules="[requiredValidator]"
                     variant="outlined"
+                    :disabled="!disabled"
                     placeholder="Tumbol"
                     clearable
                   />
@@ -833,6 +842,7 @@ const repeateAgain = () => {
                   <AppTextField
                     id="tel"
                     v-model="item.tel"
+                    :disabled="!disabled"
                     :rules="[requiredValidator]"
                     persistent-placeholder
                   />
@@ -848,6 +858,7 @@ const repeateAgain = () => {
                   <AppTextField
                     id="email"
                     v-model="item.email"
+                    :disabled="!disabled"
                     :rules="[requiredValidator]"
                     persistent-placeholder
                   />
@@ -871,6 +882,7 @@ const repeateAgain = () => {
                   <AppTextField
                     id="contact1_name"
                     v-model="item.contact1_name"
+                    :disabled="!disabled"
                     :rules="[requiredValidator]"
                     persistent-placeholder
                   />
@@ -887,6 +899,7 @@ const repeateAgain = () => {
                   <AppTextField
                     id="contact1_relation"
                     v-model="item.contact1_relation"
+                    :disabled="!disabled"
                     :rules="[requiredValidator]"
                     persistent-placeholder
                   />
@@ -904,6 +917,7 @@ const repeateAgain = () => {
                     id="contact1_tel"
                     v-model="item.contact1_tel"
                     :rules="[requiredValidator]"
+                    :disabled="!disabled"
                     persistent-placeholder
                   />
                 </VCol>
@@ -918,6 +932,7 @@ const repeateAgain = () => {
                   </label>
                   <AppTextField
                     id="contact2_name"
+                    :disabled="!disabled"
                     v-model="item.contact2_name"
                     persistent-placeholder
                   />
@@ -933,6 +948,7 @@ const repeateAgain = () => {
                   </label>
                   <AppTextField
                     id="contact2_relation"
+                    :disabled="!disabled"
                     v-model="item.contact2_relation"
                     persistent-placeholder
                   />
@@ -948,6 +964,7 @@ const repeateAgain = () => {
                   </label>
                   <AppTextField
                     id="contact2_tel"
+                    :disabled="!disabled"
                     v-model="item.contact2_tel"
                     persistent-placeholder
                   />
@@ -979,6 +996,7 @@ const repeateAgain = () => {
                   </label>
                   <AppSelect
                     :items="selectOptions.blood_groups"
+                    :disabled="!disabled"
                     v-model="item.blood_group"
                     :rules="[requiredValidator]"
                     variant="outlined"
@@ -996,6 +1014,7 @@ const repeateAgain = () => {
                   </label>
                   <AppTextField
                     id="height"
+                    :disabled="!disabled"
                     v-model="item.height"
                     :rules="[requiredValidator]"
                     persistent-placeholder
@@ -1012,6 +1031,7 @@ const repeateAgain = () => {
                   </label>
                   <AppTextField
                     id="weight"
+                    :disabled="!disabled"
                     v-model="item.weight"
                     :rules="[requiredValidator]"
                     persistent-placeholder
@@ -1029,6 +1049,7 @@ const repeateAgain = () => {
                   </label>
                   <AppTextField
                     id="emergency_tel"
+                    :disabled="!disabled"
                     v-model="item.emergency_tel"
                     :rules="[requiredValidator]"
                     persistent-placeholder
@@ -1045,6 +1066,7 @@ const repeateAgain = () => {
                   </label>
                   <AppTextarea
                     id="congenital_disease"
+                    :disabled="!disabled"
                     v-model="item.congenital_disease"
                     persistent-placeholder
                   />
@@ -1060,6 +1082,7 @@ const repeateAgain = () => {
                   </label>
                   <AppTextarea
                     id="drug_allergy"
+                    :disabled="!disabled"
                     v-model="item.drug_allergy"
                     persistent-placeholder
                   />
@@ -1093,6 +1116,7 @@ const repeateAgain = () => {
                   </label>
                   <AppTextField
                     v-model="certItem.document_name"
+                    :disabled="!disabled"
                     persistent-placeholder
                     :id="'certificate_name_' + index"
                   />
@@ -1109,6 +1133,7 @@ const repeateAgain = () => {
                   <VFileInput
                     :id="'cert-file-' + index"
                     v-model="certItem.document_file"
+                    :disabled="!disabled"
                     label="Upload Certificate"
                     persistent-placeholder
                   />
@@ -1139,6 +1164,7 @@ const repeateAgain = () => {
                     style="width: 100%"
                     color="error"
                     @click="removeCertificateItem(index)"
+                    :disabled="!disabled"
                   >
                     Del
                   </VBtn>
@@ -1151,6 +1177,7 @@ const repeateAgain = () => {
                     style="width: 100%"
                     color="info"
                     @click="repeateAgain()"
+                    :disabled="!disabled"
                   >
                     Add New
                   </VBtn>
@@ -1178,6 +1205,7 @@ const repeateAgain = () => {
                     v-model="d.document_file"
                     label="Upload File"
                     persistent-placeholder
+                    :disabled="!disabled"
                   />
                 </VCol>
 
@@ -1218,6 +1246,7 @@ const repeateAgain = () => {
               append-icon="tabler-check"
               @click="onSubmit"
               v-if="studentSteps.length - 1 === currentStep"
+              :disabled="!disabled"
             >
               submit
             </VBtn>

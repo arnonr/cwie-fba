@@ -329,6 +329,10 @@ onMounted(() => {
               <hr />
             </VCol>
 
+            <VCol cols="12" md="12">
+              <label class="font-weight-bold">ที่อยู่ตามบัตรประชาชน</label>
+            </VCol>
+
             <VCol cols="12" md="1">
               <label class="font-weight-bold">ที่อยู่ : </label>
             </VCol>

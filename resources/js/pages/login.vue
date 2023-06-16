@@ -59,7 +59,7 @@ const login = () => {
       console.log(r);
       if (r.status === 200) {
         // const { accessToken, userData, userAbilities } = r.data;
-        const { accessToken, userData } = r.data;
+        const { accessToken, userData, teacherData } = r.data;
 
         // localStorage.setItem("userAbilities", JSON.stringify(userAbilities));
         // ability.update(userAbilities);
@@ -107,6 +107,7 @@ const login = () => {
         localStorage.setItem("userAbilities", JSON.stringify(userData.ability));
         ability.update(userData.ability);
         localStorage.setItem("userData", JSON.stringify(userData));
+        localStorage.setItem("teacherData", JSON.stringify(teacherData));
         localStorage.setItem("accessToken", JSON.stringify(accessToken));
 
         // Redirect to `to` query if exist or redirect to index route

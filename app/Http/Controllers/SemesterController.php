@@ -40,6 +40,12 @@ class SemesterController extends Controller
             $items->addSelect(DB::raw('CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS chairman_name'));
             $items->leftJoin('teacher','teacher.id','=','semester.chairman_id');;
         }
+
+
+        if ($request->id_array) {
+            $items->whereIn('semester.id', $request->id_array);
+        }
+
         
         // Where
         if ($request->id) {

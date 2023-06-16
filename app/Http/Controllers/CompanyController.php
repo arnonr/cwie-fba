@@ -206,18 +206,18 @@ class CompanyController extends Controller
         $item->name_th = $request->has('name_th') ? $request->name_th : '';
         $item->name_en = $request->has('name_en') ? $request->name_en : '';
         $item->tel = $request->has('tel') ? $request->tel : '';
-        $item->fax = $request->has('fax') ? $request->fax : $item->fax;
-        $item->email = $request->has('email') ? $request->email : $item->email;
-        $item->website = $request->has('website') ? $request->website : $item->website;
-        $item->blacklist = $request->has('blacklist') ? $request->blacklist : $item->blacklist;
-        $item->comment = $request->has('comment') ? $request->comment : $item->comment;
+        $item->fax = $request->has('fax') ? $request->fax : '';
+        $item->email = $request->has('email') ? $request->email : '';
+        $item->website = $request->has('website') ? $request->website :  '';
+        $item->blacklist = $request->has('blacklist') ? $request->blacklist :  '';
+        $item->comment = $request->has('comment') ? $request->comment : '';
         $item->namecard_file = $pathNamecard;
         $item->location_file = $pathLocation;
-        $item->address = $request->has('address') ? $request->address : $item->address;
-        $item->province_id = $request->has('province_id') ? $request->province_id : $item->province_id;
-        $item->amphur_id  = $request->has('amphur_id') ? $request->amphur_id : $item->amphur_id;
-        $item->tumbol_id = $request->has('tumbol_id') ? $request->tumbol_id : $item->tumbol_id;
-        $item->active = $request->has('active') ? $request->active : $item->active;
+        $item->address = $request->has('address') ? $request->address :  '';
+        $item->province_id = $request->has('province_id') ? $request->province_id :  '';
+        $item->amphur_id  = $request->has('amphur_id') ? $request->amphur_id :  '';
+        $item->tumbol_id = $request->has('tumbol_id') ? $request->tumbol_id :  '';
+        $item->active = $request->has('active') ? $request->active :  '';
         $item->created_by = 'arnonr';
         $item->save();
 

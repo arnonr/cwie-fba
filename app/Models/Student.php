@@ -45,6 +45,7 @@ class Student extends Model
         'height',
         'weight',
         'active',
+        'status_id',
         'created_at',
         'created_by',
         'updated_at',

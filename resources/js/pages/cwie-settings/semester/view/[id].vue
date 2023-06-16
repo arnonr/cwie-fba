@@ -118,18 +118,20 @@ hr {
               item.term + "/" + item.semester_year
             }}</span>
           </VCol>
-          <VCol cols="12" md="2">
+          <VCol cols="12" md="3">
             <span class="font-weight-bold">รอบการออกสหกิจศึกษาที่ : </span>
           </VCol>
-          <VCol cols="12" md="4">
+          <VCol cols="12" md="3">
             <span class="font-italic">{{ item.round_no }}</span>
           </VCol>
 
           <!--  -->
-          <VCol cols="12" md="2">
-            <span class="font-weight-bold">รองคณบดีฝ่ายสหกิจศึกษา : </span>
+          <VCol cols="12" md="3">
+            <span class="font-weight-bold"
+              >ประธานบริหารโครงการสหกิจศึกษา :
+            </span>
           </VCol>
-          <VCol cols="12" md="10">
+          <VCol cols="12" md="9">
             <span class="font-italic">{{ item.chairman_name }}</span>
           </VCol>
           <VCol cols="12">

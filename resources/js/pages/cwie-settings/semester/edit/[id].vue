@@ -236,7 +236,7 @@ const format = (date) => {
                 for="chairman_id"
                 cols="12"
                 md="12"
-                >รองคณบดีฝ่ายสหกิจศึกษา :
+                >ประธานบริหารโครงการสหกิจศึกษา :
               </label>
               <AppSelect
                 :items="selectOptions.teachers"
@@ -250,7 +250,7 @@ const format = (date) => {
             <VCol cols="12" md="6" class="align-items-center">
               <label
                 class="v-label font-weight-bold"
-                for="province_id"
+                for="start_date"
                 cols="12"
                 md="4"
                 >วันที่เริ่มออกสหกิจศึกษา :
@@ -275,7 +275,7 @@ const format = (date) => {
             <VCol cols="12" md="6" class="align-items-center">
               <label
                 class="v-label font-weight-bold"
-                for="province_id"
+                for="end_date"
                 cols="12"
                 md="4"
                 >วันที่สิ้นสุดการปฏิบัติสหกิจศึกษา :

@@ -1,13 +1,13 @@
 <script setup>
-import { requiredValidator } from "@validators";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import "sweetalert2/src/sweetalert2.scss";
 import { useRoute, useRouter } from "vue-router";
 ////
 import buddhistEra from "dayjs/plugin/buddhistEra";
+// import VuePdfApp from "vue3-pdf-app";
 import "vue3-pdf-app/dist/icons/main.css";
-import { useCwieDataStore } from "./useCwieDataStore";
+import { useCwieDataStore } from "../useCwieDataStore";
 
 import { form_statuses, text_statuses } from "@/data-constant/data";
 
@@ -17,13 +17,15 @@ const route = useRoute();
 const router = useRouter();
 const cwieDataStore = useCwieDataStore();
 
+let userData = JSON.parse(localStorage.getItem("userData"));
+
 const student = ref({});
 const item = ref({});
-const response_company = ref({
-  response_document_file: [],
-  status_id: "",
-  response_send_at: "",
-  province_id: null,
+const rejectLog = ref({
+  comment: "",
+  reject_status_id: 2,
+  form_id: null,
+  user_id: userData.user_id,
 });
 
 const rowPerPage = ref(20);
@@ -34,27 +36,26 @@ const orderBy = ref("id");
 const order = ref("desc");
 const isAdd = ref(true);
 const isCheck = ref(true);
-const isDialogCheckVisible = ref(false);
-const isDialogResponseVisible = ref(false);
-
-const currentStep = ref(0);
+const isDialogVisible = ref(false);
+const isDialogRejectVisible = ref(false);
+const currentStep = ref(1);
 const formSteps = [
   {
     title: "ข้อมูลใบสมัคร",
     size: 24,
     icon: "tabler-file",
   },
-  {
-    title: "ข้อมูลเอกสารตอบรับ",
-    size: 24,
-    icon: "tabler-checklist",
-    isActiveStepValid: false,
-  },
-  {
-    title: "ข้อมูลแผนการปฏิบัติงาน",
-    size: 24,
-    icon: "tabler-notes",
-  },
+  //   {
+  //     title: "ข้อมูลเอกสารตอบรับ",
+  //     size: 24,
+  //     icon: "tabler-checklist",
+  //     isActiveStepValid: false,
+  //   },
+  //   {
+  //     title: "ข้อมูลแผนการปฏิบัติงาน",
+  //     size: 24,
+  //     icon: "tabler-notes",
+  //   },
 ];
 const items = ref([]);
 const prependIcon = "tabler-arrow-big-right-filled";
@@ -122,11 +123,8 @@ const documents_certificate = ref([
 
 const isOverlay = ref(false);
 const isFormValid = ref(false);
-const isResponseFormValid = ref(false);
 const refForm = ref();
-const refResponseForm = ref();
 const currentTab = ref(0);
-const check = ref(true);
 
 const isSnackbarVisible = ref(false);
 const snackbarText = ref("");
@@ -143,89 +141,6 @@ const selectOptions = ref({
     { title: "In Active", value: 0 },
   ],
 });
-
-const fetchProvinces = () => {
-  cwieDataStore
-    .fetchProvinces({})
-    .then((response) => {
-      if (response.status === 200) {
-        selectOptions.value.provinces = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.province_id };
-        });
-        isOverlay.value = false;
-      } else {
-        console.log("error");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-
-const fetchAmphurs = () => {
-  cwieDataStore
-    .fetchAmphurs({
-      province_id: item.value.province_id,
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        selectOptions.value.amphurs = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.amphur_id };
-        });
-        isOverlay.value = false;
-      } else {
-        console.log("error");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-
-const fetchTumbols = () => {
-  cwieDataStore
-    .fetchTumbols({
-      amphur_id: item.value.amphur_id,
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        selectOptions.value.tumbols = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.tumbol_id };
-        });
-        isOverlay.value = false;
-      } else {
-        console.log("error");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-
-const fetchTeachers = () => {
-  cwieDataStore
-    .fetchTeachers()
-    .then((response) => {
-      if (response.status === 200) {
-        selectOptions.value.teachers = response.data.data.map((r) => {
-          return {
-            title: r.prefix + r.firstname + " " + r.surname,
-            value: r.id,
-          };
-        });
-        isOverlay.value = false;
-      } else {
-        console.log("error");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
 
 const fetchDocumentTypes = () => {
   cwieDataStore
@@ -314,12 +229,12 @@ const fetchStudentDocuments = () => {
     });
 };
 
-let userData = JSON.parse(localStorage.getItem("userData"));
+// let userData = JSON.parse(localStorage.getItem("userData"));
 
 const fetchStudent = () => {
   cwieDataStore
     .fetchStudents({
-      username: userData.username.slice(1, userData.username.length),
+      id: route.params.id,
       includeAll: true,
     })
     .then((response) => {
@@ -403,7 +318,8 @@ const fetchStudent = () => {
 const fetchForms = () => {
   cwieDataStore
     .fetchForms({
-      student_id: student.value.id,
+      student_id: route.params.id,
+      //   student_id: student.value.id,
       perPage: rowPerPage.value,
       currentPage: currentPage.value,
       orderBy: orderBy.value,
@@ -417,9 +333,6 @@ const fetchForms = () => {
         const { data } = response.data;
 
         for (let i = 0; i < data.length; i++) {
-          if (data[i].active == 1) {
-            response_company.value.form_id = data[i].id;
-          }
           await cwieDataStore
             .fetchMajorHeads({
               semester_id: data[i].semester_id,
@@ -452,88 +365,74 @@ const fetchForms = () => {
     });
 };
 
-watch(
-  () => item.value.province_id,
-  (value, oldValue) => {
-    if (value != null) {
-      fetchAmphurs();
-      if (oldValue != null) {
-        item.value.amphur_id = null;
-        item.value.tumbol_id = null;
-      }
-    }
-  }
-);
-
-watch(
-  () => item.value.amphur_id,
-  (value, oldValue) => {
-    if (value != null) {
-      fetchTumbols();
-      if (oldValue != null) {
-        item.value.tumbol_id = null;
-      }
-    }
-    // console.log(value);
-  }
-);
-
-const onAddClick = () => {
-  if (isCheck.value == false) {
-    isDialogCheckVisible.value = true;
+const onRejectSubmit = () => {
+  if (rejectLog.comment != "") {
+    cwieDataStore
+      .addRejectLog({
+        ...rejectLog.value,
+      })
+      .then((response) => {
+        if (response.data.message == "success") {
+          localStorage.setItem("Rejected", 1);
+          nextTick(() => {
+            fetchStudent();
+            fetchForms();
+            snackbarText.value = "Rejected";
+            snackbarColor.value = "success";
+            isSnackbarVisible.value = true;
+            isOverlay.value = false;
+            isDialogRejectVisible.value = false;
+          });
+        } else {
+          isOverlay.value = false;
+          console.log("error");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   } else {
-    router.push({ name: "student-cwie-data-add" });
+    snackbarText.value = "โปรดระบุเหตุผล";
+    snackbarColor.value = "error";
+    isSnackbarVisible.value = true;
+    isOverlay.value = false;
   }
 };
 
-const onResponseSubmit = () => {
-  isOverlay.value = true;
-  refResponseForm.value?.validate().then(({ valid }) => {
-    if (valid) {
-      cwieDataStore
-        .addResponseBook({
-          ...response_company.value,
-          id: response_company.value.form_id,
-          response_document_file:
-            response_company.value.response_document_file.length !== 0
-              ? response_company.value.response_document_file[0]
-              : null,
-          response_send_at: dayjs().format("YYYY-MM-DD"),
-          status_id: response_company.value.status_id,
-        })
-        .then((response) => {
-          if (response.data.message == "success") {
-            localStorage.setItem("updated", 1);
-            nextTick(() => {
-              console.log("Success");
-              isDialogResponseVisible.value = false;
-              snackbarText.value = "Success";
-              snackbarColor.value = "success";
-              isSnackbarVisible.value = true;
-            });
-          } else {
-            isOverlay.value = false;
-            console.log("error");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
+const onSubmit = () => {
+  cwieDataStore
+    .approve({
+      id: item.value.id,
+      status_id: 4,
+      chairman_approved_at: dayjs().format("YYYY-MM-DD"),
+    })
+    .then((response) => {
+      if (response.data.message == "success") {
+        localStorage.setItem("Approved", 1);
+        nextTick(() => {
+          fetchStudent();
+          fetchForms();
+          snackbarText.value = "Approved";
+          snackbarColor.value = "success";
+          isSnackbarVisible.value = true;
           isOverlay.value = false;
+          isDialogVisible.value = false;
         });
-    } else {
-      snackbarText.value = "ข้อมูลไม่ครบถ้วน";
-      snackbarColor.value = "error";
-      isSnackbarVisible.value = true;
-    }
-    isOverlay.value = false;
-  });
+      } else {
+        isOverlay.value = false;
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 onMounted(() => {
   window.scrollTo(0, 0);
 
-  fetchProvinces();
-  fetchTeachers();
+  //   fetchProvinces();
+  //   fetchTeachers();
   fetchDocumentTypes();
 });
 </script>
@@ -581,9 +480,9 @@ onMounted(() => {
           <VDivider class="ml-4 mr-4" />
           <VCardText>
             <span class="font-weight-bold">สถานะ : </span>
-            <VChip label :color="form_statuses[student.status_id]"
-              >{{ text_statuses[student.status_id] }}
-            </VChip>
+            <VChip label :color="form_statuses[student.status_id]">{{
+              text_statuses[student.status_id]
+            }}</VChip>
           </VCardText>
           <VDivider class="ml-4 mr-4" />
           <VCardText>
@@ -847,9 +746,9 @@ onMounted(() => {
                       v-if="d.document_file_old != null"
                       :src="d.document_file_old"
                       style="width: 100%; height: 500px"
-                    ></iframe> -->
+                    ></iframe>
 
-                    <!-- <span v-else> <br />- </span> -->
+                    <span v-else> <br />- </span> -->
                     <!-- <vue-pdf-app
                       :id="'pdf' + index"
                       style="height: 500px"
@@ -861,18 +760,6 @@ onMounted(() => {
             </VWindow>
           </VCardText>
         </VCard>
-      </VCol>
-
-      <VCol cols="12" md="12">
-        <VBtn color="success" :disabled="!isAdd" @click="onAddClick">
-          <VIcon
-            size="16"
-            icon="tabler-file-description"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
-          เพิ่มใบสมัคร</VBtn
-        >
       </VCol>
 
       <VCol cols="12" md="12" v-for="(it, index) in items">
@@ -907,13 +794,9 @@ onMounted(() => {
                     <span>
                       <VChip label :color="form_statuses[it.status_id]">
                         {{
-                          it.status_id != 2
-                            ? text_statuses[it.status_id] == "คณะยืนยันข้อมูล"
-                              ? it.request_document_date != null
-                                ? "ออกหนังสือขอความอนุเคราะห์แล้ว"
-                                : text_statuses[it.status_id]
-                              : it.form_status_name
-                            : "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
+                          it.status_id == 2
+                            ? "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
+                            : it.form_status_name
                         }}</VChip
                       >
                     </span>
@@ -1016,6 +899,7 @@ onMounted(() => {
                   <VCol cols="12" md="6">
                     <h4>คุณสมบัติผู้สมัครโครงการสหกิจศึกษา</h4>
                     <VList :items="qualifications" />
+                    <!-- <VCheck  -->
                   </VCol>
 
                   <VCol cols="12" md="6">
@@ -1040,83 +924,31 @@ onMounted(() => {
                         <span> {{ rl.comment }}</span>
                       </VCol>
                     </VRow>
-                  </VCol>
-                  <VCol class="text-center">
-                    <VBtn
-                      color="info"
-                      :disabled="it.status_id != 1 || index != 0"
-                      :to="{
-                        name: 'student-cwie-data-edit-id',
-                        params: { id: it.id },
-                      }"
-                    >
-                      Edit
-                    </VBtn>
-                  </VCol>
-                </VRow>
-              </VWindowItem>
-              <VWindowItem>
-                <VRow>
-                  <VCol cols="12" md="6">
-                    <!-- <VCol cols="12" md="3"> -->
-                    <span>สถานะฟอร์ม : </span>
-                    <span>
-                      <VChip label :color="form_statuses[it.status_id]">
-                        {{
-                          it.status_id != 2
-                            ? text_statuses[it.status_id] == "คณะยืนยันข้อมูล"
-                              ? it.request_document_date != null
-                                ? "ออกหนังสือขอความอนุเคราะห์แล้ว"
-                                : text_statuses[it.status_id]
-                              : it.form_status_name
-                            : "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
-                        }}</VChip
-                      >
-                    </span>
-                  </VCol>
-                  <VCol cols="12" md="6">
-                    <span>ดาวน์โหลด : </span>
-                    <VBtn
-                      color="primary"
-                      @click=""
-                      :disabled="it.request_document_date == null"
-                    >
-                      <VIcon
-                        size="16"
-                        icon="tabler-file-description"
-                        style="opacity: 1"
-                      ></VIcon>
-                      หนังสือขอความอนุเคราะห์</VBtn
-                    >
-                  </VCol>
-                  <VCol cols="12" md="6">
-                    <span>วันที่ต้องตอบรับเอกสาร : </span>
-                    <span>{{
-                      dayjs(it.max_response_date)
-                        .locale("th")
-                        .format("DD MMM BBBB")
-                    }}</span>
-                  </VCol>
 
-                  <VCol cols="12" md="12" class="text-center">
-                    <VBtn
-                      color="info"
-                      :disabled="
-                        it.request_document_date == null ||
-                        it.status_id != 5 ||
-                        index != 0
-                      "
-                      @click="isDialogResponseVisible = true"
-                    >
-                      อัพโหลดเอกสารตอบรับ
-                    </VBtn>
+                    <!-- 
+                      <div class="row" v-for="(rl, index) in it.reject_logs">
+                    <div class="col-md-2" v-if="rl.reject_status_id == 1">
+                      <h6 class="mb-0 d-inline">วันที่ :</h6>
+                      <span>
+                        {{
+                          dayjs(rl.createdAt).locale("th").format("DD MMM BB")
+                        }}</span
+                      >
+                    </div>
+                    <div class="col-md-10" v-if="rl.reject_status_id == 1">
+                      <h6 class="mb-0 d-inline">รายละเอียด :</h6>
+                      <span> {{ rl.comment }}</span>
+                    </div>
+                  </div>
+                     -->
                   </VCol>
                 </VRow>
               </VWindowItem>
             </VWindow>
 
-            <div class="d-flex justify-space-between mt-8">
-              <VBtn
+            <div class="d-flex mt-8">
+              <!-- justify-space-between -->
+              <!-- <VBtn
                 color="secondary"
                 variant="tonal"
                 :disabled="currentStep === 0"
@@ -1124,9 +956,48 @@ onMounted(() => {
               >
                 <VIcon icon="tabler-chevron-left" start class="flip-in-rtl" />
                 Previous
+              </VBtn> -->
+
+              <VBtn
+                color="error"
+                :disabled="it.status_id != 3 || index != 0"
+                @click="
+                  () => {
+                    rejectLog.form_id = it.id;
+                    isDialogRejectVisible = true;
+                  }
+                "
+              >
+                <VIcon
+                  size="16"
+                  icon="tabler-edit"
+                  style="opacity: 1"
+                  class="mr-1"
+                ></VIcon>
+                ส่งกลับให้แก้ไข
               </VBtn>
 
               <VBtn
+                class="ml-2"
+                color="success"
+                :disabled="it.status_id != 3 || index != 0"
+                @click="
+                  () => {
+                    item = it;
+                    isDialogVisible = true;
+                  }
+                "
+              >
+                <VIcon
+                  size="16"
+                  icon="tabler-file-description"
+                  style="opacity: 1"
+                  class="mr-1"
+                ></VIcon>
+                อนุมัติ
+              </VBtn>
+
+              <!-- <VBtn
                 color="success"
                 append-icon="tabler-check"
                 v-if="formSteps.length - 1 === currentStep"
@@ -1146,7 +1017,7 @@ onMounted(() => {
               >
                 Next
                 <VIcon icon="tabler-chevron-right" end class="flip-in-rtl" />
-              </VBtn>
+              </VBtn> -->
             </div>
           </VCardText>
         </VCard>
@@ -1173,102 +1044,52 @@ onMounted(() => {
       <VProgressCircular indeterminate />
     </VOverlay>
 
-    <!-- Del Dialog -->
-    <VDialog v-model="isDialogCheckVisible" class="v-dialog-sm" persistent>
+    <!-- Dialog -->
+    <VDialog v-model="isDialogVisible" persistent class="v-dialog-sm">
+      <!-- Dialog close btn -->
+      <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" />
+
       <!-- Dialog Content -->
-      <VCard title="กรอกข้อมูลส่วนตัวไม่ครบถ้วน">
-        <VCardText>โปรดระบุข้อมูลส่วนตัวให้ครบถ้วน</VCardText>
+      <VCard title="Are You Sure?">
+        <VCardText> ยืนยันการอนุมัติ </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn
-            :to="{
-              name: 'student-personal-data',
-            }"
-            color="error"
-          >
-            Ok</VBtn
-          >
+          <VBtn @click="isDialogVisible = !isDialogVisible" color="error">
+            Cancel
+          </VBtn>
+          <VBtn @click="onSubmit()" color="success"> Approve </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
 
-    <!-- Response Form Dialog -->
-    <VDialog v-model="isDialogResponseVisible" class="v-dialog-sm">
+    <VDialog v-model="isDialogRejectVisible" persistent class="v-dialog-sm">
       <!-- Dialog close btn -->
-      <DialogCloseBtn
-        @click="isDialogResponseVisible = !isDialogResponseVisible"
-        absolute
-      />
+      <DialogCloseBtn @click="isDialogRejectVisible = !isDialogRejectVisible" />
+
       <!-- Dialog Content -->
-      <VCard title="แบบฟอร์มอัพโหลดเอกสารตอบรับ">
-        <VCardItem>
-          <VForm
-            ref="refResponseForm"
-            v-model="isResponseFormValid"
-            @submit.prevent="onResponseSubmit"
-          >
-            <VRow>
-              <VCol cols="12">
-                <!--  -->
-                <label class="v-label" for="status_id">
-                  ผลการตอบกลับจากสถานประกอบการ
-                </label>
-                <AppSelect
-                  :items="[
-                    { title: 'ตอบรับ', value: 7 },
-                    { title: 'ปฏิเสธ', value: 6 },
-                    { title: 'สละสิทธิ์', value: 8 },
-                  ]"
-                  v-model="response_company.status_id"
-                  :rules="[requiredValidator]"
-                  variant="outlined"
-                  placeholder="Status"
-                  clearable
-                />
-                <!--  -->
-              </VCol>
+      <VCard title="แบบฟอร์มส่งข้อมูลกลับให้แก้ไข">
+        <VCardText>
+          <VCol cols="12" md="12" class="align-items-center">
+            <label class="v-label font-weight-bold" for="comment"
+              >ระบุเหตุผล :
+            </label>
+            <AppTextarea
+              id="comment"
+              v-model="rejectLog.comment"
+              rows="5"
+              persistent-placeholder
+            />
+          </VCol>
+        </VCardText>
 
-              <VCol cols="12">
-                <!--  -->
-                <label class="v-label" for="response_document_file">
-                  ไฟล์หนังสือตอบกลับ
-                </label>
-                <VFileInput
-                  v-model="response_company.response_document_file"
-                  :rules="[requiredValidator]"
-                  label="Upload File"
-                  persistent-placeholder
-                />
-                <!--  -->
-              </VCol>
-
-              <VCol cols="12">
-                <label class="v-label" for="response_province_id">
-                  จังหวัดที่ไปปฏิบัติงาน
-                </label>
-                <AppSelect
-                  :items="selectOptions.provinces"
-                  v-model="response_company.province_id"
-                  variant="outlined"
-                  placeholder="Province"
-                  clearable
-                />
-              </VCol>
-            </VRow>
-          </VForm>
-        </VCardItem>
-
-        <VCardText class="d-flex justify-end flex-wrap gap-3">
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
           <VBtn
-            variant="tonal"
-            color="secondary"
-            @click="isDialogResponseVisible = false"
+            @click="isDialogRejectVisible = !isDialogRejectVisible"
+            color="error"
           >
             Cancel
           </VBtn>
-          <VBtn type="submit" @click="onResponseSubmit" id="btn-submit">
-            <span>Save</span></VBtn
-          >
+          <VBtn @click="onRejectSubmit()" color="success"> Reject </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

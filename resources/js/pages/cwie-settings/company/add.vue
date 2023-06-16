@@ -6,6 +6,13 @@ import { useCompanyStore } from "./useCompanyStore";
 const route = useRoute();
 const router = useRouter();
 const companyStore = useCompanyStore();
+const props = defineProps(["isDialogAddCompanyVisible"]);
+const emit = defineEmits([
+  "toggle:isDialogAddCompanyVisible",
+  "update:companyItem",
+]);
+
+// console.log(issetprops.isDialogAddCompanyVisible);
 
 const item = ref({
   id: null,
@@ -25,6 +32,8 @@ const item = ref({
   tumbol_id: "",
   active: 1,
 });
+
+let userData = JSON.parse(localStorage.getItem("userData"));
 
 const isOverlay = ref(false);
 const isFormValid = ref(false);
@@ -137,6 +146,9 @@ const onSubmit = () => {
   isOverlay.value = true;
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
+      if (typeof props.isDialogAddCompanyVisible !== "undefined") {
+        item.value.status = 0;
+      }
       companyStore
         .addCompany({
           ...item.value,
@@ -153,9 +165,24 @@ const onSubmit = () => {
           if (response.data.message == "success") {
             localStorage.setItem("added", 1);
             nextTick(() => {
-              router.push({
-                path: "/cwie-settings/company/view/" + response.data.data.id,
-              });
+              if (typeof props.isDialogAddCompanyVisible !== "undefined") {
+                emit("update:companyItem", {
+                  id: response.data.data.id,
+                  name_th: response.data.data.name_th,
+                  tel: response.data.data.tel,
+                  fax: response.data.data.fax,
+                  email: response.data.data.email,
+                  website: response.data.data.website,
+                  address: response.data.data.address,
+                  province_id: response.data.data.province_id,
+                });
+
+                emit("toggle:isDialogAddCompanyVisible", false);
+              } else {
+                router.push({
+                  path: "/cwie-settings/company/view/" + response.data.data.id,
+                });
+              }
             });
           } else {
             isOverlay.value = false;
@@ -325,10 +352,10 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="2">
+            <VCol cols="12" md="2" v-if="userData.account_type != 1">
               <label class="font-weight-bold">ความคิดเห็น : </label>
             </VCol>
-            <VCol cols="12" md="10">
+            <VCol cols="12" md="10" v-if="userData.account_type != 1">
               <AppTextField
                 id="comment"
                 v-model="item.comment"
@@ -337,7 +364,12 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+              v-if="userData.account_type != 1"
+            >
               <label class="v-label font-weight-bold" for="mail"
                 >Blacklist :
               </label>
@@ -349,7 +381,12 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+              v-if="userData.account_type != 1"
+            >
               <label class="v-label font-weight-bold" for="website"
                 >สถานะ :
               </label>

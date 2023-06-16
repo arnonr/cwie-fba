@@ -240,11 +240,7 @@ onMounted(() => {
               </thead>
               <!-- 👉 table body -->
               <tbody>
-                <tr
-                  v-for="it in items"
-                  :key="it.company_id"
-                  style="height: 3.75rem"
-                >
+                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
                   <!-- 👉 User -->
                   <td>
                     <span>

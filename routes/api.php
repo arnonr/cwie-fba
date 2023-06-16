@@ -35,7 +35,6 @@ use App\Http\Controllers\PrefixNameController;
 //
 use App\Http\Controllers\FroalaController;
 
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -51,123 +50,154 @@ use App\Http\Controllers\FroalaController;
 //     return $request->user();
 // });
 
-Route::group(['prefix' => 'auth'], function () {
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']);
+Route::group(["prefix" => "auth"], function () {
+    Route::post("login", [AuthController::class, "login"]);
+    Route::post("register", [AuthController::class, "register"]);
 
-    Route::group(['middleware' => 'auth:api'], function() {
-      Route::get('logout', [AuthController::class, 'logout']);
-      Route::get('user', [AuthController::class, 'user']);
+    Route::group(["middleware" => "auth:api"], function () {
+        Route::get("logout", [AuthController::class, "logout"]);
+        Route::get("user", [AuthController::class, "user"]);
     });
 });
 
-Route::group(['prefix' => 'user'], function () {
-    Route::get('/get-icit-account/{id}', [UserController::class, 'getIcitAccount']);
-    Route::post('/import-icit-account/{id}', [UserController::class, 'getImportIcitAccount']);
-    Route::get('/{id}', [UserController::class, 'get']);
-    Route::get('/', [UserController::class, 'getAll']);
-    Route::post('/', [UserController::class, 'add']);
-    Route::put('/{id}', [UserController::class, 'edit']);
-    Route::delete('/{id}', [UserController::class, 'delete']);
+Route::group(["prefix" => "user"], function () {
+    Route::get("/get-icit-account/{id}", [
+        UserController::class,
+        "getIcitAccount",
+    ]);
+    Route::post("/import-icit-account/{id}", [
+        UserController::class,
+        "getImportIcitAccount",
+    ]);
+    Route::get("/{id}", [UserController::class, "get"]);
+    Route::get("/", [UserController::class, "getAll"]);
+    Route::post("/", [UserController::class, "add"]);
+    Route::put("/{id}", [UserController::class, "edit"]);
+    Route::delete("/{id}", [UserController::class, "delete"]);
 });
 
-
-Route::group(['prefix' => 'province'], function () {
-  Route::get('/{id}', [ProvinceController::class, 'get']);
-  Route::get('/', [ProvinceController::class, 'getAll']);
-  Route::post('/', [ProvinceController::class, 'add']);
-  Route::put('/{id}', [ProvinceController::class, 'edit']);
-  Route::delete('/{id}', [ProvinceController::class, 'delete']);
+Route::group(["prefix" => "province"], function () {
+    Route::get("/{id}", [ProvinceController::class, "get"]);
+    Route::get("/", [ProvinceController::class, "getAll"]);
+    Route::post("/", [ProvinceController::class, "add"]);
+    Route::put("/{id}", [ProvinceController::class, "edit"]);
+    Route::delete("/{id}", [ProvinceController::class, "delete"]);
 });
 
-Route::group(['prefix' => 'amphur'], function () {
-  Route::get('/{id}', [AmphurController::class, 'get']);
-  Route::get('/', [AmphurController::class, 'getAll']);
+Route::group(["prefix" => "amphur"], function () {
+    Route::get("/{id}", [AmphurController::class, "get"]);
+    Route::get("/", [AmphurController::class, "getAll"]);
 });
 
-Route::group(['prefix' => 'tumbol'], function () {
-  Route::get('/{id}', [TumbolController::class, 'get']);
-  Route::get('/', [TumbolController::class, 'getAll']);
+Route::group(["prefix" => "tumbol"], function () {
+    Route::get("/{id}", [TumbolController::class, "get"]);
+    Route::get("/", [TumbolController::class, "getAll"]);
 });
 
-
-Route::group(['prefix' => 'teacher'], function () {
-
-  Route::get('/hris-find-personnel', [TeacherController::class, 'getHrisPersonel']);
-  Route::get('/hris-sync-all-teacher', [TeacherController::class, 'hrisSyncAllTeacher']);
-  Route::get('/{id}', [TeacherController::class, 'get']);
-  Route::get('/', [TeacherController::class, 'getAll']);
-  Route::post('/', [TeacherController::class, 'add']);
-  Route::put('/{id}', [TeacherController::class, 'edit']);
-  Route::delete('/{id}', [TeacherController::class, 'delete']);
+Route::group(["prefix" => "teacher"], function () {
+    Route::get("/hris-find-personnel", [
+        TeacherController::class,
+        "getHrisPersonel",
+    ]);
+    Route::get("/hris-sync-all-teacher", [
+        TeacherController::class,
+        "hrisSyncAllTeacher",
+    ]);
+    Route::get("/{id}", [TeacherController::class, "get"]);
+    Route::get("/", [TeacherController::class, "getAll"]);
+    Route::post("/", [TeacherController::class, "add"]);
+    Route::put("/{id}", [TeacherController::class, "edit"]);
+    Route::delete("/{id}", [TeacherController::class, "delete"]);
 });
 
-Route::group(['prefix' => 'faculty'], function () {
-  Route::get('/{id}', [FacultyController::class, 'get']);
-  Route::get('/', [FacultyController::class, 'getAll']);
-  Route::put('/{id}', [FacultyController::class, 'edit']);
+Route::group(["prefix" => "faculty"], function () {
+    Route::get("/{id}", [FacultyController::class, "get"]);
+    Route::get("/", [FacultyController::class, "getAll"]);
+    Route::put("/{id}", [FacultyController::class, "edit"]);
 });
 
-Route::group(['prefix' => 'department'], function () {
-  Route::get('/{id}', [DepartmentController::class, 'get']);
-  Route::get('/', [DepartmentController::class, 'getAll']);
-  Route::put('/{id}', [DepartmentController::class, 'edit']);
+Route::group(["prefix" => "department"], function () {
+    Route::get("/{id}", [DepartmentController::class, "get"]);
+    Route::get("/", [DepartmentController::class, "getAll"]);
+    Route::put("/{id}", [DepartmentController::class, "edit"]);
 });
 
-Route::group(['prefix' => 'major'], function () {
-  Route::get('/{id}', [MajorController::class, 'get']);
-  Route::get('/', [MajorController::class, 'getAll']);
-  Route::put('/{id}', [MajorController::class, 'edit']);
+Route::group(["prefix" => "major"], function () {
+    Route::get("/{id}", [MajorController::class, "get"]);
+    Route::get("/", [MajorController::class, "getAll"]);
+    Route::put("/{id}", [MajorController::class, "edit"]);
 });
 
-Route::group(['prefix' => 'major-head'], function () {
-  Route::get('/{id}', [MajorHeadController::class, 'get']);
-  Route::get('/', [MajorHeadController::class, 'getAll']);
-  Route::post('/', [MajorHeadController::class, 'add']);
-  Route::put('/{id}', [MajorHeadController::class, 'edit']);
-  Route::delete('/{id}', [MajorHeadController::class, 'delete']);
+Route::group(["prefix" => "major-head"], function () {
+    Route::get("/{id}", [MajorHeadController::class, "get"]);
+    Route::get("/", [MajorHeadController::class, "getAll"]);
+    Route::post("/", [MajorHeadController::class, "add"]);
+    Route::put("/{id}", [MajorHeadController::class, "edit"]);
+    Route::delete("/{id}", [MajorHeadController::class, "delete"]);
 });
 
-Route::group(['prefix' => 'company'], function () {
-  Route::get('/{id}', [CompanyController::class, 'get']);
-  Route::get('/', [CompanyController::class, 'getAll']);
-  Route::post('/', [CompanyController::class, 'add']);
-  Route::put('/{id}', [CompanyController::class, 'edit']);
-  Route::delete('/{id}', [CompanyController::class, 'delete']);
+Route::group(["prefix" => "company"], function () {
+    Route::get("/{id}", [CompanyController::class, "get"]);
+    Route::get("/", [CompanyController::class, "getAll"]);
+    Route::post("/", [CompanyController::class, "add"]);
+    Route::put("/{id}", [CompanyController::class, "edit"]);
+    Route::delete("/{id}", [CompanyController::class, "delete"]);
 });
 
-Route::group(['prefix' => 'semester'], function () {
-  Route::get('/{id}', [SemesterController::class, 'get']);
-  Route::get('/', [SemesterController::class, 'getAll']);
-  Route::post('/', [SemesterController::class, 'add']);
-  Route::put('/{id}', [SemesterController::class, 'edit']);
-  Route::delete('/{id}', [SemesterController::class, 'delete']);
+Route::group(["prefix" => "semester"], function () {
+    Route::get("/{id}", [SemesterController::class, "get"]);
+    Route::get("/", [SemesterController::class, "getAll"]);
+    Route::post("/", [SemesterController::class, "add"]);
+    Route::put("/{id}", [SemesterController::class, "edit"]);
+    Route::delete("/{id}", [SemesterController::class, "delete"]);
 });
 
-Route::group(['prefix' => 'student'], function () {
-  Route::post('/import/{id}', [StudentController::class, 'import']);
-  Route::get('/{id}', [StudentController::class, 'get']);
-  Route::get('/', [StudentController::class, 'getAll']);
-  Route::post('/', [StudentController::class, 'add']);
-  Route::put('/{id}', [StudentController::class, 'edit']);
-  Route::delete('/{id}', [StudentController::class, 'delete']);
-
+Route::group(["prefix" => "student"], function () {
+    Route::post("/import/{id}", [StudentController::class, "import"]);
+    //   Route::get('/list', [StudentController::class, 'getList']);
+    Route::get("/{id}", [StudentController::class, "get"]);
+    Route::get("/", [StudentController::class, "getAll"]);
+    Route::post("/", [StudentController::class, "add"]);
+    Route::put("/{id}", [StudentController::class, "edit"]);
+    Route::delete("/{id}", [StudentController::class, "delete"]);
 });
 
-Route::group(['prefix' => 'document-type'], function () {
-  Route::get('/{id}', [DocumentTypeController::class, 'get']);
-  Route::get('/', [DocumentTypeController::class, 'getAll']);
-  Route::post('/', [DocumentTypeController::class, 'add']);
-  Route::put('/{id}', [DocumentTypeController::class, 'edit']);
-  Route::delete('/{id}', [DocumentTypeController::class, 'delete']);
+Route::group(["prefix" => "document-type"], function () {
+    Route::get("/{id}", [DocumentTypeController::class, "get"]);
+    Route::get("/", [DocumentTypeController::class, "getAll"]);
+    Route::post("/", [DocumentTypeController::class, "add"]);
+    Route::put("/{id}", [DocumentTypeController::class, "edit"]);
+    Route::delete("/{id}", [DocumentTypeController::class, "delete"]);
 });
 
-Route::group(['prefix' => 'student-document'], function () {
-  Route::get('/{id}', [StudentDocumentController::class, 'get']);
-  Route::get('/', [StudentDocumentController::class, 'getAll']);
-  Route::post('/', [StudentDocumentController::class, 'add']);
-  Route::put('/{id}', [StudentDocumentController::class, 'edit']);
-  Route::delete('/{id}', [StudentDocumentController::class, 'delete']);
+Route::group(["prefix" => "student-document"], function () {
+    Route::get("/{id}", [StudentDocumentController::class, "get"]);
+    Route::get("/", [StudentDocumentController::class, "getAll"]);
+    Route::post("/", [StudentDocumentController::class, "add"]);
+    Route::put("/{id}", [StudentDocumentController::class, "edit"]);
+    Route::delete("/{id}", [StudentDocumentController::class, "delete"]);
+});
+
+Route::group(["prefix" => "form"], function () {
+    Route::get("/{id}", [FormController::class, "get"]);
+    Route::get("/", [FormController::class, "getAll"]);
+    Route::post("/", [FormController::class, "add"]);
+    Route::post("/add-request-book", [FormController::class, "AddRequestBook"]);
+    Route::post("/add-response-book", [
+        FormController::class,
+        "AddResponseBook",
+    ]);
+    Route::put("/approve/{id}", [FormController::class, "approve"]);
+    Route::put("/{id}", [FormController::class, "edit"]);
+    Route::delete("/{id}", [FormController::class, "delete"]);
+});
+
+Route::group(["prefix" => "reject-log"], function () {
+    Route::get("/{id}", [RejectLogController::class, "get"]);
+    Route::get("/", [RejectLogController::class, "getAll"]);
+    Route::post("/", [RejectLogController::class, "add"]);
+    Route::put("/{id}", [RejectLogController::class, "edit"]);
+    Route::delete("/{id}", [RejectLogController::class, "delete"]);
 });
 
 // Route::group(['prefix' => ''], function () {
@@ -180,8 +210,8 @@ Route::group(['prefix' => 'student-document'], function () {
 // //   Route::post('/uppy', [NewsGalleryController::class, 'uppy']);
 // });
 
-Route::group(['prefix' => 'froala'], function () {
-  Route::post('/image', [FroalaController::class, 'image']);
-  Route::post('/document', [FroalaController::class, 'document']);
-  Route::post('/video', [FroalaController::class, 'video']);
+Route::group(["prefix" => "froala"], function () {
+    Route::post("/image", [FroalaController::class, "image"]);
+    Route::post("/document", [FroalaController::class, "document"]);
+    Route::post("/video", [FroalaController::class, "video"]);
 });

@@ -231,7 +231,7 @@ const format = (date) => {
                 for="chairman_id"
                 cols="12"
                 md="12"
-                >รองคณบดีฝ่ายสหกิจศึกษา :
+                >ประธานบริหารโครงการสหกิจศึกษา :
               </label>
               <AppSelect
                 :items="selectOptions.teachers"

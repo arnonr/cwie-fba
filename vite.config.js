@@ -17,7 +17,7 @@ import DefineOptions from "unplugin-vue-define-options/vite";
 export default defineConfig({
   server: {
     hmr: {
-      host: "127.0.0.1",
+      host: "localhost",
     },
     watch: {
       ignored: ["**/storage/app/public/**"],

@@ -59,6 +59,11 @@ class AuthController extends Controller
             )
             ->where('username', $request->username)
             ->first();
+            
+            $teacher = null;
+            if($userDB->account_type == 2){
+                $teacher = Teacher::where('user_id',$userDB->id)->first();
+            }
 
             $user = $userDB;
 
@@ -71,6 +76,7 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'success',
                 'userData' => $userDB,
+                'teacherData' => $teacher,
                 'accessToken' => $tokenResult->accessToken,
                 'token_type' => 'Bearer',
                 'expires_at' => Carbon::parse(

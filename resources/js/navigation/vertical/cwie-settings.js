@@ -1,5 +1,5 @@
 export default [
-  { heading: "ตั้งค่า CWIE", action: "read", subject: "Auth" },
+  { heading: "ตั้งค่า COOP", action: "read", subject: "Auth" },
   {
     title: "ข้อมูลอาจารย์",
     icon: { icon: "tabler-users" },

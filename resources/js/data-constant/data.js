@@ -384,9 +384,9 @@ export const form_statuses = [
   "warning", // 3
   "warning", // 4
   "warning", // 5
-  "danger", // 6
+  "error", // 6
   "success", // 7
-  "danger", // 8
+  "error", // 8
   "primary", // 9
 ];
 
