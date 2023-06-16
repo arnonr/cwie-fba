@@ -63,7 +63,7 @@ class TeacherController extends Controller
             ->leftJoin('faculty','faculty.id','=','teacher.faculty_id')
             ->leftJoin('department','department.id','=','teacher.department_id');
         }
-        
+
         if($request->includeFaculty){
             $items->addSelect('faculty.name_th as faculty_name');
             $items->leftJoin('faculty','faculty.id','=','teacher.faculty_id');
@@ -149,7 +149,7 @@ class TeacherController extends Controller
         }else{
             $items = $items->orderBy('teacher.id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -158,7 +158,7 @@ class TeacherController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -212,49 +212,60 @@ class TeacherController extends Controller
         ], 200);
     }
 
-    // public function add(Request $request)
-    // {
-    //     $request->validate([
-    //         'name as required',
-    //         'name as required',
-    //         'email as required',
-    //         'account_type as required',
-    //     ]);
-        
-    //     // $data = $request->all();
-    //     // $data['column9'] = 'aaaa';
-    //     // Province::create($data);
+    public function add(Request $request)
+    {
+        $request->validate([
+            'citizen_id as required',
+            'person_key as required',
+        ]);
 
-    //     // Province::create([
-    //     //     'provincename' => $request->provincename,
-    //     //     'name' => $request->name,
-    //     //     'email' => $request->email,
-    //     //     'citizen_id' => $request->citizen_id,
-    //     //     'account_type' => $request->account_type,
-    //     // ]);
+        $item = new Teacher;
 
-    //     $data = new Province;
-    //     $data->provincename = $request->provincename;
-    //     $data->name = $request->name;
-    //     $data->email = $request->email;
-    //     $data->citizen_id = $request->citizen_id;
-    //     $data->account_type = $request->account_type;
-    //     $data->save();
+        $pathSignature = null;
+        if(($request->signature_file != "") && ($request->signature_file != 'null') && ($request->signature_file != 'undefined')){
+            $fileSignature = 'signature-'.rand(10,100).'-'.$request->file('signature_file')->getClientOriginalName();
+            $pathSignature = '/teacher/signature/'.$fileSignature;
+            Storage::disk('public')->put($pathSignature, file_get_contents($request->signature_file));
+            $request->signature_file = $pathSignature;
+        }
 
-    //     $responseData = [
-    //         'message' => 'success',
-    //         'data' => $data,
-    //     ];
+        $item->person_key = $request->person_key;
+        $item->citizen_id = $request->citizen_id;
+        $item->prefix = $request->prefix;
+        $item->citizen_id = $request->citizen_id;
+        $item->firstname = $request->firstname;
+        $item->surname = $request->surname;
+        $item->tel = $request->tel;
+        $item->email = $request->email;
+        $item->signature_file = $pathSignature;
+        $item->address = $request->address;
+        $item->province_id = $request->province_id;
+        $item->amphur_id = $request->amphur_id;
+        $item->tumbol_id = $request->tumbol_id;
+        $item->faculty_id = $request->faculty_id;
+        $item->department_id = $request->department_id;
+        $item->updated_by = 'arnonr';
+        $item->save();
 
-    //     return response()->json($responseData, 200);
-    // }
+        $responseData = [
+            'message' => 'success',
+            'data' => $item,
+        ];
+
+        return response()->json($responseData, 200);
+    }
 
     public function edit($id, Request $request)
     {
-        $request->validate([
-            'id as required',
-        ]);
-
+        // $request->validate([
+        //     'id as required',
+        // ]);
+            // print_r($request);
+        // if(!empty($request->citizen_id)){
+        //     echo "xxx";
+        // }else{
+        //     echo "yyy";
+        // }
         $item = Teacher::where('id', $id)->first();
 
         $pathSignature = null;
@@ -267,20 +278,50 @@ class TeacherController extends Controller
             $pathSignature  = $item->signature_file;
         }
 
-        $item->prefix = $request->has('prefix') ? $request->prefix: $item->prefix;
-        $item->firstname = $request->has('firstname') ? $request->firstname: $item->firstname;
-        $item->surname = $request->has('surname') ? $request->surname: $item->surname;
-        // $item-> = $request->has('') ? $request->: $item->;
-        $item->tel = $request->has('tel') ? $request->tel : $item->tel;
-        $item->email = $request->has('email') ? $request->email : $item->email;
+        // $item->person_key = $request->has('person_key') ? $request->person_key: $item->person_key;
+        // $item->citizen_id = $request->has('citizen_id') ? $request->citizen_id: $item->citizen_id;
+        // $item->prefix = $request->has('prefix') ? $request->prefix: $item->prefix;
+        // $item->firstname = $request->has('firstname') ? $request->firstname: $item->firstname;
+        // $item->surname = $request->has('surname') ? $request->surname: $item->surname;
+        // $item->tel = $request->has('tel') ? $request->tel : $item->tel;
+        // $item->email = $request->has('email') ? $request->email : $item->email;
+        // $item->signature_file = $pathSignature;
+        // $item->address = $request->has('address') ? $request->address : $item->address;
+        // $item->province_id = $request->has('province_id') ? $request->province_id : $item->province_id;
+        // $item->amphur_id  = $request->has('amphur_id') ? $request->amphur_id : $item->amphur_id;
+        // $item->tumbol_id = $request->has('tumbol_id') ? $request->tumbol_id : $item->tumbol_id;
+        // $item->active = $request->has('active') ? $request->active : $item->active;
+        // $item->faculty_id = $request->has('faculty_id') ? $request->faculty_id : $item->faculty_id;
+        // $item->department_id = $request->has('department_id') ? $request->department_id : $item->department_id;
+        // $item->hris_last_updated_at = $request->has('hris_last_updated_at') ? $request->hris_last_updated_at : $item->hris_last_updated_at;
+
+        $item->person_key = $request->person_key ? $request->person_key: $item->person_key;
+        $item->citizen_id = $request->citizen_id ? $request->citizen_id: $item->citizen_id;
+        $item->prefix = $request->prefix ? $request->prefix: $item->prefix;
+        $item->firstname = $request->firstname ? $request->firstname: $item->firstname;
+        $item->surname = $request->surname ? $request->surname: $item->surname;
+        $item->tel = $request->tel ? $request->tel : $item->tel;
+        $item->email = $request->email ? $request->email : $item->email;
         $item->signature_file = $pathSignature;
-        $item->address = $request->has('address') ? $request->address : $item->address;
-        $item->province_id = $request->has('province_id') ? $request->province_id : $item->province_id;
-        $item->amphur_id  = $request->has('amphur_id') ? $request->amphur_id : $item->amphur_id;
-        $item->tumbol_id = $request->has('tumbol_id') ? $request->tumbol_id : $item->tumbol_id;
-        $item->active = $request->has('active') ? $request->active : $item->active;
+        $item->address = $request->address ? $request->address : $item->address;
+        $item->province_id = $request->hprovince_id ? $request->province_id : $item->province_id;
+        $item->amphur_id  = $request->hamphur_id ? $request->amphur_id : $item->amphur_id;
+        $item->tumbol_id = $request->tumbol_id ? $request->tumbol_id : $item->tumbol_id;
+        $item->active = $request->active ? $request->active : $item->active;
+        $item->faculty_id = $request->faculty_id ? $request->faculty_id : $item->faculty_id;
+        $item->department_id = $request->department_id ? $request->department_id : $item->department_id;
+        $item->hris_last_updated_at = $request->hris_last_updated_at ? $request->hris_last_updated_at : $item->hris_last_updated_at;
+
+        // echo '$item->hris_last_updated_atxx'.$item->hris_last_updated_at;
+
         $item->updated_by = 'arnonr';
-        $item->save();
+        // print_r($item);
+        // $item->save();
+        if($item->save()){
+            // echo "OK";
+        }else{
+            // echo "Fail";
+        }
 
         $responseData = [
             'message' => 'success',
@@ -293,7 +334,7 @@ class TeacherController extends Controller
     public function delete($id)
     {
         $data = Teacher::where('id', $id)->first();
-        
+
         $data->deleted_at = Carbon::now();
         $data->save();
 
@@ -304,14 +345,158 @@ class TeacherController extends Controller
         return response()->json($responseData, 200);
     }
 
+    public function hrisPersonnelInfo(Request $request)
+    {
+        $params = [];
+        if ($request->person_key) $params['person_key'] = $request->person_key;
+        if ($request->citizen_id) $params['citizen_id'] = $request->citizen_id;
 
-    public function hrisPersonnelInfo(Request $request) {
+        $result = $this->apiHrisPersonnelDetail($params);
+
+        if(empty($result)){
+            return response()->json([
+                'message' => 'ไม่พบข้อมูลบุคลากรในระบบ HRIS',
+            ], 404);
+        }
+
+        $responseData = [
+            'message' => 'success',
+            'data' => $result,
+        ];
+        return response()->json($responseData, 200);
+    }
+
+    function hrisImportPersonnel(Request $request)
+    {
+        // $request->validate([
+        //     'firstname as required',
+        //     'surname as required',
+        // ]);
+        $person_key = null;
+        if ($request->person_key){
+            $person_key = $request->person_key;
+        }
+
+        $result = $this->apiHrisPersonnelDetail(['person_key' => $person_key]);
+        if(empty($result)){
+            return response()->json([
+                'message' => 'ไม่พบข้อมูลบุคลากรในระบบ HRIS',
+            ], 404);
+        }
+
+        $citizen_id = $result['citizen_id'];
+        $prefix = $result['prefix'];
+        $firstname = $result['firstname'];
+        $surname = $result['surname'];
+        $faculty_code = $result['faculty_code'];
+        $faculty_name = $result['faculty_name'];
+        $department_code = $result['department_code'];
+        $department_name = $result['department_name'];
+        $position_id = $result['position_id'];
+        $position_th = $result['position_th'];
+        $last_updated_at = $result['last_updated_at'];
+
+        // print_r($result_detail);
+        $faculty = app('App\Http\Controllers\FacultyController')->import($faculty_code,$faculty_name);
+        $department = app('App\Http\Controllers\DepartmentController')->import($department_code,$department_name);
+
+        $reqTeacher = new Request();
+        $reqTeacher->person_key = $person_key;
+        $reqTeacher->citizen_id = $citizen_id;
+        $reqTeacher->prefix = $prefix;
+        $reqTeacher->firstname = $firstname;
+        $reqTeacher->surname = $surname;
+        $reqTeacher->faculty_id = $faculty->id;
+        $reqTeacher->department_id = $department->id;
+        $reqTeacher->hris_last_updated_at = $last_updated_at;
+
+        $teacher_data = Teacher::where('person_key', $person_key)->first();
+        if ($teacher_data) {
+            // echo "Update";
+            $save_data = $this->edit($teacher_data->id, $reqTeacher);
+        }else{
+            $save_data = $this->add($reqTeacher);
+            // echo "Insert";
+        }
+        return $save_data;
+    }
+
+    function hrisFindPersonnel(Request $request)
+    {
+        // $request->validate([
+        //     'firstname as required',
+        //     'surname as required',
+        // ]);
+        $result = $this->apiListHrisPersonnel($request);
+        if(empty($result)){
+            return response()->json([
+                'message' => 'ไม่พบข้อมูลบุคลากรในระบบ HRIS',
+            ], 404);
+        }
+
+        $responseData = [
+            'message' => 'success',
+            'data' => $result[0],
+        ];
+
+        return response()->json($responseData, 200);
+    }
+
+    public function apiListHrisPersonnel(Request $request)
+    {
+        $access_token = 'rn7496A7JE7jEnstEbAQDsm2bstbKhaW'; // <----- API - Access Token Here
+        //
+        $data = [
+            'faculty_code' => 14,
+        ];
+
+        if ($request->firstname){
+            $data['firstname'] = $request->firstname;
+        }
+
+        if ($request->surname){
+            $data['lastname'] = $request->surname;
+        }
+
+        if ($request->position_type_id){
+            $data['position_type_id'] = $request->position_type_id;
+        }
+
+        if ($request->person_key){
+            $data['person_key'] = $request->person_key;
+        }
+
+        $api_url = "https://api.hris.kmutnb.ac.th/api/personnel-api/list-personnel"; // <----- API URL
+
+        $response = Http::timeout(50)->withToken($access_token)->post($api_url, $data);
+
+        $api_data = [];
+
+        if($response != false){
+            if (!empty($response['data'])) {
+
+                foreach($response['data'] as $value){
+                    $api_data[] = [
+                        'person_key' => $value['person_key'],
+                        'last_updated_at' => $value['last_updated_at'],
+                        'firstname' => $value['firstname_th'],
+                        'surname' => $value['lastname_th'],
+                        'position_type_id' => $value['position_type_id'],
+                    ];
+                }
+
+            }
+        }
+        return $api_data;
+    }
+
+    public function apiHrisPersonnelDetail($params) {
         $dataParams = [];
 
-        if ($request->person_key) $dataParams["person_key"] = $request->person_key;
-    
-        if ($request->citizen_id) $dataParams["citizen_id"] = $request->citizen_id;
-    
+        if (!empty($params['person_key'])) $dataParams["person_key"] = $params['person_key'];
+
+        if (!empty($params['citizen_id'])) $dataParams["citizen_id"] = $params['citizen_id'];
+
         $dataParams["get_work_info"] = 1;
         $dataParams["get_citizen_id"] = 1;
         // dataParams['get_icit_account'] = 1;
@@ -321,10 +506,9 @@ class TeacherController extends Controller
         $api_url = 'https://api.hris.kmutnb.ac.th/api/personnel-api/personnel-detail'; // <----- API URL
 
         $response = Http::timeout(50)->withToken($access_token)->post($api_url, $dataParams);
-
-        if($response != false){
-            console.log($response);
-
+        // print_r($response);
+        $apiData = [];
+        if(!empty($response['person_key'])){
             $apiData = [
                 'person_key' => $response['person_key'],
                 'citizen_id' => $response['person_info']['citizen_id'],
@@ -339,154 +523,87 @@ class TeacherController extends Controller
                 'department_name' => $response['work_info']['department_name_th'],
                 'position_id' => $response['work_info']['position_id'],
                 'position_th' => $response['work_info']['position_th'],
-                // icit_account: apiObj.icit_account,
             ];
-              //console.log("service fac = " +apiObj.work_info.faculty_code);
-
-            //   return response()->json([
-            //     'message' => 'success',
-            //     'apiData' => $apiData
-            // ], 200);
-
-            return response()->json($apiData, 200);
-
-        }else{
-            return response()->json([
-                'message' => 'ไม่พบข้อมูลบุคลากรในระบบ HRIS',
-            ], 404);
         }
+        return $apiData;
     }
 
+    function hrisSyncAllTeacher(Request $req) {
+        /* ดึงข้อมูลสายวิชาการทั้งหมด */
 
-    public function getHrisPersonel(Request $request) {
+        $request = new Request();
+        $request->position_type_id = 1;
+        // $request->firstname = 'ทวีศักดิ์';
 
-        $request->validate([
-            'firstname as required',
-            'surname as required',
-        ]);
+        $result = $this->apiListHrisPersonnel($request);
+        $insert = 0;
+        $update = 0;
+        $total = 0;
+        foreach ($result as $key => $value) {
+            $total++;
+            $person_key = $value['person_key'];
+            $api_updated_time = $value['last_updated_at'];
+            $person_name = $value['firstname'].' '.$value['surname'];
 
-        $access_token = 'rn7496A7JE7jEnstEbAQDsm2bstbKhaW'; // <----- API - Access Token Here
-        // 
-        $data = [
-            'faculty_code' => 14,
+            $teacher_data = Teacher::where('person_key', $person_key)->first();
+            // print_r($teacher_data);
+            // echo "api".$api_updated_time;
+            // echo '\ndb'.$teacher_data->hris_last_updated_at;
+            if ($teacher_data) {
+                if($teacher_data->hris_last_updated_at == $api_updated_time){
+                    // echo $teacher_data->firstname."Already exists\n";
+                    continue;
+                }
+                // echo $teacher_data->firstname."Update";
+                // echo "\n";
+            }
+
+            $result_detail = $this->apiHrisPersonnelDetail(['person_key' => $person_key]);
+
+            $citizen_id = $result_detail['citizen_id'];
+            $prefix = $result_detail['prefix'];
+            $firstname = $result_detail['firstname'];
+            $surname = $result_detail['surname'];
+            $faculty_code = $result_detail['faculty_code'];
+            $faculty_name = $result_detail['faculty_name'];
+            $department_code = $result_detail['department_code'];
+            $department_name = $result_detail['department_name'];
+            $position_id = $result_detail['position_id'];
+            $position_th = $result_detail['position_th'];
+
+            // print_r($result_detail);
+            $faculty = app('App\Http\Controllers\FacultyController')->import($faculty_code,$faculty_name);
+            $department = app('App\Http\Controllers\DepartmentController')->import($department_code,$department_name);
+
+            $reqTeacher = new Request();
+            $reqTeacher->person_key = $person_key;
+            $reqTeacher->citizen_id = $citizen_id;
+            $reqTeacher->prefix = $prefix;
+            $reqTeacher->firstname = $firstname;
+            $reqTeacher->surname = $surname;
+            $reqTeacher->faculty_id = $faculty->id;
+            $reqTeacher->department_id = $department->id;
+            $reqTeacher->hris_last_updated_at = $api_updated_time;
+
+            // print_r($result_detail);
+
+            if ($teacher_data) {
+                // echo "ID ".$teacher_data->id;
+                $save_data = $this->edit($teacher_data->id, $reqTeacher);
+                $update++;
+            }else{
+                $save_data = $this->add($reqTeacher);
+                $insert++;
+                // echo "Insert";
+            }
+        }
+
+        $responseData = [
+            'message' => 'success',
+            'data' => ['total' => $total, 'insert' => $insert, 'update' => $update],
         ];
 
-        if ($request->firstname){
-            $data['firstname'] = $request->firstname;
-        }
-
-        if ($request->surname){
-            $data['surname'] = $request->surname;
-        }
-
-        if ($request->position_type_id){
-            $data['position_type_id'] = $request->position_type_id;
-        }
-
-        if ($request->position_type_id){
-            $data['person_key'] = $request->person_key;
-        }
-
-        $api_url = "https://api.hris.kmutnb.ac.th/api/personnel-api/list-personnel"; // <----- API URL
-
-        $response = Http::timeout(50)->withToken($access_token)->post($api_url, $data);
-     
-        if($response != false){
-            if (!empty($response['data'])) {
-                $api_data = [];
-                foreach($response['data'] as $value){
-                    array_push($api_data,[
-                        'person_key' => $value['person_key'],
-                        'last_updated_at' => $value['last_updated_at'],
-                        'firstname' => $value['firstname_th'],
-                        'surname' => $value['lastname_th'],
-                        'position_type_id' => $value['position_type_id'],
-                    ]);
-                }
-
-                // return $api_data;
-                return response()->json($api_data, 200);
-
-            } else if ($get_response->status == 404) {
-                return response()->json([
-                    'message' => 'ไม่พบข้อมูลบุคลากรในระบบ HRIS',
-                ], 404);
-            } else {
-                return $response;
-            }
-        }else{
-            return response()->json([
-                'message' => 'API ICIT HRIS ERROR',
-            ], 503);
-        }
+        return response()->json($responseData, 200);
     }
 
-
-    public function hrisSyncAllTeacher(Request $req) {
-            /* ดึงข้อมูลสายวิชาการทั้งหมด */
-
-            $req = new Request();
-            $req->position_type_id = 1;
-            // 
-            $result = $this->getHrisPersonel($req);
-        
-            foreach($result as $key => $value){
-                
-                print_r($value);
-
-                $person_key = $result[$key]['person_key'];
-
-                $api_updated_time = $result[$key]['last_updated_at'];
-
-                $person_name = $result[$key]['firstname'].' '.$result[$key]['surname'];
-
-                $teacher_data = Teacher::where('person_key', $person_key)->first();
-
-                $db_updated_time = null;
-                
-                if ($teacher_data) {
-                    $db_updated_time = $api_updated_time;
-
-                    if($db_updated_time == $api_updated_time){
-                        continue;
-                    }
-                }
-
-                $req1 = new Request();
-                $req1->person_key = person_key;
-
-                $resultInfo = $this->hrisPersonnelInfo($req1);
-
-                $faculty = app('App\Http\Controllers\FacultyController')->import($result->faculty_code,$result->faculty_name);
-                $major = app('App\Http\Controllers\DepartmentController')->import($result->department_code,$result->department_name);
-    
-                $result['faculty_id'] = $faculty->id;
-                $result['department_id'] = $department->id;
-
-                $teacher_data = Teacher::where('citizen_id',$resultInfo->citizen_id)->first();
-
-                $resultInfo['person_key'] = resultInfo->person_key;
-                // resultInfo['icit_account'] = resultInfo.icit_account;
-                $resultInfo['citizen_id'] = resultInfo->citizen_id;
-                $resultInfo['faculty_id'] = faculty_id;
-                $resultInfo['department_id'] = department_id;
-                $resultInfo['hris_last_updated_at'] = resultInfo->last_updated_at;
-
-                $save_data = null;
-                if (!$teacher_data) {
-                    $resultInfo['created_by'] = 'arnonr';
-                    $save_data = $this->add($resultInfo);
-                    console.log("insert");
-                }else{
-                    if($db_updated_time !== $api_updated_time){
-                        $save_data = $this->update($teacher_data.id, $resultInfo);
-                        console.log("Update");
-                    }else{
-                        console.log("Up to date");
-                    }
-                }
-            }
-            // res.success(result);
-    }
-    
 }
