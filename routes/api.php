@@ -34,6 +34,7 @@ use App\Http\Controllers\NewsCategoryController;
 use App\Http\Controllers\PrefixNameController;
 //
 use App\Http\Controllers\FroalaController;
+use App\Http\Controllers\MailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -223,3 +224,9 @@ Route::group(["prefix" => "froala"], function () {
     Route::post("/document", [FroalaController::class, "document"]);
     Route::post("/video", [FroalaController::class, "video"]);
 });
+
+Route::group(["prefix" => "mail"], function () {
+    Route::get("/send/{receiver}", [MailController::class, "send"]);
+});
+
+
