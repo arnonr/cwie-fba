@@ -828,6 +828,25 @@ class FormController extends Controller
             "max_response_date" => $request->max_response_date,
             "updated_by" => "arnonr",
         ]);
+        // รอส่งเมลแจ้งเตือนหนังสือขอความอนุเคราะห์
+
+        $responseData = [
+            "message" => "success",
+        ];
+
+        return response()->json($responseData, 200);
+    }
+
+    public function addSendBook(Request $request)
+    {
+        $request->validate(["id as required"]);
+
+        Form::whereIn("id", $request->id)->update([
+            "send_document_number" => $request->send_document_number,
+            "send_document_date" => $request->send_document_date,
+            "updated_by" => "arnonr",
+        ]);
+        // รอส่งเมลแจ้งเตือนหนังสือส่งตัว
 
         $responseData = [
             "message" => "success",

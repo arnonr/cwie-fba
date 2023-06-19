@@ -533,11 +533,13 @@ const format = (date) => {
 
                   <td class="text-center" style="min-width: 100px">
                     <VChip label :color="form_statuses[it.status_id]">{{
-                      text_statuses[it.status_id] == "คณะยืนยันข้อมูล"
-                        ? it.request_document_date != null
-                          ? "ออกหนังสือขอความอนุเคราะห์แล้ว"
+                      text_statuses[it.status_id] != "คณะยืนยันข้อมูล"
+                        ? it.request_document_date == null
+                          ? text_statuses[it.status_id] == "ส่งแล้ว"
+                            ? "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
+                            : text_statuses[it.status_id] //
                           : text_statuses[it.status_id]
-                        : "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
+                        : "คณะยืนยันข้อมูล"
                     }}</VChip>
                   </td>
 

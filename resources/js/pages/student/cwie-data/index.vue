@@ -4,6 +4,10 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 import "sweetalert2/src/sweetalert2.scss";
 import { useRoute, useRouter } from "vue-router";
+
+import { PDFDocument, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+
 ////
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import "vue3-pdf-app/dist/icons/main.css";
@@ -57,6 +61,7 @@ const formSteps = [
   },
 ];
 const items = ref([]);
+const formActive = ref({});
 const prependIcon = "tabler-arrow-big-right-filled";
 const qualifications = [
   {
@@ -419,6 +424,7 @@ const fetchForms = () => {
         for (let i = 0; i < data.length; i++) {
           if (data[i].active == 1) {
             response_company.value.form_id = data[i].id;
+            formActive.value = data[i];
           }
           await cwieDataStore
             .fetchMajorHeads({
@@ -527,6 +533,77 @@ const onResponseSubmit = () => {
     }
     isOverlay.value = false;
   });
+};
+
+const generatePdf = async () => {
+  isOverlay.value = true;
+  const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
+  const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
+  const fontBytes = await fetch(urlFont).then((res) => res.arrayBuffer());
+  const fontBytesBold = await fetch(urlFontBold).then((res) =>
+    res.arrayBuffer()
+  );
+  let url = "";
+  url = window.location.origin + "/storage/pdf/book1.pdf";
+
+  const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
+  const pdfTemplate = await PDFDocument.load(existingPdfBytes);
+  // Create PDF
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const sarabunFont = await pdfDoc.embedFont(fontBytes);
+  const sarabunBoldFont = await pdfDoc.embedFont(fontBytesBold);
+
+  const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
+  pdfDoc.addPage(existingPage);
+  existingPage.drawText(formActive.value.request_document_number, {
+    x: 125, //คอลัมน์ ซ้ายไปขวา
+    y: 757, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    size: 16, //
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.request_document_date)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 335, //คอลัมน์ ซ้ายไปขวา
+      y: 668, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+      size: 16,
+      font: sarabunFont,
+      color: rgb(0, 0, 0),
+    }
+  );
+
+  existingPage.drawText(formActive.value.request_name, {
+    x: 100, //คอลัมน์ ซ้ายไปขวา
+    y: 600, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    size: 16,
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  });
+
+  existingPage.drawText(formActive.value.request_name, {
+    x: 100, //คอลัมน์ ซ้ายไปขวา
+    y: 560, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    size: 16,
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  });
+
+  const pdfBytes = await pdfDoc.save();
+  let objectPdf = URL.createObjectURL(
+    new Blob([pdfBytes.buffer], { type: "application/pdf" } /* (1) */)
+  );
+
+  const link = document.createElement("a");
+  link.href = objectPdf;
+  link.download = "book.pdf";
+  link.click();
+
+  isOverlay.value = false;
 };
 
 onMounted(() => {
@@ -1078,7 +1155,7 @@ onMounted(() => {
                     <span>ดาวน์โหลด : </span>
                     <VBtn
                       color="primary"
-                      @click=""
+                      @click="generatePdf"
                       :disabled="it.request_document_date == null"
                     >
                       <VIcon

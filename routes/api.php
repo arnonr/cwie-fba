@@ -190,7 +190,8 @@ Route::group(["prefix" => "form"], function () {
     Route::get("/{id}", [FormController::class, "get"]);
     Route::get("/", [FormController::class, "getAll"]);
     Route::post("/", [FormController::class, "add"]);
-    Route::post("/add-request-book", [FormController::class, "AddRequestBook"]);
+    Route::post("/add-request-book", [FormController::class, "addRequestBook"]);
+    Route::post("/add-send-book", [FormController::class, "addSendBook"]);
     Route::post("/add-response-book", [
         FormController::class,
         "AddResponseBook",
