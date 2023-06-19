@@ -953,6 +953,7 @@ class StudentController extends Controller
                 $result->faculty_code,
                 $result->faculty_name
             );
+
             $major = app("App\Http\Controllers\MajorController")->import(
                 $result->major_code,
                 $result->major_name

@@ -44,6 +44,7 @@ class CompanyController extends Controller
             'company.amphur_id as amphur_id',
             'company.tumbol_id as tumbol_id',
             'company.active as active',
+            'company.is_confirmed as is_confirmed',
         )
         ->where('company.deleted_at', null);
 
@@ -103,13 +104,17 @@ class CompanyController extends Controller
             $items->where('company.active', $request->active);
         }
 
+        if ($request->is_confirmed) {
+            $items->where('company.is_confirmed', $request->is_confirmed);
+        }
+
         // Order
         if($request->orderBy){
             $items = $items->orderBy($request->orderBy, $request->order);
         }else{
             $items = $items->orderBy('id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -118,7 +123,7 @@ class CompanyController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -154,6 +159,7 @@ class CompanyController extends Controller
             'company.amphur_id as amphur_id',
             'company.tumbol_id as tumbol_id',
             'company.active as active',
+            'company.is_confirmed as is_confirmed',
             'province.name_th as province_name',
             'amphur.name_th as amphur_name',
             'tumbol.name_th as tumbol_name'
@@ -176,7 +182,7 @@ class CompanyController extends Controller
         $request->validate([
             'name_th as required',
         ]);
-        
+
         $pathNamecard = null;
         if(($request->namecard_file != "") && ($request->namecard_file != 'null') && ($request->namecard_file != 'undefined')){
 
@@ -201,23 +207,24 @@ class CompanyController extends Controller
         //         $data[$key] = null;
         //     }
         // }
-    
+
         $item = new Company;
-        $item->name_th = $request->has('name_th') ? $request->name_th : '';
-        $item->name_en = $request->has('name_en') ? $request->name_en : '';
-        $item->tel = $request->has('tel') ? $request->tel : '';
-        $item->fax = $request->has('fax') ? $request->fax : '';
-        $item->email = $request->has('email') ? $request->email : '';
-        $item->website = $request->has('website') ? $request->website :  '';
-        $item->blacklist = $request->has('blacklist') ? $request->blacklist :  '';
-        $item->comment = $request->has('comment') ? $request->comment : '';
+        $item->name_th = $request->name_th;
+        $item->name_en = $request->name_en;
+        $item->tel = $request->tel;
+        $item->fax = $request->fax;
+        $item->email = $request->email;
+        $item->website = $request->website;
+        $item->blacklist = $request->blacklist;
+        $item->comment = $request->comment;
         $item->namecard_file = $pathNamecard;
         $item->location_file = $pathLocation;
-        $item->address = $request->has('address') ? $request->address :  '';
-        $item->province_id = $request->has('province_id') ? $request->province_id :  '';
-        $item->amphur_id  = $request->has('amphur_id') ? $request->amphur_id :  '';
-        $item->tumbol_id = $request->has('tumbol_id') ? $request->tumbol_id :  '';
-        $item->active = $request->has('active') ? $request->active :  '';
+        $item->address = $request->address;
+        $item->province_id = $request->province_id;
+        $item->amphur_id  = $request->amphur_id;
+        $item->tumbol_id = $request->tumbol_id;
+        $item->active = $request->active;
+        $item->is_confirmed = $request->is_confirmed;
         $item->created_by = 'arnonr';
         $item->save();
 
@@ -225,7 +232,7 @@ class CompanyController extends Controller
             'message' => 'success',
             'data' => $item,
         ];
-        
+
         return response()->json($responseData, 200);
     }
 
@@ -257,7 +264,7 @@ class CompanyController extends Controller
         }else{
             $pathLocation  = $item->location_file;
         }
-        
+
         $item->name_th = $request->has('name_th') ? $request->name_th : $item->name_th;
         $item->name_en = $request->has('name_en') ? $request->name_en : $item->name_en;
         $item->tel = $request->has('tel') ? $request->tel : $item->tel;
@@ -273,6 +280,7 @@ class CompanyController extends Controller
         $item->amphur_id  = $request->has('amphur_id') ? $request->amphur_id : $item->amphur_id;
         $item->tumbol_id = $request->has('tumbol_id') ? $request->tumbol_id : $item->tumbol_id;
         $item->active = $request->has('active') ? $request->active : $item->active;
+        $item->is_confirmed = $request->has('is_confirmed') ? $request->is_confirmed : $item->is_confirmed;
         $item->updated_by = 'arnonr';
         $item->save();
 
