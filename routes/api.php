@@ -190,6 +190,7 @@ Route::group(["prefix" => "student-document"], function () {
 Route::group(["prefix" => "form"], function () {
     Route::get("/{id}", [FormController::class, "get"]);
     Route::get("/", [FormController::class, "getAll"]);
+    Route::post("/import-form-supervisor/{semester_id}", [FormController::class, "importFormSupervisor"]);
     Route::post("/", [FormController::class, "add"]);
     Route::post("/add-request-book", [FormController::class, "addRequestBook"]);
     Route::post("/add-send-book", [FormController::class, "addSendBook"]);
