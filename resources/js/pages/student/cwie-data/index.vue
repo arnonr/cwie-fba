@@ -13,7 +13,7 @@ import buddhistEra from "dayjs/plugin/buddhistEra";
 import "vue3-pdf-app/dist/icons/main.css";
 import { useCwieDataStore } from "./useCwieDataStore";
 
-import { form_statuses, text_statuses } from "@/data-constant/data";
+import { form_statuses, text_statuses, statusShow } from "@/data-constant/data";
 
 // const route = useRoute();
 dayjs.extend(buddhistEra);
@@ -30,6 +30,37 @@ const response_company = ref({
   province_id: null,
 });
 
+const plan = ref({
+  plan_document_file: [],
+  plan_send_at: "",
+  workplace_address: "",
+  workplace_province_id: "",
+  workplace_amphur_id: "",
+  workplace_tumbol_id: "",
+  workplace_googlemap_url: "",
+  workplace_googlemap_file: "",
+});
+
+const chairman = ref({
+  prefix: "",
+  firstname: "",
+  surname: "",
+  signature_file: "",
+  executive_position: "",
+});
+
+const company = ref({
+  name_th: "",
+  tel: "",
+  address: "",
+  fax: "",
+  email: "",
+  province_name: "",
+  amphur_name: "",
+  tumbol_name: "",
+  zipcode: "",
+});
+
 const rowPerPage = ref(20);
 const currentPage = ref(1);
 const totalPage = ref(1);
@@ -40,6 +71,9 @@ const isAdd = ref(true);
 const isCheck = ref(true);
 const isDialogCheckVisible = ref(false);
 const isDialogResponseVisible = ref(false);
+const isDialogPlanVisible = ref(false);
+
+const isPlanFormValid = ref(false);
 
 const currentStep = ref(0);
 const formSteps = [
@@ -425,7 +459,36 @@ const fetchForms = () => {
           if (data[i].active == 1) {
             response_company.value.form_id = data[i].id;
             formActive.value = data[i];
+
+            await cwieDataStore
+              .fetchTeacher({ id: formActive.value.chairman_id })
+              .then((response) => {
+                if (response.status === 200) {
+                  chairman.value = response.data.data;
+                } else {
+                  console.log("error");
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+                isOverlay.value = false;
+              });
+
+            await cwieDataStore
+              .fetchCompany({ id: formActive.value.company_id })
+              .then((response) => {
+                if (response.status === 200) {
+                  company.value = response.data.data;
+                } else {
+                  console.log("error");
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+                isOverlay.value = false;
+              });
           }
+
           await cwieDataStore
             .fetchMajorHeads({
               semester_id: data[i].semester_id,
@@ -492,6 +555,7 @@ const onAddClick = () => {
   }
 };
 
+// Response
 const onResponseSubmit = () => {
   isOverlay.value = true;
   refResponseForm.value?.validate().then(({ valid }) => {
@@ -511,7 +575,8 @@ const onResponseSubmit = () => {
           if (response.data.message == "success") {
             localStorage.setItem("updated", 1);
             nextTick(() => {
-              console.log("Success");
+              fetchStudent();
+              fetchForms();
               isDialogResponseVisible.value = false;
               snackbarText.value = "Success";
               snackbarColor.value = "success";
@@ -535,7 +600,278 @@ const onResponseSubmit = () => {
   });
 };
 
-const generatePdf = async () => {
+const onPlanSubmit = () => {
+  console.log(plan.value);
+};
+
+const generateRegisPDF = async () => {
+  isOverlay.value = true;
+  const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
+  const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
+  const fontBytes = await fetch(urlFont).then((res) => res.arrayBuffer());
+  const fontBytesBold = await fetch(urlFontBold).then((res) =>
+    res.arrayBuffer()
+  );
+  let url = "";
+  url = window.location.origin + "/storage/pdf/book_regis.pdf";
+
+  const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
+  const pdfTemplate = await PDFDocument.load(existingPdfBytes);
+  // Create PDF
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const sarabunFont = await pdfDoc.embedFont(fontBytes);
+  const sarabunBoldFont = await pdfDoc.embedFont(fontBytesBold);
+
+  const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
+  pdfDoc.addPage(existingPage);
+
+  const defaultSize = {
+    size: 16,
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  };
+
+  existingPage.drawText(formActive.value.term.toString(), {
+    x: 285, //คอลัมน์ ซ้ายไปขวา
+    y: 692, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.semester_year, {
+    x: 315, //คอลัมน์ ซ้ายไปขวา
+    y: 692, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    student.value.prefix_name +
+      student.value.firstname +
+      " " +
+      student.value.surname,
+    {
+      x: 220,
+      y: 658,
+      ...defaultSize,
+    }
+  );
+  existingPage.drawText(student.value.student_code, {
+    x: 200,
+    y: 638,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.class_year.toString(), {
+    x: 433,
+    y: 638,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.class_room, {
+    x: 500,
+    y: 638,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.advisor_name, {
+    x: 150,
+    y: 616,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.major_name, {
+    x: 360, //คอลัมน์ ซ้ายไปขวา
+    y: 616, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.tel, {
+    x: 105,
+    y: 595,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.email, {
+    x: 290,
+    y: 595,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.gpa.toString(), {
+    x: 505,
+    y: 595,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.term.toString(), {
+    x: 343,
+    y: 574,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.semester_year, {
+    x: 370,
+    y: 574,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.start_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 455,
+      y: 574,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(formActive.value.end_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 109,
+      y: 553,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(formActive.value.round_no.toString(), {
+    x: 260,
+    y: 553,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.company_name, {
+    x: 230,
+    y: 523,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.address, {
+    x: 160,
+    y: 502,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.tumbol_name, {
+    x: 130,
+    y: 460,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.amphur_name, {
+    x: 300,
+    y: 460,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.province_name, {
+    x: 455,
+    y: 460,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.postcode, {
+    x: 160,
+    y: 439,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.tel, {
+    x: 250,
+    y: 439,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.email, {
+    x: 380,
+    y: 439,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.contact1_name, {
+    x: 270,
+    y: 406,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.contact1_relation, {
+    x: 140,
+    y: 385,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.contact1_tel, {
+    x: 275,
+    y: 385,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.request_name, {
+    x: 130,
+    y: 330,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.request_position, {
+    x: 400,
+    y: 330,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    student.value.prefix_name +
+      student.value.firstname +
+      " " +
+      student.value.surname,
+    {
+      x: 360,
+      y: 218,
+      ...defaultSize,
+    }
+  );
+
+  //   const sigUrl = chairman.value.signature_file;
+  //   const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
+  //   const sigImage = await pdfDoc.embedPng(sigImageBytes);
+  //   existingPage.drawImage(sigImage, {
+  //     x: 310,
+  //     y: 120,
+  //     width: 100,
+  //     height: 50,
+  //   });
+
+  //   existingPage.drawText(
+  //     chairman.value.prefix +
+  //       " " +
+  //       chairman.value.firstname +
+  //       " " +
+  //       chairman.value.surname,
+  //     {
+  //       x: 300,
+  //       y: 117,
+  //       ...defaultSize,
+  //     }
+  //   );
+
+  //   existingPage.drawText(chairman.value.executive_position, {
+  //     x: 275,
+  //     y: 96,
+  //     ...defaultSize,
+  //   });
+
+  const pdfBytes = await pdfDoc.save();
+  let objectPdf = URL.createObjectURL(
+    new Blob([pdfBytes.buffer], { type: "application/pdf" } /* (1) */)
+  );
+
+  const link = document.createElement("a");
+  link.href = objectPdf;
+  link.download = "book.pdf";
+  link.click();
+
+  isOverlay.value = false;
+};
+
+const generatePDF = async () => {
   isOverlay.value = true;
   const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
   const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
@@ -556,12 +892,17 @@ const generatePdf = async () => {
 
   const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
   pdfDoc.addPage(existingPage);
+
+  const defaultSize = {
+    size: 16,
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  };
+
   existingPage.drawText(formActive.value.request_document_number, {
     x: 125, //คอลัมน์ ซ้ายไปขวา
     y: 757, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    size: 16, //
-    font: sarabunFont,
-    color: rgb(0, 0, 0),
+    ...defaultSize,
   });
 
   existingPage.drawText(
@@ -569,28 +910,154 @@ const generatePdf = async () => {
       .locale("th")
       .format("DD MMMM BBBB"),
     {
-      x: 335, //คอลัมน์ ซ้ายไปขวา
-      y: 668, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-      size: 16,
-      font: sarabunFont,
-      color: rgb(0, 0, 0),
+      x: 335,
+      y: 668,
+      ...defaultSize,
     }
   );
 
-  existingPage.drawText(formActive.value.request_name, {
-    x: 100, //คอลัมน์ ซ้ายไปขวา
-    y: 600, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    size: 16,
-    font: sarabunFont,
-    color: rgb(0, 0, 0),
+  existingPage.drawText(
+    formActive.value.request_name +
+      " (" +
+      formActive.value.request_position +
+      ")",
+    {
+      x: 105,
+      y: 595,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(formActive.value.company_name, {
+    x: 105, //คอลัมน์ ซ้ายไปขวา
+    y: 565, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
   });
 
-  existingPage.drawText(formActive.value.request_name, {
-    x: 100, //คอลัมน์ ซ้ายไปขวา
-    y: 560, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    size: 16,
-    font: sarabunFont,
-    color: rgb(0, 0, 0),
+  existingPage.drawText(student.value.major_name, {
+    x: 210, //คอลัมน์ ซ้ายไปขวา
+    y: 365, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.term.toString(), {
+    x: 291,
+    y: 345,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.semester_year, {
+    x: 358,
+    y: 345,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.start_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 434,
+      y: 345,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(formActive.value.end_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 95,
+      y: 324,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(student.value.firstname, {
+    x: 104,
+    y: 303,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.surname, {
+    x: 248,
+    y: 303,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.class_year.toString(), {
+    x: 390,
+    y: 303,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.student_code, {
+    x: 460,
+    y: 303,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.email, {
+    x: 170,
+    y: 283,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.tel, {
+    x: 410,
+    y: 283,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.max_response_date)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 75,
+      y: 198,
+      ...defaultSize,
+    }
+  );
+
+  //   Chairman_id
+
+  //   existingPage.drawText(
+  //     chairman.value.prefix +
+  //       " " +
+  //       chairman.value.firstname +
+  //       " " +
+  //       chairman.value.surname,
+  //     {
+  //       x: 300,
+  //       y: 135,
+  //       ...defaultSize,
+  //     }
+  //   );
+  const sigUrl = chairman.value.signature_file;
+  const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
+  const sigImage = await pdfDoc.embedPng(sigImageBytes);
+  existingPage.drawImage(sigImage, {
+    x: 310,
+    y: 120,
+    width: 100,
+    height: 50,
+  });
+
+  existingPage.drawText(
+    chairman.value.prefix +
+      " " +
+      chairman.value.firstname +
+      " " +
+      chairman.value.surname,
+    {
+      x: 300,
+      y: 117,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(chairman.value.executive_position, {
+    x: 275,
+    y: 96,
+    ...defaultSize,
   });
 
   const pdfBytes = await pdfDoc.save();
@@ -606,9 +1073,184 @@ const generatePdf = async () => {
   isOverlay.value = false;
 };
 
+const generateSendPDF = async () => {
+  isOverlay.value = true;
+  const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
+  const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
+  const fontBytes = await fetch(urlFont).then((res) => res.arrayBuffer());
+  const fontBytesBold = await fetch(urlFontBold).then((res) =>
+    res.arrayBuffer()
+  );
+  let url = "";
+  url = window.location.origin + "/storage/pdf/book2.pdf";
+
+  const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
+  const pdfTemplate = await PDFDocument.load(existingPdfBytes);
+  // Create PDF
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const sarabunFont = await pdfDoc.embedFont(fontBytes);
+  const sarabunBoldFont = await pdfDoc.embedFont(fontBytesBold);
+
+  const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
+  pdfDoc.addPage(existingPage);
+
+  const defaultSize = {
+    size: 16,
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  };
+
+  existingPage.drawText(formActive.value.request_document_number, {
+    x: 125, //คอลัมน์ ซ้ายไปขวา
+    y: 757, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.request_document_date)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 335,
+      y: 668,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    formActive.value.request_name +
+      " (" +
+      formActive.value.request_position +
+      ")",
+    {
+      x: 105,
+      y: 595,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(formActive.value.company_name, {
+    x: 220, //คอลัมน์ ซ้ายไปขวา
+    y: 523, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.major_name, {
+    x: 280, //คอลัมน์ ซ้ายไปขวา
+    y: 502, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.start_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 165,
+      y: 460,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(formActive.value.end_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 290,
+      y: 460,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(student.value.firstname, {
+    x: 104,
+    y: 418,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.surname, {
+    x: 248,
+    y: 418,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.class_year.toString(), {
+    x: 390,
+    y: 418,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.student_code, {
+    x: 460,
+    y: 418,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.email, {
+    x: 170,
+    y: 397,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.tel, {
+    x: 410,
+    y: 397,
+    ...defaultSize,
+  });
+
+  const sigUrl = chairman.value.signature_file;
+  const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
+  const sigImage = await pdfDoc.embedPng(sigImageBytes);
+  existingPage.drawImage(sigImage, {
+    x: 310,
+    y: 150,
+    width: 100,
+    height: 50,
+  });
+
+  existingPage.drawText(
+    chairman.value.prefix +
+      " " +
+      chairman.value.firstname +
+      " " +
+      chairman.value.surname,
+    {
+      x: 300,
+      y: 145,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(chairman.value.executive_position, {
+    x: 275,
+    y: 125,
+    ...defaultSize,
+  });
+
+  const pdfBytes = await pdfDoc.save();
+  let objectPdf = URL.createObjectURL(
+    new Blob([pdfBytes.buffer], { type: "application/pdf" } /* (1) */)
+  );
+
+  const link = document.createElement("a");
+  link.href = objectPdf;
+  link.download = "book.pdf";
+  link.click();
+
+  isOverlay.value = false;
+};
+
+const responseProvinceName = (response_province_id) => {
+  if (response_province_id) {
+    let response_province_select = selectOptions.value.provinces.find((x) => {
+      return x.value == response_province_id;
+    });
+    return response_province_select.title;
+  } else {
+    return "-";
+  }
+};
+
 onMounted(() => {
   window.scrollTo(0, 0);
-
   fetchProvinces();
   fetchTeachers();
   fetchDocumentTypes();
@@ -950,6 +1592,36 @@ onMounted(() => {
           ></VIcon>
           เพิ่มใบสมัคร</VBtn
         >
+
+        <VBtn color="primary" class="ml-2" @click="generateRegisPDF">
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
+          ใบสมัครโครงการ</VBtn
+        >
+
+        <VBtn color="primary" class="ml-2" @click="generatePDF">
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
+          หนังสือขอความอนุเคราะห์</VBtn
+        >
+
+        <VBtn color="primary" class="ml-2" @click="generateSendPDF">
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
+          หนังสือส่งตัว</VBtn
+        >
       </VCol>
 
       <VCol cols="12" md="12" v-for="(it, index) in items">
@@ -984,13 +1656,11 @@ onMounted(() => {
                     <span>
                       <VChip label :color="form_statuses[it.status_id]">
                         {{
-                          it.status_id != 2
-                            ? text_statuses[it.status_id] == "คณะยืนยันข้อมูล"
-                              ? it.request_document_date != null
-                                ? "ออกหนังสือขอความอนุเคราะห์แล้ว"
-                                : text_statuses[it.status_id]
-                              : it.form_status_name
-                            : "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
+                          statusShow(
+                            it.status_id,
+                            it.request_document_date,
+                            it.confirm_response_at
+                          )
                         }}</VChip
                       >
                     </span>
@@ -1140,39 +1810,124 @@ onMounted(() => {
                     <span>
                       <VChip label :color="form_statuses[it.status_id]">
                         {{
-                          it.status_id != 2
-                            ? text_statuses[it.status_id] == "คณะยืนยันข้อมูล"
-                              ? it.request_document_date != null
-                                ? "ออกหนังสือขอความอนุเคราะห์แล้ว"
-                                : text_statuses[it.status_id]
-                              : it.form_status_name
-                            : "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
+                          statusShow(
+                            it.status_id,
+                            it.request_document_date,
+                            it.confirm_response_at
+                          )
                         }}</VChip
                       >
                     </span>
                   </VCol>
                   <VCol cols="12" md="6">
-                    <span>ดาวน์โหลด : </span>
-                    <VBtn
-                      color="primary"
-                      @click="generatePdf"
-                      :disabled="it.request_document_date == null"
-                    >
-                      <VIcon
-                        size="16"
-                        icon="tabler-file-description"
-                        style="opacity: 1"
-                      ></VIcon>
-                      หนังสือขอความอนุเคราะห์</VBtn
-                    >
+                    <span>หนังสือขอความอนุเคราะห์ : </span>
+                    <span>
+                      {{
+                        it.request_document_date == null
+                          ? "-"
+                          : dayjs(it.request_document_date)
+                              .locale("th")
+                              .format("DD MMMM BBBB")
+                      }}
+                    </span>
                   </VCol>
                   <VCol cols="12" md="6">
                     <span>วันที่ต้องตอบรับเอกสาร : </span>
                     <span>{{
-                      dayjs(it.max_response_date)
-                        .locale("th")
-                        .format("DD MMM BBBB")
+                      it.max_response_date == null
+                        ? "-"
+                        : dayjs(it.max_response_date)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
                     }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ไฟล์หนังสือตอบกลับ : </span>
+                    <a
+                      :href="
+                        it.response_document_file != null
+                          ? it.response_document_file
+                          : '#'
+                      "
+                      target="_blank"
+                      ><span>
+                        <VIcon
+                          size="16"
+                          icon="tabler-file"
+                          style="opacity: 1"
+                          class="mr-1"
+                        />เอกสาร</span
+                      >
+                    </a>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่ส่งหนังสือตอบกลับ : </span>
+                    <span>{{
+                      it.response_send_at == null
+                        ? "-"
+                        : dayjs(it.response_send_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>จังหวัดที่ตอบรับสหกิจศึกษา : </span>
+                    <span>{{
+                      responseProvinceName(it.response_province_id)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่ตรวจสอบหนังสือตอบกลับ : </span>
+                    <span>{{
+                      it.confirm_response_at == null
+                        ? "-"
+                        : dayjs(it.confirm_response_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>หนังสือส่งตัว : </span>
+                    <span>
+                      {{
+                        it.send_document_date == null
+                          ? "-"
+                          : dayjs(it.send_document_date)
+                              .locale("th")
+                              .format("DD MMMM BBBB")
+                      }}
+                    </span>
+                  </VCol>
+
+                  <VDivider></VDivider>
+
+                  <VCol cols="12" md="6">
+                    <VRow>
+                      <VCol cols="12" md="12">
+                        <h4>Remark</h4>
+                      </VCol>
+                    </VRow>
+                    <VRow v-for="(rl, index) in it.reject_log">
+                      <VCol cols="12" md="4" v-if="rl.reject_status_id > 3">
+                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <span>
+                          {{
+                            dayjs(rl.created_at)
+                              .locale("th")
+                              .format("DD MMM BB")
+                          }}</span
+                        >
+                      </VCol>
+                      <VCol cols="12" md="8" v-if="rl.reject_status_id > 3">
+                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <span> {{ rl.comment }}</span>
+                      </VCol>
+                    </VRow>
                   </VCol>
 
                   <VCol cols="12" md="12" class="text-center">
@@ -1190,6 +1945,127 @@ onMounted(() => {
                   </VCol>
                 </VRow>
               </VWindowItem>
+
+              <VWindowItem>
+                <VRow>
+                  <VCol cols="12" md="6">
+                    <!-- <VCol cols="12" md="3"> -->
+                    <span>สถานะฟอร์ม : </span>
+                    <span>
+                      <VChip label :color="form_statuses[it.status_id]">
+                        {{
+                          statusShow(
+                            it.status_id,
+                            it.request_document_date,
+                            it.confirm_response_at
+                          )
+                        }}</VChip
+                      >
+                    </span>
+                  </VCol>
+                  <VCol cols="12" md="6">
+                    <span>หนังสือขอความอนุเคราะห์ : </span>
+                    <span>
+                      {{
+                        it.request_document_date == null
+                          ? "-"
+                          : dayjs(it.request_document_date)
+                              .locale("th")
+                              .format("DD MMMM BBBB")
+                      }}
+                    </span>
+                  </VCol>
+                  <VCol cols="12" md="6">
+                    <span>วันที่ต้องตอบรับเอกสาร : </span>
+                    <span>{{
+                      it.max_response_date == null
+                        ? "-"
+                        : dayjs(it.max_response_date)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ไฟล์หนังสือตอบกลับ : </span>
+                    <a
+                      :href="
+                        it.response_document_file != null
+                          ? it.response_document_file
+                          : '#'
+                      "
+                      target="_blank"
+                      ><span>
+                        <VIcon
+                          size="16"
+                          icon="tabler-file"
+                          style="opacity: 1"
+                          class="mr-1"
+                        />เอกสาร</span
+                      >
+                    </a>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่ส่งหนังสือตอบกลับ : </span>
+                    <span>{{
+                      it.response_send_at == null
+                        ? "-"
+                        : dayjs(it.response_send_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>จังหวัดที่ตอบรับสหกิจศึกษา : </span>
+                    <span>{{
+                      responseProvinceName(it.response_province_id)
+                    }}</span>
+                  </VCol>
+
+                  <VDivider></VDivider>
+
+                  <VCol cols="12" md="6">
+                    <VRow>
+                      <VCol cols="12" md="12">
+                        <h4>Remark</h4>
+                      </VCol>
+                    </VRow>
+                    <VRow v-for="(rl, index) in it.reject_log">
+                      <VCol cols="12" md="4" v-if="rl.reject_status_id > 4">
+                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <span>
+                          {{
+                            dayjs(rl.created_at)
+                              .locale("th")
+                              .format("DD MMM BB")
+                          }}</span
+                        >
+                      </VCol>
+                      <VCol cols="12" md="8" v-if="rl.reject_status_id > 4">
+                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <span> {{ rl.comment }}</span>
+                      </VCol>
+                    </VRow>
+                  </VCol>
+
+                  <VCol cols="12" md="12" class="text-center">
+                    <!-- Disabled = true -->
+                    <VBtn
+                      color="info"
+                      :disabled="
+                        it.plan_send_at != null ||
+                        it.status_id != 7 ||
+                        index != 0
+                      "
+                      @click="isDialogPlanVisible = true"
+                    >
+                      อัพโหลดแผนการปฏิบัติงาน
+                    </VBtn>
+                  </VCol>
+                </VRow>
+              </VWindowItem>
             </VWindow>
 
             <div class="d-flex justify-space-between mt-8">
@@ -1203,16 +2079,16 @@ onMounted(() => {
                 Previous
               </VBtn>
 
-              <VBtn
+              <!-- <VBtn
                 color="success"
                 append-icon="tabler-check"
-                v-if="formSteps.length - 1 === currentStep"
+               
               >
                 submit
-              </VBtn>
+              </VBtn> -->
 
               <VBtn
-                v-else
+                v-if="formSteps.length - 1 !== currentStep"
                 @click="currentStep++"
                 :disabled="
                   it.status_id < 5 ||
@@ -1344,6 +2220,122 @@ onMounted(() => {
             Cancel
           </VBtn>
           <VBtn type="submit" @click="onResponseSubmit" id="btn-submit">
+            <span>Save</span></VBtn
+          >
+        </VCardText>
+      </VCard>
+    </VDialog>
+
+    <!--  Plan Form Dialog -->
+    <VDialog v-model="isDialogPlanVisible" class="v-dialog-sm">
+      <!-- Dialog close btn -->
+      <DialogCloseBtn
+        @click="isDialogPlanVisible = !isDialogPlanVisible"
+        absolute
+      />
+      <!-- Dialog Content -->
+      <VCard title="แบบฟอร์มอัพโหลดแผนการปฏิบัติงาน">
+        <VCardItem>
+          <VForm
+            ref="refPlanForm"
+            v-model="isPlanFormValid"
+            @submit.prevent="onPlanSubmit"
+          >
+            <VRow>
+              <VCol cols="12">
+                <!--  -->
+                <label class="v-label" for="plan_document_file">
+                  ไฟล์แผนการปฏิบัติงาน
+                </label>
+                <VFileInput
+                  v-model="plan.plan_document_file"
+                  :rules="[requiredValidator]"
+                  label="Upload File"
+                  persistent-placeholder
+                />
+                <!--  -->
+              </VCol>
+
+              <VCol cols="12">
+                <label class="v-label" for="workplace_address"> Address </label>
+                <AppTextField
+                  id="workplace_address"
+                  v-model="plan.workplace_address"
+                />
+              </VCol>
+
+              <VCol cols="12">
+                <label class="v-label" for="response_province_id">
+                  จังหวัดที่ไปปฏิบัติงาน
+                </label>
+                <AppSelect
+                  :items="selectOptions.provinces"
+                  v-model="response_company.province_id"
+                  variant="outlined"
+                  placeholder="Province"
+                  clearable
+                />
+              </VCol>
+
+              <VCol cols="12">
+                <label class="v-label" for="response_province_id">
+                  อำเภอ
+                </label>
+                <AppSelect
+                  :items="selectOptions.provinces"
+                  v-model="response_company.province_id"
+                  variant="outlined"
+                  placeholder="Province"
+                  clearable
+                />
+              </VCol>
+
+              <VCol cols="12">
+                <label class="v-label" for="response_province_id"> ตำบล </label>
+                <AppSelect
+                  :items="selectOptions.provinces"
+                  v-model="response_company.province_id"
+                  variant="outlined"
+                  placeholder="Province"
+                  clearable
+                />
+              </VCol>
+
+              <VCol cols="12">
+                <label class="v-label" for="workplace_googlemap_url">
+                  Google Map Url
+                </label>
+                <AppTextField
+                  id="workplace_googlemap_url"
+                  v-model="plan.workplace_googlemap_url"
+                />
+              </VCol>
+
+              <VCol cols="12">
+                <!--  -->
+                <label class="v-label" for="workplace_googlemap_file">
+                  ไฟล์ภาพ Google Map
+                </label>
+                <VFileInput
+                  v-model="plan.workplace_googlemap_file"
+                  label="Upload File"
+                  persistent-placeholder
+                />
+                <!--  -->
+              </VCol>
+            </VRow>
+          </VForm>
+        </VCardItem>
+
+        <VCardText class="d-flex justify-end flex-wrap gap-3">
+          <VBtn
+            variant="tonal"
+            color="secondary"
+            @click="isDialogPlanVisible = false"
+          >
+            Cancel
+          </VBtn>
+          <VBtn type="submit" @click="onPlanSubmit" id="btn-submit">
             <span>Save</span></VBtn
           >
         </VCardText>

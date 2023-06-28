@@ -1,59 +1,12 @@
 import axios from "@axios";
 import { defineStore } from "pinia";
 
-export const useCwieDataStore = defineStore("CwieDataStore", {
+export const useStudentStore = defineStore("StudentStore", {
   actions: {
-    async addForm(dataSend) {
-      var form_data = new FormData();
-
-      for (var key in dataSend) {
-        form_data.append(key, dataSend[key]);
-        if (dataSend[key] == null) {
-          dataSend[key] = "";
-        }
-      }
-
-      return await axios.post(`/form`, form_data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        validateStatus: () => true,
-      });
-    },
-
-    async editForm(dataSend) {
-      var form_data = new FormData();
-
-      for (var key in dataSend) {
-        form_data.append(key, dataSend[key]);
-        if (dataSend[key] == null) {
-          dataSend[key] = "";
-        }
-      }
-      form_data.append("_method", "PUT");
-
-      return await axios.post(`/form/${dataSend.id}`, form_data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        validateStatus: () => true,
-      });
-    },
-
     async fetchForms(params) {
       return axios.get(
         `/form`,
         { params },
-        {
-          validateStatus: () => true,
-        }
-      );
-    },
-
-    async fetchForm({ id }) {
-      return axios.get(
-        `/form/${id}`,
-        {},
         {
           validateStatus: () => true,
         }
@@ -70,32 +23,9 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
       );
     },
 
-    fetchStudent({ id }) {
-      return axios.get(`/student/${id}`, {
-        validateStatus: () => true,
-      });
-    },
-
-    fetchCompany({ id }) {
+    fetchListStudents(params) {
       return axios.get(
-        `/company/${id}`,
-        {},
-        {
-          validateStatus: () => true,
-        }
-      );
-    },
-
-    async editStudent(dataSend) {
-      //
-      return await axios.put(`/student/${dataSend.id}`, dataSend, {
-        validateStatus: () => true,
-      });
-    },
-
-    fetchTeachers(params) {
-      return axios.get(
-        "/teacher",
+        `/student`,
         { params },
         {
           validateStatus: () => true,
@@ -103,14 +33,10 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
       );
     },
 
-    fetchTeacher({ id }) {
-      return axios.get(
-        `/teacher/${id}`,
-        {},
-        {
-          validateStatus: () => true,
-        }
-      );
+    fetchStudent({ id }) {
+      return axios.get(`/student/${id}`, {
+        validateStatus: () => true,
+      });
     },
 
     fetchProvinces(params) {
@@ -203,18 +129,24 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
       );
     },
 
-    async addResponseBook(dataSend) {
-      var form_data = new FormData();
-
-      for (var key in dataSend) {
-        if (dataSend[key] == null) {
-          dataSend[key] = "";
+    fetchMajors(params) {
+      return axios.get(
+        "/major",
+        { params },
+        {
+          validateStatus: () => true,
         }
-        form_data.append(key, dataSend[key]);
-      }
-      return await axios.post(`/form/add-response-book`, form_data, {
-        validateStatus: () => true,
-      });
+      );
+    },
+
+    fetchTeachers(params) {
+      return axios.get(
+        `/teacher`,
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
     },
   },
 });

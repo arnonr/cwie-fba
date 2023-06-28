@@ -9,7 +9,7 @@ import buddhistEra from "dayjs/plugin/buddhistEra";
 import "vue3-pdf-app/dist/icons/main.css";
 import { useCwieDataStore } from "../useCwieDataStore";
 
-import { form_statuses, text_statuses } from "@/data-constant/data";
+import { form_statuses, text_statuses, statusShow } from "@/data-constant/data";
 
 // const route = useRoute();
 dayjs.extend(buddhistEra);
@@ -141,6 +141,26 @@ const selectOptions = ref({
     { title: "In Active", value: 0 },
   ],
 });
+
+const fetchProvinces = () => {
+  cwieDataStore
+    .fetchProvinces({})
+    .then((response) => {
+      if (response.status === 200) {
+        selectOptions.value.provinces = response.data.data.map((r) => {
+          return { title: r.name_th, value: r.province_id };
+        });
+        isOverlay.value = false;
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+};
+fetchProvinces();
 
 const fetchDocumentTypes = () => {
   cwieDataStore
@@ -399,12 +419,30 @@ const onRejectSubmit = () => {
   }
 };
 
+const status_id_send = ref(5);
+
 const onSubmit = () => {
+  let date = {};
+  if (status_id_send.value == 5) {
+    date = {
+      faculty_confirmed_at: dayjs().format("YYYY-MM-DD"),
+    };
+  } else if (
+    status_id_send.value == 6 ||
+    status_id_send.value == 7 ||
+    status_id_send.value == 8
+  ) {
+    date = {
+      confirm_response_at: dayjs().format("YYYY-MM-DD"),
+    };
+  } else {
+  }
+
   cwieDataStore
     .approve({
       id: item.value.id,
-      status_id: 5,
-      faculty_confirmed_at: dayjs().format("YYYY-MM-DD"),
+      status_id: status_id_send.value,
+      ...date,
     })
     .then((response) => {
       if (response.data.message == "success") {
@@ -435,6 +473,17 @@ onMounted(() => {
   //   fetchTeachers();
   fetchDocumentTypes();
 });
+
+const responseProvinceName = (response_province_id) => {
+  if (response_province_id) {
+    let response_province_select = selectOptions.value.provinces.find((x) => {
+      return x.value == response_province_id;
+    });
+    return response_province_select.title;
+  } else {
+    return "-";
+  }
+};
 </script>
 <style lang="scss">
 .checkout-stepper {
@@ -793,9 +842,11 @@ onMounted(() => {
                     <span>
                       <VChip label :color="form_statuses[it.status_id]">
                         {{
-                          it.status_id == 2
-                            ? "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
-                            : it.form_status_name
+                          statusShow(
+                            it.status_id,
+                            it.request_document_date,
+                            it.confirm_response_at
+                          )
                         }}</VChip
                       >
                     </span>
@@ -943,6 +994,135 @@ onMounted(() => {
                   </VCol>
                 </VRow>
               </VWindowItem>
+              <VWindowItem>
+                <VRow>
+                  <VCol cols="12" md="6">
+                    <!-- <VCol cols="12" md="3"> -->
+                    <span>สถานะฟอร์ม : </span>
+                    <span>
+                      <VChip label :color="form_statuses[it.status_id]">
+                        {{
+                          statusShow(
+                            it.status_id,
+                            it.request_document_date,
+                            it.confirm_response_at
+                          )
+                        }}</VChip
+                      >
+                    </span>
+                  </VCol>
+                  <VCol cols="12" md="6">
+                    <span>หนังสือขอความอนุเคราะห์ : </span>
+                    <span>
+                      {{
+                        it.request_document_date == null
+                          ? "-"
+                          : dayjs(it.request_document_date)
+                              .locale("th")
+                              .format("DD MMMM BBBB")
+                      }}
+                    </span>
+                  </VCol>
+                  <VCol cols="12" md="6">
+                    <span>วันที่ต้องตอบรับเอกสาร : </span>
+                    <span>{{
+                      it.max_response_date == null
+                        ? "-"
+                        : dayjs(it.max_response_date)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ไฟล์หนังสือตอบกลับ : </span>
+                    <a
+                      :href="
+                        it.response_document_file != null
+                          ? it.response_document_file
+                          : '#'
+                      "
+                      target="_blank"
+                      ><span>
+                        <VIcon
+                          size="16"
+                          icon="tabler-file"
+                          style="opacity: 1"
+                          class="mr-1"
+                        />เอกสาร</span
+                      >
+                    </a>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่ส่งหนังสือตอบกลับ : </span>
+                    <span>{{
+                      it.response_send_at == null
+                        ? "-"
+                        : dayjs(it.response_send_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>จังหวัดที่ตอบรับสหกิจศึกษา : </span>
+                    <span>{{
+                      responseProvinceName(it.response_province_id)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่ตรวจสอบหนังสือตอบกลับ : </span>
+                    <span>{{
+                      it.confirm_response_at == null
+                        ? "-"
+                        : dayjs(it.confirm_response_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>หนังสือส่งตัว : </span>
+                    <span>
+                      {{
+                        it.send_document_date == null
+                          ? "-"
+                          : dayjs(it.send_document_date)
+                              .locale("th")
+                              .format("DD MMMM BBBB")
+                      }}
+                    </span>
+                  </VCol>
+
+                  <VDivider></VDivider>
+
+                  <VCol cols="12" md="6">
+                    <VRow>
+                      <VCol cols="12" md="12">
+                        <h4>Remark</h4>
+                      </VCol>
+                    </VRow>
+                    <VRow v-for="(rl, index) in it.reject_log">
+                      <VCol cols="12" md="4" v-if="rl.reject_status_id > 3">
+                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <span>
+                          {{
+                            dayjs(rl.created_at)
+                              .locale("th")
+                              .format("DD MMM BB")
+                          }}</span
+                        >
+                      </VCol>
+                      <VCol cols="12" md="8" v-if="rl.reject_status_id > 3">
+                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <span> {{ rl.comment }}</span>
+                      </VCol>
+                    </VRow>
+                  </VCol>
+                </VRow>
+              </VWindowItem>
             </VWindow>
 
             <div class="d-flex mt-8">
@@ -959,7 +1139,7 @@ onMounted(() => {
 
               <VBtn
                 color="error"
-                :disabled="it.status_id != 4 || index != 0"
+                v-if="!(it.status_id != 4 || index != 0)"
                 @click="
                   () => {
                     rejectLog.form_id = it.id;
@@ -979,7 +1159,7 @@ onMounted(() => {
               <VBtn
                 class="ml-2"
                 color="success"
-                :disabled="it.status_id != 4 || index != 0"
+                v-if="!(it.status_id != 4 || index != 0)"
                 @click="
                   () => {
                     item = it;
@@ -994,6 +1174,60 @@ onMounted(() => {
                   class="mr-1"
                 ></VIcon>
                 อนุมัติ
+              </VBtn>
+
+              <!--  -->
+              <VBtn
+                color="error"
+                v-if="
+                  (it.status_id == 6 ||
+                    it.status_id == 7 ||
+                    it.status_id == 8) &&
+                  index == 0 &&
+                  it.confirm_response_at == null
+                "
+                @click="
+                  () => {
+                    rejectLog.form_id = it.id;
+                    rejectLog.reject_status_id = 4;
+                    isDialogRejectVisible = true;
+                  }
+                "
+              >
+                <VIcon
+                  size="16"
+                  icon="tabler-edit"
+                  style="opacity: 1"
+                  class="mr-1"
+                ></VIcon>
+                ส่งกลับให้แก้ไข
+              </VBtn>
+
+              <VBtn
+                class="ml-2"
+                color="success"
+                v-if="
+                  (it.status_id == 6 ||
+                    it.status_id == 7 ||
+                    it.status_id == 8) &&
+                  index == 0 &&
+                  it.confirm_response_at == null
+                "
+                @click="
+                  () => {
+                    item = it;
+                    status_id_send = it.status_id;
+                    isDialogVisible = true;
+                  }
+                "
+              >
+                <VIcon
+                  size="16"
+                  icon="tabler-file-description"
+                  style="opacity: 1"
+                  class="mr-1"
+                ></VIcon>
+                รับทราบผล
               </VBtn>
 
               <!-- <VBtn

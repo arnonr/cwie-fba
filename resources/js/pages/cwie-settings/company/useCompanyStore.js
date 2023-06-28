@@ -45,6 +45,7 @@ export const useCompanyStore = defineStore("CompanyStore", {
         }
         form_data.append(key, dataSend[key]);
       }
+
       form_data.append("_method", "PUT");
 
       return await axios.post(`/company/${dataSend.id}`, form_data, {

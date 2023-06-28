@@ -36,7 +36,7 @@ const isDialogVisible = ref(false);
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: 5,
+  status_id: 7,
   student_code: "",
   firstname: "",
   surname: "",
@@ -78,8 +78,8 @@ const selectOptions = ref({
   teachers: [],
   companies: [],
   book_statuses: [
-    { title: "รอออกหนังสือขอความอนุเคราะห์", value: 1 },
-    { title: "ออกหนังสือขอความอนุเคราะห์แล้ว", value: 2 },
+    { title: "รอออกหนังสือส่งตัว", value: 3 },
+    { title: "ออกหนังสือส่งตัวแล้ว", value: 4 },
   ],
 });
 
@@ -178,6 +178,7 @@ fetchMajors();
 
 // 👉 Fetching
 const fetchItems = () => {
+  console.log(advancedSearch.book_status);
   if (advancedSearch.semester_id != "") {
     let search = {
       ...advancedSearch,
@@ -257,18 +258,13 @@ const onSubmit = () => {
     //
     if (valid) {
       cwieDataStore
-        .addRequestBook({
+        .addSendBook({
           id: selectedItem.value,
-          request_document_number: document.value.request_document_number,
-          request_document_date:
-            document.value.request_document_date &&
-            document.value.request_document_date != null
-              ? dayjs(document.value.request_document_date).format("YYYY-MM-DD")
-              : null,
-          max_response_date:
-            document.value.max_response_date &&
-            document.value.max_response_date != null
-              ? dayjs(document.value.max_response_date).format("YYYY-MM-DD")
+          send_document_number: document.value.send_document_number,
+          send_document_date:
+            document.value.send_document_date &&
+            document.value.send_document_date != null
+              ? dayjs(document.value.send_document_date).format("YYYY-MM-DD")
               : null,
         })
         .then((response) => {
@@ -526,7 +522,7 @@ const format = (date) => {
                       v-model="selectedItem"
                       class="chkItem"
                       :value="it.form_id"
-                      v-if="it.status_id > 4"
+                      v-if="it.status_id > 5"
                     />
                     <!-- @click="onSelectItem(it.id)" -->
                   </td>
@@ -551,23 +547,26 @@ const format = (date) => {
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    <VChip label :color="form_statuses[it.status_id]">{{
-                      statusShow(
-                        it.status_id,
-                        it.request_document_date,
-                        it.confirm_response_at
-                      )
-                    }}</VChip>
+                    <VChip label :color="form_statuses[it.status_id]">
+                      {{
+                        statusShow(
+                          it.status_id,
+                          it.request_document_date,
+                          it.confirm_response_at
+                        )
+                      }}</VChip
+                    >
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    {{ it.request_document_number }}
+                    {{ it.send_document_number }}
                   </td>
 
                   <!-- 👉 Actions -->
                   <td class="text-center" style="min-width: 80px">
                     <VBtn
                       color="info"
+                      target="_blank"
                       :to="{
                         name: 'staff-students-view-id',
                         params: { id: it.id },
@@ -579,16 +578,14 @@ const format = (date) => {
                     <VBtn
                       color="primary"
                       class="ml-2"
-                      :disabled="it.request_document_date == null"
+                      :disabled="it.send_document_date == null"
                       @click="
                         () => {
                           selectedItem = [it.form_id];
                           document = [];
-                          document.request_document_number =
-                            it.request_document_number;
-                          document.request_document_date =
-                            it.request_document_date;
-                          document.max_response_date = it.max_response_date;
+                          document.send_document_number =
+                            it.send_document_number;
+                          document.send_document_date = it.send_document_date;
                           onAddBook();
                         }
                       "
@@ -646,16 +643,16 @@ const format = (date) => {
       <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" absolute />
 
       <!-- Dialog Content -->
-      <VCard title="แบบฟอร์มออกหนังสือ">
+      <VCard title="แบบฟอร์มออกหนังสือส่งตัว">
         <VCardItem>
           <VForm ref="refAddBook" v-model="isAddBookValid">
             <!-- @submit.prevent="onAddSubmit" -->
             <VRow>
               <VCol cols="12">
                 <AppTextField
-                  id="request_document_number"
+                  id="send_document_number"
                   label="เลขที่หนังสือ"
-                  v-model="document.request_document_number"
+                  v-model="document.send_document_number"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -663,37 +660,13 @@ const format = (date) => {
               <VCol cols="12" md="12" class="align-items-center">
                 <label
                   class="v-label font-weight-bold"
-                  for="request_document_date"
+                  for="send_document_date"
                   cols="12"
                   md="4"
                   >วันที่หนังสือ :
                 </label>
                 <VueDatePicker
-                  v-model="document.request_document_date"
-                  :enable-time-picker="false"
-                  locale="th"
-                  auto-apply
-                  :format="format"
-                >
-                  <template #year-overlay-value="{ text }">
-                    {{ parseInt(text) + 543 }}
-                  </template>
-                  <template #year="{ year }">
-                    {{ year + 543 }}
-                  </template>
-                </VueDatePicker>
-              </VCol>
-
-              <VCol cols="12" md="12" class="align-items-center">
-                <label
-                  class="v-label font-weight-bold"
-                  for="request_document_date"
-                  cols="12"
-                  md="4"
-                  >วันที่ต้องตอบรับ :
-                </label>
-                <VueDatePicker
-                  v-model="document.max_response_date"
+                  v-model="document.send_document_date"
                   :enable-time-picker="false"
                   locale="th"
                   auto-apply

@@ -43,7 +43,12 @@ class FormController extends Controller
             "form.max_response_date as max_response_date",
             "form.send_document_date as send_document_date",
             "form.send_document_number as send_document_number",
-            "form.response_document_file as response_document_file",
+            DB::raw(
+                "(CASE WHEN form.response_document_file = NULL THEN ''
+            ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',form.response_document_file) END) AS response_document_file"
+            ),
             "form.response_send_at as response_send_at",
             "form.response_province_id as response_province_id",
             "form.confirm_response_at as confirm_response_at",
@@ -92,7 +97,11 @@ class FormController extends Controller
                 "response_province.name_th as response_province_name",
                 "province.name_th as province_name",
                 "amphur.name_th as amphur_name",
-                "tumbol.name_th as tumbol_name"
+                "tumbol.name_th as tumbol_name",
+                "semester.semester_year as semester_year",
+                "semester.term as term",
+                "semester.round_no as round_no",
+                "semester.chairman_id as chairman_id"
             );
             $items->leftJoin(
                 "teacher",
@@ -340,7 +349,12 @@ class FormController extends Controller
             "form.max_response_date as max_response_date",
             "form.send_document_date as send_document_date",
             "form.send_document_number as send_document_number",
-            "form.response_document_file as response_document_file",
+            DB::raw(
+                "(CASE WHEN form.response_document_file = NULL THEN ''
+            ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',form.response_document_file) END) AS response_document_file"
+            ),
             "form.response_send_at as response_send_at",
             "form.response_province_id as response_province_id",
             "form.confirm_response_at as confirm_response_at",
@@ -800,6 +814,9 @@ class FormController extends Controller
         $item->faculty_confirmed_at = $request->has("faculty_confirmed_at")
             ? $request->faculty_confirmed_at
             : $item->faculty_confirmed_at;
+        $item->confirm_response_at = $request->has("confirm_response_at")
+            ? $request->confirm_response_at
+            : $item->confirm_response_at;
         $item->active = $request->has("active")
             ? $request->active
             : $item->active;
@@ -885,7 +902,7 @@ class FormController extends Controller
 
         $item->response_document_file = $pathResponseFile;
         $item->response_send_at = $request->response_send_at;
-        $item->province_id = $request->province_id;
+        $item->response_province_id = $request->province_id;
         $item->status_id = $request->status_id;
         $item->updated_by = "arnonr";
         $item->save();

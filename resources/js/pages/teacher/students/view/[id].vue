@@ -795,9 +795,11 @@ onMounted(() => {
                     <span>
                       <VChip label :color="form_statuses[it.status_id]">
                         {{
-                          it.status_id == 2
-                            ? "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
-                            : it.form_status_name
+                          statusShow(
+                            it.status_id,
+                            it.request_document_date,
+                            it.confirm_response_at
+                          )
                         }}</VChip
                       >
                     </span>

@@ -14,4 +14,11 @@ export default [
     action: "read",
     subject: "Auth",
   },
+  {
+    title: "หนังสือส่งตัว",
+    icon: { icon: "tabler-user" },
+    to: { name: "staff-book2" },
+    action: "read",
+    subject: "Auth",
+  },
 ];

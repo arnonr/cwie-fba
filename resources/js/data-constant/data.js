@@ -414,3 +414,55 @@ export const statuses = [
   { value: 8, title: "นักศึกษาสละสิทธิ์" },
   { value: 9, title: "อนุมัติแผนการปฏิบัติงาน" },
 ];
+
+export const statusShow = (
+  status,
+  request_document_date = null,
+  confirm_response_at = null
+) => {
+  let text = "";
+  if (status == 1) {
+    text = "ร่าง";
+  } else if (status == 2) {
+    text = "ส่งแล้ว";
+  } else if (status == 3) {
+    text = "อาจารย์ที่ปรึกษาอนุมัติ";
+  } else if (status == 4) {
+    text = "ประธานอาจารย์นิเทศอนุมัติ";
+  } else if (status == 5) {
+    if (request_document_date != null) {
+      text = "ออกหนังสือขอความอนุเคราะห์แล้ว";
+    } else {
+      text = "คณะยืนยันข้อมูล";
+    }
+  } else if (
+    (status == 6 || status == 7 || status == 8) &&
+    confirm_response_at == null
+  ) {
+    text = "รอยืนยันเอกสารตอบรับ";
+  } else if (status == 6) {
+    text = "สถานประกอบการปฏิเสธ";
+  } else if (status == 7) {
+    text = "สถานประกอบการตอบรับ";
+  } else if (status == 8) {
+    text = "นักศึกษาสละสิทธิ์";
+  } else {
+    text = "FREEDOM";
+  }
+  return text;
+};
+
+export const book_statuses = [
+  { value: 1, title: "รอออกหนังสือขอความอนุเคราะห์" },
+  { value: 2, title: "ออกหนังสือขอความอนุเคราะห์แล้ว" },
+  { value: 3, title: "รอออกหนังสือส่งตัว" },
+  { value: 4, title: "ออกหนังสือส่งตัวแล้ว" },
+];
+
+// it.status_id != 2
+// ? text_statuses[it.status_id] == "คณะยืนยันข้อมูล"
+//   ? it.request_document_date != null
+//     ? "ออกหนังสือขอความอนุเคราะห์แล้ว"
+//     : text_statuses[it.status_id]
+//   : it.form_status_name
+// : "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"

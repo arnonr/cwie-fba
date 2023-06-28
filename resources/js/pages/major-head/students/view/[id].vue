@@ -9,7 +9,7 @@ import buddhistEra from "dayjs/plugin/buddhistEra";
 import "vue3-pdf-app/dist/icons/main.css";
 import { useCwieDataStore } from "../useCwieDataStore";
 
-import { form_statuses, text_statuses } from "@/data-constant/data";
+import { form_statuses, text_statuses, statusShow } from "@/data-constant/data";
 
 // const route = useRoute();
 dayjs.extend(buddhistEra);
@@ -794,9 +794,11 @@ onMounted(() => {
                     <span>
                       <VChip label :color="form_statuses[it.status_id]">
                         {{
-                          it.status_id == 2
-                            ? "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
-                            : it.form_status_name
+                          statusShow(
+                            it.status_id,
+                            it.request_document_date,
+                            it.confirm_response_at
+                          )
                         }}</VChip
                       >
                     </span>

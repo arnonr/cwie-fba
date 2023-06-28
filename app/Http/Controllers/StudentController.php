@@ -120,7 +120,9 @@ class StudentController extends Controller
             if ($request->semester_id) {
                 $items->addSelect("form.id as form_id");
                 $items->addSelect("form.semester_id as semester_id");
-                // $items->addSelect('form.* as form');
+                // $items->addSelect(
+                //     "form.confirm_response_at as confirm_response_at"
+                // );
                 $items->leftJoin("form", function ($join) {
                     $join
                         ->on("form.student_id", "=", "student.id")
@@ -432,7 +434,10 @@ class StudentController extends Controller
                     "form.id as form_id",
                     "request_document_date",
                     "request_document_number",
-                    "max_response_date"
+                    "max_response_date",
+                    "confirm_response_at",
+                    "send_document_date",
+                    "send_document_number"
                 );
                 // $items->addSelect('form.* as form');
                 $items->leftJoin("form", function ($join) {
@@ -441,6 +446,28 @@ class StudentController extends Controller
                         ->where("form.active", 1);
                 });
                 $items->where("form.semester_id", $request->semester_id);
+
+                if ($request->book_status) {
+                    if ($request->book_status == 1) {
+                        $items->whereNull("form.request_document_number");
+                    }
+
+                    if ($request->book_status == 2) {
+                        $items->whereNotNull("form.request_document_number");
+                    }
+
+                    if ($request->book_status == 3) {
+                        $items->whereNotNull("form.request_document_number");
+                        $items->whereNull("form.send_document_number");
+                    }
+
+                    if ($request->book_status == 4) {
+                        $items->whereNotNull("form.request_document_number");
+                        $items->whereNotNull("form.send_document_number");
+                    }
+                }
+
+                // whereNotNull()
             }
         }
 

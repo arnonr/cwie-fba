@@ -2,7 +2,7 @@
 import { class_rooms, class_years, statuses } from "@/data-constant/data";
 import { useStudentStore } from "./useStudentStore";
 
-import { form_statuses, text_statuses } from "@/data-constant/data";
+import { form_statuses, text_statuses, statusShow } from "@/data-constant/data";
 
 const studentStore = useStudentStore();
 
@@ -432,9 +432,11 @@ onMounted(() => {
                           : form_statuses[it.status_id]
                       "
                       >{{
-                        text_statuses[it.status_id] != "ส่งแล้ว"
-                          ? text_statuses[it.status_id]
-                          : "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
+                        statusShow(
+                          it.status_id,
+                          it.request_document_date,
+                          it.confirm_response_at
+                        )
                       }}</VChip
                     >
                   </td>
