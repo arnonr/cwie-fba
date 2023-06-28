@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Form;
 use App\Models\Student;
+use App\Models\Teacher;
 use Carbon\Carbon;
 use Validator;
 use Illuminate\Support\Facades\DB;
@@ -468,135 +469,55 @@ class FormController extends Controller
         }
 
         $item = new Form();
-        $item->semester_id = $request->has("semester_id")
-            ? $request->semester_id
-            : "";
-        $item->supervision_id = $request->has("supervision_id")
-            ? $request->supervision_id
-            : "";
-        $item->student_id = $request->has("student_id")
-            ? $request->student_id
-            : "";
-        $item->company_id = $request->has("company_id")
-            ? $request->company_id
-            : "";
-        $item->status_id = $request->has("status_id")
-            ? $request->status_id
-            : "";
-        $item->start_date = $request->has("start_date")
-            ? $request->start_date
-            : "";
-        $item->end_date = $request->has("end_date") ? $request->end_date : "";
-        $item->co_name = $request->has("co_name") ? $request->co_name : "";
-        $item->co_position = $request->has("co_position")
-            ? $request->co_position
-            : "";
-        $item->co_tel = $request->has("co_tel") ? $request->co_tel : "";
-        $item->co_email = $request->has("co_email") ? $request->co_email : "";
-        $item->request_name = $request->has("request_name")
-            ? $request->request_name
-            : "";
-        $item->request_position = $request->has("request_position")
-            ? $request->request_position
-            : "";
-        $item->request_document_date = $request->has("request_document_date")
-            ? $request->request_document_date
-            : "";
-        $item->request_document_number = $request->has(
-            "request_document_number"
-        )
-            ? $request->request_document_number
-            : "";
-        $item->max_response_date = $request->has("max_response_date")
-            ? $request->max_response_date
-            : "";
-        $item->send_document_date = $request->has("send_document_date")
-            ? $request->send_document_date
-            : "";
-        $item->send_document_number = $request->has("send_document_number")
-            ? $request->send_document_number
-            : "";
-        $item->response_document_file = $request->has("response_document_file")
-            ? $request->response_document_file
-            : "";
-        $item->response_send_at = $request->has("response_send_at")
-            ? $request->response_send_at
-            : "";
-        $item->response_province_id = $request->has("response_province_id")
-            ? $request->response_province_id
-            : "";
-        $item->confirm_response_at = $request->has("confirm_response_at")
-            ? $request->confirm_response_at
-            : "";
-        $item->workplace_address = $request->has("workplace_address")
-            ? $request->workplace_address
-            : "";
-        $item->workplace_province_id = $request->has("workplace_province_id")
-            ? $request->workplace_province_id
-            : "";
-        $item->workplace_amphur_id = $request->has("workplace_amphur_id")
-            ? $request->workplace_amphur_id
-            : "";
-        $item->workplace_tumbol_id = $request->has("workplace_tumbol_id")
-            ? $request->workplace_tumbol_id
-            : "";
-        $item->workplace_googlemap_url = $request->has(
-            "workplace_googlemap_url"
-        )
-            ? $request->workplace_googlemap_url
-            : "";
-        $item->workplace_googlemap_file = $request->has(
-            "workplace_googlemap_file"
-        )
-            ? $request->workplace_googlemap_file
-            : "";
-        $item->plan_document_file = $request->has("plan_document_file")
-            ? $request->plan_document_file
-            : "";
-        $item->plan_send_at = $request->has("plan_send_at")
-            ? $request->plan_send_at
-            : "";
-        $item->plan_accept_at = $request->has("plan_accept_at")
-            ? $request->plan_accept_at
-            : "";
-        $item->reject_status_id = $request->has("reject_status_id")
-            ? $request->reject_status_id
-            : "";
-        $item->advisor_verified_at = $request->has("advisor_verified_at")
-            ? $request->advisor_verified_at
-            : "";
-        $item->chairman_approved_at = $request->has("chairman_approved_at")
-            ? $request->chairman_approved_at
-            : "";
-        $item->faculty_confirmed_at = $request->has("faculty_confirmed_at")
-            ? $request->faculty_confirmed_at
-            : "";
-        $item->company_rating = $request->has("company_rating")
-            ? $request->company_rating
-            : "";
-        $item->rating_comment = $request->has("rating_comment")
-            ? $request->rating_comment
-            : "";
-        $item->next_coop = $request->has("next_coop")
-            ? $request->next_coop
-            : "";
-        $item->province_id = $request->has("province_id")
-            ? $request->province_id
-            : "";
-        $item->amphur_id = $request->has("amphur_id")
-            ? $request->amphur_id
-            : "";
-        $item->tumbol_id = $request->has("tumbol_id")
-            ? $request->tumbol_id
-            : "";
-        $item->active = $request->has("active") ? $request->active : "";
+        $item->semester_id = $request->semester_id;
+        $item->supervision_id =$request->supervision_id;
+        $item->student_id = $request->student_id;
+        $item->company_id = $request->company_id;
+        $item->status_id = $request->status_id;
+        $item->start_date = $request->start_date;
+        $item->end_date = $request->end_date;
+        $item->co_name = $request->co_name;
+        $item->co_position = $request->co_position;
+        $item->co_tel = $request->co_tel;
+        $item->co_email = $request->co_email;
+        $item->request_name =$request->request_name;
+        $item->request_position = $request->request_position;
+        $item->request_document_date = $request->request_document_date;
+        $item->request_document_number = $request->request_document_number;
+        $item->max_response_date = $request->max_response_date;
+        $item->send_document_date = $request->send_document_date;
+        $item->send_document_number = $request->send_document_number;
+        $item->response_document_file = $request->response_document_file;
+        $item->response_send_at = $request->response_send_at;
+        $item->response_province_id = $request->response_province_id;
+        $item->confirm_response_at = $request->confirm_response_at;
+        $item->workplace_address = $request->workplace_address;
+        $item->workplace_province_id = $request->workplace_province_id;
+        $item->workplace_amphur_id = $request->workplace_amphur_id;
+        $item->workplace_tumbol_id = $request->workplace_tumbol_id;
+        $item->workplace_googlemap_url = $request->workplace_googlemap_url;
+        $item->workplace_googlemap_file = $request->workplace_googlemap_file;
+        $item->plan_document_file = $request->plan_document_file;
+        $item->plan_send_at = $request->plan_send_at;
+        $item->plan_accept_at = $request->plan_accept_at;
+        $item->reject_status_id = $request->reject_status_id;
+        $item->advisor_verified_at = $request->advisor_verified_at;
+        $item->chairman_approved_at = $request->chairman_approved_at;
+        $item->faculty_confirmed_at = $request->faculty_confirmed_at;
+        $item->company_rating = $request->company_rating;
+        $item->rating_comment = $request->rating_comment;
+        $item->next_coop = $request->next_coop;
+        $item->province_id = $request->province_id;
+        $item->amphur_id = $request->amphur_id;
+        $item->tumbol_id = $request->tumbol_id;
+        $item->active = $request->active;
         $item->namecard_file = $pathNamecard;
         $item->created_by = "arnonr";
         $item->save();
 
-        $student = Student::where("id", $item->student_id)->first();
-        $student->status_id = $item->status_id;
-        $student->save();
+        // $student = Student::where("id", $item->student_id)->first();
+        // $student->status_id = $item->status_id;
+        // $student->save();
 
         $responseData = [
             "message" => "success",
@@ -934,5 +855,49 @@ class FormController extends Controller
         ];
 
         return response()->json($responseData, 200);
+    }
+
+    public function importFormSupervisor($semester_id, Request $request)
+    {
+        $data = [];
+        $status = true;
+        $import_message = [];
+
+        $student = Student::where("student_code", $request->student_code)->first();
+        if($student === null){
+            $import_message[] = "Student not found";
+            $status = false;
+        }
+
+        $teacher = Teacher::where("firstname", $request->firstname)->where("surname", $request->surename)->first();
+        if($teacher === null){
+            $import_message[] = "Teacher not found";
+            $status = false;
+        }
+
+        if($student !== null && $teacher !== null){
+            $form = Form::where("semester_id", $semester_id)
+                        ->where("student_id", $student->id)
+                        ->where("active", 1)
+                        ->first();
+
+            if($form === null){
+                $import_message[] = "Form not found";
+                $status = false;
+            }else{
+                $form->supervision_id = $teacher->id;
+                $form->save();
+                $import_message[] = "success";
+            }
+        }
+
+        $data[$request->student_code] = ['status' => $status, 'message' => implode(", ", $import_message)];
+
+        $responseData = [
+            "message" => "success",
+            "data" => $data,
+        ];
+        return response()->json($responseData, 200);
+
     }
 }
