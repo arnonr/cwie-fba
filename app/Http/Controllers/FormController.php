@@ -69,6 +69,12 @@ class FormController extends Controller
             "form.company_rating as company_rating",
             "form.rating_comment as rating_comment",
             "form.next_coop as next_coop",
+            "form.is_pass_coop_subject as is_pass_coop_subject",
+            "form.is_pass_general_subject as is_pass_general_subject",
+            "form.is_pass_gpa as is_pass_gpa",
+            "form.is_pass_suspend as is_pass_suspend",
+            "form.is_pass_punishment as is_pass_punishment",
+            "form.is_pass_disease as is_pass_disease",
             DB::raw(
                 "(CASE WHEN form.namecard_file = NULL THEN ''
             ELSE CONCAT('" .
@@ -297,6 +303,30 @@ class FormController extends Controller
             $items->where("form.active", $request->active);
         }
 
+        if ($request->is_pass_coop_subject) {
+            $items->where("form.is_pass_coop_subject", $request->is_pass_coop_subject);
+        }
+
+        if ($request->is_pass_general_subject) {
+            $items->where("form.is_pass_general_subject", $request->is_pass_general_subject);
+        }
+
+        if ($request->is_pass_gpa) {
+            $items->where("form.is_pass_gpa", $request->is_pass_gpa);
+        }
+
+        if ($request->is_pass_suspend) {
+            $items->where("form.is_pass_suspend", $request->is_pass_suspend);
+        }
+
+        if ($request->is_pass_punishment) {
+            $items->where("form.is_pass_punishment", $request->is_pass_punishment);
+        }
+
+        if ($request->is_pass_disease) {
+            $items->where("form.is_pass_disease", $request->is_pass_disease);
+        }
+
         // Order
         if ($request->orderBy) {
             $items = $items->orderBy($request->orderBy, $request->order);
@@ -375,6 +405,12 @@ class FormController extends Controller
             "form.company_rating as company_rating",
             "form.rating_comment as rating_comment",
             "form.next_coop as next_coop",
+            "form.is_pass_coop_subject as is_pass_coop_subject",
+            "form.is_pass_general_subject as is_pass_general_subject",
+            "form.is_pass_gpa as is_pass_gpa",
+            "form.is_pass_suspend as is_pass_suspend",
+            "form.is_pass_punishment as is_pass_punishment",
+            "form.is_pass_disease as is_pass_disease",
             DB::raw(
                 "(CASE WHEN form.namecard_file = NULL THEN ''
             ELSE CONCAT('" .
@@ -512,6 +548,13 @@ class FormController extends Controller
         $item->tumbol_id = $request->tumbol_id;
         $item->active = $request->active;
         $item->namecard_file = $pathNamecard;
+
+        $item->is_pass_coop_subject = $request->is_pass_coop_subject;
+        $item->is_pass_general_subject = $request->is_pass_general_subject;
+        $item->is_pass_gpa = $request->is_pass_gpa;
+        $item->is_pass_suspend = $request->is_pass_suspend;
+        $item->is_pass_punishment = $request->is_pass_punishment;
+        $item->is_pass_disease = $request->is_pass_disease;
         $item->created_by = "arnonr";
         $item->save();
 
@@ -693,6 +736,12 @@ class FormController extends Controller
         $item->active = $request->has("active")
             ? $request->active
             : $item->active;
+        $item->is_pass_coop_subject = $request->has("is_pass_coop_subject") ? $request->is_pass_coop_subject : $item->is_pass_coop_subject;
+        $item->is_pass_general_subject = $request->has("is_pass_general_subject") ? $request->is_pass_general_subject : $item->is_pass_general_subject;
+        $item->is_pass_gpa = $request->has("is_pass_gpa") ? $request->is_pass_gpa : $item->is_pass_gpa;
+        $item->is_pass_suspend = $request->has("is_pass_suspend") ? $request->is_pass_suspend : $item->is_pass_suspend;
+        $item->is_pass_punishment = $request->has("is_pass_punishment") ? $request->is_pass_punishment : $item->is_pass_punishment;
+        $item->is_pass_disease = $request->has("is_pass_disease") ? $request->is_pass_disease : $item->is_pass_disease;
         $item->updated_by = "arnonr";
         $item->save();
 

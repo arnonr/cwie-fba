@@ -62,6 +62,12 @@ class Form extends Model
         "province_id",
         "amphur_id",
         "tumbold_id",
+        "is_pass_coop_subject",
+        "is_pass_general_subject",
+        "is_pass_gpa",
+        "is_pass_suspend",
+        "is_pass_punishment",
+        "is_pass_disease"
     ];
 
     public function reject_log(): HasMany
