@@ -358,7 +358,7 @@ let userData = JSON.parse(localStorage.getItem("userData"));
 const fetchStudent = () => {
   cwieDataStore
     .fetchStudents({
-      username: userData.username.slice(1, userData.username.length),
+      student_code: userData.username.slice(1, userData.username.length),
       includeAll: true,
     })
     .then((response) => {
@@ -1290,7 +1290,7 @@ onMounted(() => {
           <VDivider class="ml-4 mr-4" />
           <VCardText>
             <span class="font-weight-bold">สาขาวิชา : </span>
-            <span>{{}}</span></VCardText
+            <span>{{ student.major_name }}</span></VCardText
           >
           <VDivider class="ml-4 mr-4" />
           <VCardText>

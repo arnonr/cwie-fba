@@ -256,7 +256,7 @@ const fetchStudent = () => {
   personalDataStore
     .fetchStudents({
       // id: route.params.id,
-      username: userData.username.slice(1, userData.username.length),
+      student_code: userData.username.slice(1, userData.username.length),
       includeAll: true,
       // get id self
     })

@@ -47,7 +47,8 @@
     "vue3-pdf-app": "^1.0.3",
     "vue3-perfect-scrollbar": "1.6.1",
     "vuetify": "3.2.1",
-    "webfontloader": "1.6.28"
+    "webfontloader": "1.6.28",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.0/xlsx-0.20.0.tgz"
   },
   "devDependencies": {
     "@antfu/eslint-config-vue": "0.38.5",

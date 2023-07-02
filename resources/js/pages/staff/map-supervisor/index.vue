@@ -12,8 +12,34 @@ import { form_statuses, statusShow } from "@/data-constant/data";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
+import XLSX from "xlsx";
 dayjs.extend(buddhistEra);
+//
+const readFileAsync = (file) => {
+  return new Promise((resolve, reject) => {
+    let reader = new FileReader();
 
+    reader.onload = () => {
+      let data = reader.result;
+      data = new Uint8Array(data);
+
+      let workbook = XLSX.read(data, { type: "array" });
+      let first_worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      let result = XLSX.utils.sheet_to_json(first_worksheet, { header: 1 });
+      // workbook.SheetNames.forEach(function (sheetName) {
+      //     var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
+      //     if (roa.length) result[sheetName] = roa;
+      // });
+
+      resolve(result);
+    };
+
+    reader.onerror = reject;
+
+    reader.readAsArrayBuffer(file);
+  });
+};
+//
 const studentStore = useStudentStore();
 const cwieDataStore = useCwieDataStore();
 
@@ -27,6 +53,7 @@ const isOverlay = ref(true);
 const orderBy = ref("student.id");
 const order = ref("desc");
 const selectedItem = ref([]);
+const importData = ref({ supervisor_file: [], semester_id: "" });
 
 const refAddBook = ref();
 const isAddBookValid = ref(false);
@@ -224,66 +251,54 @@ watch(
   }
 );
 
-// selectItem
-const onSelectItemAll = () => {
-  selectedItem.value = [];
-  selectedItem.value = items.value.map((d) => {
-    return d.form_id;
-  });
-  //   chkItem
-  console.log(selectedItem.value);
-};
-
-const onDisSelectItemAll = () => {
-  selectedItem.value = [];
-  console.log(selectedItem.value);
-};
-
 const onAddBook = () => {
-  if (selectedItem.value.length != 0) {
-    if (advancedSearch.semester_id != "") {
-      isDialogVisible.value = true;
-    }
-  } else {
-    snackbarText.value = "โปรดเลือกนักศึกษา";
-    snackbarColor.value = "error";
-    isSnackbarVisible.value = true;
-    isDialogVisible.value = false;
-  }
+  isDialogVisible.value = true;
 };
 
 const onSubmit = () => {
   isOverlay.value = true;
-  refAddBook.value?.validate().then(({ valid }) => {
-    //
+
+  refAddBook.value?.validate().then(async ({ valid }) => {
     if (valid) {
-      cwieDataStore
-        .addSendBook({
-          id: selectedItem.value,
-          send_document_number: document.value.send_document_number,
-          send_document_date:
-            document.value.send_document_date &&
-            document.value.send_document_date != null
-              ? dayjs(document.value.send_document_date).format("YYYY-MM-DD")
-              : null,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            //
-            fetchItems();
-            isDialogVisible.value = false;
-            isOverlay.value = false;
-            snackbarText.value = "ออกหนังสือสำเร็จ";
-            snackbarColor.value = "success";
-            isSnackbarVisible.value = true;
-          } else {
-            console.log("error");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          isOverlay.value = false;
+      let importFile = null;
+      if (importData.value.supervisor_file.length !== 0) {
+        importFile = importData.value.supervisor_file[0];
+        let result = await readFileAsync(importFile);
+        result.shift();
+        console.log(result);
+        let data = [];
+        result.forEach((el) => {
+          data.push({
+            student_code: el[0],
+            supervisor_firstname: el[3],
+            supervisor_surname: el[4],
+          });
         });
+
+        //
+        cwieDataStore
+          .importSupervisor({
+            semester_id: importData.value.semester_id,
+            data: data,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              //
+              fetchItems();
+              isDialogVisible.value = false;
+              isOverlay.value = false;
+              snackbarText.value = "สำเร็จ";
+              snackbarColor.value = "success";
+              isSnackbarVisible.value = true;
+            } else {
+              console.log("error");
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            isOverlay.value = false;
+          });
+      }
     }
     isOverlay.value = false;
   });
@@ -319,7 +334,7 @@ const format = (date) => {
 <template>
   <div>
     <!-- Table -->
-    <VCard title="หนังสือส่งตัว">
+    <VCard title="จับคู่อาจารย์นิเทศ">
       <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Search -->
@@ -468,11 +483,23 @@ const format = (date) => {
 
           <!-- Table -->
           <VCol cols="12" class="mb-2 d-flex">
-            <VBtn color="primary" @click="onSelectItemAll"> เลือกทั้งหมด</VBtn>
+            <!-- <VBtn color="primary" @click="onSelectItemAll"> เลือกทั้งหมด</VBtn>
             <VBtn color="error" @click="onDisSelectItemAll" class="ml-2">
               ยกเลิก</VBtn
-            >
+            > -->
             <VSpacer />
+            <VBtn
+              color="primary"
+              class="mr-2"
+              @click="
+                () => {
+                  document = [];
+                  onAddBook();
+                }
+              "
+            >
+              ดาวน์โหลด Template</VBtn
+            >
             <VBtn
               color="success"
               @click="
@@ -482,7 +509,7 @@ const format = (date) => {
                 }
               "
             >
-              ออกหนังสือ</VBtn
+              นำเข้าข้อมูล</VBtn
             >
           </VCol>
           <VCol cols="12" sm="12">
@@ -490,7 +517,6 @@ const format = (date) => {
               <!-- 👉 table head -->
               <thead>
                 <tr>
-                  <th scope="col" class="font-weight-bold">เลือก</th>
                   <th scope="col" class="font-weight-bold">รหัสนักศึกษา</th>
                   <th scope="col" class="text-center font-weight-bold">
                     ชื่อ-นามสกุล
@@ -499,14 +525,16 @@ const format = (date) => {
                     สาขาวิชา
                   </th>
                   <th scope="col" class="text-center font-weight-bold">
-                    ชั้นปี
+                    สถานประกอบการ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">ห้อง</th>
+                  <th scope="col" class="text-center font-weight-bold">
+                    จังหวัด
+                  </th>
+                  <th scope="col" class="text-center font-weight-bold">
+                    อาจารย์นิเทศ
+                  </th>
                   <th scope="col" class="text-center font-weight-bold">
                     สถานะ
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    เลขที่หนังสือ
                   </th>
                   <th scope="col" class="text-center font-weight-bold">
                     จัดการ
@@ -517,15 +545,6 @@ const format = (date) => {
               <tbody>
                 <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
                   <!-- 👉 User -->
-                  <td>
-                    <VCheckbox
-                      v-model="selectedItem"
-                      class="chkItem"
-                      :value="it.form_id"
-                      v-if="it.status_id > 5"
-                    />
-                    <!-- @click="onSelectItem(it.id)" -->
-                  </td>
                   <td>
                     <span>
                       {{ it.student_code }}
@@ -539,11 +558,15 @@ const format = (date) => {
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    {{ it.class_year }}
+                    {{ it.company_name }}
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    {{ it.class_room }}
+                    {{ it.response_province_id }}
+                  </td>
+
+                  <td class="text-center" style="min-width: 100px">
+                    {{ it.supervisor_id }}
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
@@ -556,10 +579,6 @@ const format = (date) => {
                         )
                       }}</VChip
                     >
-                  </td>
-
-                  <td class="text-center" style="min-width: 100px">
-                    {{ it.send_document_number }}
                   </td>
 
                   <!-- 👉 Actions -->
@@ -643,42 +662,36 @@ const format = (date) => {
       <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" absolute />
 
       <!-- Dialog Content -->
-      <VCard title="แบบฟอร์มออกหนังสือส่งตัว">
+      <VCard title="แบบฟอร์มอัพโหลดไฟล์ จับคู่อาจารย์นิเทศ">
         <VCardItem>
           <VForm ref="refAddBook" v-model="isAddBookValid">
             <!-- @submit.prevent="onAddSubmit" -->
             <VRow>
               <VCol cols="12">
-                <AppTextField
+                <!-- <AppTextField
                   id="send_document_number"
                   label="เลขที่หนังสือ"
                   v-model="document.send_document_number"
                   :rules="[requiredValidator]"
+                /> -->
+                <label>ปีการศึกษา</label>
+                <VSelect
+                  v-model="importData.semester_id"
+                  density="compact"
+                  variant="outlined"
+                  clearable
+                  :rules="[requiredValidator]"
+                  :items="selectOptions.semesters"
                 />
               </VCol>
 
-              <VCol cols="12" md="12" class="align-items-center">
-                <label
-                  class="v-label font-weight-bold"
-                  for="send_document_date"
-                  cols="12"
-                  md="4"
-                  >วันที่หนังสือ :
-                </label>
-                <VueDatePicker
-                  v-model="document.send_document_date"
-                  :enable-time-picker="false"
-                  locale="th"
-                  auto-apply
-                  :format="format"
-                >
-                  <template #year-overlay-value="{ text }">
-                    {{ parseInt(text) + 543 }}
-                  </template>
-                  <template #year="{ year }">
-                    {{ year + 543 }}
-                  </template>
-                </VueDatePicker>
+              <VCol cols="12">
+                <label> อัพโหลดไฟล์ Excel (.xls, .xlsx) </label>
+                <VFileInput
+                  id="supervisor_file"
+                  v-model="importData.supervisor_file"
+                  persistent-placeholder
+                />
               </VCol>
             </VRow>
           </VForm>

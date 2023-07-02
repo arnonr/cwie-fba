@@ -56,13 +56,15 @@ const login = () => {
       }
     )
     .then((r) => {
-      console.log(r);
       if (r.status === 200) {
         // const { accessToken, userData, userAbilities } = r.data;
         const { accessToken, userData, teacherData } = r.data;
 
         // localStorage.setItem("userAbilities", JSON.stringify(userAbilities));
         // ability.update(userAbilities);
+        console.log(r);
+        console.log(r.data);
+        // console.log(r.data.userData);
 
         userData.role = "";
 
@@ -79,28 +81,32 @@ const login = () => {
 
         if (userData.account_type == 1) {
           userData.role = "student";
-          userData.ability.push = {
-            action: "manage",
+          userData.ability.push({
             subject: "StudentUser",
-          };
+            action: "manage",
+          });
         } else if (userData.account_type == 2) {
           userData.role = "teacher";
-          userData.ability.push = {
-            action: "manage",
+          userData.ability.push({
             subject: "TeacherUser",
-          };
+            action: "manage",
+          });
         } else if (userData.account_type == 3) {
           userData.role = "staff";
-          userData.ability.push = {
-            action: "manage",
+          userData.ability.push({
             subject: "StaffUser",
-          };
+            action: "manage",
+          });
         } else {
           userData.role = "admin";
-          userData.ability = {
+          userData.ability.push({
+            subject: "StaffUser",
             action: "manage",
+          });
+          userData.ability.push({
             subject: "AdminUser",
-          };
+            action: "manage",
+          });
         }
 
         console.log(userData);

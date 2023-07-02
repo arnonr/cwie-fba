@@ -1,10 +1,10 @@
 export default [
-  { heading: "ประธานอาจารย์นิเทศ", action: "read", subject: "Auth" },
+  { heading: "ประธานอาจารย์นิเทศ", subject: "TeacherUser", action: "manage" },
   {
     title: "รายการนักศึกษา",
     icon: { icon: "tabler-user" },
     to: { name: "major-head-students" },
-    action: "read",
-    subject: "Auth",
+    subject: "TeacherUser",
+    action: "manage",
   },
 ];

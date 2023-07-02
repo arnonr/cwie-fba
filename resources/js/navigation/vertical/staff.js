@@ -1,24 +1,31 @@
 export default [
-  { heading: "เจ้าหน้าที่คณะ", action: "read", subject: "Auth" },
+  { heading: "เจ้าหน้าที่คณะ", action: "manage", subject: "StaffUser" },
   {
     title: "รายการนักศึกษา",
     icon: { icon: "tabler-user" },
     to: { name: "staff-students" },
-    action: "read",
-    subject: "Auth",
+    action: "manage",
+    subject: "StaffUser",
   },
   {
     title: "หนังสือขอความอนุเคราะห์",
     icon: { icon: "tabler-user" },
     to: { name: "staff-book1" },
-    action: "read",
-    subject: "Auth",
+    action: "manage",
+    subject: "StaffUser",
   },
   {
     title: "หนังสือส่งตัว",
     icon: { icon: "tabler-user" },
     to: { name: "staff-book2" },
-    action: "read",
-    subject: "Auth",
+    action: "manage",
+    subject: "StaffUser",
+  },
+  {
+    title: "จับคู่อาจารย์นิเทศ",
+    icon: { icon: "tabler-user" },
+    to: { name: "staff-map-supervisor" },
+    action: "manage",
+    subject: "StaffUser",
   },
 ];

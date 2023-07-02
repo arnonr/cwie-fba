@@ -470,7 +470,7 @@ class FormController extends Controller
 
         $item = new Form();
         $item->semester_id = $request->semester_id;
-        $item->supervision_id =$request->supervision_id;
+        $item->supervision_id = $request->supervision_id;
         $item->student_id = $request->student_id;
         $item->company_id = $request->company_id;
         $item->status_id = $request->status_id;
@@ -480,7 +480,7 @@ class FormController extends Controller
         $item->co_position = $request->co_position;
         $item->co_tel = $request->co_tel;
         $item->co_email = $request->co_email;
-        $item->request_name =$request->request_name;
+        $item->request_name = $request->request_name;
         $item->request_position = $request->request_position;
         $item->request_document_date = $request->request_document_date;
         $item->request_document_number = $request->request_document_number;
@@ -767,6 +767,7 @@ class FormController extends Controller
             "updated_by" => "arnonr",
         ]);
         // รอส่งเมลแจ้งเตือนหนังสือขอความอนุเคราะห์
+        //send_mail = 1
 
         $responseData = [
             "message" => "success",
@@ -859,45 +860,56 @@ class FormController extends Controller
 
     public function importFormSupervisor($semester_id, Request $request)
     {
+        // [
+        // {student_code: 640202,supervisor_firstname: 'อานนท์',supervisor_surname: 'รักจักร์'},
+        // {student_code: 640202,supervisor_firstname: 'อานนท์',supervisor_surname: 'รักจักร์'}
+        // ]
         $data = [];
         $status = true;
         $import_message = [];
 
-        $student = Student::where("student_code", $request->student_code)->first();
-        if($student === null){
+        $student = Student::where(
+            "student_code",
+            $request->student_code
+        )->first();
+        if ($student === null) {
             $import_message[] = "Student not found";
             $status = false;
         }
 
-        $teacher = Teacher::where("firstname", $request->firstname)->where("surname", $request->surename)->first();
-        if($teacher === null){
+        $teacher = Teacher::where("firstname", $request->firstname)
+            ->where("surname", $request->surename)
+            ->first();
+        if ($teacher === null) {
             $import_message[] = "Teacher not found";
             $status = false;
         }
 
-        if($student !== null && $teacher !== null){
+        if ($student !== null && $teacher !== null) {
             $form = Form::where("semester_id", $semester_id)
-                        ->where("student_id", $student->id)
-                        ->where("active", 1)
-                        ->first();
+                ->where("student_id", $student->id)
+                ->where("active", 1)
+                ->first();
 
-            if($form === null){
+            if ($form === null) {
                 $import_message[] = "Form not found";
                 $status = false;
-            }else{
+            } else {
                 $form->supervision_id = $teacher->id;
                 $form->save();
                 $import_message[] = "success";
             }
         }
 
-        $data[$request->student_code] = ['status' => $status, 'message' => implode(", ", $import_message)];
+        $data[$request->student_code] = [
+            "status" => $status,
+            "message" => implode(", ", $import_message),
+        ];
 
         $responseData = [
             "message" => "success",
             "data" => $data,
         ];
         return response()->json($responseData, 200);
-
     }
 }
