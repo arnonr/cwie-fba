@@ -270,8 +270,8 @@ const onSubmit = () => {
         result.forEach((el) => {
           data.push({
             student_code: el[0],
-            supervisor_firstname: el[3],
-            supervisor_surname: el[4],
+            firstname: el[3],
+            surname: el[4],
           });
         });
 

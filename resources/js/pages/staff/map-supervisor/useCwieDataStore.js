@@ -156,13 +156,9 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
     },
 
     async importSupervisor(dataSend) {
-      return await axios.post(
-        `/form/import-form-supervisor/${dataSend.semester_id}`,
-        dataSend,
-        {
-          validateStatus: () => true,
-        }
-      );
+      return await axios.post(`/form/import-form-supervisor`, dataSend, {
+        validateStatus: () => true,
+      });
     },
   },
 });

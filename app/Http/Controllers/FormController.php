@@ -304,11 +304,17 @@ class FormController extends Controller
         }
 
         if ($request->is_pass_coop_subject) {
-            $items->where("form.is_pass_coop_subject", $request->is_pass_coop_subject);
+            $items->where(
+                "form.is_pass_coop_subject",
+                $request->is_pass_coop_subject
+            );
         }
 
         if ($request->is_pass_general_subject) {
-            $items->where("form.is_pass_general_subject", $request->is_pass_general_subject);
+            $items->where(
+                "form.is_pass_general_subject",
+                $request->is_pass_general_subject
+            );
         }
 
         if ($request->is_pass_gpa) {
@@ -320,7 +326,10 @@ class FormController extends Controller
         }
 
         if ($request->is_pass_punishment) {
-            $items->where("form.is_pass_punishment", $request->is_pass_punishment);
+            $items->where(
+                "form.is_pass_punishment",
+                $request->is_pass_punishment
+            );
         }
 
         if ($request->is_pass_disease) {
@@ -736,12 +745,26 @@ class FormController extends Controller
         $item->active = $request->has("active")
             ? $request->active
             : $item->active;
-        $item->is_pass_coop_subject = $request->has("is_pass_coop_subject") ? $request->is_pass_coop_subject : $item->is_pass_coop_subject;
-        $item->is_pass_general_subject = $request->has("is_pass_general_subject") ? $request->is_pass_general_subject : $item->is_pass_general_subject;
-        $item->is_pass_gpa = $request->has("is_pass_gpa") ? $request->is_pass_gpa : $item->is_pass_gpa;
-        $item->is_pass_suspend = $request->has("is_pass_suspend") ? $request->is_pass_suspend : $item->is_pass_suspend;
-        $item->is_pass_punishment = $request->has("is_pass_punishment") ? $request->is_pass_punishment : $item->is_pass_punishment;
-        $item->is_pass_disease = $request->has("is_pass_disease") ? $request->is_pass_disease : $item->is_pass_disease;
+        $item->is_pass_coop_subject = $request->has("is_pass_coop_subject")
+            ? $request->is_pass_coop_subject
+            : $item->is_pass_coop_subject;
+        $item->is_pass_general_subject = $request->has(
+            "is_pass_general_subject"
+        )
+            ? $request->is_pass_general_subject
+            : $item->is_pass_general_subject;
+        $item->is_pass_gpa = $request->has("is_pass_gpa")
+            ? $request->is_pass_gpa
+            : $item->is_pass_gpa;
+        $item->is_pass_suspend = $request->has("is_pass_suspend")
+            ? $request->is_pass_suspend
+            : $item->is_pass_suspend;
+        $item->is_pass_punishment = $request->has("is_pass_punishment")
+            ? $request->is_pass_punishment
+            : $item->is_pass_punishment;
+        $item->is_pass_disease = $request->has("is_pass_disease")
+            ? $request->is_pass_disease
+            : $item->is_pass_disease;
         $item->updated_by = "arnonr";
         $item->save();
 
@@ -907,11 +930,12 @@ class FormController extends Controller
         return response()->json($responseData, 200);
     }
 
-    public function importFormSupervisor($semester_id, Request $request)
+    public function importFormSupervisor(Request $request)
     {
+        print_r($request->data);
         // [
-        // {student_code: 640202,supervisor_firstname: 'อานนท์',supervisor_surname: 'รักจักร์'},
-        // {student_code: 640202,supervisor_firstname: 'อานนท์',supervisor_surname: 'รักจักร์'}
+        // {student_code: 640202,firstname: 'อานนท์',surname: 'รักจักร์'},
+        // {student_code: 640202,firstname: 'อานนท์',surname: 'รักจักร์'}
         // ]
         $data = [];
         $status = true;
