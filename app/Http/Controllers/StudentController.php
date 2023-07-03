@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
+use Laravel\Sanctum\PersonalAccessToken;
 const whitelist = ["127.0.0.1", "::1", "localhost:8115"];
 
 class StudentController extends Controller
@@ -773,6 +774,10 @@ class StudentController extends Controller
 
     public function edit($id, Request $request)
     {
+        // // $token = PersonalAccessToken::findToken($hashedTooken);
+        // $access_token = $request->header('Authorization');
+        // print_r($access_token);
+
         $request->validate(["id as required"]);
 
         $id = $request->id;
@@ -867,7 +872,7 @@ class StudentController extends Controller
             ? $request->active
             : $item->active;
 
-        $item->updated_by = "arnonr";
+        // $item->updated_by = "arnonr";
         $item->save();
 
         $responseData = [
@@ -990,7 +995,7 @@ class StudentController extends Controller
             $result["major_id"] = $major->id;
 
             // var_dump($result);
-            print_r($result);
+            // print_r($result);
             $message = "Updated student";
             if (!$item) {
                 $this->add($result);

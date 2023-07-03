@@ -12,6 +12,7 @@ use Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use PHPMailer\PHPMailer\PHPMailer;
 const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
 
 class FormController extends Controller
@@ -932,57 +933,166 @@ class FormController extends Controller
 
     public function importFormSupervisor(Request $request)
     {
-        print_r($request->data);
-        // [
-        // {student_code: 640202,firstname: 'อานนท์',surname: 'รักจักร์'},
-        // {student_code: 640202,firstname: 'อานนท์',surname: 'รักจักร์'}
-        // ]
+        if(!$request->has('semester_id')) {
+            return response()->json(["message" => "No semester_id"], 400);
+        }
+
+        if(!$request->has('data')) {
+            return response()->json(["message" => "No data"], 400);
+        }
+
+        $semester_id = $request->semester_id;
+
+        // print_r($request->all());
+        // Sample JSON data
+        // {
+        //     "semester_id": 3,
+        //     "data": [
+        //     {"student_code": "5402041520261","firstname": "ธานินทร์","surname": "ศิลป์จารุ"},
+        //     {"student_code": "5402041520016","firstname": "ทวีศักดิ์","surname": "รูปสิงห์"}
+        //     ]
+        // }
+
         $data = [];
-        $status = true;
-        $import_message = [];
+        $student_code_list = [];
+        if(count($request->data) > 0){
+            foreach ($request->data as $key => $value) {
 
-        $student = Student::where(
-            "student_code",
-            $request->student_code
-        )->first();
-        if ($student === null) {
-            $import_message[] = "Student not found";
-            $status = false;
+                $import_message = [];
+                $status = true;
+
+                $student_code = $value['student_code'];
+                $firstname = $value['firstname'];
+                $surname = $value['surname'];
+                $student_code_list[] = $student_code;
+
+                $student = Student::where("student_code", $student_code)->first();
+                if ($student === null) {
+                    $import_message[] = "Student not found";
+                    $status = false;
+                }
+
+                $teacher = Teacher::where("firstname", $firstname)
+                    ->where("surname", $surname)
+                    ->first();
+                if ($teacher === null) {
+                    $import_message[] = "Teacher not found";
+                    $status = false;
+                }
+
+                if ($student !== null && $teacher !== null) {
+                    $form = Form::where("semester_id", $semester_id)
+                        ->where("student_id", $student->id)
+                        ->where("active", 1)
+                        ->first();
+
+                    if ($form === null) {
+                        $import_message[] = "Form not found";
+                        $status = false;
+                    } else {
+                        $form->supervision_id = $teacher->id;
+                        $form->save();
+                        $import_message[] = "success";
+                    }
+                }
+
+                $data[$student_code] = [
+                    "status" => $status,
+                    "message" => implode(", ", $import_message),
+                ];
+
+            } /* !-- foreach */
         }
 
-        $teacher = Teacher::where("firstname", $request->firstname)
-            ->where("surname", $request->surename)
-            ->first();
-        if ($teacher === null) {
-            $import_message[] = "Teacher not found";
-            $status = false;
-        }
-
-        if ($student !== null && $teacher !== null) {
-            $form = Form::where("semester_id", $semester_id)
-                ->where("student_id", $student->id)
-                ->where("active", 1)
-                ->first();
-
-            if ($form === null) {
-                $import_message[] = "Form not found";
-                $status = false;
-            } else {
-                $form->supervision_id = $teacher->id;
-                $form->save();
-                $import_message[] = "success";
-            }
-        }
-
-        $data[$request->student_code] = [
-            "status" => $status,
-            "message" => implode(", ", $import_message),
-        ];
+        // $student_code_list
+        $this->testSendMail($student_code_list);
 
         $responseData = [
             "message" => "success",
             "data" => $data,
         ];
+
         return response()->json($responseData, 200);
+    }
+
+    private function testSendMail($student_code = [])
+    {
+        // Sample input
+        // $student_code = ["5402041520261", "5402041520016"];
+
+        $student = Student::whereIn("student_code", $student_code)->get();
+        $email_list = [];
+        foreach ($student as $key => $value) {
+
+            $name = $value->firstname ." ". $value->surname;
+            $email = $value->email;
+
+            if(empty($email)) continue;
+
+            $email_list[] = [
+                "name" => $name,
+                "email" => $email,
+            ];
+        }
+
+        $subject = "หนังสือส่งตัวสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
+        $body = "ท่านได้รับการอนุมัติหนังสือส่งสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+
+        $this->sendEmail($email_list, $subject, $body);
+    }
+
+    private function sendEmail($receiverList = [], $subject = "", $body = "")
+    {
+        // $receiverList = []
+        // print_r($receiverList);
+
+        if(empty($receiverList)) return null;
+
+        // $sender = "arnon.r@technopark.kmutnb.ac.th";
+        $username = "";
+        $password = "";
+
+        $sender = $username;
+        $mail = new PHPMailer(true);
+        try {
+            //Server settings
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $username;
+            $mail->Password   = $password;
+            $mail->SMTPSecure = 'tls';
+            $mail->Port       = 587;
+            $mail->CharSet    = "UTF-8";
+
+            //Recipients
+            $mail->setFrom($sender , 'CWIE-FBA');
+            // $mail->addAddress($receiver, 'Receiver'); /* Receiver */
+            $mail->addReplyTo($sender , 'CWIE-FBA');
+            // $mail->addCC('arnon.r@technopark.kmutnb.ac.th');
+            // $mail->addCC('siwakorn.l@icit.kmutnb.ac.th', "ศิวกร");
+
+            foreach ($receiverList as $key => $value) {
+                $email = $value['email'];
+                $name = $value['name'];
+                $mail->addCC($email, $name);
+            }
+            // print_r($mail->getCcAddresses());
+
+            // Content
+            $mail->isHTML(true);
+            // $mail->Subject = 'หนังสือส่งตัว สหกิจศึกษา';
+            // $mail->Body    = 'Body หนังสือส่งตัว';
+            $mail->Subject = $subject;
+            $mail->Body    = $body;
+
+            // $mail->AltBody = 'Test mail from Laravel : This is the body in plain text for non-HTML mail clients';
+
+            $mail->send();
+            // echo 'Message has been sent';
+
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
     }
 }

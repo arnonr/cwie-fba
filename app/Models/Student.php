@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 
 class Student extends Model
 {
@@ -52,4 +53,30 @@ class Student extends Model
         'updated_by',
         'deleted_at',
     ];
+
+    // protected static function boot()
+    // {
+    //     parent::boot();
+
+    //     static::saving(function ($model) {
+    //         if (Auth::check()) {
+    //             $authId = Auth::id();
+    //             $hasCreated = Schema::hasColumn($model->getTable(), 'created_by');
+    //             $hasUpdated = Schema::hasColumn($model->getTable(), 'updated_by');
+    //             $hasDeleted = Schema::hasColumn($model->getTable(), 'deleted_by');
+
+    //             if ($hasCreated && !$model->exists) {
+    //                 $model->created_by = $authId;
+    //             }
+
+    //             if ($hasUpdated && $model->exists) {
+    //                 $model->updated_by = $authId;
+    //             }
+
+    //             if ($hasDeleted && $model->isForceDeleting()) {
+    //                 $model->deleted_by = $authId;
+    //             }
+    //         }
+    //     });
+    // }
 }
