@@ -15,11 +15,10 @@ class PrefixNameController extends Controller
     {
         $items = PrefixName::select(
             'prefix_name.id as id',
-            'prefix_name.prefix_name prefix_name',
+            'prefix_name.prefix_name as prefix_name',
             'prefix_name.active as active',
         )
         ->where('prefix_name.deleted_at', null);
-
 
         if ($request->id) {
             $items->where('id', $request->id);
@@ -38,7 +37,7 @@ class PrefixNameController extends Controller
         }else{
             $items = $items->orderBy('id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -47,7 +46,7 @@ class PrefixNameController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -55,7 +54,7 @@ class PrefixNameController extends Controller
             'totalData' => $count,
         ], 200);
     }
-    
+
     public function get($id)
     {
         $item = PrefixName::select(
@@ -68,7 +67,7 @@ class PrefixNameController extends Controller
                 'department.name as department_name',
             )
             ->where('prefix_name.id', $id)
-            ->leftJoin('department','department.id','=','prefix_name.department_id')
+            // ->leftJoin('department','department.id','=','prefix_name.department_id')
             ->first();
 
         return response()->json([

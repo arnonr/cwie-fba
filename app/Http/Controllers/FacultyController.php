@@ -17,15 +17,14 @@ class FacultyController extends Controller
         $items = Faculty::select(
             'faculty.id as id',
             'faculty.faculty_code as faculty_code',
-            'faculty.faculty_id as faculty_id',
             'faculty.name_th as name_th',
             'faculty.name_en as name_en',
             'faculty.active as active',
         )
         ->where('faculty.deleted_at', null);
 
-        if ($request->faculty_id) {
-            $items->where('faculty_id', $request->faculty_id);
+        if ($request->id) {
+            $items->where('id', $request->id);
         }
 
         if ($request->faculty_code) {
@@ -71,9 +70,8 @@ class FacultyController extends Controller
     public function get($id)
     {
         $item = Faculty::select(
-                'faculty.faculty_id as faculty_id',
+                'faculty.id as id',
                 'faculty.faculty_code as faculty_code',
-                'faculty.faculty_id as faculty_id',
                 'faculty.name_th as name_th',
                 'faculty.name_en as name_en',
                 'faculty.active as active',

@@ -16,7 +16,7 @@ class RejectLogController extends Controller
     public function getAll(Request $request)
     {
         $items = RejectLog::select(
-            "reject_log.log_id as log_id",
+            "reject_log.id as id",
             "reject_log.comment as comment",
             "reject_log.user_id as user_id",
             "reject_log.form_id as form_id",
@@ -24,8 +24,8 @@ class RejectLogController extends Controller
             "reject_log.active as active"
         )->where("reject_log.deleted_at", null);
 
-        if ($request->log_id) {
-            $items->where("reject_log.log_id", $request->log_id);
+        if ($request->id) {
+            $items->where("reject_log.id", $request->id);
         }
 
         if ($request->form_id) {
@@ -44,6 +44,9 @@ class RejectLogController extends Controller
 
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
+        if($perPage == 0 &&  $count==0){
+            $perPage = 1;
+        }
         $currentPage = $request->currentPage ? $request->currentPage : 1;
 
         $totalPage = ceil($count / $perPage) == 0 ? 1 : ceil($count / $perPage);
@@ -65,14 +68,14 @@ class RejectLogController extends Controller
     public function get($id)
     {
         $item = RejectLog::select(
-            "reject_log.log_id as log_id",
+            "reject_log.id as id",
             "reject_log.comment as comment",
             "reject_log.user_id as user_id",
             "reject_log.form_id as form_id",
             "reject_log.reject_status_id as reject_status_id",
             "reject_log.active as active"
         )
-            ->where("reject_log.log_id", $id)
+            ->where("reject_log.id", $id)
             ->first();
 
         return response()->json(
@@ -89,13 +92,11 @@ class RejectLogController extends Controller
         $request->validate(["form_id as required"]);
 
         $item = new RejectLog();
-        $item->comment = $request->has("comment") ? $request->comment : "";
-        $item->user_id = $request->has("user_id") ? $request->user_id : null;
-        $item->form_id = $request->has("form_id") ? $request->form_id : null;
-        $item->reject_status_id = $request->has("reject_status_id")
-            ? $request->reject_status_id
-            : null;
-        $item->active = $request->has("active") ? $request->active : 1;
+        $item->comment = $request->commen;
+        $item->user_id = $request->user_id;
+        $item->form_id = $request->form_id;
+        $item->reject_status_id = $request->reject_status_id;
+        $item->active = $request->active;
         $item->created_by = "arnonr";
         $item->save();
 

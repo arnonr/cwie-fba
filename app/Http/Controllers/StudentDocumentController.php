@@ -38,7 +38,7 @@ class StudentDocumentController extends Controller
             $items->addSelect('document_type.name as document_type_name');
             $items->leftJoin('document_type','document_type.id','=','student_document.document_type_id');
         }
-        
+
         // Where
         if ($request->id) {
             $items->where('student_document.id', $request->id);
@@ -66,7 +66,7 @@ class StudentDocumentController extends Controller
         }else{
             $items = $items->orderBy('id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         if($perPage == 0 &&  $count==0){
@@ -78,7 +78,7 @@ class StudentDocumentController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -129,11 +129,11 @@ class StudentDocumentController extends Controller
         }
         var_dump($pathDocument );
         $item = new StudentDocument;
-        $item->document_name = $request->has('document_name') ? $request->document_name : '';
-        $item->document_type_id = $request->has('document_type_id') ? $request->document_type_id : '';
+        $item->document_name = $request->document_name;
+        $item->document_type_id = $request->document_type_id;
         $item->document_file = $pathDocument;
-        $item->student_id = $request->has('student_id') ? $request->student_id : '';
-        $item->active = $request->has('active') ? $request->active : 1;
+        $item->student_id = $request->student_id;
+        $item->active = $request->active;
         $item->created_by = 'arnonr';
         $item->save();
 
@@ -141,10 +141,9 @@ class StudentDocumentController extends Controller
             'message' => 'success',
             'data' => $item,
         ];
-        
+
         return response()->json($responseData, 200);
     }
-
 
     public function edit($id, Request $request)
     {

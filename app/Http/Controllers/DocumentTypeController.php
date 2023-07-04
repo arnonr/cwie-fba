@@ -40,7 +40,7 @@ class DocumentTypeController extends Controller
         }else{
             $items = $items->orderBy('id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -49,7 +49,7 @@ class DocumentTypeController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -80,11 +80,11 @@ class DocumentTypeController extends Controller
         $request->validate([
             'name as required',
         ]);
-        
+
         $item = new DocumentType;
-        $item->name = $request->has('name') ? $request->name : '';
-        $item->description = $request->has('description') ? $request->description : '';
-        $item->active = $request->has('active') ? $request->active : 1;
+        $item->name = $request->name;
+        $item->description = $request->description;
+        $item->active = $request->active;
         $item->created_by = 'arnonr';
         $item->save();
 
@@ -92,7 +92,7 @@ class DocumentTypeController extends Controller
             'message' => 'success',
             'data' => $item,
         ];
-        
+
         return response()->json($responseData, 200);
     }
 
@@ -105,7 +105,7 @@ class DocumentTypeController extends Controller
 
         $item = DocumentType::where('id', $request->id)->first();
 
-        
+
         $item->name = $request->has('name') ? $request->name : $item->name;
         $item->description = $request->has('description') ? $request->description : $item->description;
         $item->active = $request->has('active') ? $request->active : $item->active;

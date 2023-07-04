@@ -58,7 +58,7 @@ class DepartmentController extends Controller
         }else{
             $items = $items->orderBy('id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -67,7 +67,7 @@ class DepartmentController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -80,15 +80,15 @@ class DepartmentController extends Controller
     public function get($id)
     {
         $item = Department::select(
-                'department.department_id as department_id',
+                'department.id as id',
                 'department.department_code as department_code',
                 'department.faculty_id as faculty_id',
                 'department.name_th as name_th',
                 'department.name_en as name_en',
                 'department.active as active',
-                'faculty.name as faculty_name',
+                'faculty.name_th as faculty_name',
             )
-            ->where('department.department_id', $id)
+            ->where('department.id', $id)
             ->leftJoin('faculty','faculty.id','=','department.faculty_id')
             ->first();
 

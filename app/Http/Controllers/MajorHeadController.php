@@ -40,7 +40,7 @@ class MajorHeadController extends Controller
         if ($request->teacher_id) {
             $items->where('teacher_id', $request->teacher_id);
         }
-  
+
         if ($request->major_id) {
             $items->where('major_id', $request->major_id);
         }
@@ -54,7 +54,7 @@ class MajorHeadController extends Controller
         }else{
             $items = $items->orderBy('id', 'asc');
         }
-    
+
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -63,7 +63,7 @@ class MajorHeadController extends Controller
         $offset = $perPage * ($currentPage - 1);
         $items = $items->skip($offset)->take($perPage);
         $items = $items->get();
-    
+
         return response()->json([
             'message' => 'success',
             'data' => $items,
@@ -101,12 +101,12 @@ class MajorHeadController extends Controller
             'teacher_id as required',
             'major_id as required'
         ]);
-        
+
         $item = new MajorHead;
-        $item->semester_id = $request->has('semester_id') ? $request->semester_id : $item->semester_id;
-        $item->teacher_id = $request->has('teacher_id') ? $request->teacher_id : $item->teacher_id;
-        $item->major_id  = $request->has('major_id') ? $request->major_id : $item->major_id;
-        // $item->active = $request->has('active') ? $request->active : $item->active;
+        $item->semester_id =$request->semester_id;
+        $item->teacher_id = $request->teacher_id;
+        $item->major_id  = $request->major_id;
+        // $item->active = $request->active;
         $item->created_by = 'arnonr';
         $item->save();
 
@@ -114,7 +114,7 @@ class MajorHeadController extends Controller
             'message' => 'success',
             'data' => $item,
         ];
-        
+
         return response()->json($responseData, 200);
     }
 
@@ -126,8 +126,6 @@ class MajorHeadController extends Controller
         ]);
 
         $item = MajorHead::where('id', $request->id)->first();
-
-       
         $item->semester_id = $request->has('semester_id') ? $request->semester_id : $item->semester_id;
         $item->teacher_id = $request->has('teacher_id') ? $request->teacher_id : $item->teacher_id;
         $item->major_id  = $request->has('major_id') ? $request->major_id : $item->major_id;
@@ -146,7 +144,7 @@ class MajorHeadController extends Controller
     public function delete($id)
     {
         $data = MajorHead::where('id', $id)->first();
-        
+
         $data->deleted_at = Carbon::now();
         $data->save();
 

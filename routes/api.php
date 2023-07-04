@@ -85,6 +85,14 @@ Route::group(["prefix" => "province"], function () {
     Route::delete("/{id}", [ProvinceController::class, "delete"]);
 });
 
+Route::group(["prefix" => "prefix-name"], function () {
+    Route::get("/{id}", [PrefixNameController::class, "get"]);
+    Route::get("/", [PrefixNameController::class, "getAll"]);
+    // Route::post("/", [PrefixNameController::class, "add"]);
+    Route::put("/{id}", [PrefixNameController::class, "edit"]);
+    // Route::delete("/{id}", [PrefixNameController::class, "delete"]);
+});
+
 Route::group(["prefix" => "amphur"], function () {
     Route::get("/{id}", [AmphurController::class, "get"]);
     Route::get("/", [AmphurController::class, "getAll"]);
