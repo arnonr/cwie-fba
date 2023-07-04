@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
 {
@@ -53,6 +54,12 @@ class Student extends Model
         'updated_by',
         'deleted_at',
     ];
+
+    public function form(): HasMany
+    {
+        return $this->hasMany(Form::class, 'student_id', 'id');
+    }
+
 
     // protected static function boot()
     // {

@@ -839,8 +839,20 @@ class FormController extends Controller
             "max_response_date" => $request->max_response_date,
             "updated_by" => "arnonr",
         ]);
+
         // รอส่งเมลแจ้งเตือนหนังสือขอความอนุเคราะห์
-        //send_mail = 1
+        if($request->send_mail == 1){
+            $student_code = [];
+            $students = Form::whereIn("id", $request->id)->with('student')->get();
+            foreach ($students as $key => $value) {
+                $student_code[] = $value->student->student_code;
+            }
+
+            $subject = "หนังสือขอความอนุเคราะห์เข้าสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
+            $body = "ท่านได้รับหนังสือขอความอนุเคราะสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+            $this->sendStudentMail($student_code, $subject, $body);
+        }
+        // ส่งเมลแจ้งเตือนหนังสือส่งตัว
 
         $responseData = [
             "message" => "success",
@@ -858,7 +870,19 @@ class FormController extends Controller
             "send_document_date" => $request->send_document_date,
             "updated_by" => "arnonr",
         ]);
-        // รอส่งเมลแจ้งเตือนหนังสือส่งตัว
+
+        if($request->send_mail == 1){
+            $student_code = [];
+            $students = Form::whereIn("id", $request->id)->with('student')->get();
+            foreach ($students as $key => $value) {
+                $student_code[] = $value->student->student_code;
+            }
+
+            $subject = "หนังสือส่งตัวสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
+            $body = "ท่านได้รับการอนุมัติหนังสือส่งสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+            $this->sendStudentMail($student_code, $subject, $body);
+        }
+        // ส่งเมลแจ้งเตือนหนังสือส่งตัว
 
         $responseData = [
             "message" => "success",
@@ -1005,7 +1029,7 @@ class FormController extends Controller
         }
 
         // $student_code_list
-        $this->testSendMail($student_code_list);
+        // $this->testSendMail($student_code_list);
 
         $responseData = [
             "message" => "success",
@@ -1015,7 +1039,7 @@ class FormController extends Controller
         return response()->json($responseData, 200);
     }
 
-    private function testSendMail($student_code = [])
+    private function sendStudentMail($student_code = [], $subject = "", $body = "")
     {
         // Sample input
         // $student_code = ["5402041520261", "5402041520016"];
@@ -1035,8 +1059,10 @@ class FormController extends Controller
             ];
         }
 
-        $subject = "หนังสือส่งตัวสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
-        $body = "ท่านได้รับการอนุมัติหนังสือส่งสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+        // print_r($email_list);
+
+        // $subject = "หนังสือส่งตัวสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
+        // $body = "ท่านได้รับการอนุมัติหนังสือส่งสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
 
         $this->sendEmail($email_list, $subject, $body);
     }
@@ -1085,10 +1111,9 @@ class FormController extends Controller
             // $mail->Body    = 'Body หนังสือส่งตัว';
             $mail->Subject = $subject;
             $mail->Body    = $body;
-
             // $mail->AltBody = 'Test mail from Laravel : This is the body in plain text for non-HTML mail clients';
 
-            $mail->send();
+            // $mail->send();
             // echo 'Message has been sent';
 
         } catch (Exception $e) {
