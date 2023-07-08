@@ -93,7 +93,7 @@ class FormController extends Controller
             "form.tumbol_id as tumbol_id",
             "form.active as active",
             "form.ppt_report_file as ppt_report_file",
-            "form.poster_report_file as poster_report_file",
+            "form.poster_report_file as poster_report_file"
         )->where("form.deleted_at", null);
 
         // Include
@@ -286,7 +286,7 @@ class FormController extends Controller
 
         if ($request->status_id) {
             // $items->where("form.status_id", $request->status_id);
-           $items->whereIn("status_id", $request->status_id);
+            $items->whereIn("status_id", $request->status_id);
         }
 
         if ($request->reject_status_id) {
@@ -468,7 +468,7 @@ class FormController extends Controller
             "tumbol.name_th as tumbol_name",
             "form.response_result as response_result",
             "form.ppt_report_file as ppt_report_file",
-            "form.poster_report_file as poster_report_file",
+            "form.poster_report_file as poster_report_file"
         )
             ->where("form.id", $id)
             ->leftJoin(
@@ -976,8 +976,10 @@ class FormController extends Controller
                 $student_code[] = $value->student->student_code;
             }
 
-            $subject = "หนังสือขอความอนุเคราะห์รับนักศึกษาเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง";
-            $body = "ท่านได้รับการอนุมัติหนังสือขอความอนุเคราะห์รับนักศึกษาเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+            $subject =
+                "หนังสือขอความอนุเคราะห์รับนักศึกษาเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง";
+            $body =
+                "ท่านได้รับการอนุมัติหนังสือขอความอนุเคราะห์รับนักศึกษาเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
             $this->sendStudentMail($student_code, $subject, $body);
         }
         // ส่งเมลแจ้งเตือนหนังสือส่งตัว
@@ -1025,8 +1027,10 @@ class FormController extends Controller
                 $student_code[] = $value->student->student_code;
             }
 
-            $subject = "หนังสือส่งตัวเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง";
-            $body = "ท่านได้รับการอนุมัติส่งตัวเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+            $subject =
+                "หนังสือส่งตัวเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง";
+            $body =
+                "ท่านได้รับการอนุมัติส่งตัวเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
             $this->sendStudentMail($student_code, $subject, $body);
         }
         // ส่งเมลแจ้งเตือนหนังสือส่งตัว
@@ -1304,8 +1308,8 @@ class FormController extends Controller
             return null;
         }
 
-        $username = "sahakij.support@fba.kmutnb.ac.th";
-        $password = "support555";
+        $username = env("MAIL_USERNAME");
+        $password = env("MAIL_PASSWORD");
         $app_name = "ระบบสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง";
 
         $sender = $username;
@@ -1322,9 +1326,9 @@ class FormController extends Controller
             $mail->CharSet = "UTF-8";
 
             //Recipients
-            $mail->setFrom($sender , $app_name);
+            $mail->setFrom($sender, $app_name);
             // $mail->addAddress($receiver, 'Receiver'); /* Receiver */
-            $mail->addReplyTo($sender , $app_name);
+            $mail->addReplyTo($sender, $app_name);
             $i = 0;
             foreach ($receiverList as $key => $value) {
                 $email = $value["email"];
