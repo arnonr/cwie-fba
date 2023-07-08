@@ -848,8 +848,8 @@ class FormController extends Controller
                 $student_code[] = $value->student->student_code;
             }
 
-            $subject = "หนังสือขอความอนุเคราะห์เข้าสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
-            $body = "ท่านได้รับหนังสือขอความอนุเคราะสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+            $subject = "หนังสือขอความอนุเคราะห์รับนักศึกษาเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง";
+            $body = "ท่านได้รับการอนุมัติหนังสือขอความอนุเคราะห์รับนักศึกษาเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
             $this->sendStudentMail($student_code, $subject, $body);
         }
         // ส่งเมลแจ้งเตือนหนังสือส่งตัว
@@ -878,8 +878,8 @@ class FormController extends Controller
                 $student_code[] = $value->student->student_code;
             }
 
-            $subject = "หนังสือส่งตัวสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
-            $body = "ท่านได้รับการอนุมัติหนังสือส่งสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+            $subject = "หนังสือส่งตัวเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง";
+            $body = "ท่านได้รับการอนุมัติส่งตัวเข้าฝึกสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
             $this->sendStudentMail($student_code, $subject, $body);
         }
         // ส่งเมลแจ้งเตือนหนังสือส่งตัว
@@ -1074,9 +1074,9 @@ class FormController extends Controller
 
         if(empty($receiverList)) return null;
 
-        // $sender = "arnon.r@technopark.kmutnb.ac.th";
-        $username = "";
-        $password = "";
+        $username = "sahakij.support@fba.kmutnb.ac.th";
+        $password = "support555";
+        $app_name = "ระบบสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง";
 
         $sender = $username;
         $mail = new PHPMailer(true);
@@ -1092,16 +1092,15 @@ class FormController extends Controller
             $mail->CharSet    = "UTF-8";
 
             //Recipients
-            $mail->setFrom($sender , 'CWIE-FBA');
+            $mail->setFrom($sender , $app_name);
             // $mail->addAddress($receiver, 'Receiver'); /* Receiver */
-            $mail->addReplyTo($sender , 'CWIE-FBA');
-            // $mail->addCC('arnon.r@technopark.kmutnb.ac.th');
-            // $mail->addCC('siwakorn.l@icit.kmutnb.ac.th', "ศิวกร");
-
+            $mail->addReplyTo($sender , $app_name);
+            $i = 0;
             foreach ($receiverList as $key => $value) {
                 $email = $value['email'];
                 $name = $value['name'];
                 $mail->addCC($email, $name);
+                $i++;
             }
             // print_r($mail->getCcAddresses());
 
@@ -1113,7 +1112,7 @@ class FormController extends Controller
             $mail->Body    = $body;
             // $mail->AltBody = 'Test mail from Laravel : This is the body in plain text for non-HTML mail clients';
 
-            // $mail->send();
+            $mail->send();
             // echo 'Message has been sent';
 
         } catch (Exception $e) {
