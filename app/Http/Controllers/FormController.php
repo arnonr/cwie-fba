@@ -91,7 +91,9 @@ class FormController extends Controller
             "form.province_id as province_id",
             "form.amphur_id as amphur_id",
             "form.tumbol_id as tumbol_id",
-            "form.active as active"
+            "form.active as active",
+            "form.ppt_report_file as ppt_report_file",
+            "form.poster_report_file as poster_report_file",
         )->where("form.deleted_at", null);
 
         // Include
@@ -283,7 +285,8 @@ class FormController extends Controller
         }
 
         if ($request->status_id) {
-            $items->where("form.status_id", $request->status_id);
+            // $items->where("form.status_id", $request->status_id);
+           $items->whereIn("status_id", $request->status_id);
         }
 
         if ($request->reject_status_id) {
@@ -343,6 +346,8 @@ class FormController extends Controller
             $items->where("form.is_pass_disease", $request->is_pass_disease);
         }
 
+        // print_r($request->all());
+
         // Order
         if ($request->orderBy) {
             $items = $items->orderBy($request->orderBy, $request->order);
@@ -352,6 +357,9 @@ class FormController extends Controller
 
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
+        if ($perPage == 0 && $count == 0) {
+            $perPage = 1;
+        }
         $currentPage = $request->currentPage ? $request->currentPage : 1;
 
         $totalPage = ceil($count / $perPage) == 0 ? 1 : ceil($count / $perPage);
@@ -458,7 +466,9 @@ class FormController extends Controller
             "province.name_th as province_name",
             "amphur.name_th as amphur_name",
             "tumbol.name_th as tumbol_name",
-            "form.response_result as response_result"
+            "form.response_result as response_result",
+            "form.ppt_report_file as ppt_report_file",
+            "form.poster_report_file as poster_report_file",
         )
             ->where("form.id", $id)
             ->leftJoin(
@@ -519,6 +529,42 @@ class FormController extends Controller
             );
         }
 
+        $pathPPT = null;
+        if (
+            $request->ppt_report_file != "" &&
+            $request->ppt_report_file != "null" &&
+            $request->ppt_report_file != "undefined"
+        ) {
+            $filePPT =
+                "ppt_report-" .
+                rand(10, 100) .
+                "-" .
+                $request->file("ppt_report_file")->getClientOriginalName();
+            $pathPPT = "/form/ppt/" . $filePPT;
+            Storage::disk("public")->put(
+                $pathPPT,
+                file_get_contents($request->ppt_report_file)
+            );
+        }
+
+        $pathPoster = null;
+        if (
+            $request->poster_report_file != "" &&
+            $request->poster_report_file != "null" &&
+            $request->poster_report_file != "undefined"
+        ) {
+            $filePoster =
+                "poster_report-" .
+                rand(10, 100) .
+                "-" .
+                $request->file("poster_report_file")->getClientOriginalName();
+            $pathPoster = "/form/ppt/" . $filePoster;
+            Storage::disk("public")->put(
+                $pathPoster,
+                file_get_contents($request->poster_report_file)
+            );
+        }
+
         $data = $request->all();
 
         foreach ($data as $key => $value) {
@@ -570,7 +616,10 @@ class FormController extends Controller
         $item->amphur_id = $request->amphur_id;
         $item->tumbol_id = $request->tumbol_id;
         $item->active = $request->active;
+
         $item->namecard_file = $pathNamecard;
+        $item->ppt_report_file = $pathPPT;
+        $item->poster_report_file = $pathPoster;
 
         $item->is_pass_coop_subject = $request->is_pass_coop_subject;
         $item->is_pass_general_subject = $request->is_pass_general_subject;
@@ -622,6 +671,42 @@ class FormController extends Controller
             $request->namecard_file = $pathNamecard;
         } else {
             $pathNamecard = $item->namecard_file;
+        }
+
+        $pathPPT = null;
+        if (
+            $request->ppt_report_file != "" &&
+            $request->ppt_report_file != "null" &&
+            $request->ppt_report_file != "undefined"
+        ) {
+            $filePPT =
+                "ppt_report-" .
+                rand(10, 100) .
+                "-" .
+                $request->file("ppt_report_file")->getClientOriginalName();
+            $pathPPT = "/form/ppt/" . $filePPT;
+            Storage::disk("public")->put(
+                $pathPPT,
+                file_get_contents($request->ppt_report_file)
+            );
+        }
+
+        $pathPoster = null;
+        if (
+            $request->poster_report_file != "" &&
+            $request->poster_report_file != "null" &&
+            $request->poster_report_file != "undefined"
+        ) {
+            $filePoster =
+                "poster_report-" .
+                rand(10, 100) .
+                "-" .
+                $request->file("poster_report_file")->getClientOriginalName();
+            $pathPoster = "/form/ppt/" . $filePoster;
+            Storage::disk("public")->put(
+                $pathPoster,
+                file_get_contents($request->poster_report_file)
+            );
         }
 
         $data = $request->all();
@@ -750,7 +835,11 @@ class FormController extends Controller
         $item->next_coop = $request->has("next_coop")
             ? $request->next_coop
             : $item->next_coop;
+
         $item->namecard_file = $pathNamecard;
+        $item->ppt_report_file = $pathPPT;
+        $item->poster_report_file = $pathPoster;
+
         $item->province_id = $request->has("province_id")
             ? $request->province_id
             : $item->province_id;
