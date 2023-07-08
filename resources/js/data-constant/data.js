@@ -397,22 +397,26 @@ export const text_statuses = [
   "อาจารย์ที่ปรึกษาอนุมัติ",
   "ประธานอาจารย์นิเทศอนุมัติ",
   "คณะยืนยันข้อมูล",
-  "สถานประกอบการปฏิเสธ",
   "สถานประกอบการตอบรับ",
+  "สถานประกอบการปฏิเสธ",
   "นักศึกษาสละสิทธิ์",
   "อนุมัติแผนการปฏิบัติงาน",
 ];
 
 export const statuses = [
   { value: 1, title: "ร่าง" },
-  { value: 2, title: "ส่งแล้ว" },
+  { value: 2, title: "ส่งใบสมัคร" },
   { value: 3, title: "อาจารย์ที่ปรึกษาอนุมัติ" },
   { value: 4, title: "ประธานอาจารย์นิเทศอนุมัติ" },
   { value: 5, title: "คณะยืนยันข้อมูล" },
-  { value: 6, title: "สถานประกอบการปฏิเสธ" },
-  { value: 7, title: "สถานประกอบการตอบรับ" },
-  { value: 8, title: "นักศึกษาสละสิทธิ์" },
-  { value: 9, title: "อนุมัติแผนการปฏิบัติงาน" },
+  { value: 6, title: "ออกหนังสือขอความอนุเคราะห์" },
+  { value: 7, title: "ส่งเอกสารตอบรับ" },
+  { value: 8, title: "สถานประกอบการตอบรับ" },
+  { value: 9, title: "สถานประกอบการปฏิเสธ" },
+  { value: 10, title: "นักศึกษาสละสิทธิ์" },
+  { value: 11, title: "ออกหนังสือส่งตัว" },
+  { value: 12, title: "ส่งแผนการปฏิบัติงาน" },
+  { value: 13, title: "อนุมัติแผนการปฏิบัติงาน" },
 ];
 
 export const statusShow = (
@@ -424,28 +428,29 @@ export const statusShow = (
   if (status == 1) {
     text = "ร่าง";
   } else if (status == 2) {
-    text = "ส่งแล้ว";
+    text = "ส่งใบสมัคร";
   } else if (status == 3) {
     text = "อาจารย์ที่ปรึกษาอนุมัติ";
   } else if (status == 4) {
     text = "ประธานอาจารย์นิเทศอนุมัติ";
   } else if (status == 5) {
-    if (request_document_date != null) {
-      text = "ออกหนังสือขอความอนุเคราะห์แล้ว";
-    } else {
-      text = "คณะยืนยันข้อมูล";
-    }
-  } else if (
-    (status == 6 || status == 7 || status == 8) &&
-    confirm_response_at == null
-  ) {
-    text = "รอยืนยันเอกสารตอบรับ";
+    text = "คณะยืนยันข้อมูล";
   } else if (status == 6) {
-    text = "สถานประกอบการปฏิเสธ";
+    text = "ออกหนังสือขอความอนุเคราะห์";
   } else if (status == 7) {
-    text = "สถานประกอบการตอบรับ";
+    text = "ส่งเอกสารตอบรับ";
   } else if (status == 8) {
+    text = "สถานประกอบการตอบรับ";
+  } else if (status == 9) {
+    text = "สถานประกอบการปฏิเสธ";
+  } else if (status == 10) {
     text = "นักศึกษาสละสิทธิ์";
+  } else if (status == 11) {
+    text = "ออกหนังสือส่งตัว";
+  } else if (status == 12) {
+    text = "ส่งแผนการปฏิบัติงาน";
+  } else if (status == 13) {
+    text = "อนุมัติแผนการปฏิบัติงาน";
   } else {
     text = "FREEDOM";
   }

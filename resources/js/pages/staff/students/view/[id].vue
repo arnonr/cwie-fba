@@ -9,7 +9,7 @@ import buddhistEra from "dayjs/plugin/buddhistEra";
 import "vue3-pdf-app/dist/icons/main.css";
 import { useCwieDataStore } from "../useCwieDataStore";
 
-import { form_statuses, text_statuses, statusShow } from "@/data-constant/data";
+import { form_statuses, statusShow } from "@/data-constant/data";
 
 // const route = useRoute();
 dayjs.extend(buddhistEra);
@@ -38,7 +38,10 @@ const isAdd = ref(true);
 const isCheck = ref(true);
 const isDialogVisible = ref(false);
 const isDialogRejectVisible = ref(false);
-const currentStep = ref(1);
+const isDialogResponseVisible = ref(false);
+const isDialogResponseRejectVisible = ref(false);
+
+const currentStep = ref(0);
 const formSteps = [
   {
     title: "ข้อมูลใบสมัคร",
@@ -390,6 +393,7 @@ const onRejectSubmit = () => {
     cwieDataStore
       .addRejectLog({
         ...rejectLog.value,
+        active: 1,
       })
       .then((response) => {
         if (response.data.message == "success") {
@@ -402,6 +406,7 @@ const onRejectSubmit = () => {
             isSnackbarVisible.value = true;
             isOverlay.value = false;
             isDialogRejectVisible.value = false;
+            isDialogResponseRejectVisible.value = false;
           });
         } else {
           isOverlay.value = false;
@@ -427,14 +432,11 @@ const onSubmit = () => {
     date = {
       faculty_confirmed_at: dayjs().format("YYYY-MM-DD"),
     };
-  } else if (
-    status_id_send.value == 6 ||
-    status_id_send.value == 7 ||
-    status_id_send.value == 8
-  ) {
+  } else if (status_id_send.value == 7) {
     date = {
       confirm_response_at: dayjs().format("YYYY-MM-DD"),
     };
+    status_id_send.value = item.value.response_result;
   } else {
   }
 
@@ -455,6 +457,7 @@ const onSubmit = () => {
           isSnackbarVisible.value = true;
           isOverlay.value = false;
           isDialogVisible.value = false;
+          isDialogResponseVisible.value = false;
         });
       } else {
         isOverlay.value = false;
@@ -519,7 +522,7 @@ const responseProvinceName = (response_province_id) => {
           <VDivider class="ml-4 mr-4" />
           <VCardText>
             <span class="font-weight-bold">สาขาวิชา : </span>
-            <span>{{}}</span></VCardText
+            <span>{{ student.major_name }}</span></VCardText
           >
           <VDivider class="ml-4 mr-4" />
           <VCardText>
@@ -530,7 +533,7 @@ const responseProvinceName = (response_province_id) => {
           <VCardText>
             <span class="font-weight-bold">สถานะ : </span>
             <VChip label :color="form_statuses[student.status_id]">{{
-              text_statuses[student.status_id]
+              statusShow(student.status_id)
             }}</VChip>
           </VCardText>
           <VDivider class="ml-4 mr-4" />
@@ -791,18 +794,6 @@ const responseProvinceName = (response_province_id) => {
                         />เอกสาร</span
                       >
                     </a>
-                    <!-- <iframe
-                      v-if="d.document_file_old != null"
-                      :src="d.document_file_old"
-                      style="width: 100%; height: 500px"
-                    ></iframe>
-
-                    <span v-else> <br />- </span> -->
-                    <!-- <vue-pdf-app
-                      :id="'pdf' + index"
-                      style="height: 500px"
-                      :pdf="d.document_file_old"
-                    ></vue-pdf-app> -->
                   </VCol>
                 </VRow>
               </VWindowItem>
@@ -959,7 +950,7 @@ const responseProvinceName = (response_province_id) => {
                       </VCol>
                     </VRow>
                     <VRow v-for="(rl, index) in it.reject_log">
-                      <VCol cols="12" md="4" v-if="rl.reject_status_id < 4">
+                      <VCol cols="12" md="4" v-if="rl.reject_status_id > 3">
                         <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
                         <span>
                           {{
@@ -969,28 +960,52 @@ const responseProvinceName = (response_province_id) => {
                           }}</span
                         >
                       </VCol>
-                      <VCol cols="12" md="8" v-if="rl.reject_status_id < 4">
+                      <VCol cols="12" md="8" v-if="rl.reject_status_id > 3">
                         <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
                         <span> {{ rl.comment }}</span>
                       </VCol>
                     </VRow>
+                  </VCol>
 
-                    <!-- 
-                      <div class="row" v-for="(rl, index) in it.reject_logs">
-                    <div class="col-md-2" v-if="rl.reject_status_id == 1">
-                      <h6 class="mb-0 d-inline">วันที่ :</h6>
-                      <span>
-                        {{
-                          dayjs(rl.createdAt).locale("th").format("DD MMM BB")
-                        }}</span
-                      >
-                    </div>
-                    <div class="col-md-10" v-if="rl.reject_status_id == 1">
-                      <h6 class="mb-0 d-inline">รายละเอียด :</h6>
-                      <span> {{ rl.comment }}</span>
-                    </div>
-                  </div>
-                     -->
+                  <VCol cols="12" md="12" class="text-center">
+                    <VBtn
+                      color="error"
+                      :disabled="it.status_id != 4 || index != 0"
+                      @click="
+                        () => {
+                          rejectLog.form_id = it.id;
+                          isDialogRejectVisible = true;
+                        }
+                      "
+                    >
+                      <VIcon
+                        size="16"
+                        icon="tabler-edit"
+                        style="opacity: 1"
+                        class="mr-1"
+                      ></VIcon>
+                      ส่งกลับให้แก้ไข
+                    </VBtn>
+
+                    <VBtn
+                      class="ml-2"
+                      color="success"
+                      :disabled="it.status_id != 4 || index != 0"
+                      @click="
+                        () => {
+                          item = it;
+                          isDialogVisible = true;
+                        }
+                      "
+                    >
+                      <VIcon
+                        size="16"
+                        icon="tabler-file-description"
+                        style="opacity: 1"
+                        class="mr-1"
+                      ></VIcon>
+                      อนุมัติ
+                    </VBtn>
                   </VCol>
                 </VRow>
               </VWindowItem>
@@ -1037,11 +1052,8 @@ const responseProvinceName = (response_province_id) => {
                   <VCol cols="12" md="6">
                     <span>ไฟล์หนังสือตอบกลับ : </span>
                     <a
-                      :href="
-                        it.response_document_file != null
-                          ? it.response_document_file
-                          : '#'
-                      "
+                      v-if="it.response_document_file"
+                      :href="it.response_document_file"
                       target="_blank"
                       ><span>
                         <VIcon
@@ -1052,6 +1064,7 @@ const responseProvinceName = (response_province_id) => {
                         />เอกสาร</span
                       >
                     </a>
+                    <span v-else>-</span>
                   </VCol>
 
                   <VCol cols="12" md="6">
@@ -1062,6 +1075,15 @@ const responseProvinceName = (response_province_id) => {
                         : dayjs(it.response_send_at)
                             .locale("th")
                             .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ผลการตอบกลับ : </span>
+                    <span>{{
+                      it.response_result == null
+                        ? "-"
+                        : statusShow(it.response_result)
                     }}</span>
                   </VCol>
 
@@ -1121,13 +1143,53 @@ const responseProvinceName = (response_province_id) => {
                       </VCol>
                     </VRow>
                   </VCol>
+
+                  <VCol cols="12" md="12" class="text-center">
+                    <VBtn
+                      color="error"
+                      :disabled="it.status_id != 7 || index != 0"
+                      @click="
+                        () => {
+                          rejectLog.form_id = it.id;
+                          isDialogResponseRejectVisible = true;
+                        }
+                      "
+                    >
+                      <VIcon
+                        size="16"
+                        icon="tabler-edit"
+                        style="opacity: 1"
+                        class="mr-1"
+                      ></VIcon>
+                      ส่งกลับให้แก้ไข
+                    </VBtn>
+
+                    <VBtn
+                      class="ml-2"
+                      color="success"
+                      :disabled="it.status_id != 7 || index != 0"
+                      @click="
+                        () => {
+                          item = it;
+                          isDialogResponseVisible = true;
+                        }
+                      "
+                    >
+                      <VIcon
+                        size="16"
+                        icon="tabler-file-description"
+                        style="opacity: 1"
+                        class="mr-1"
+                      ></VIcon>
+                      รับทราบผล
+                    </VBtn>
+                  </VCol>
                 </VRow>
               </VWindowItem>
             </VWindow>
 
-            <div class="d-flex mt-8">
-              <!-- justify-space-between -->
-              <!-- <VBtn
+            <div class="d-flex justify-space-between mt-8">
+              <VBtn
                 color="secondary"
                 variant="tonal"
                 :disabled="currentStep === 0"
@@ -1135,122 +1197,14 @@ const responseProvinceName = (response_province_id) => {
               >
                 <VIcon icon="tabler-chevron-left" start class="flip-in-rtl" />
                 Previous
-              </VBtn> -->
-
-              <VBtn
-                color="error"
-                v-if="!(it.status_id != 4 || index != 0)"
-                @click="
-                  () => {
-                    rejectLog.form_id = it.id;
-                    isDialogRejectVisible = true;
-                  }
-                "
-              >
-                <VIcon
-                  size="16"
-                  icon="tabler-edit"
-                  style="opacity: 1"
-                  class="mr-1"
-                ></VIcon>
-                ส่งกลับให้แก้ไข
               </VBtn>
-
               <VBtn
-                class="ml-2"
-                color="success"
-                v-if="!(it.status_id != 4 || index != 0)"
-                @click="
-                  () => {
-                    item = it;
-                    isDialogVisible = true;
-                  }
-                "
-              >
-                <VIcon
-                  size="16"
-                  icon="tabler-file-description"
-                  style="opacity: 1"
-                  class="mr-1"
-                ></VIcon>
-                อนุมัติ
-              </VBtn>
-
-              <!--  -->
-              <VBtn
-                color="error"
-                v-if="
-                  (it.status_id == 6 ||
-                    it.status_id == 7 ||
-                    it.status_id == 8) &&
-                  index == 0 &&
-                  it.confirm_response_at == null
-                "
-                @click="
-                  () => {
-                    rejectLog.form_id = it.id;
-                    rejectLog.reject_status_id = 4;
-                    isDialogRejectVisible = true;
-                  }
-                "
-              >
-                <VIcon
-                  size="16"
-                  icon="tabler-edit"
-                  style="opacity: 1"
-                  class="mr-1"
-                ></VIcon>
-                ส่งกลับให้แก้ไข
-              </VBtn>
-
-              <VBtn
-                class="ml-2"
-                color="success"
-                v-if="
-                  (it.status_id == 6 ||
-                    it.status_id == 7 ||
-                    it.status_id == 8) &&
-                  index == 0 &&
-                  it.confirm_response_at == null
-                "
-                @click="
-                  () => {
-                    item = it;
-                    status_id_send = it.status_id;
-                    isDialogVisible = true;
-                  }
-                "
-              >
-                <VIcon
-                  size="16"
-                  icon="tabler-file-description"
-                  style="opacity: 1"
-                  class="mr-1"
-                ></VIcon>
-                รับทราบผล
-              </VBtn>
-
-              <!-- <VBtn
-                color="success"
-                append-icon="tabler-check"
-                v-if="formSteps.length - 1 === currentStep"
-              >
-                submit
-              </VBtn>
-
-              <VBtn
-                v-else
+                v-if="formSteps.length - 1 !== currentStep"
                 @click="currentStep++"
-                :disabled="
-                  it.status_id < 5 ||
-                  it.reject_status_id == 1 ||
-                  it.reject_status_id == 2 ||
-                  it.reject_status_id == 3
-                "
               >
                 Next
                 <VIcon icon="tabler-chevron-right" end class="flip-in-rtl" />
-              </VBtn> -->
+              </VBtn>
             </div>
           </VCardText>
         </VCard>
@@ -1323,6 +1277,89 @@ const responseProvinceName = (response_province_id) => {
             Cancel
           </VBtn>
           <VBtn @click="onRejectSubmit()" color="success"> Reject </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+
+    <!-- Dialog -->
+    <VDialog v-model="isDialogResponseVisible" persistent class="v-dialog-sm">
+      <!-- Dialog close btn -->
+      <DialogCloseBtn
+        @click="isDialogResponseVisible = !isDialogResponseVisible"
+      />
+
+      <!-- Dialog Content -->
+      <VCard title="Are You Sure?">
+        <VCardText> ยืนยันการรับทราบผล </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            @click="isDialogResponseVisible = !isDialogResponseVisible"
+            color="error"
+          >
+            Cancel
+          </VBtn>
+          <VBtn
+            @click="
+              () => {
+                status_id_send = 7;
+                onSubmit();
+              }
+            "
+            color="success"
+          >
+            Confirm
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+
+    <VDialog
+      v-model="isDialogResponseRejectVisible"
+      persistent
+      class="v-dialog-sm"
+    >
+      <!-- Dialog close btn -->
+      <DialogCloseBtn
+        @click="isDialogResponseRejectVisible = !isDialogResponseRejectVisible"
+      />
+
+      <!-- Dialog Content -->
+      <VCard title="แบบฟอร์มส่งข้อมูลกลับให้แก้ไข">
+        <VCardText>
+          <VCol cols="12" md="12" class="align-items-center">
+            <label class="v-label font-weight-bold" for="comment"
+              >ระบุเหตุผล :
+            </label>
+            <AppTextarea
+              id="comment"
+              v-model="rejectLog.comment"
+              rows="5"
+              persistent-placeholder
+            />
+          </VCol>
+        </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            @click="
+              isDialogResponseRejectVisible = !isDialogResponseRejectVisible
+            "
+            color="error"
+          >
+            Cancel
+          </VBtn>
+          <VBtn
+            @click="
+              () => {
+                rejectLog.reject_status_id = 4;
+                onRejectSubmit();
+              }
+            "
+            color="success"
+          >
+            Reject
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

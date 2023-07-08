@@ -438,13 +438,25 @@ class StudentController extends Controller
                     "max_response_date",
                     "confirm_response_at",
                     "send_document_date",
-                    "send_document_number"
+                    "send_document_number",
+                    "company.name_th as company_name",
+                    "form.response_province_id",
+                    DB::raw(
+                        'CONCAT(supervision.prefix,supervision.firstname," ", supervision.surname) AS supervision_name'
+                    )
                 );
                 // $items->addSelect('form.* as form');
                 $items->leftJoin("form", function ($join) {
                     $join
                         ->on("form.student_id", "=", "student.id")
                         ->where("form.active", 1);
+                });
+                $items->leftJoin("company", function ($join) {
+                    $join->on("form.company_id", "=", "company.id");
+                });
+
+                $items->leftJoin("teacher as supervision", function ($join) {
+                    $join->on("form.supervision_id", "=", "supervision.id");
                 });
                 $items->where("form.semester_id", $request->semester_id);
 

@@ -59,7 +59,12 @@ class FormController extends Controller
             "form.workplace_amphur_id as workplace_amphur_id",
             "form.workplace_tumbol_id as workplace_tumbol_id",
             "form.workplace_googlemap_url as workplace_googlemap_url",
-            "form.workplace_googlemap_file as workplace_googlemap_file",
+            DB::raw(
+                "(CASE WHEN form.workplace_googlemap_file = NULL THEN ''
+            ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',form.workplace_googlemap_file) END) AS workplace_googlemap_file"
+            ),
             "form.plan_document_file as plan_document_file",
             "form.plan_send_at as plan_send_at",
             "form.plan_accept_at as plan_accept_at",
@@ -76,6 +81,7 @@ class FormController extends Controller
             "form.is_pass_suspend as is_pass_suspend",
             "form.is_pass_punishment as is_pass_punishment",
             "form.is_pass_disease as is_pass_disease",
+            "form.response_result as response_result",
             DB::raw(
                 "(CASE WHEN form.namecard_file = NULL THEN ''
             ELSE CONCAT('" .
@@ -404,7 +410,13 @@ class FormController extends Controller
             "form.workplace_amphur_id as workplace_amphur_id",
             "form.workplace_tumbol_id as workplace_tumbol_id",
             "form.workplace_googlemap_url as workplace_googlemap_url",
-            "form.workplace_googlemap_file as workplace_googlemap_file",
+            // "form.workplace_googlemap_file as workplace_googlemap_file",
+            DB::raw(
+                "(CASE WHEN form.workplace_googlemap_file = NULL THEN ''
+            ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',form.workplace_googlemap_file) END) AS workplace_googlemap_file"
+            ),
             "form.plan_document_file as plan_document_file",
             "form.plan_send_at as plan_send_at",
             "form.plan_accept_at as plan_accept_at",
@@ -445,7 +457,8 @@ class FormController extends Controller
             "response_province.name_th as response_province_name",
             "province.name_th as province_name",
             "amphur.name_th as amphur_name",
-            "tumbol.name_th as tumbol_name"
+            "tumbol.name_th as tumbol_name",
+            "form.response_result as response_result"
         )
             ->where("form.id", $id)
             ->leftJoin(
@@ -567,6 +580,10 @@ class FormController extends Controller
         $item->is_pass_disease = $request->is_pass_disease;
         $item->created_by = "arnonr";
         $item->save();
+
+        $student = Student::where("id", $item->student_id)->first();
+        $student->status_id = $item->status_id;
+        $student->save();
 
         // $student = Student::where("id", $item->student_id)->first();
         // $student->status_id = $item->status_id;
@@ -811,6 +828,9 @@ class FormController extends Controller
         $item->confirm_response_at = $request->has("confirm_response_at")
             ? $request->confirm_response_at
             : $item->confirm_response_at;
+        $item->plan_accept_at = $request->has("plan_accept_at")
+            ? $request->plan_accept_at
+            : $item->plan_accept_at;
         $item->active = $request->has("active")
             ? $request->active
             : $item->active;
@@ -833,23 +853,44 @@ class FormController extends Controller
     {
         $request->validate(["id as required"]);
 
-        Form::whereIn("id", $request->id)->update([
+        $updateForm = Form::whereIn("id", $request->id)->update([
             "request_document_number" => $request->request_document_number,
             "request_document_date" => $request->request_document_date,
             "max_response_date" => $request->max_response_date,
             "updated_by" => "arnonr",
         ]);
 
+        Form::whereIn("id", $request->id)
+            ->where("status_id", "<", "6")
+            ->update([
+                "status_id" => 6,
+            ]);
+
+        $student_id = [];
+        $form = Form::where("id", $request->id)->get();
+        foreach ($form as $value) {
+            array_push($student_id, $value->student_id);
+        }
+        Student::whereIn("id", $student_id)
+            ->where("status_id", "<", "6")
+            ->update([
+                "status_id" => 6,
+            ]);
+
         // รอส่งเมลแจ้งเตือนหนังสือขอความอนุเคราะห์
-        if($request->send_mail == 1){
+        if ($request->send_mail == 1) {
             $student_code = [];
-            $students = Form::whereIn("id", $request->id)->with('student')->get();
+            $students = Form::whereIn("id", $request->id)
+                ->with("student")
+                ->get();
             foreach ($students as $key => $value) {
                 $student_code[] = $value->student->student_code;
             }
 
-            $subject = "หนังสือขอความอนุเคราะห์เข้าสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
-            $body = "ท่านได้รับหนังสือขอความอนุเคราะสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+            $subject =
+                "หนังสือขอความอนุเคราะห์เข้าสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
+            $body =
+                "ท่านได้รับหนังสือขอความอนุเคราะสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
             $this->sendStudentMail($student_code, $subject, $body);
         }
         // ส่งเมลแจ้งเตือนหนังสือส่งตัว
@@ -871,15 +912,35 @@ class FormController extends Controller
             "updated_by" => "arnonr",
         ]);
 
-        if($request->send_mail == 1){
+        Form::whereIn("id", $request->id)
+            ->where("status_id", "<", "11")
+            ->update([
+                "status_id" => 11,
+            ]);
+
+        $student_id = [];
+        $form = Form::where("id", $request->id)->get();
+        foreach ($form as $value) {
+            array_push($student_id, $value->student_id);
+        }
+        Student::whereIn("id", $student_id)
+            ->where("status_id", "<", "11")
+            ->update([
+                "status_id" => 11,
+            ]);
+
+        if ($request->send_mail == 1) {
             $student_code = [];
-            $students = Form::whereIn("id", $request->id)->with('student')->get();
+            $students = Form::whereIn("id", $request->id)
+                ->with("student")
+                ->get();
             foreach ($students as $key => $value) {
                 $student_code[] = $value->student->student_code;
             }
 
             $subject = "หนังสือส่งตัวสหกิจศึกษา คณะบริหารธุรกิจ มจพ.";
-            $body = "ท่านได้รับการอนุมัติหนังสือส่งสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
+            $body =
+                "ท่านได้รับการอนุมัติหนังสือส่งสหกิจศึกษา คณะบริหารธุรกิจ มจพ. เรียบร้อยแล้ว กรุณาตรวจสอบที่ระบบสหกิจศึกษา";
             $this->sendStudentMail($student_code, $subject, $body);
         }
         // ส่งเมลแจ้งเตือนหนังสือส่งตัว
@@ -923,6 +984,82 @@ class FormController extends Controller
         $item->response_send_at = $request->response_send_at;
         $item->response_province_id = $request->province_id;
         $item->status_id = $request->status_id;
+        $item->response_result = $request->response_result;
+        $item->updated_by = "arnonr";
+        $item->save();
+
+        $student = Student::where("id", $item->student_id)->first();
+        $student->status_id = $item->status_id;
+        $student->save();
+
+        // student
+
+        $responseData = [
+            "message" => "success",
+            "data" => $item,
+        ];
+
+        return response()->json($responseData, 200);
+    }
+
+    public function addPlan(Request $request)
+    {
+        $request->validate(["id as required"]);
+
+        $item = Form::where("id", $request->id)->first();
+
+        $pathPlanFile = null;
+        if (
+            $request->plan_document_file != "" &&
+            $request->plan_document_file != "null" &&
+            $request->plan_document_file != "undefined"
+        ) {
+            $fileResponse =
+                "response-" .
+                rand(10, 100) .
+                "-" .
+                $request->file("plan_document_file")->getClientOriginalName();
+            $pathPlanFile = "/student/plan-document/" . $fileResponse;
+            Storage::disk("public")->put(
+                $pathPlanFile,
+                file_get_contents($request->plan_document_file)
+            );
+        } else {
+            $pathPlanFile = $item->plan_document_file;
+        }
+
+        $pathGooglemapFile = null;
+        if (
+            $request->workplace_googlemap_file != "" &&
+            $request->workplace_googlemap_file != "null" &&
+            $request->workplace_googlemap_file != "undefined"
+        ) {
+            $fileResponse =
+                "response-" .
+                rand(10, 100) .
+                "-" .
+                $request
+                    ->file("workplace_googlemap_file")
+                    ->getClientOriginalName();
+            $pathGooglemapFile = "/student/plan/google-map/" . $fileResponse;
+            Storage::disk("public")->put(
+                $pathGooglemapFile,
+                file_get_contents($request->workplace_googlemap_file)
+            );
+        } else {
+            $pathGooglemapFile = $item->workplace_googlemap_file;
+        }
+
+        $item->plan_document_file = $pathPlanFile;
+        $item->plan_send_at = $request->plan_send_at;
+        $item->workplace_address = $request->workplace_address;
+        $item->workplace_province_id = $request->workplace_province_id;
+        $item->workplace_province_id = $request->workplace_province_id;
+        $item->workplace_amphur_id = $request->workplace_amphur_id;
+        $item->workplace_tumbol_id = $request->workplace_tumbol_id;
+        $item->workplace_googlemap_url = $request->workplace_googlemap_url;
+        $item->workplace_googlemap_file = $pathGooglemapFile;
+        $item->status_id = 12;
         $item->updated_by = "arnonr";
         $item->save();
 
@@ -957,11 +1094,11 @@ class FormController extends Controller
 
     public function importFormSupervisor(Request $request)
     {
-        if(!$request->has('semester_id')) {
+        if (!$request->has("semester_id")) {
             return response()->json(["message" => "No semester_id"], 400);
         }
 
-        if(!$request->has('data')) {
+        if (!$request->has("data")) {
             return response()->json(["message" => "No data"], 400);
         }
 
@@ -979,18 +1116,20 @@ class FormController extends Controller
 
         $data = [];
         $student_code_list = [];
-        if(count($request->data) > 0){
+        if (count($request->data) > 0) {
             foreach ($request->data as $key => $value) {
-
                 $import_message = [];
                 $status = true;
 
-                $student_code = $value['student_code'];
-                $firstname = $value['firstname'];
-                $surname = $value['surname'];
+                $student_code = $value["student_code"];
+                $firstname = $value["firstname"];
+                $surname = $value["surname"];
                 $student_code_list[] = $student_code;
 
-                $student = Student::where("student_code", $student_code)->first();
+                $student = Student::where(
+                    "student_code",
+                    $student_code
+                )->first();
                 if ($student === null) {
                     $import_message[] = "Student not found";
                     $status = false;
@@ -1024,7 +1163,6 @@ class FormController extends Controller
                     "status" => $status,
                     "message" => implode(", ", $import_message),
                 ];
-
             } /* !-- foreach */
         }
 
@@ -1039,19 +1177,23 @@ class FormController extends Controller
         return response()->json($responseData, 200);
     }
 
-    private function sendStudentMail($student_code = [], $subject = "", $body = "")
-    {
+    private function sendStudentMail(
+        $student_code = [],
+        $subject = "",
+        $body = ""
+    ) {
         // Sample input
         // $student_code = ["5402041520261", "5402041520016"];
 
         $student = Student::whereIn("student_code", $student_code)->get();
         $email_list = [];
         foreach ($student as $key => $value) {
-
-            $name = $value->firstname ." ". $value->surname;
+            $name = $value->firstname . " " . $value->surname;
             $email = $value->email;
 
-            if(empty($email)) continue;
+            if (empty($email)) {
+                continue;
+            }
 
             $email_list[] = [
                 "name" => $name,
@@ -1072,7 +1214,9 @@ class FormController extends Controller
         // $receiverList = []
         // print_r($receiverList);
 
-        if(empty($receiverList)) return null;
+        if (empty($receiverList)) {
+            return null;
+        }
 
         // $sender = "arnon.r@technopark.kmutnb.ac.th";
         $username = "";
@@ -1083,24 +1227,24 @@ class FormController extends Controller
         try {
             //Server settings
             $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $username;
-            $mail->Password   = $password;
-            $mail->SMTPSecure = 'tls';
-            $mail->Port       = 587;
-            $mail->CharSet    = "UTF-8";
+            $mail->Host = "smtp.gmail.com";
+            $mail->SMTPAuth = true;
+            $mail->Username = $username;
+            $mail->Password = $password;
+            $mail->SMTPSecure = "tls";
+            $mail->Port = 587;
+            $mail->CharSet = "UTF-8";
 
             //Recipients
-            $mail->setFrom($sender , 'CWIE-FBA');
+            $mail->setFrom($sender, "CWIE-FBA");
             // $mail->addAddress($receiver, 'Receiver'); /* Receiver */
-            $mail->addReplyTo($sender , 'CWIE-FBA');
+            $mail->addReplyTo($sender, "CWIE-FBA");
             // $mail->addCC('arnon.r@technopark.kmutnb.ac.th');
             // $mail->addCC('siwakorn.l@icit.kmutnb.ac.th', "ศิวกร");
 
             foreach ($receiverList as $key => $value) {
-                $email = $value['email'];
-                $name = $value['name'];
+                $email = $value["email"];
+                $name = $value["name"];
                 $mail->addCC($email, $name);
             }
             // print_r($mail->getCcAddresses());
@@ -1110,12 +1254,11 @@ class FormController extends Controller
             // $mail->Subject = 'หนังสือส่งตัว สหกิจศึกษา';
             // $mail->Body    = 'Body หนังสือส่งตัว';
             $mail->Subject = $subject;
-            $mail->Body    = $body;
+            $mail->Body = $body;
             // $mail->AltBody = 'Test mail from Laravel : This is the body in plain text for non-HTML mail clients';
 
             // $mail->send();
             // echo 'Message has been sent';
-
         } catch (Exception $e) {
             echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }

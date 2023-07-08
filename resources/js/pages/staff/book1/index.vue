@@ -109,6 +109,9 @@ const fetchSemesters = () => {
     .then((response) => {
       if (response.status === 200) {
         selectOptions.value.semesters = response.data.data.map((r) => {
+          if (r.is_current == 1) {
+            advancedSearch.semester_id = r.id;
+          }
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
             value: r.id,
@@ -552,11 +555,7 @@ const format = (date) => {
 
                   <td class="text-center" style="min-width: 100px">
                     <VChip label :color="form_statuses[it.status_id]">{{
-                      statusShow(
-                        it.status_id,
-                        it.request_document_date,
-                        it.confirm_response_at
-                      )
+                      statusShow(it.status_id)
                     }}</VChip>
                   </td>
 

@@ -44,7 +44,7 @@ class RejectLogController extends Controller
 
         $count = $items->count();
         $perPage = $request->perPage ? $request->perPage : $count;
-        if($perPage == 0 &&  $count==0){
+        if ($perPage == 0 && $count == 0) {
             $perPage = 1;
         }
         $currentPage = $request->currentPage ? $request->currentPage : 1;
@@ -92,7 +92,7 @@ class RejectLogController extends Controller
         $request->validate(["form_id as required"]);
 
         $item = new RejectLog();
-        $item->comment = $request->commen;
+        $item->comment = $request->comment;
         $item->user_id = $request->user_id;
         $item->form_id = $request->form_id;
         $item->reject_status_id = $request->reject_status_id;
@@ -111,7 +111,11 @@ class RejectLogController extends Controller
         }
 
         if ($item->reject_status_id == 4) {
-            $form->status_id = 5;
+            $form->status_id = 6;
+        }
+
+        if ($item->reject_status_id == 5) {
+            $form->status_id = 11;
         }
 
         $form->save();

@@ -17,7 +17,7 @@ const order = ref("desc");
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: "",
+  status_id: 4,
   student_code: "",
   firstname: "",
   surname: "",
@@ -84,6 +84,9 @@ const fetchSemesters = () => {
     .then((response) => {
       if (response.status === 200) {
         selectOptions.value.semesters = response.data.data.map((r) => {
+          if (r.is_current == 1) {
+            advancedSearch.semester_id = r.id;
+          }
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
             value: r.id,

@@ -63,7 +63,7 @@ const isDialogVisible = ref(false);
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: 7,
+  status_id: 11,
   student_code: "",
   firstname: "",
   surname: "",
@@ -136,6 +136,9 @@ const fetchSemesters = () => {
     .then((response) => {
       if (response.status === 200) {
         selectOptions.value.semesters = response.data.data.map((r) => {
+          if (r.is_current == 1) {
+            advancedSearch.semester_id = r.id;
+          }
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
             value: r.id,
@@ -210,6 +213,7 @@ const fetchItems = () => {
     let search = {
       ...advancedSearch,
       includeAll: true,
+      includeForm: true,
     };
     studentStore
       .fetchListStudents({
@@ -235,6 +239,17 @@ const fetchItems = () => {
         console.error(error);
         isOverlay.value = false;
       });
+  }
+};
+
+const responseProvinceName = (response_province_id) => {
+  if (response_province_id) {
+    let response_province_select = selectOptions.value.provinces.find((x) => {
+      return x.value == response_province_id;
+    });
+    return response_province_select.title;
+  } else {
+    return "-";
   }
 };
 
@@ -491,12 +506,8 @@ const format = (date) => {
             <VBtn
               color="primary"
               class="mr-2"
-              @click="
-                () => {
-                  document = [];
-                  onAddBook();
-                }
-              "
+              href="http://localhost:8117/storage/pdf/template_import_supervisor.xlsx"
+              target="_blank"
             >
               ดาวน์โหลด Template</VBtn
             >
@@ -562,22 +573,16 @@ const format = (date) => {
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    {{ it.response_province_id }}
+                    {{ responseProvinceName(it.response_province_id) }}
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    {{ it.supervisor_id }}
+                    {{ it.supervision_name }}
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
                     <VChip label :color="form_statuses[it.status_id]">
-                      {{
-                        statusShow(
-                          it.status_id,
-                          it.request_document_date,
-                          it.confirm_response_at
-                        )
-                      }}</VChip
+                      {{ statusShow(it.status_id) }}</VChip
                     >
                   </td>
 
@@ -594,7 +599,7 @@ const format = (date) => {
                       View</VBtn
                     >
 
-                    <VBtn
+                    <!-- <VBtn
                       color="primary"
                       class="ml-2"
                       :disabled="it.send_document_date == null"
@@ -610,7 +615,7 @@ const format = (date) => {
                       "
                     >
                       Edit</VBtn
-                    >
+                    > -->
                   </td>
                 </tr>
               </tbody>
