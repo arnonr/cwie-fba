@@ -30,6 +30,8 @@ class Semester extends Model
         'updated_at',
         'updated_by',
         'deleted_at',
-        'is_current'
+        'is_current',
+        'student_report_due_date',
+        'supervisor_report_due_date'
     ];
 }

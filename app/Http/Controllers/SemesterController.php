@@ -27,7 +27,9 @@ class SemesterController extends Controller
             "semester.regis_start_date",
             "semester.regis_end_date",
             "semester.active as active",
-            "semester.is_current as is_current"
+            "semester.is_current as is_current",
+            "semester.student_report_due_date as student_report_due_date",
+            "semester.supervisor_report_due_date as supervisor_report_due_date",
         )->where("semester.deleted_at", null);
 
         // Include
@@ -104,6 +106,14 @@ class SemesterController extends Controller
             $items->where("semester.is_current", $request->is_current);
         }
 
+        if ($request->student_report_due_date) {
+            $items->where("semester.student_report_due_date", $request->student_report_due_date);
+        }
+
+        if ($request->supervisor_report_due_date) {
+            $items->where("semester.supervisor_report_due_date", $request->supervisor_report_due_date);
+        }
+
         // Order
         if ($request->orderBy) {
             $items = $items->orderBy($request->orderBy, $request->order);
@@ -156,6 +166,8 @@ class SemesterController extends Controller
             "semester.regis_end_date",
             "semester.active as active",
             "semester.is_current as is_current",
+            "semester.student_report_due_date as student_report_due_date",
+            "semester.supervisor_report_due_date as supervisor_report_due_date",
             DB::raw(
                 'CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS chairman_name'
             )
@@ -194,6 +206,9 @@ class SemesterController extends Controller
         $item->regis_end_date = $request->regis_end_date;
         $item->active = $request->active;
         $item->is_current = $request->is_current;
+        $item->student_report_due_date = $request->student_report_due_date;
+        $item->supervisor_report_due_date = $request->supervisor_report_due_date;
+
         $item->created_by = "arnonr";
         $item->save();
 
@@ -253,6 +268,13 @@ class SemesterController extends Controller
         $item->is_current = $request->has("is_current")
             ? $request->is_current
             : $item->is_current;
+        $item->student_report_due_date = $request->has("student_report_due_date")
+            ? $request->student_report_due_date
+            : $item->student_report_due_date;
+        $item->supervisor_report_due_date = $request->has("supervisor_report_due_date")
+            ? $request->supervisor_report_due_date
+            : $item->supervisor_report_due_date;
+
         $item->updated_by = "arnonr";
         $item->save();
 
