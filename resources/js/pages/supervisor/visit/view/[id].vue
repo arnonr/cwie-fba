@@ -23,7 +23,7 @@ const student = ref({});
 const item = ref({});
 const rejectLog = ref({
   comment: "",
-  reject_status_id: 3,
+  reject_status_id: 5,
   form_id: null,
   user_id: userData.user_id,
 });
@@ -38,13 +38,14 @@ const isAdd = ref(true);
 const isCheck = ref(true);
 const isDialogVisible = ref(false);
 const isDialogRejectVisible = ref(false);
-const currentStep = ref(1);
+const currentStep = ref(2);
 const formSteps = [
   {
     title: "ข้อมูลใบสมัคร",
     size: 24,
     icon: "tabler-file",
   },
+
   {
     title: "ข้อมูลเอกสารตอบรับ",
     size: 24,
@@ -229,8 +230,6 @@ const fetchStudentDocuments = () => {
     });
 };
 
-// let userData = JSON.parse(localStorage.getItem("userData"));
-
 const fetchStudent = () => {
   cwieDataStore
     .fetchStudents({
@@ -370,6 +369,7 @@ const onRejectSubmit = () => {
     cwieDataStore
       .addRejectLog({
         ...rejectLog.value,
+        active: 1,
       })
       .then((response) => {
         if (response.data.message == "success") {
@@ -400,11 +400,12 @@ const onRejectSubmit = () => {
 };
 
 const onSubmit = () => {
+  console.log(item.value);
   cwieDataStore
     .approve({
       id: item.value.id,
-      status_id: 5,
-      faculty_confirmed_at: dayjs().format("YYYY-MM-DD"),
+      status_id: 13,
+      plan_accept_at: dayjs().format("YYYY-MM-DD"),
     })
     .then((response) => {
       if (response.data.message == "success") {
@@ -428,13 +429,111 @@ const onSubmit = () => {
     });
 };
 
+const fetchProvinces = () => {
+  cwieDataStore
+    .fetchProvinces({})
+    .then((response) => {
+      if (response.status === 200) {
+        selectOptions.value.provinces = response.data.data.map((r) => {
+          return { title: r.name_th, value: r.province_id };
+        });
+        isOverlay.value = false;
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+};
+
+const fetchAmphurs = (type = 1) => {
+  cwieDataStore
+    .fetchAmphurs({
+      province_id:
+        type == 1 ? item.value.province_id : plan.value.workplace_province_id,
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        selectOptions.value.amphurs = response.data.data.map((r) => {
+          return { title: r.name_th, value: r.amphur_id };
+        });
+        isOverlay.value = false;
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+};
+
+const fetchTumbols = (type = 1) => {
+  cwieDataStore
+    .fetchTumbols({
+      amphur_id:
+        type == 1 ? item.value.amphur_id : plan.value.workplace_amphur_id,
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        selectOptions.value.tumbols = response.data.data.map((r) => {
+          return { title: r.name_th, value: r.tumbol_id };
+        });
+        isOverlay.value = false;
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+};
+
 onMounted(() => {
   window.scrollTo(0, 0);
 
-  //   fetchProvinces();
+  fetchProvinces();
+  fetchAmphurs();
+  fetchTumbols();
   //   fetchTeachers();
   fetchDocumentTypes();
 });
+
+const responseProvinceName = (response_province_id) => {
+  if (response_province_id) {
+    let response_province_select = selectOptions.value.provinces.find((x) => {
+      return x.value == response_province_id;
+    });
+    return response_province_select.title;
+  } else {
+    return "-";
+  }
+};
+
+const responseAmphurName = (amphur_id) => {
+  if (amphur_id) {
+    let amphur_select = selectOptions.value.amphurs.find((x) => {
+      return x.value == amphur_id;
+    });
+    return amphur_select.title;
+  } else {
+    return "-";
+  }
+};
+
+const responseTumbolName = (tumbol_id) => {
+  if (tumbol_id) {
+    let tumbol_select = selectOptions.value.tumbols.find((x) => {
+      return x.value == tumbol_id;
+    });
+    return tumbol_select.title;
+  } else {
+    return "-";
+  }
+};
 </script>
 <style lang="scss">
 .checkout-stepper {
@@ -470,7 +569,7 @@ onMounted(() => {
           <VDivider class="ml-4 mr-4" />
           <VCardText>
             <span class="font-weight-bold">สาขาวิชา : </span>
-            <span>{{ student.major_name }}</span></VCardText
+            <span>{{}}</span></VCardText
           >
           <VDivider class="ml-4 mr-4" />
           <VCardText>
@@ -772,6 +871,7 @@ onMounted(() => {
               v-model:current-step="currentStep"
               class="checkout-stepper"
               :items="formSteps"
+              :isActiveStepValid="true"
               :direction="$vuetify.display.smAndUp ? 'horizontal' : 'vertical'"
             />
           </VCardText>
@@ -945,11 +1045,342 @@ onMounted(() => {
                   </VCol>
                 </VRow>
               </VWindowItem>
+              <!--  -->
+              <VWindowItem>
+                <VRow>
+                  <VCol cols="12" md="6">
+                    <!-- <VCol cols="12" md="3"> -->
+                    <span>สถานะฟอร์ม : </span>
+                    <span>
+                      <VChip label :color="form_statuses[it.status_id]">
+                        {{
+                          statusShow(
+                            it.status_id,
+                            it.request_document_date,
+                            it.confirm_response_at
+                          )
+                        }}</VChip
+                      >
+                    </span>
+                  </VCol>
+                  <VCol cols="12" md="6">
+                    <span>หนังสือขอความอนุเคราะห์ : </span>
+                    <span>
+                      {{
+                        it.request_document_date == null
+                          ? "-"
+                          : dayjs(it.request_document_date)
+                              .locale("th")
+                              .format("DD MMMM BBBB")
+                      }}
+                    </span>
+                  </VCol>
+                  <VCol cols="12" md="6">
+                    <span>วันที่ต้องตอบรับเอกสาร : </span>
+                    <span>{{
+                      it.max_response_date == null
+                        ? "-"
+                        : dayjs(it.max_response_date)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ไฟล์หนังสือตอบกลับ : </span>
+                    <a
+                      v-if="it.response_document_file"
+                      :href="it.response_document_file"
+                      target="_blank"
+                      ><span>
+                        <VIcon
+                          size="16"
+                          icon="tabler-file"
+                          style="opacity: 1"
+                          class="mr-1"
+                        />เอกสาร</span
+                      >
+                    </a>
+                    <span v-else>-</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่ส่งหนังสือตอบกลับ : </span>
+                    <span>{{
+                      it.response_send_at == null
+                        ? "-"
+                        : dayjs(it.response_send_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ผลการตอบกลับ : </span>
+                    <span>{{
+                      it.response_result == null
+                        ? "-"
+                        : statusShow(it.response_result)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>จังหวัดที่ตอบรับสหกิจศึกษา : </span>
+                    <span>{{
+                      responseProvinceName(it.response_province_id)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่ตรวจสอบหนังสือตอบกลับ : </span>
+                    <span>{{
+                      it.confirm_response_at == null
+                        ? "-"
+                        : dayjs(it.confirm_response_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>หนังสือส่งตัว : </span>
+                    <span>
+                      {{
+                        it.send_document_date == null
+                          ? "-"
+                          : dayjs(it.send_document_date)
+                              .locale("th")
+                              .format("DD MMMM BBBB")
+                      }}
+                    </span>
+                  </VCol>
+
+                  <VDivider></VDivider>
+
+                  <VCol cols="12" md="6">
+                    <VRow>
+                      <VCol cols="12" md="12">
+                        <h4>Remark</h4>
+                      </VCol>
+                    </VRow>
+                    <VRow v-for="(rl, index) in it.reject_log">
+                      <VCol cols="12" md="4" v-if="rl.reject_status_id == 4">
+                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <span>
+                          {{
+                            dayjs(rl.created_at)
+                              .locale("th")
+                              .format("DD MMM BB")
+                          }}</span
+                        >
+                      </VCol>
+                      <VCol cols="12" md="8" v-if="rl.reject_status_id == 4">
+                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <span> {{ rl.comment }}</span>
+                      </VCol>
+                    </VRow>
+                  </VCol>
+                </VRow>
+              </VWindowItem>
+
+              <VWindowItem>
+                <VRow>
+                  <VCol cols="12" md="6">
+                    <!-- <VCol cols="12" md="3"> -->
+                    <span>สถานะฟอร์ม : </span>
+                    <span>
+                      <VChip label :color="form_statuses[it.status_id]">
+                        {{
+                          statusShow(
+                            it.status_id,
+                            it.request_document_date,
+                            it.confirm_response_at
+                          )
+                        }}</VChip
+                      >
+                    </span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ไฟล์แผนการปฏิบัติงาน : </span>
+                    <a
+                      v-if="it.plan_document_file"
+                      :href="it.plan_document_file"
+                      target="_blank"
+                      ><span>
+                        <VIcon
+                          size="16"
+                          icon="tabler-file"
+                          style="opacity: 1"
+                          class="mr-1"
+                        />เอกสาร</span
+                      >
+                    </a>
+                    <span v-else>-</span>
+                  </VCol>
+                  <VCol cols="12" md="6">
+                    <span>วันที่ส่งแผน : </span>
+                    <span>{{
+                      it.plan_send_at == null
+                        ? "-"
+                        : dayjs(it.plan_send_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่อนุมัติแผน : </span>
+                    <span>{{
+                      it.plan_accept_at == null
+                        ? "-"
+                        : dayjs(it.plan_accept_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+                  <VCol cols="12" md="12">
+                    <hr />
+                  </VCol>
+
+                  <VCol cols="12" md="12">
+                    <span>ที่อยู่ที่ปฏิบัติงาน : </span>
+                    <span>{{ it.workplace_address }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>จังหวัด : </span>
+                    <span>{{
+                      responseProvinceName(it.workplace_province_id)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>อำเภอ : </span>
+                    <span>{{
+                      responseAmphurName(it.workplace_amphur_id)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ตำบล : </span>
+                    <span>{{
+                      responseTumbolName(it.workplace_tumbol_id)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ลิงค์แผนที่ : </span>
+                    <a
+                      v-if="it.workplace_googlemap_url"
+                      :href="it.workplace_googlemap_url"
+                      target="_blank"
+                    >
+                      <span>
+                        <VIcon
+                          size="16"
+                          icon="tabler-map-pin"
+                          style="opacity: 1"
+                          class="mr-1"
+                        />Map</span
+                      >
+                    </a>
+                    <span v-else>-</span>
+                  </VCol>
+
+                  <VCol cols="12" md="12">
+                    <span>ภาพแผนที่ : </span>
+                    <a
+                      :href="it.workplace_googlemap_file"
+                      target="_blank"
+                      v-if="it.workplace_googlemap_file"
+                    >
+                      <VImg :src="it.workplace_googlemap_file" width="300" />
+                    </a>
+                    <span v-else>-</span>
+                  </VCol>
+                  <VDivider></VDivider>
+
+                  <VCol cols="12" md="6">
+                    <VRow>
+                      <VCol cols="12" md="12">
+                        <h4>Remark</h4>
+                      </VCol>
+                    </VRow>
+                    <VRow v-for="(rl, index) in it.reject_log">
+                      <VCol cols="12" md="4" v-if="rl.reject_status_id == 5">
+                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <span>
+                          {{
+                            dayjs(rl.created_at)
+                              .locale("th")
+                              .format("DD MMM BB")
+                          }}</span
+                        >
+                      </VCol>
+                      <VCol cols="12" md="8" v-if="rl.reject_status_id == 5">
+                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <span> {{ rl.comment }}</span>
+                      </VCol>
+                    </VRow>
+                  </VCol>
+
+                  <VCol cols="12" md="12" class="text-center">
+                    <!-- Disabled = true -->
+                    <VBtn
+                      color="error"
+                      :disabled="
+                        it.status_id != 12 ||
+                        index != 0 ||
+                        it.plan_accept_at != null
+                      "
+                      @click="
+                        () => {
+                          rejectLog.form_id = it.id;
+                          isDialogRejectVisible = true;
+                        }
+                      "
+                    >
+                      <VIcon
+                        size="16"
+                        icon="tabler-edit"
+                        style="opacity: 1"
+                        class="mr-1"
+                      ></VIcon>
+                      ส่งกลับให้แก้ไข
+                    </VBtn>
+
+                    <VBtn
+                      class="ml-2"
+                      color="success"
+                      :disabled="
+                        it.status_id != 12 ||
+                        index != 0 ||
+                        it.plan_accept_at != null
+                      "
+                      @click="
+                        () => {
+                          item = it;
+                          isDialogVisible = true;
+                        }
+                      "
+                    >
+                      <VIcon
+                        size="16"
+                        icon="tabler-file-description"
+                        style="opacity: 1"
+                        class="mr-1"
+                      ></VIcon>
+                      อนุมัติ
+                    </VBtn>
+                  </VCol>
+                </VRow>
+              </VWindowItem>
+              <!--  -->
             </VWindow>
 
-            <div class="d-flex mt-8">
-              <!-- justify-space-between -->
-              <!-- <VBtn
+            <div class="d-flex justify-space-between mt-8">
+              <VBtn
                 color="secondary"
                 variant="tonal"
                 :disabled="currentStep === 0"
@@ -957,68 +1388,23 @@ onMounted(() => {
               >
                 <VIcon icon="tabler-chevron-left" start class="flip-in-rtl" />
                 Previous
-              </VBtn> -->
-
-              <VBtn
-                color="error"
-                :disabled="it.status_id != 4 || index != 0"
-                @click="
-                  () => {
-                    rejectLog.form_id = it.id;
-                    isDialogRejectVisible = true;
-                  }
-                "
-              >
-                <VIcon
-                  size="16"
-                  icon="tabler-edit"
-                  style="opacity: 1"
-                  class="mr-1"
-                ></VIcon>
-                ส่งกลับให้แก้ไข
-              </VBtn>
-
-              <VBtn
-                class="ml-2"
-                color="success"
-                :disabled="it.status_id != 4 || index != 0"
-                @click="
-                  () => {
-                    item = it;
-                    isDialogVisible = true;
-                  }
-                "
-              >
-                <VIcon
-                  size="16"
-                  icon="tabler-file-description"
-                  style="opacity: 1"
-                  class="mr-1"
-                ></VIcon>
-                อนุมัติ
               </VBtn>
 
               <!-- <VBtn
                 color="success"
                 append-icon="tabler-check"
-                v-if="formSteps.length - 1 === currentStep"
+               
               >
                 submit
-              </VBtn>
+              </VBtn> -->
 
               <VBtn
-                v-else
+                v-if="formSteps.length - 1 !== currentStep"
                 @click="currentStep++"
-                :disabled="
-                  it.status_id < 5 ||
-                  it.reject_status_id == 1 ||
-                  it.reject_status_id == 2 ||
-                  it.reject_status_id == 3
-                "
               >
                 Next
                 <VIcon icon="tabler-chevron-right" end class="flip-in-rtl" />
-              </VBtn> -->
+              </VBtn>
             </div>
           </VCardText>
         </VCard>

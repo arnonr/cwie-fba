@@ -209,6 +209,7 @@ Route::group(["prefix" => "form"], function () {
         FormController::class,
         "AddResponseBook",
     ]);
+    Route::post("/add-plan", [FormController::class, "AddPlan"]);
     Route::put("/approve/{id}", [FormController::class, "approve"]);
     Route::put("/{id}", [FormController::class, "edit"]);
     Route::delete("/{id}", [FormController::class, "delete"]);

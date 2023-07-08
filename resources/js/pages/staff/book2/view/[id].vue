@@ -9,7 +9,7 @@ import buddhistEra from "dayjs/plugin/buddhistEra";
 import "vue3-pdf-app/dist/icons/main.css";
 import { useCwieDataStore } from "../useCwieDataStore";
 
-import { form_statuses, text_statuses, statusShow } from "@/data-constant/data";
+import { form_statuses, statusShow } from "@/data-constant/data";
 
 // const route = useRoute();
 dayjs.extend(buddhistEra);
@@ -481,7 +481,7 @@ onMounted(() => {
           <VCardText>
             <span class="font-weight-bold">สถานะ : </span>
             <VChip label :color="form_statuses[student.status_id]">{{
-              text_statuses[student.status_id]
+              statusShow(student.status_id)
             }}</VChip>
           </VCardText>
           <VDivider class="ml-4 mr-4" />

@@ -13,7 +13,7 @@ import buddhistEra from "dayjs/plugin/buddhistEra";
 import "vue3-pdf-app/dist/icons/main.css";
 import { useCwieDataStore } from "./useCwieDataStore";
 
-import { form_statuses, text_statuses, statusShow } from "@/data-constant/data";
+import { form_statuses, statusShow } from "@/data-constant/data";
 
 // const route = useRoute();
 dayjs.extend(buddhistEra);
@@ -26,6 +26,7 @@ const item = ref({});
 const response_company = ref({
   response_document_file: [],
   status_id: "",
+  result: "",
   response_send_at: "",
   province_id: null,
 });
@@ -38,7 +39,7 @@ const plan = ref({
   workplace_amphur_id: "",
   workplace_tumbol_id: "",
   workplace_googlemap_url: "",
-  workplace_googlemap_file: "",
+  workplace_googlemap_file: [],
 });
 
 const chairman = ref({
@@ -202,10 +203,11 @@ const fetchProvinces = () => {
     });
 };
 
-const fetchAmphurs = () => {
+const fetchAmphurs = (type = 1) => {
   cwieDataStore
     .fetchAmphurs({
-      province_id: item.value.province_id,
+      province_id:
+        type == 1 ? item.value.province_id : plan.value.workplace_province_id,
     })
     .then((response) => {
       if (response.status === 200) {
@@ -223,10 +225,11 @@ const fetchAmphurs = () => {
     });
 };
 
-const fetchTumbols = () => {
+const fetchTumbols = (type = 1) => {
   cwieDataStore
     .fetchTumbols({
-      amphur_id: item.value.amphur_id,
+      amphur_id:
+        type == 1 ? item.value.amphur_id : plan.value.workplace_amphur_id,
     })
     .then((response) => {
       if (response.status === 200) {
@@ -547,6 +550,32 @@ watch(
   }
 );
 
+watch(
+  () => plan.value.workplace_province_id,
+  (value, oldValue) => {
+    if (value != null) {
+      fetchAmphurs(2);
+      if (oldValue != null) {
+        plan.value.workplace_amphur_id = null;
+        plan.value.workplace_tumbol_id = null;
+      }
+    }
+  }
+);
+
+watch(
+  () => plan.value.workplace_amphur_id,
+  (value, oldValue) => {
+    if (value != null) {
+      fetchTumbols(2);
+      if (oldValue != null) {
+        plan.value.workplace_tumbol_id = null;
+      }
+    }
+    // console.log(value);
+  }
+);
+
 const onAddClick = () => {
   if (isCheck.value == false) {
     isDialogCheckVisible.value = true;
@@ -569,7 +598,8 @@ const onResponseSubmit = () => {
               ? response_company.value.response_document_file[0]
               : null,
           response_send_at: dayjs().format("YYYY-MM-DD"),
-          status_id: response_company.value.status_id,
+          status_id: 7,
+          response_result: response_company.value.result,
         })
         .then((response) => {
           if (response.data.message == "success") {
@@ -601,7 +631,42 @@ const onResponseSubmit = () => {
 };
 
 const onPlanSubmit = () => {
-  console.log(plan.value);
+  cwieDataStore
+    .addPlan({
+      ...plan.value,
+      id: response_company.value.form_id,
+      plan_document_file:
+        plan.value.plan_document_file.length !== 0
+          ? plan.value.plan_document_file[0]
+          : null,
+      workplace_googlemap_file:
+        plan.value.workplace_googlemap_file.length !== 0
+          ? plan.value.workplace_googlemap_file[0]
+          : null,
+
+      plan_send_at: dayjs().format("YYYY-MM-DD"),
+    })
+    .then((response) => {
+      if (response.data.message == "success") {
+        localStorage.setItem("updated", 1);
+        nextTick(() => {
+          fetchStudent();
+          fetchForms();
+          isDialogPlanVisible.value = false;
+          snackbarText.value = "Success";
+          snackbarColor.value = "success";
+          isSnackbarVisible.value = true;
+        });
+      } else {
+        isOverlay.value = false;
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+  ``;
 };
 
 const generateRegisPDF = async () => {
@@ -1238,20 +1303,70 @@ const generateSendPDF = async () => {
   isOverlay.value = false;
 };
 
-const responseProvinceName = (response_province_id) => {
-  if (response_province_id) {
-    let response_province_select = selectOptions.value.provinces.find((x) => {
-      return x.value == response_province_id;
+const responseProvinceName = (province_id) => {
+  if (province_id) {
+    let province_select = selectOptions.value.provinces.find((x) => {
+      return x.value == province_id;
     });
-    return response_province_select.title;
+    return province_select.title;
   } else {
     return "-";
   }
 };
 
+const responseAmphurName = (amphur_id) => {
+  if (amphur_id) {
+    let amphur_select = selectOptions.value.amphurs.find((x) => {
+      return x.value == amphur_id;
+    });
+    return amphur_select.title;
+  } else {
+    return "-";
+  }
+};
+
+const responseTumbolName = (tumbol_id) => {
+  if (tumbol_id) {
+    let tumbol_select = selectOptions.value.tumbols.find((x) => {
+      return x.value == tumbol_id;
+    });
+    return tumbol_select.title;
+  } else {
+    return "-";
+  }
+};
+
+const reject_status_show = (reject_status_id) => {
+  if (reject_status_id) {
+    if (reject_status_id == 1) {
+      return "อาจารย์ที่ปรึกษา";
+    }
+
+    if (reject_status_id == 2) {
+      return "ประธานอาจารย์นิเทศ";
+    }
+
+    if (reject_status_id == 3) {
+      return "เจ้าหน้าที่คณะ";
+    }
+
+    if (reject_status_id == 4) {
+      return "เอกสารตอบรับ";
+    }
+
+    if (reject_status_id == 5) {
+      return "แผนการปฏิบัติงาน";
+    }
+  }
+  return "";
+};
+
 onMounted(() => {
   window.scrollTo(0, 0);
   fetchProvinces();
+
+  fetchAmphurs();
+  fetchTumbols();
   fetchTeachers();
   fetchDocumentTypes();
 });
@@ -1301,7 +1416,7 @@ onMounted(() => {
           <VCardText>
             <span class="font-weight-bold">สถานะ : </span>
             <VChip label :color="form_statuses[student.status_id]"
-              >{{ text_statuses[student.status_id] }}
+              >{{ statusShow(student.status_id) }}
             </VChip>
           </VCardText>
           <VDivider class="ml-4 mr-4" />
@@ -1593,7 +1708,12 @@ onMounted(() => {
           เพิ่มใบสมัคร</VBtn
         >
 
-        <VBtn color="primary" class="ml-2" @click="generateRegisPDF">
+        <VBtn
+          color="primary"
+          class="ml-2"
+          @click="generateRegisPDF"
+          :disabled="student.status_id < 5"
+        >
           <VIcon
             size="16"
             icon="tabler-file-description"
@@ -1603,7 +1723,12 @@ onMounted(() => {
           ใบสมัครโครงการ</VBtn
         >
 
-        <VBtn color="primary" class="ml-2" @click="generatePDF">
+        <VBtn
+          color="primary"
+          class="ml-2"
+          @click="generatePDF"
+          :disabled="student.status_id < 6"
+        >
           <VIcon
             size="16"
             icon="tabler-file-description"
@@ -1613,7 +1738,12 @@ onMounted(() => {
           หนังสือขอความอนุเคราะห์</VBtn
         >
 
-        <VBtn color="primary" class="ml-2" @click="generateSendPDF">
+        <VBtn
+          color="primary"
+          class="ml-2"
+          @click="generateSendPDF"
+          :disabled="student.status_id < 11"
+        >
           <VIcon
             size="16"
             icon="tabler-file-description"
@@ -1655,13 +1785,7 @@ onMounted(() => {
                     <span>สถานะฟอร์ม : </span>
                     <span>
                       <VChip label :color="form_statuses[it.status_id]">
-                        {{
-                          statusShow(
-                            it.status_id,
-                            it.request_document_date,
-                            it.confirm_response_at
-                          )
-                        }}</VChip
+                        {{ statusShow(it.status_id) }}</VChip
                       >
                     </span>
                   </VCol>
@@ -1783,6 +1907,15 @@ onMounted(() => {
                         >
                       </VCol>
                       <VCol cols="12" md="8" v-if="rl.reject_status_id < 4">
+                        <h4 class="mb-0 d-inline mr-1">ผู้ตรวจ :</h4>
+                        <span>
+                          {{ reject_status_show(rl.reject_status_id) }}
+                          <!-- ขั้นตอนการปฏิเสธ (1=ที่ปรึกษา,
+                          ประธานอาจารย์นิเทศ,3=เจ้าหน้าที่คณะ, 4=เอกสารตอบรับ,
+                          5=แผนการปฏิบัติงาน) -->
+                        </span>
+                      </VCol>
+                      <VCol cols="12" md="8" v-if="rl.reject_status_id < 4">
                         <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
                         <span> {{ rl.comment }}</span>
                       </VCol>
@@ -1845,11 +1978,8 @@ onMounted(() => {
                   <VCol cols="12" md="6">
                     <span>ไฟล์หนังสือตอบกลับ : </span>
                     <a
-                      :href="
-                        it.response_document_file != null
-                          ? it.response_document_file
-                          : '#'
-                      "
+                      v-if="it.response_document_file"
+                      :href="it.response_document_file"
                       target="_blank"
                       ><span>
                         <VIcon
@@ -1860,6 +1990,7 @@ onMounted(() => {
                         />เอกสาร</span
                       >
                     </a>
+                    <span v-else>-</span>
                   </VCol>
 
                   <VCol cols="12" md="6">
@@ -1870,6 +2001,15 @@ onMounted(() => {
                         : dayjs(it.response_send_at)
                             .locale("th")
                             .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ผลการตอบกลับ : </span>
+                    <span>{{
+                      it.response_result == null
+                        ? "-"
+                        : statusShow(it.response_result)
                     }}</span>
                   </VCol>
 
@@ -1935,7 +2075,7 @@ onMounted(() => {
                       color="info"
                       :disabled="
                         it.request_document_date == null ||
-                        it.status_id != 5 ||
+                        it.status_id != 6 ||
                         index != 0
                       "
                       @click="isDialogResponseVisible = true"
@@ -1963,37 +2103,12 @@ onMounted(() => {
                       >
                     </span>
                   </VCol>
-                  <VCol cols="12" md="6">
-                    <span>หนังสือขอความอนุเคราะห์ : </span>
-                    <span>
-                      {{
-                        it.request_document_date == null
-                          ? "-"
-                          : dayjs(it.request_document_date)
-                              .locale("th")
-                              .format("DD MMMM BBBB")
-                      }}
-                    </span>
-                  </VCol>
-                  <VCol cols="12" md="6">
-                    <span>วันที่ต้องตอบรับเอกสาร : </span>
-                    <span>{{
-                      it.max_response_date == null
-                        ? "-"
-                        : dayjs(it.max_response_date)
-                            .locale("th")
-                            .format("DD MMMM BBBB")
-                    }}</span>
-                  </VCol>
 
                   <VCol cols="12" md="6">
-                    <span>ไฟล์หนังสือตอบกลับ : </span>
+                    <span>ไฟล์แผนการปฏิบัติงาน : </span>
                     <a
-                      :href="
-                        it.response_document_file != null
-                          ? it.response_document_file
-                          : '#'
-                      "
+                      v-if="it.plan_document_file"
+                      :href="it.plan_document_file"
                       target="_blank"
                       ><span>
                         <VIcon
@@ -2004,26 +2119,89 @@ onMounted(() => {
                         />เอกสาร</span
                       >
                     </a>
+                    <span v-else>-</span>
                   </VCol>
-
                   <VCol cols="12" md="6">
-                    <span>วันที่ส่งหนังสือตอบกลับ : </span>
+                    <span>วันที่ส่งแผน : </span>
                     <span>{{
-                      it.response_send_at == null
+                      it.plan_send_at == null
                         ? "-"
-                        : dayjs(it.response_send_at)
+                        : dayjs(it.plan_send_at)
                             .locale("th")
                             .format("DD MMMM BBBB")
                     }}</span>
                   </VCol>
 
                   <VCol cols="12" md="6">
-                    <span>จังหวัดที่ตอบรับสหกิจศึกษา : </span>
+                    <span>วันที่อนุมัติแผน : </span>
                     <span>{{
-                      responseProvinceName(it.response_province_id)
+                      it.plan_accept_at == null
+                        ? "-"
+                        : dayjs(it.plan_accept_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+                  <VCol cols="12" md="12">
+                    <hr />
+                  </VCol>
+
+                  <VCol cols="12" md="12">
+                    <span>ที่อยู่ที่ปฏิบัติงาน : </span>
+                    <span>{{ it.workplace_address }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>จังหวัด : </span>
+                    <span>{{
+                      responseProvinceName(it.workplace_province_id)
                     }}</span>
                   </VCol>
 
+                  <VCol cols="12" md="6">
+                    <span>อำเภอ : </span>
+                    <span>{{
+                      responseAmphurName(it.workplace_amphur_id)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ตำบล : </span>
+                    <span>{{
+                      responseTumbolName(it.workplace_tumbol_id)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ลิงค์แผนที่ : </span>
+                    <a
+                      v-if="it.workplace_googlemap_url"
+                      :href="it.workplace_googlemap_url"
+                      target="_blank"
+                    >
+                      <span>
+                        <VIcon
+                          size="16"
+                          icon="tabler-map-pin"
+                          style="opacity: 1"
+                          class="mr-1"
+                        />Map</span
+                      >
+                    </a>
+                    <span v-else>-</span>
+                  </VCol>
+
+                  <VCol cols="12" md="12">
+                    <span>ภาพแผนที่ : </span>
+                    <a
+                      :href="it.workplace_googlemap_file"
+                      target="_blank"
+                      v-if="it.workplace_googlemap_file"
+                    >
+                      <VImg :src="it.workplace_googlemap_file" width="300" />
+                    </a>
+                    <span v-else>-</span>
+                  </VCol>
                   <VDivider></VDivider>
 
                   <VCol cols="12" md="6">
@@ -2054,11 +2232,7 @@ onMounted(() => {
                     <!-- Disabled = true -->
                     <VBtn
                       color="info"
-                      :disabled="
-                        it.plan_send_at != null ||
-                        it.status_id != 7 ||
-                        index != 0
-                      "
+                      :disabled="it.status_id != 11 || index != 0"
                       @click="isDialogPlanVisible = true"
                     >
                       อัพโหลดแผนการปฏิบัติงาน
@@ -2078,15 +2252,6 @@ onMounted(() => {
                 <VIcon icon="tabler-chevron-left" start class="flip-in-rtl" />
                 Previous
               </VBtn>
-
-              <!-- <VBtn
-                color="success"
-                append-icon="tabler-check"
-               
-              >
-                submit
-              </VBtn> -->
-
               <VBtn
                 v-if="formSteps.length - 1 !== currentStep"
                 @click="currentStep++"
@@ -2168,11 +2333,11 @@ onMounted(() => {
                 </label>
                 <AppSelect
                   :items="[
-                    { title: 'ตอบรับ', value: 7 },
-                    { title: 'ปฏิเสธ', value: 6 },
-                    { title: 'สละสิทธิ์', value: 8 },
+                    { title: 'ตอบรับ', value: 8 },
+                    { title: 'ปฏิเสธ', value: 9 },
+                    { title: 'สละสิทธิ์', value: 10 },
                   ]"
-                  v-model="response_company.status_id"
+                  v-model="response_company.result"
                   :rules="[requiredValidator]"
                   variant="outlined"
                   placeholder="Status"
@@ -2265,12 +2430,12 @@ onMounted(() => {
               </VCol>
 
               <VCol cols="12">
-                <label class="v-label" for="response_province_id">
+                <label class="v-label" for="workplace_province_id">
                   จังหวัดที่ไปปฏิบัติงาน
                 </label>
                 <AppSelect
                   :items="selectOptions.provinces"
-                  v-model="response_company.province_id"
+                  v-model="plan.workplace_province_id"
                   variant="outlined"
                   placeholder="Province"
                   clearable
@@ -2278,25 +2443,23 @@ onMounted(() => {
               </VCol>
 
               <VCol cols="12">
-                <label class="v-label" for="response_province_id">
-                  อำเภอ
-                </label>
+                <label class="v-label" for="workplace_amphur_id"> อำเภอ </label>
                 <AppSelect
-                  :items="selectOptions.provinces"
-                  v-model="response_company.province_id"
+                  :items="selectOptions.amphurs"
+                  v-model="plan.workplace_amphur_id"
                   variant="outlined"
-                  placeholder="Province"
+                  placeholder="Amphur"
                   clearable
                 />
               </VCol>
 
               <VCol cols="12">
-                <label class="v-label" for="response_province_id"> ตำบล </label>
+                <label class="v-label" for="workplace_tumbol_id"> ตำบล </label>
                 <AppSelect
-                  :items="selectOptions.provinces"
-                  v-model="response_company.province_id"
+                  :items="selectOptions.tumbols"
+                  v-model="plan.workplace_tumbol_id"
                   variant="outlined"
-                  placeholder="Province"
+                  placeholder="Tumbol"
                   clearable
                 />
               </VCol>

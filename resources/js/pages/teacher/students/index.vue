@@ -2,7 +2,7 @@
 import { class_rooms, class_years, statuses } from "@/data-constant/data";
 import { useStudentStore } from "./useStudentStore";
 
-import { form_statuses, text_statuses, statusShow } from "@/data-constant/data";
+import { form_statuses, statusShow } from "@/data-constant/data";
 
 const studentStore = useStudentStore();
 
@@ -18,7 +18,7 @@ const teacherData = JSON.parse(localStorage.getItem("teacherData"));
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: "",
+  status_id: 2,
   student_code: "",
   firstname: "",
   surname: "",
@@ -85,6 +85,9 @@ const fetchSemesters = () => {
     .then((response) => {
       if (response.status === 200) {
         selectOptions.value.semesters = response.data.data.map((r) => {
+          if (r.is_current == 1) {
+            advancedSearch.semester_id = r.id;
+          }
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
             value: r.id,
@@ -194,34 +197,6 @@ watchEffect(() => {
 const isSnackbarVisible = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("success");
-
-const resolveActive = (active, type) => {
-  let data = "";
-
-  if (active == 1) data = ["success", "Active"];
-
-  if (active == 0) data = ["secondary", "In Active"];
-
-  if (type == "color") {
-    return data[0];
-  }
-
-  return data[1];
-};
-
-const resolveBlacklist = (b, type) => {
-  let data = "";
-
-  if (b == 1) data = ["error", "Blacklist"];
-
-  if (b == 0) data = ["secondary", "None"];
-
-  if (type == "color") {
-    return data[0];
-  }
-
-  return data[1];
-};
 
 if (localStorage.getItem("deleted") == 1) {
   snackbarText.value = "Deleted Company";
@@ -424,21 +399,9 @@ onMounted(() => {
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    <VChip
-                      label
-                      :color="
-                        text_statuses[it.status_id] == 'อาจารย์ที่ปรึกษาอนุมัติ'
-                          ? 'success'
-                          : form_statuses[it.status_id]
-                      "
-                      >{{
-                        statusShow(
-                          it.status_id,
-                          it.request_document_date,
-                          it.confirm_response_at
-                        )
-                      }}</VChip
-                    >
+                    <VChip label :color="form_statuses[it.status_id]">{{
+                      statusShow(it.status_id)
+                    }}</VChip>
                   </td>
 
                   <!-- 👉 Actions -->

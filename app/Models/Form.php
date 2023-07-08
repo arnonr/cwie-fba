@@ -36,6 +36,7 @@ class Form extends Model
         "send_document_number",
         "response_document_file",
         "response_send_at",
+        "response_result",
         "response_province_id",
         "confirm_response_at",
         "workplace_address",
@@ -69,7 +70,7 @@ class Form extends Model
         "is_pass_gpa",
         "is_pass_suspend",
         "is_pass_punishment",
-        "is_pass_disease"
+        "is_pass_disease",
     ];
 
     public function reject_log(): HasMany
@@ -79,6 +80,6 @@ class Form extends Model
 
     public function student(): BelongsTo
     {
-        return $this->belongsTo(Student::class, 'student_id', 'id');
+        return $this->belongsTo(Student::class, "student_id", "id");
     }
 }
