@@ -1310,7 +1310,7 @@ class FormController extends Controller
 
         $username = env("MAIL_USERNAME");
         $password = env("MAIL_PASSWORD");
-        $app_name = "ระบบสหกิจศึกษา คณะบริหารธุรกิจ มจพ.ระยอง";
+        $app_name = env("MAIL_FROM_NAME");
 
         $sender = $username;
         $mail = new PHPMailer(true);
@@ -1333,7 +1333,13 @@ class FormController extends Controller
             foreach ($receiverList as $key => $value) {
                 $email = $value["email"];
                 $name = $value["name"];
-                $mail->addCC($email, $name);
+
+                if($i == 0){
+                    $mail->addAddress($email, $name); /* Send to */
+                }else{
+                    $mail->addCC($email, $name);
+                }
+
                 $i++;
             }
             // print_r($mail->getCcAddresses());
