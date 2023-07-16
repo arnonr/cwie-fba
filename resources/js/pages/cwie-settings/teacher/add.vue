@@ -1,11 +1,11 @@
 <script setup>
 import { requiredValidator } from "@validators";
 import { useRoute, useRouter } from "vue-router";
-import { useCompanyStore } from "./useCompanyStore";
+import { useTeacherStore } from "./useTeacherStore";
 // const route = useRoute();
 const route = useRoute();
 const router = useRouter();
-const companyStore = useCompanyStore();
+const teacherStore = useTeacherStore();
 
 const item = ref({
   id: null,
@@ -45,7 +45,7 @@ const selectOptions = ref({
 });
 
 const fetchProvinces = () => {
-  companyStore
+  teacherStore
     .fetchProvinces({})
     .then((response) => {
       if (response.status === 200) {
@@ -65,7 +65,7 @@ const fetchProvinces = () => {
 fetchProvinces();
 
 const fetchAmphurs = () => {
-  companyStore
+  teacherStore
     .fetchAmphurs({
       province_id: item.value.province_id,
     })
@@ -86,7 +86,7 @@ const fetchAmphurs = () => {
 };
 
 const fetchTumbols = () => {
-  companyStore
+  teacherStore
     .fetchTumbols({
       amphur_id: item.value.amphur_id,
     })
@@ -137,8 +137,8 @@ const onSubmit = () => {
   isOverlay.value = true;
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
-      companyStore
-        .addCompany({
+      teacherStore
+        .addTeacher({
           ...item.value,
           namecard_file:
             item.value.namecard_file.length !== 0
@@ -154,7 +154,7 @@ const onSubmit = () => {
             localStorage.setItem("added", 1);
             nextTick(() => {
               router.push({
-                path: "/cwie-settings/company/view/" + response.data.data.id,
+                path: "/cwie-settings/teacher/view/" + response.data.data.id,
               });
             });
           } else {
