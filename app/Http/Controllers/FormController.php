@@ -17,7 +17,7 @@ const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
 
 class FormController extends Controller
 {
-    protected $uploadUrl = "http://143.198.208.110:8117/storage/";
+    protected $uploadUrl = "http://54.251.134.242:8117/storage/";
 
     public function getAll(Request $request)
     {
@@ -1334,9 +1334,9 @@ class FormController extends Controller
                 $email = $value["email"];
                 $name = $value["name"];
 
-                if($i == 0){
+                if ($i == 0) {
                     $mail->addAddress($email, $name); /* Send to */
-                }else{
+                } else {
                     $mail->addCC($email, $name);
                 }
 

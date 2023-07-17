@@ -39,16 +39,14 @@ const password = ref("");
 const rememberMe = ref(false);
 
 const login = () => {
-  // http://143.198.208.110/
-  let baseUrl = "http://143.198.208.110:8117/api";
+  let baseUrl = "http://54.251.134.242:8117/api";
   if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     baseUrl = "http://127.0.0.1:8117/api";
   }
 
   axios
     .post(
-      //   baseUrl +
-      "http://143.198.208.110:8117/api/auth/login",
+      baseUrl + "/auth/login",
       {
         username: username.value,
         password: password.value,

@@ -14,7 +14,7 @@ const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
 
 class CompanyController extends Controller
 {
-    protected $uploadUrl = "http://143.198.208.110:8117/storage/";
+    protected $uploadUrl = "http://54.251.134.242:8117/storage/";
 
     public function getAll(Request $request)
     {
