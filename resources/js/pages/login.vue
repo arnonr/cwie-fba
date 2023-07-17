@@ -39,6 +39,7 @@ const password = ref("");
 const rememberMe = ref(false);
 
 const login = () => {
+  // http://143.198.208.110/
   let baseUrl = "http://143.198.208.110:8117/api";
   if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     baseUrl = "http://127.0.0.1:8117/api";
@@ -46,7 +47,8 @@ const login = () => {
 
   axios
     .post(
-      baseUrl + "/auth/login",
+      //   baseUrl +
+      "http://143.198.208.110:8117/api/auth/login",
       {
         username: username.value,
         password: password.value,
@@ -120,18 +122,19 @@ const login = () => {
         router.replace(route.query.to ? String(route.query.to) : "/");
         //
       } else {
-        const { errors: formErrors } = {
-          errors: { username: [r.data.error.message] },
-        };
-        errors.value = formErrors;
+        console.log("ERROR1");
+        // const { errors: formErrors } = {
+        //   errors: { username: [r.data.error.message] },
+        // };
+        // errors.value = formErrors;
       }
     })
     .catch((e) => {
-      console.log(e);
-      const { errors: formErrors } = e.response.data;
-
-      errors.value = formErrors;
-      console.error(e.response.data);
+      console.log("ERROR2");
+      //   console.log(e);
+      //   const { errors: formErrors } = e.response;
+      //   errors.value = formErrors;
+      //   console.error(e.response);
     });
 };
 
