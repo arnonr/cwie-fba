@@ -122,6 +122,7 @@ const login = () => {
         router.replace(route.query.to ? String(route.query.to) : "/");
         //
       } else {
+        console.log(r);
         console.log("ERROR1");
         // const { errors: formErrors } = {
         //   errors: { username: [r.data.error.message] },
