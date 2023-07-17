@@ -46,10 +46,10 @@ const login = () => {
 
   axios
     .post(
-      baseUrl + "/auth/login",
+      `${baseUrl}/auth/login`,
       {
-        username: username.value,
-        password: password.value,
+        username: "arnonr",
+        password: "Tong7529",
       },
       {
         validateStatus: () => true,
@@ -120,20 +120,20 @@ const login = () => {
         router.replace(route.query.to ? String(route.query.to) : "/");
         //
       } else {
-        console.log(r);
-        console.log("ERROR1");
-        // const { errors: formErrors } = {
-        //   errors: { username: [r.data.error.message] },
-        // };
-        // errors.value = formErrors;
+        // console.log(r);
+        // console.log("ERROR1");
+        const { errors: formErrors } = {
+          errors: { username: [r.data.error.message] },
+        };
+        errors.value = formErrors;
       }
     })
     .catch((e) => {
-      console.log("ERROR2");
+      console.log(e);
       //   console.log(e);
-      //   const { errors: formErrors } = e.response;
-      //   errors.value = formErrors;
-      //   console.error(e.response);
+      const { errors: formErrors } = e.response.data;
+      errors.value = formErrors;
+      console.error(e.response);
     });
 };
 
