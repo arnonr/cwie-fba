@@ -506,7 +506,7 @@ const format = (date) => {
             <VBtn
               color="primary"
               class="mr-2"
-              href="http://localhost:8117/storage/pdf/template_import_supervisor.xlsx"
+              href="http://localhost/storage/pdf/template_import_supervisor.xlsx"
               target="_blank"
             >
               ดาวน์โหลด Template</VBtn

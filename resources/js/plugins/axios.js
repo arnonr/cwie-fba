@@ -1,9 +1,9 @@
 import router from "@/router";
 import axios from "axios";
 
-let baseUrl = "http://54.251.134.242:8117/api";
+let baseUrl = "http://54.251.134.242/api";
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-  baseUrl = "http://localhost:8117/api";
+  baseUrl = "http://localhost/api";
 }
 
 const axiosIns = axios.create({

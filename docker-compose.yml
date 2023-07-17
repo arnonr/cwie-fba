@@ -10,7 +10,7 @@ services:
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
-            - '8117:80'
+            - '80:80'
             - '5181:${VITE_PORT:-5173}'
         environment:
             WWWUSER: '${WWWUSER}'
@@ -21,7 +21,7 @@ services:
         volumes:
             - '.:/var/www/html'
         networks:
-            - sail
+            - sail_1
         depends_on:
             - mysql
     mysql:
@@ -39,7 +39,7 @@ services:
             - './data:/var/lib/mysql'
             - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
         networks:
-            - sail
+            - sail_1
         healthcheck:
             test:
                 - CMD
@@ -59,9 +59,9 @@ services:
         ports:
             - '8118:80'
         networks:
-            - sail
+            - sail_1
 networks:
-    sail:
+    sail_1:
         driver: bridge
 volumes:
     sail-mysql:

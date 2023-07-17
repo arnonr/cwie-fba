@@ -10,16 +10,16 @@ use Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
+const whitelist = ["127.0.0.1", "::1", "localhost"];
 
 class StudentDocumentController extends Controller
 {
-    protected $uploadUrl = "http://54.251.134.242:8117/storage/";
+    protected $uploadUrl = "http://54.251.134.242/storage/";
 
     public function getAll(Request $request)
     {
         if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
-            $this->uploadUrl = "http://localhost:8117/storage/";
+            $this->uploadUrl = "http://localhost/storage/";
         }
 
         $items = StudentDocument::select(
@@ -108,7 +108,7 @@ class StudentDocumentController extends Controller
     public function get($id)
     {
         if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
-            $this->uploadUrl = "http://localhost:8117/storage/";
+            $this->uploadUrl = "http://localhost/storage/";
         }
 
         $item = StudentDocument::select(

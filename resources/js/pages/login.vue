@@ -39,9 +39,9 @@ const password = ref("");
 const rememberMe = ref(false);
 
 const login = () => {
-  let baseUrl = "http://54.251.134.242:8117/api";
+  let baseUrl = "http://54.251.134.242/api";
   if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    baseUrl = "http://127.0.0.1:8117/api";
+    baseUrl = "http://127.0.0.1/api";
   }
 
   axios

@@ -8,7 +8,7 @@ use App\Models\Semester;
 use Carbon\Carbon;
 use Validator;
 use Illuminate\Support\Facades\DB;
-const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
+const whitelist = ["127.0.0.1", "::1", "localhost"];
 
 class SemesterController extends Controller
 {
@@ -29,7 +29,7 @@ class SemesterController extends Controller
             "semester.active as active",
             "semester.is_current as is_current",
             "semester.student_report_due_date as student_report_due_date",
-            "semester.supervisor_report_due_date as supervisor_report_due_date",
+            "semester.supervisor_report_due_date as supervisor_report_due_date"
         )->where("semester.deleted_at", null);
 
         // Include
@@ -107,11 +107,17 @@ class SemesterController extends Controller
         }
 
         if ($request->student_report_due_date) {
-            $items->where("semester.student_report_due_date", $request->student_report_due_date);
+            $items->where(
+                "semester.student_report_due_date",
+                $request->student_report_due_date
+            );
         }
 
         if ($request->supervisor_report_due_date) {
-            $items->where("semester.supervisor_report_due_date", $request->supervisor_report_due_date);
+            $items->where(
+                "semester.supervisor_report_due_date",
+                $request->supervisor_report_due_date
+            );
         }
 
         // Order
@@ -149,7 +155,7 @@ class SemesterController extends Controller
     public function get($id)
     {
         if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
-            $this->uploadUrl = "http://localhost:8117/storage/";
+            $this->uploadUrl = "http://localhost/storage/";
         }
 
         $item = Semester::select(
@@ -207,7 +213,8 @@ class SemesterController extends Controller
         $item->active = $request->active;
         $item->is_current = $request->is_current;
         $item->student_report_due_date = $request->student_report_due_date;
-        $item->supervisor_report_due_date = $request->supervisor_report_due_date;
+        $item->supervisor_report_due_date =
+            $request->supervisor_report_due_date;
 
         $item->created_by = "arnonr";
         $item->save();
@@ -268,10 +275,14 @@ class SemesterController extends Controller
         $item->is_current = $request->has("is_current")
             ? $request->is_current
             : $item->is_current;
-        $item->student_report_due_date = $request->has("student_report_due_date")
+        $item->student_report_due_date = $request->has(
+            "student_report_due_date"
+        )
             ? $request->student_report_due_date
             : $item->student_report_due_date;
-        $item->supervisor_report_due_date = $request->has("supervisor_report_due_date")
+        $item->supervisor_report_due_date = $request->has(
+            "supervisor_report_due_date"
+        )
             ? $request->supervisor_report_due_date
             : $item->supervisor_report_due_date;
 
