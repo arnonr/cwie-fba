@@ -176,7 +176,8 @@ class AuthController extends Controller
                     $create_account = false;
                     if (
                         $account_type == "alumni" ||
-                        $account_type == "student"
+                        $account_type == "student" ||
+                        $account_type == "students"
                     ) {
                         $create_account = true;
                         $create_account_type = 1; //Student
@@ -188,8 +189,8 @@ class AuthController extends Controller
 
                         if (!$teacherDB) {
                             $this->errorCode = self::ERROR_INVALID_CREDENTIALS;
-                            $this->errorMessage =
-                                "ไม่มีสิทธิ์เข้าใช้งาน กรุณาติดต่องานสหกิจศึกษา คณะบริหารธุรกิจ";
+                            $this->errorMessage = $account_type;
+                            // "ไม่มีสิทธิ์เข้าใช้งาน กรุณาติดต่องานสหกิจศึกษา คณะบริหารธุรกิจ";
                         } else {
                             // พบข้อมูลในตาราง Teacher เป็นอาจารย์
                             $create_account = true;
