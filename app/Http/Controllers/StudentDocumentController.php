@@ -14,7 +14,7 @@ const whitelist = ["127.0.0.1", "::1", "localhost"];
 
 class StudentDocumentController extends Controller
 {
-    protected $uploadUrl = "http://54.251.134.242/storage/";
+    protected $uploadUrl = "http://co-op.fba.kmutnb.ac.th/storage/";
 
     public function getAll(Request $request)
     {

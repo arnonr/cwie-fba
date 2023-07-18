@@ -54,7 +54,7 @@ return [
     |
     */
 
-    "url" => env("APP_URL", "http://54.251.134.242"),
+    "url" => env("APP_URL", "http://co-op.fba.kmutnb.ac.th/"),
 
     "asset_url" => env("ASSET_URL"),
 

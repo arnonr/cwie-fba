@@ -18,6 +18,7 @@ npm-debug.log
 yarn-error.log
 /.fleet
 /.idea
+docker-compose.yml
 
 # Logs
 logs
@@ -53,3 +54,4 @@ dist-ssr
 
 # iconify dist files
 resources/js/@iconify/icons-bundle.js
+

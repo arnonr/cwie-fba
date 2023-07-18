@@ -17,12 +17,12 @@ const whitelist = ["127.0.0.1", "::1", "localhost"];
 
 class FormController extends Controller
 {
-    protected $uploadUrl = "http://54.251.134.242/storage/";
+    protected $uploadUrl = "http://co-op.fba.kmutnb.ac.th/storage/";
 
     public function getAll(Request $request)
     {
         if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
-            $this->uploadUrl = "http://localhost/storage/";
+            $this->uploadUrl = "http://localhost:8117/storage/";
         }
 
         $items = Form::select(
@@ -381,7 +381,7 @@ class FormController extends Controller
     public function get($id)
     {
         if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
-            $this->uploadUrl = "http://localhost/storage/";
+            $this->uploadUrl = "http://localhost:8117/storage/";
         }
 
         $item = Form::select(

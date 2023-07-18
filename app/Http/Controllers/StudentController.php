@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Laravel\Sanctum\PersonalAccessToken;
-const whitelist = ["127.0.0.1", "::1", "localhost:8115"];
+const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
 
 class StudentController extends Controller
 {

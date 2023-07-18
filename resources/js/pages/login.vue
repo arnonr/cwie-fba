@@ -39,17 +39,17 @@ const password = ref("");
 const rememberMe = ref(false);
 
 const login = () => {
-  let baseUrl = "http://54.251.134.242/api";
+  let baseUrl = "http://co-op.fba.kmutnb.ac.th/api";
   if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    baseUrl = "http://127.0.0.1/api";
+    baseUrl = "http://127.0.0.1:8117/api";
   }
 
   axios
     .post(
       `${baseUrl}/auth/login`,
       {
-        username: "arnonr",
-        password: "Tong7529",
+        username: username.value,
+        password: password.value,
       },
       {
         validateStatus: () => true,
