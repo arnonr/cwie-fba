@@ -39,22 +39,15 @@ const password = ref("");
 const rememberMe = ref(false);
 
 const login = () => {
-  let baseUrl = "http://co-op.fba.kmutnb.ac.th/api";
-  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    baseUrl = "http://127.0.0.1:8117/api";
-  }
+  let dataSend = {
+    username: username.value,
+    password: password.value,
+  };
 
   axios
-    .post(
-      `${baseUrl}/auth/login`,
-      {
-        username: username.value,
-        password: password.value,
-      },
-      {
-        validateStatus: () => true,
-      }
-    )
+    .post(`/auth/login/`, dataSend, {
+      validateStatus: () => true,
+    })
     .then((r) => {
       if (r.status === 200) {
         // const { accessToken, userData, userAbilities } = r.data;
@@ -120,12 +113,12 @@ const login = () => {
         router.replace(route.query.to ? String(route.query.to) : "/");
         //
       } else {
-        // console.log(r);
+        console.log(r);
         // console.log("ERROR1");
-        const { errors: formErrors } = {
-          errors: { username: [r.data.error.message] },
-        };
-        errors.value = formErrors;
+        // const { errors: formErrors } = {
+        //   errors: { username: [r.data.error.message] },
+        // };
+        // errors.value = formErrors;
       }
     })
     .catch((e) => {
