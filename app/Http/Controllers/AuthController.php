@@ -150,7 +150,11 @@ class AuthController extends Controller
                 $display_name = $json_data["userInfo"]["displayname"];
                 $create_account_type = 0;
 
-                if ($account_type == "alumni" || $account_type == "student") {
+                if (
+                    $account_type == "alumni" ||
+                    $account_type == "student" ||
+                    $account_type == "students"
+                ) {
                     /* ตรวจสอบคณะจากรหัสนักศึกษา  */
                     // if (substr($username, 3, 5) != "14"){
                     // reject(
