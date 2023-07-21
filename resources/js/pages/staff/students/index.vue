@@ -303,33 +303,37 @@ onMounted(() => {
             />
           </VCol>
 
-          <VCol cols="12" sm="6">
-            <VSelect
-              label="อาจารย์ที่ปรึกษา"
-              v-model="advancedSearch.advisor_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.teachers"
-            />
-          </VCol>
-
-          <VCol cols="12" sm="6">
-            <VSelect
-              label="อาจารย์นิเทศ"
-              v-model="advancedSearch.supervision_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.teachers"
-            />
-          </VCol>
-
-          <VCol cols="12" sm="6">
+          <VCol cols="12" sm="12">
             <VTextField
               label="สถานประกอบการ"
               v-model="advancedSearch.company_name"
               density="compact"
+            />
+          </VCol>
+
+          <VCol cols="12" sm="6">
+            <AppAutocomplete
+              v-model="advancedSearch.advisor_id"
+              :items="selectOptions.teachers"
+              :rules="[requiredValidator]"
+              placeholder="อาจารย์ที่ปรึกษา"
+              label="อาจารย์ที่ปรึกษา"
+              density="compact"
+              variant="outlined"
+              clearable
+            />
+          </VCol>
+
+          <VCol cols="12" sm="6">
+            <AppAutocomplete
+              v-model="advancedSearch.supervision_id"
+              :items="selectOptions.teachers"
+              :rules="[requiredValidator]"
+              placeholder="อาจารย์นิเทศ"
+              label="อาจารย์นิเทศ"
+              density="compact"
+              variant="outlined"
+              clearable
             />
           </VCol>
 

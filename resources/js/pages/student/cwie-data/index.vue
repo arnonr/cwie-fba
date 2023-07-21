@@ -673,6 +673,7 @@ const generateRegisPDF = async () => {
   url = window.location.origin + "/storage/pdf/book_regis.pdf";
 
   const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
+
   const pdfTemplate = await PDFDocument.load(existingPdfBytes);
   // Create PDF
   const pdfDoc = await PDFDocument.create();
@@ -838,11 +839,14 @@ const generateRegisPDF = async () => {
     ...defaultSize,
   });
 
-  existingPage.drawText(company.value.email, {
-    x: 380,
-    y: 439,
-    ...defaultSize,
-  });
+  existingPage.drawText(
+    company.value.email == null ? "" : company.value.email,
+    {
+      x: 380,
+      y: 439,
+      ...defaultSize,
+    }
+  );
 
   existingPage.drawText(student.value.contact1_name, {
     x: 270,
@@ -1913,7 +1917,48 @@ onMounted(() => {
                       </VCol>
                     </VRow>
                   </VCol>
-                  <VCol class="text-center">
+
+                  <VDivider class="mt-6 mb-6"></VDivider>
+                  <VCol cols="12" md="6">
+                    <span>วันที่อาจารย์ที่ปรึกษาอนุมัติ : </span>
+                    <span>
+                      {{
+                        it.advisor_verified_at
+                          ? dayjs(it.advisor_verified_at)
+                              .locale("th")
+                              .format("DD MMM BBBB")
+                          : "-"
+                      }}
+                    </span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่ประธานอาจารย์นิเทศอนุมัติ : </span>
+                    <span>
+                      {{
+                        it.chairman_approved_at
+                          ? dayjs(it.chairman_approved_at)
+                              .locale("th")
+                              .format("DD MMM BBBB")
+                          : "-"
+                      }}
+                    </span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่คณะอนุมัติ : </span>
+                    <span>
+                      {{
+                        it.faculty_confirmed_at
+                          ? dayjs(it.faculty_confirmed_at)
+                              .locale("th")
+                              .format("DD MMM BBBB")
+                          : "-"
+                      }}
+                    </span>
+                  </VCol>
+
+                  <VCol class="text-center" cols="12" md="12">
                     <VBtn
                       color="info"
                       :disabled="it.status_id != 1 || index != 0"

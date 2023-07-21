@@ -74,6 +74,7 @@ const qualifications = [
   {
     title:
       "ผ่านรายวิชาเตรียมสหกิจศึกษา หรืออยู่ระหว่างเรียนวิชาเตรียมสหกิจศึกษา",
+    label: "is_pass_coop_subject",
     props: {
       prependIcon: prependIcon,
     },
@@ -81,6 +82,7 @@ const qualifications = [
   {
     title:
       "ผ่านรายวิชาหมวดศึกษาทั่วไปและหมวดวิชาเฉพาะ ไม่น้อยกว่า 15, 60 หน่วยกิต ตามลำดับ",
+    label: "is_pass_general_subject",
     props: {
       prependIcon: prependIcon,
     },
@@ -88,6 +90,7 @@ const qualifications = [
   {
     title:
       "มีเกรดเฉลี่ยไม่ต่ำกว่า 2.00 นับถึงภาคการศึกษาสุดท้ายก่อนออกฝึกสหกิจศึกษา",
+    label: "is_pass_gpa",
     props: {
       prependIcon: prependIcon,
     },
@@ -95,42 +98,28 @@ const qualifications = [
   {
     title:
       "ไม่อยู่ในระหว่างถูกพักการศึกษาในภาคการศึกษาที่เข้าร่วมโครงการสหกิจศึกษา",
+    label: "is_pass_suspend",
     props: {
       prependIcon: prependIcon,
     },
   },
   {
     title: "ไม่เคยถูกลงโทษทางวินัย หรือกระทำผิดกฏหมายอาญาร้ายแรง",
+    label: "is_pass_punishment",
     props: {
       prependIcon: prependIcon,
     },
   },
   {
     title: "ไม่เป็นโรคที่เป็นอุปสรรคต่อการปฏิบัติงานในสถานประกอบการ",
+    label: "is_pass_disease",
     props: {
       prependIcon: prependIcon,
     },
   },
 ];
 
-const documents_certificate = ref([
-  {
-    id: null,
-    document_file: null,
-    document_file_old: ref(null),
-    document_type_id: 1,
-    document_name: null,
-    student_id: null,
-  },
-  {
-    id: null,
-    document_file: null,
-    document_file_old: ref(null),
-    document_type_id: 1,
-    document_name: null,
-    student_id: null,
-  },
-]);
+const documents_certificate = ref([]);
 
 const isOverlay = ref(false);
 const isFormValid = ref(false);
@@ -874,7 +863,7 @@ onMounted(() => {
         </VCard>
       </VCol>
 
-      <VCol cols="12" md="12" v-for="(it, index) in items">
+      <VCol cols="12" md="12" v-for="(it, index) in items" :key="index">
         <VCard class="pa-5">
           <VCardText>
             <h3>ครั้งที่ {{ items.length - index }}</h3>
@@ -1014,7 +1003,11 @@ onMounted(() => {
                     <h4>คุณสมบัติผู้สมัครโครงการสหกิจศึกษา</h4>
                     <!-- <VList :items="qualifications" /> -->
                     <ul>
-                      <li style="list-style: none" v-for="qf in qualifications">
+                      <li
+                        style="list-style: none"
+                        v-for="(qf, index) in qualifications"
+                        :key="index"
+                      >
                         <VCheckbox :label="qf.title"></VCheckbox>
                       </li>
                     </ul>
@@ -1027,7 +1020,7 @@ onMounted(() => {
                         <h4>Remark</h4>
                       </VCol>
                     </VRow>
-                    <VRow v-for="(rl, index) in it.reject_log">
+                    <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id < 4">
                         <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
                         <span>
@@ -1052,6 +1045,48 @@ onMounted(() => {
                       </VCol>
                     </VRow>
                   </VCol>
+
+                  <VDivider class="mt-6 mb-6"></VDivider>
+                  <VCol cols="12" md="6">
+                    <span>วันที่อาจารย์ที่ปรึกษาอนุมัติ : </span>
+                    <span>
+                      {{
+                        it.advisor_verified_at
+                          ? dayjs(it.advisor_verified_at)
+                              .locale("th")
+                              .format("DD MMM BBBB")
+                          : "-"
+                      }}
+                    </span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่ประธานอาจารย์นิเทศอนุมัติ : </span>
+                    <span>
+                      {{
+                        it.chairman_approved_at
+                          ? dayjs(it.chairman_approved_at)
+                              .locale("th")
+                              .format("DD MMM BBBB")
+                          : "-"
+                      }}
+                    </span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่คณะอนุมัติ : </span>
+                    <span>
+                      {{
+                        it.faculty_confirmed_at
+                          ? dayjs(it.faculty_confirmed_at)
+                              .locale("th")
+                              .format("DD MMM BBBB")
+                          : "-"
+                      }}
+                    </span>
+                  </VCol>
+
+                  <!-- Btn -->
 
                   <VCol cols="12" md="12" class="text-center">
                     <VBtn
@@ -1212,7 +1247,7 @@ onMounted(() => {
                         <h4>Remark</h4>
                       </VCol>
                     </VRow>
-                    <VRow v-for="(rl, index) in it.reject_log">
+                    <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id > 3">
                         <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
                         <span>
@@ -1343,7 +1378,7 @@ onMounted(() => {
                         <h4>Remark</h4>
                       </VCol>
                     </VRow>
-                    <VRow v-for="(rl, index) in it.reject_log">
+                    <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id > 4">
                         <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
                         <span>
