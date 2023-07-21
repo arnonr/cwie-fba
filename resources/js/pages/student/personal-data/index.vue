@@ -725,7 +725,15 @@ const repeateAgain = () => {
                     md="2"
                     >อาจารย์ที่ปรึกษา :
                   </label>
-                  <AppSelect
+                  <AppAutocomplete
+                    v-model="item.advisor_id"
+                    :items="selectOptions.teachers"
+                    :rules="[requiredValidator]"
+                    placeholder="Advisor"
+                    clearable
+                  />
+
+                  <!-- <AppSelect
                     :items="selectOptions.teachers"
                     v-model="item.advisor_id"
                     :rules="[requiredValidator]"
@@ -733,7 +741,7 @@ const repeateAgain = () => {
                     :disabled="!disabled"
                     placeholder="Advisor"
                     clearable
-                  />
+                  /> -->
                 </VCol>
 
                 <VCol cols="12" md="2" class="align-items-center">
