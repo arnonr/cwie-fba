@@ -771,14 +771,10 @@ class StudentController extends Controller
         if ($request->photo_file != "" &&
             $request->photo_file != "null" &&
             $request->photo_file != "undefined") {
-            $pathPhoto =
-                "student_photo-" .
-                rand(10, 100) .
-                "-" .
-                date("YmdHis");
+            $pathPhoto = date("YmdHis")."_student_photo_".rand(1, 10000).'.'.$request->file("photo_file")->extension();
             $pathPhoto = "/student/" . $pathPhoto;
             Storage::disk("public")->put(
-                $pathPoster,
+                $pathPhoto,
                 file_get_contents($request->photo_file)
             );
         }
@@ -810,14 +806,10 @@ class StudentController extends Controller
         if ($request->photo_file != "" &&
             $request->photo_file != "null" &&
             $request->photo_file != "undefined") {
-            $pathPhoto =
-                "student_photo-" .
-                rand(10, 100) .
-                "-" .
-                date("YmdHis");
+            $pathPhoto = date("YmdHis")."_student_photo_" .rand(1, 10000).'.'.$request->file("photo_file")->extension();
             $pathPhoto = "/student/" . $pathPhoto;
             Storage::disk("public")->put(
-                $pathPoster,
+                $pathPhoto,
                 file_get_contents($request->photo_file)
             );
         }
