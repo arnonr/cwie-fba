@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\DepartmentController;
 
-const whitelist = ["127.0.0.1", "::1", "localhost"];
+const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
 
 class TeacherController extends Controller
 {

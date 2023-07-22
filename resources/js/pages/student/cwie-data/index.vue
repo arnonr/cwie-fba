@@ -1080,18 +1080,18 @@ const generatePDF = async () => {
 
   //   Chairman_id
 
-  //   existingPage.drawText(
-  //     chairman.value.prefix +
-  //       " " +
-  //       chairman.value.firstname +
-  //       " " +
-  //       chairman.value.surname,
-  //     {
-  //       x: 300,
-  //       y: 135,
-  //       ...defaultSize,
-  //     }
-  //   );
+  existingPage.drawText(
+    chairman.value.prefix +
+      " " +
+      chairman.value.firstname +
+      " " +
+      chairman.value.surname,
+    {
+      x: 300,
+      y: 135,
+      ...defaultSize,
+    }
+  );
   const sigUrl = chairman.value.signature_file;
   const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
   const sigImage = await pdfDoc.embedPng(sigImageBytes);

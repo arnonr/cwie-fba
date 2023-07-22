@@ -343,6 +343,10 @@ const fetchForms = () => {
             .then((res) => {
               data[i].major_head_name = res.data.data[0].teacher_name;
             });
+
+          qualifications.forEach((qf) => {
+            data[i][qf.label] = data[i][qf.label] == 1 ? true : false;
+          });
         }
         items.value = data;
 
@@ -419,6 +423,40 @@ const onSubmit = () => {
           isSnackbarVisible.value = true;
           isOverlay.value = false;
           isDialogVisible.value = false;
+        });
+      } else {
+        isOverlay.value = false;
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+const onQualifications = (label, isCheck) => {
+  console.log(item.value.id);
+  console.log(label, isCheck);
+
+  let dataSend = {
+    id: item.value.id,
+  };
+
+  dataSend[label] = isCheck == true ? 1 : 0;
+
+  cwieDataStore
+    .editForm(dataSend)
+    .then((response) => {
+      if (response.data.message == "success") {
+        localStorage.setItem("Approved", 1);
+        nextTick(() => {
+          //   fetchStudent();
+          fetchForms();
+          //   snackbarText.value = "Approved";
+          //   snackbarColor.value = "success";
+          //   isSnackbarVisible.value = true;
+          //   isOverlay.value = false;
+          //   isDialogVisible.value = false;
         });
       } else {
         isOverlay.value = false;
@@ -1008,7 +1046,16 @@ onMounted(() => {
                         v-for="(qf, index) in qualifications"
                         :key="index"
                       >
-                        <VCheckbox :label="qf.title"></VCheckbox>
+                        <VCheckbox
+                          :label="qf.title"
+                          v-model="it[qf.label]"
+                          @change="
+                            () => {
+                              item = it;
+                              onQualifications(qf.label, it[qf.label]);
+                            }
+                          "
+                        ></VCheckbox>
                       </li>
                     </ul>
                     <!-- <VCheck  -->
@@ -1111,7 +1158,16 @@ onMounted(() => {
                     <VBtn
                       class="ml-2"
                       color="success"
-                      :disabled="it.status_id != 2 || index != 0"
+                      :disabled="
+                        it.status_id != 2 ||
+                        (index != 0 && it) ||
+                        it.is_pass_coop_subject == false ||
+                        it.is_pass_general_subject == false ||
+                        it.is_pass_gpa == false ||
+                        it.is_pass_suspend == false ||
+                        it.is_pass_punishment == false ||
+                        it.is_pass_disease == false
+                      "
                       @click="
                         () => {
                           item = it;
