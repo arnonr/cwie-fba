@@ -20,12 +20,14 @@ use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\DocumentTypeController;
+use App\Http\Controllers\DocumentDownloadTypeController;
 use App\Http\Controllers\MajorHeadController;
 //
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormStatusController;
 use App\Http\Controllers\RejectLogController;
 use App\Http\Controllers\StudentDocumentController;
+use App\Http\Controllers\DocumentDownloadController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\VisitImageController;
 //
@@ -187,12 +189,28 @@ Route::group(["prefix" => "document-type"], function () {
     Route::delete("/{id}", [DocumentTypeController::class, "delete"]);
 });
 
+Route::group(["prefix" => "document-download-type"], function () {
+    Route::get("/{id}", [DocumentDownloadTypeController::class, "get"]);
+    Route::get("/", [DocumentDownloadTypeController::class, "getAll"]);
+    Route::post("/", [DocumentDownloadTypeController::class, "add"]);
+    Route::put("/{id}", [DocumentDownloadTypeController::class, "edit"]);
+    Route::delete("/{id}", [DocumentDownloadTypeController::class, "delete"]);
+});
+
 Route::group(["prefix" => "student-document"], function () {
     Route::get("/{id}", [StudentDocumentController::class, "get"]);
     Route::get("/", [StudentDocumentController::class, "getAll"]);
     Route::post("/", [StudentDocumentController::class, "add"]);
     Route::put("/{id}", [StudentDocumentController::class, "edit"]);
     Route::delete("/{id}", [StudentDocumentController::class, "delete"]);
+});
+
+Route::group(["prefix" => "document-download"], function () {
+    Route::get("/{id}", [DocumentDownloadController::class, "get"]);
+    Route::get("/", [DocumentDownloadController::class, "getAll"]);
+    Route::post("/", [DocumentDownloadController::class, "add"]);
+    Route::put("/{id}", [DocumentDownloadController::class, "edit"]);
+    Route::delete("/{id}", [DocumentDownloadController::class, "delete"]);
 });
 
 Route::group(["prefix" => "form"], function () {
