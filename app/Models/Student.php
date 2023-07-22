@@ -53,6 +53,7 @@ class Student extends Model
         'updated_at',
         'updated_by',
         'deleted_at',
+        'photo_file'
     ];
 
     public function form(): HasMany

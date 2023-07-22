@@ -64,7 +64,8 @@ class StudentController extends Controller
             "student.height as height",
             "student.weight as weight",
             "student.active as active",
-            "student.status_id as status_id"
+            "student.status_id as status_id",
+            "student.photo_file as photo_file",
         )->where("student.deleted_at", null);
 
         // Include
@@ -375,7 +376,8 @@ class StudentController extends Controller
             "student.height as height",
             "student.weight as weight",
             "student.active as active",
-            "student.status_id as status_id"
+            "student.status_id as status_id",
+            "student.photo_file as photo_file",
         )->where("student.deleted_at", null);
 
         // Include
@@ -723,6 +725,7 @@ class StudentController extends Controller
             "student.weight as weight",
             "student.active as active",
             "student.status_id as status_id",
+            "student.photo_file as photo_file",
             "province.name_th as province_name",
             "amphur.name_th as amphur_name",
             "tumbol.name_th as tumbol_name",
@@ -764,6 +767,22 @@ class StudentController extends Controller
 
     public function add(Request $request)
     {
+        $pathPhoto = null;
+        if ($request->photo_file != "" &&
+            $request->photo_file != "null" &&
+            $request->photo_file != "undefined") {
+            $pathPhoto =
+                "student_photo-" .
+                rand(10, 100) .
+                "-" .
+                date("YmdHis");
+            $pathPhoto = "/student/" . $pathPhoto;
+            Storage::disk("public")->put(
+                $pathPoster,
+                file_get_contents($request->photo_file)
+            );
+        }
+
         $item = new Student();
         $item->student_code = $request->student_code;
         $item->prefix_id = $request->prefix_id;
@@ -772,6 +791,7 @@ class StudentController extends Controller
         $item->citizen_id = $request->citizen_id;
         $item->faculty_id = $request->faculty_id;
         $item->major_id = $request->major_id;
+        $item->photo_file = $pathPhoto;
         // $item->department_id = $request->department_id;
         $item->created_by = "arnonr";
         $item->save();
@@ -786,9 +806,21 @@ class StudentController extends Controller
 
     public function edit($id, Request $request)
     {
-        // // $token = PersonalAccessToken::findToken($hashedTooken);
-        // $access_token = $request->header('Authorization');
-        // print_r($access_token);
+        $pathPhoto = null;
+        if ($request->photo_file != "" &&
+            $request->photo_file != "null" &&
+            $request->photo_file != "undefined") {
+            $pathPhoto =
+                "student_photo-" .
+                rand(10, 100) .
+                "-" .
+                date("YmdHis");
+            $pathPhoto = "/student/" . $pathPhoto;
+            Storage::disk("public")->put(
+                $pathPoster,
+                file_get_contents($request->photo_file)
+            );
+        }
 
         $request->validate(["id as required"]);
 
@@ -883,6 +915,8 @@ class StudentController extends Controller
         $item->active = $request->has("active")
             ? $request->active
             : $item->active;
+
+        $item->photo_file = $pathPhoto;
 
         // $item->updated_by = "arnonr";
         $item->save();
