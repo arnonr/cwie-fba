@@ -38,6 +38,10 @@ const username = ref("");
 const password = ref("");
 const rememberMe = ref(false);
 
+const isSnackbarVisible = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("success");
+
 const login = () => {
   let dataSend = {
     username: username.value,
@@ -113,7 +117,11 @@ const login = () => {
         router.replace(route.query.to ? String(route.query.to) : "/");
         //
       } else {
-        console.log(r);
+        // console.log(r);
+        snackbarText.value = r.data.message;
+        snackbarColor.value = "danger";
+        isSnackbarVisible.value = true;
+
         // console.log("ERROR1");
         // const { errors: formErrors } = {
         //   errors: { username: [r.data.error.message] },
@@ -122,11 +130,9 @@ const login = () => {
       }
     })
     .catch((e) => {
-      console.log(e);
-      //   console.log(e);
-      const { errors: formErrors } = e.response.data;
-      errors.value = formErrors;
-      console.error(e.response);
+      snackbarText.value = e;
+      snackbarColor.value = "danger";
+      isSnackbarVisible.value = true;
     });
 };
 
@@ -217,6 +223,19 @@ const onSubmit = () => {
           </VForm>
         </VCardText>
       </VCard>
+    </VCol>
+
+    <VCol>
+      <VSnackbar
+        v-model="isSnackbarVisible"
+        location="top end"
+        :color="snackbarColor"
+      >
+        {{ snackbarText }}
+        <template #actions>
+          <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        </template>
+      </VSnackbar>
     </VCol>
   </VRow>
 </template>
