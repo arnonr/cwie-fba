@@ -269,6 +269,14 @@ const fetchStudent = () => {
           disabled.value = true;
         }
 
+        // item.value.photo_file = [];
+        item.value.photo_file_old = null;
+        if (data[0].photo_file != null) {
+          item.value.photo_file_old = data[0].photo_file;
+        }
+        console.log(data[0].photo_file);
+        item.value.photo_file = [];
+
         item.value.documents = selectOptions.value.document_types.map((d) => {
           return {
             id: null,
@@ -323,6 +331,10 @@ const onSubmit = () => {
       personalDataStore
         .editStudent({
           ...item.value,
+          photo_file:
+            item.value.photo_file.length !== 0
+              ? item.value.photo_file[0]
+              : null,
         })
         .then((response) => {
           if (response.data.message == "success") {
@@ -584,6 +596,36 @@ const repeateAgain = () => {
               </VRow>
 
               <VRow>
+                <!--  -->
+                <VCol cols="12" md="10">
+                  <label class="v-label font-weight-bold" for="document_name"
+                    >รูปภาพนักศึกษา (1x1.5 นิ้ว)
+                  </label>
+                  <VFileInput
+                    v-model="item.photo_file"
+                    label="Upload File"
+                    persistent-placeholder
+                    :disabled="!disabled"
+                  />
+                </VCol>
+
+                <VCol cols="12" md="2" class="pl-2 align-self-end">
+                  <VBtn
+                    style="width: 100%"
+                    :color="
+                      item.photo_file_old == null ? 'secondary' : 'primary'
+                    "
+                    :disabled="item.photo_file_old == null"
+                    :href="
+                      item.photo_file_old != null ? item.photo_file_old : '/'
+                    "
+                    target="_blank"
+                  >
+                    View File
+                  </VBtn>
+                </VCol>
+                <!--  -->
+
                 <VCol cols="12" md="3" class="align-items-center">
                   <label
                     class="v-label font-weight-bold"
@@ -730,6 +772,7 @@ const repeateAgain = () => {
                     :items="selectOptions.teachers"
                     :rules="[requiredValidator]"
                     placeholder="Advisor"
+                    :disabled="!disabled"
                     clearable
                   />
 

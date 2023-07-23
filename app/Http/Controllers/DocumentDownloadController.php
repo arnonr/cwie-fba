@@ -19,7 +19,7 @@ class DocumentDownloadController extends Controller
     public function getAll(Request $request)
     {
         if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
-            $this->uploadUrl = "http://localhost/storage/";
+            $this->uploadUrl = "http://localhost:8117/storage/";
         }
 
         $items = DocumentDownload::select(
@@ -103,7 +103,7 @@ class DocumentDownloadController extends Controller
     public function get($id)
     {
         if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
-            $this->uploadUrl = "http://localhost/storage/";
+            $this->uploadUrl = "http://localhost:8117/storage/";
         }
 
         $item = DocumentDownload::select(
@@ -151,7 +151,8 @@ class DocumentDownloadController extends Controller
             $request->document_file != "undefined"
         ) {
             $fileDocument =
-                 date("YmdHis")."_document_" .
+                date("YmdHis") .
+                "_document_" .
                 rand(1, 10000) .
                 "." .
                 $request->file("document_file")->extension();
@@ -185,10 +186,22 @@ class DocumentDownloadController extends Controller
         $item = DocumentDownload::where("id", $request->id)->first();
 
         $pathDocument = null;
-        if ($request->document_file != "" && $request->document_file != "null" &&$request->document_file != "undefined") {
-            $fileDocument = date("YmdHis")."_document_" .rand(1, 10000) ."." .$request->file("document_file")->extension();
+        if (
+            $request->document_file != "" &&
+            $request->document_file != "null" &&
+            $request->document_file != "undefined"
+        ) {
+            $fileDocument =
+                date("YmdHis") .
+                "_document_" .
+                rand(1, 10000) .
+                "." .
+                $request->file("document_file")->extension();
             $pathDocument = "/document_download/" . $fileDocument;
-            Storage::disk("public")->put($pathDocument,file_get_contents($request->document_file));
+            Storage::disk("public")->put(
+                $pathDocument,
+                file_get_contents($request->document_file)
+            );
             $request->document_file = $pathDocument;
         } else {
             $pathDocument = $item->document_file;

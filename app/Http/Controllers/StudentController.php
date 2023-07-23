@@ -18,6 +18,7 @@ const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
 
 class StudentController extends Controller
 {
+    protected $uploadUrl = "http://co-op.fba.kmutnb.ac.th/storage/";
     const ERROR_NONE = 0;
     const ERROR_API_FAIL = 1;
     const ERROR_INVALID_CREDENTIALS = 2;
@@ -31,6 +32,10 @@ class StudentController extends Controller
 
     public function getList(Request $request)
     {
+        if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
+            $this->uploadUrl = "http://localhost:8117/storage/";
+        }
+
         $items = Student::select(
             "student.id as id",
             "student.student_code as student_code",
@@ -65,7 +70,12 @@ class StudentController extends Controller
             "student.weight as weight",
             "student.active as active",
             "student.status_id as status_id",
-            "student.photo_file as photo_file",
+            DB::raw(
+                "(CASE WHEN photo_file = NULL THEN ''
+             ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',photo_file) END) AS photo_file"
+            )
         )->where("student.deleted_at", null);
 
         // Include
@@ -343,6 +353,10 @@ class StudentController extends Controller
 
     public function getAll(Request $request)
     {
+        if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
+            $this->uploadUrl = "http://localhost:8117/storage/";
+        }
+
         $items = Student::select(
             "student.id as id",
             "student.student_code as student_code",
@@ -377,7 +391,12 @@ class StudentController extends Controller
             "student.weight as weight",
             "student.active as active",
             "student.status_id as status_id",
-            "student.photo_file as photo_file",
+            DB::raw(
+                "(CASE WHEN photo_file = NULL THEN ''
+             ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',photo_file) END) AS photo_file"
+            )
         )->where("student.deleted_at", null);
 
         // Include
@@ -691,6 +710,9 @@ class StudentController extends Controller
 
     public function get($id)
     {
+        if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
+            $this->uploadUrl = "http://localhost:8117/storage/";
+        }
         $item = Student::select(
             "student.id as id",
             "student.student_code as student_code",
@@ -733,6 +755,12 @@ class StudentController extends Controller
             "department.name_th as department_name",
             "major.name_th as major_name",
             DB::raw(
+                "(CASE WHEN photo_file = NULL THEN ''
+             ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',photo_file) END) AS photo_file"
+            ),
+            DB::raw(
                 'CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'
             )
         )
@@ -768,10 +796,17 @@ class StudentController extends Controller
     public function add(Request $request)
     {
         $pathPhoto = null;
-        if ($request->photo_file != "" &&
+        if (
+            $request->photo_file != "" &&
             $request->photo_file != "null" &&
-            $request->photo_file != "undefined") {
-            $pathPhoto = date("YmdHis")."_student_photo_".rand(1, 10000).'.'.$request->file("photo_file")->extension();
+            $request->photo_file != "undefined"
+        ) {
+            $pathPhoto =
+                date("YmdHis") .
+                "_student_photo_" .
+                rand(1, 10000) .
+                "." .
+                $request->file("photo_file")->extension();
             $pathPhoto = "/student/" . $pathPhoto;
             Storage::disk("public")->put(
                 $pathPhoto,
@@ -803,10 +838,17 @@ class StudentController extends Controller
     public function edit($id, Request $request)
     {
         $pathPhoto = null;
-        if ($request->photo_file != "" &&
+        if (
+            $request->photo_file != "" &&
             $request->photo_file != "null" &&
-            $request->photo_file != "undefined") {
-            $pathPhoto = date("YmdHis")."_student_photo_" .rand(1, 10000).'.'.$request->file("photo_file")->extension();
+            $request->photo_file != "undefined"
+        ) {
+            $pathPhoto =
+                date("YmdHis") .
+                "_student_photo_" .
+                rand(1, 10000) .
+                "." .
+                $request->file("photo_file")->extension();
             $pathPhoto = "/student/" . $pathPhoto;
             Storage::disk("public")->put(
                 $pathPhoto,

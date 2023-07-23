@@ -20,8 +20,20 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
     },
 
     async editStudent(dataSend) {
-      //
-      return await axios.put(`/student/${dataSend.id}`, dataSend, {
+      var form_data = new FormData();
+
+      for (var key in dataSend) {
+        if (dataSend[key] == null) {
+          dataSend[key] = "";
+        }
+        form_data.append(key, dataSend[key]);
+      }
+      form_data.append("_method", "PUT");
+
+      return await axios.post(`/student/${dataSend.id}`, form_data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
         validateStatus: () => true,
       });
     },

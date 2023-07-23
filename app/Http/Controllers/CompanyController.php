@@ -186,7 +186,7 @@ class CompanyController extends Controller
     public function get($id)
     {
         if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
-            $this->uploadUrl = "http://localhost/storage/";
+            $this->uploadUrl = "http://localhost:8117/storage/";
         }
 
         $item = Company::select(
