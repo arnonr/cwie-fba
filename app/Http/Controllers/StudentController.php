@@ -837,6 +837,11 @@ class StudentController extends Controller
 
     public function edit($id, Request $request)
     {
+        $request->validate(["id as required"]);
+
+        $id = $request->id;
+        $item = Student::where("id", $id)->first();
+
         $pathPhoto = null;
         if (
             $request->photo_file != "" &&
@@ -854,12 +859,9 @@ class StudentController extends Controller
                 $pathPhoto,
                 file_get_contents($request->photo_file)
             );
+        } else {
+            $pathPhoto = $item->photo_file;
         }
-
-        $request->validate(["id as required"]);
-
-        $id = $request->id;
-        $item = Student::where("id", $id)->first();
 
         $item->student_code = $request->has("student_code")
             ? $request->student_code
