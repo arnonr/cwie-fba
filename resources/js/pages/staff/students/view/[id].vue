@@ -918,6 +918,19 @@ const responseProvinceName = (response_province_id) => {
                     </span>
                   </VCol>
 
+                  <VCol cols="12" md="12" class="text-center">
+                    <VBtn
+                      color="primary"
+                      :to="{
+                        name: 'cwie-settings-company-edit-id',
+                        params: { id: it.company_id },
+                      }"
+                      target="_blank"
+                    >
+                      แก้ไขข้อมูลสถานประกอบการ
+                    </VBtn>
+                  </VCol>
+
                   <VDivider class="mt-6 mb-6"></VDivider>
 
                   <VCol cols="12" md="6">

@@ -327,6 +327,7 @@ class TeacherController extends Controller
         $item->tumbol_id = $request->tumbol_id;
         $item->faculty_id = $request->faculty_id;
         $item->department_id = $request->department_id;
+        $item->executive_position = $request->executive_position;
         $item->updated_by = "arnonr";
         $item->save();
 
@@ -402,6 +403,10 @@ class TeacherController extends Controller
         $item->surname = $request->surname ? $request->surname : $item->surname;
         $item->tel = $request->tel ? $request->tel : $item->tel;
         $item->email = $request->email ? $request->email : $item->email;
+        $item->executive_position = $request->executive_position
+            ? $request->executive_position
+            : $item->executive_position;
+
         $item->signature_file = $pathSignature;
         $item->address = $request->address ? $request->address : $item->address;
         $item->province_id = $request->hprovince_id

@@ -324,6 +324,22 @@ onMounted(() => {
               >
             </VCol>
 
+            <VCol cols="12" md="12" class="align-items-center">
+              <label
+                class="v-label font-weight-bold"
+                for="executive_position"
+                cols="12"
+                md="5"
+                >ตำแหน่งบริหาร :
+              </label>
+              <AppTextField
+                v-model="item.executive_position"
+                variant="outlined"
+                placeholder="Surname"
+                persistent-placeholder
+              />
+            </VCol>
+
             <!--  -->
             <VCol cols="12">
               <hr />
