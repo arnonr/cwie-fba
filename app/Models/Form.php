@@ -73,6 +73,7 @@ class Form extends Model
         "is_pass_disease",
         "ppt_report_file",
         "poster_report_file",
+        "send_at"
     ];
 
     public function reject_log(): HasMany

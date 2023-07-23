@@ -45,6 +45,7 @@ class FormController extends Controller
             "form.max_response_date as max_response_date",
             "form.send_document_date as send_document_date",
             "form.send_document_number as send_document_number",
+            "form.send_at as send_at",
             DB::raw(
                 "(CASE WHEN form.response_document_file = NULL THEN ''
             ELSE CONCAT('" .
@@ -346,6 +347,14 @@ class FormController extends Controller
             $items->where("form.is_pass_disease", $request->is_pass_disease);
         }
 
+        if ($request->send_at) {
+            $items->where(
+                "form.send_at",
+                "LIKE",
+                "%" . $request->send_at . "%"
+            );
+        }
+
         // print_r($request->all());
 
         // Order
@@ -418,6 +427,7 @@ class FormController extends Controller
             "form.workplace_amphur_id as workplace_amphur_id",
             "form.workplace_tumbol_id as workplace_tumbol_id",
             "form.workplace_googlemap_url as workplace_googlemap_url",
+            "form.send_at as send_at",
             // "form.workplace_googlemap_file as workplace_googlemap_file",
             DB::raw(
                 "(CASE WHEN form.workplace_googlemap_file = NULL THEN ''
@@ -616,6 +626,7 @@ class FormController extends Controller
         $item->amphur_id = $request->amphur_id;
         $item->tumbol_id = $request->tumbol_id;
         $item->active = $request->active;
+        $item->send_at = $request->send_at;
 
         $item->namecard_file = $pathNamecard;
         $item->ppt_report_file = $pathPPT;
@@ -873,6 +884,10 @@ class FormController extends Controller
         $item->is_pass_disease = $request->has("is_pass_disease")
             ? $request->is_pass_disease
             : $item->is_pass_disease;
+        $item->send_at = $request->has("send_at")
+            ? $request->send_at
+            : $item->send_at;
+
         $item->updated_by = "arnonr";
         $item->save();
 
