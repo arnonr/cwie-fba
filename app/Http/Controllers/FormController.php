@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use PHPMailer\PHPMailer\PHPMailer;
-const whitelist = ["127.0.0.1", "::1", "localhost"];
+const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
 
 class FormController extends Controller
 {

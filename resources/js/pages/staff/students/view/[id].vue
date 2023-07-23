@@ -918,6 +918,19 @@ const responseProvinceName = (response_province_id) => {
                     </span>
                   </VCol>
 
+                  <VCol cols="12" md="12">
+                    <span>นามบัตร : </span>
+                    <span>
+                      <a :href="it.namecard_file" target="_blank">
+                        <VImg
+                          :src="it.namecard_file"
+                          style="max-width: 300px"
+                          class="mt-2"
+                        />
+                      </a>
+                    </span>
+                  </VCol>
+
                   <VCol cols="12" md="12" class="text-center">
                     <VBtn
                       color="primary"

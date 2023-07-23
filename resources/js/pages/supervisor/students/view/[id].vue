@@ -1049,6 +1049,19 @@ const responseTumbolName = (tumbol_id) => {
                     </span>
                   </VCol>
 
+                  <VCol cols="12" md="12">
+                    <span>นามบัตร : </span>
+                    <span>
+                      <a :href="it.namecard_file" target="_blank">
+                        <VImg
+                          :src="it.namecard_file"
+                          style="max-width: 300px"
+                          class="mt-2"
+                        />
+                      </a>
+                    </span>
+                  </VCol>
+
                   <VDivider class="mt-6 mb-6"></VDivider>
 
                   <VCol cols="12" md="6">

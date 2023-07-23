@@ -861,7 +861,7 @@ const responseTumbolName = (tumbol_id) => {
         </VCard>
       </VCol>
 
-      <VCol cols="12" md="12" v-for="(it, index) in items">
+      <VCol cols="12" md="12" v-for="(it, index) in items" :key="index">
         <VCard class="pa-5">
           <VCardText>
             <h3>ครั้งที่ {{ items.length - index }}</h3>
@@ -995,6 +995,19 @@ const responseTumbolName = (tumbol_id) => {
                     </span>
                   </VCol>
 
+                  <VCol cols="12" md="12">
+                    <span>นามบัตร : </span>
+                    <span>
+                      <a :href="it.namecard_file" target="_blank">
+                        <VImg
+                          :src="it.namecard_file"
+                          style="max-width: 300px"
+                          class="mt-2"
+                        />
+                      </a>
+                    </span>
+                  </VCol>
+
                   <VDivider class="mt-6 mb-6"></VDivider>
 
                   <VCol cols="12" md="6">
@@ -1009,7 +1022,7 @@ const responseTumbolName = (tumbol_id) => {
                         <h4>Remark</h4>
                       </VCol>
                     </VRow>
-                    <VRow v-for="(rl, index) in it.reject_log">
+                    <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id < 4">
                         <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
                         <span>
@@ -1163,7 +1176,7 @@ const responseTumbolName = (tumbol_id) => {
                         <h4>Remark</h4>
                       </VCol>
                     </VRow>
-                    <VRow v-for="(rl, index) in it.reject_log">
+                    <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id == 4">
                         <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
                         <span>
@@ -1307,7 +1320,7 @@ const responseTumbolName = (tumbol_id) => {
                         <h4>Remark</h4>
                       </VCol>
                     </VRow>
-                    <VRow v-for="(rl, index) in it.reject_log">
+                    <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id == 5">
                         <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
                         <span>

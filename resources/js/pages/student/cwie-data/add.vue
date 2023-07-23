@@ -310,6 +310,11 @@ const onSubmit = () => {
             item.value.end_date != "" && item.value.end_date != null
               ? dayjs(item.value.end_date).format("YYYY-MM-DD")
               : null,
+
+          namecard_file:
+            item.value.namecard_file.length !== 0
+              ? item.value.namecard_file[0]
+              : null,
         })
         .then((response) => {
           if (response.data.message == "success") {
@@ -626,6 +631,16 @@ const format = (date) => {
                 id="co_email"
                 v-model="item.co_email"
                 placeholder="Email"
+                persistent-placeholder
+              />
+            </VCol>
+
+            <VCol cols="12" md="12" class="align-items-center">
+              <span class="font-weight-bold">นามบัตร : </span>
+              <VFileInput
+                label="Upload Namecard"
+                id="namecard_file"
+                v-model="item.namecard_file"
                 persistent-placeholder
               />
             </VCol>

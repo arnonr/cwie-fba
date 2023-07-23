@@ -230,6 +230,12 @@ const fetchForm = () => {
     .then((response) => {
       if (response.status === 200) {
         item.value = response.data.data;
+
+        item.value.namecard_file_old = null;
+        if (item.value.namecard_file != null) {
+          item.value.namecard_file_old = response.data.data.namecard_file;
+        }
+        item.value.namecard_file = [];
       } else {
         console.log("error");
       }
@@ -322,6 +328,10 @@ const onSubmit = () => {
             item.value.reject_status_id != 5
               ? item.value.reject_status_id + 1
               : 7,
+          namecard_file:
+            item.value.namecard_file.length !== 0
+              ? item.value.namecard_file[0]
+              : null,
         })
         .then((response) => {
           if (response.data.message == "success") {
@@ -640,6 +650,30 @@ const format = (date) => {
                 placeholder="Email"
                 persistent-placeholder
               />
+            </VCol>
+
+            <VCol cols="12" md="2">
+              <span class="font-weight-bold">นามบัตร : </span>
+            </VCol>
+
+            <VCol cols="12" md="8">
+              <VFileInput
+                label="Upload Namecard"
+                id="namecard_file"
+                v-model="item.namecard_file"
+                persistent-placeholder
+              />
+            </VCol>
+
+            <VCol cols="12" md="2" class="pl-2">
+              <a
+                :href="
+                  item.namecard_file_old != null ? item.namecard_file_old : '/'
+                "
+                target="_blank"
+              >
+                <VBtn style="width: 100%"> View File </VBtn></a
+              >
             </VCol>
 
             <VDivider class="mt-4 mb-4"></VDivider>
