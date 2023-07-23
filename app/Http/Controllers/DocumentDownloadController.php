@@ -185,21 +185,10 @@ class DocumentDownloadController extends Controller
         $item = DocumentDownload::where("id", $request->id)->first();
 
         $pathDocument = null;
-        if (
-            $request->document_file != "" &&
-            $request->document_file != "null" &&
-            $request->document_file != "undefined"
-        ) {
-            $fileDocument =
-                 date("YmdHis")."_document_" .
-                rand(1, 10000) .
-                "." .
-                $request->file("document_file")->extension();
+        if ($request->document_file != "" && $request->document_file != "null" &&$request->document_file != "undefined") {
+            $fileDocument = date("YmdHis")."_document_" .rand(1, 10000) ."." .$request->file("document_file")->extension();
             $pathDocument = "/document_download/" . $fileDocument;
-            Storage::disk("public")->put(
-                $pathDocument,
-                file_get_contents($request->document_file)
-            );
+            Storage::disk("public")->put($pathDocument,file_get_contents($request->document_file));
             $request->document_file = $pathDocument;
         } else {
             $pathDocument = $item->document_file;

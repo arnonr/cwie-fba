@@ -189,6 +189,23 @@ Route::group(["prefix" => "document-type"], function () {
     Route::delete("/{id}", [DocumentTypeController::class, "delete"]);
 });
 
+Route::group(["prefix" => "news-category"], function () {
+    Route::get("/{id}", [NewsCategoryController::class, "get"]);
+    Route::get("/", [NewsCategoryController::class, "getAll"]);
+    Route::post("/", [NewsCategoryController::class, "add"]);
+    Route::put("/{id}", [NewsCategoryController::class, "edit"]);
+    Route::delete("/{id}", [NewsCategoryController::class, "delete"]);
+});
+
+Route::group(["prefix" => "news"], function () {
+    Route::get("/{id}", [NewsController::class, "get"]);
+    Route::get("/", [NewsController::class, "getAll"]);
+    Route::post("/", [NewsController::class, "add"]);
+    Route::put("/{id}", [NewsController::class, "edit"]);
+    Route::delete("/{id}", [NewsController::class, "delete"]);
+});
+
+
 Route::group(["prefix" => "document-download-type"], function () {
     Route::get("/{id}", [DocumentDownloadTypeController::class, "get"]);
     Route::get("/", [DocumentDownloadTypeController::class, "getAll"]);
