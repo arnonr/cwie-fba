@@ -2,6 +2,7 @@
 import { requiredValidator } from "@validators";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
+import Swal from "sweetalert2";
 import "sweetalert2/src/sweetalert2.scss";
 import { useRoute, useRouter } from "vue-router";
 
@@ -499,7 +500,7 @@ const fetchForms = () => {
 
         if (items.value.length != 0) {
           isAdd.value = false;
-          if (items.value[0].status_id == 6 || items.value[0].status_id == 8) {
+          if (items.value[0].status_id == 9 || items.value[0].status_id == 10) {
             isAdd.value = true;
           }
         }
@@ -1357,6 +1358,51 @@ const reject_status_show = (reject_status_id) => {
   return "";
 };
 
+const confirmCancel = (it) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "เมื่อยกเลิกการสมัครแล้วจะไม่สามารถแก้ไขข้อมูลได้",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Cancel it!",
+    customClass: {
+      confirmButton:
+        "v-btn v-btn--elevated v-theme--light bg-primary v-btn--density-default v-btn--size-default v-btn--variant-elevated",
+      cancelButton:
+        "v-btn v-btn--elevated v-theme--light bg-error v-btn--density-default v-btn--size-default v-btn--variant-elevated ml-1",
+    },
+    buttonsStyling: false,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      cwieDataStore
+        .editForm({
+          id: it.id,
+          active: 0,
+          status_id: 10,
+          //
+        })
+        .then(async (response) => {
+          if (response.status == 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Cancel!",
+              text: "Your file has been cancel.",
+              customClass: {
+                confirmButton:
+                  "v-btn v-btn--elevated v-theme--light bg-success v-btn--density-default v-btn--size-default v-btn--variant-elevated",
+              },
+            });
+          } else {
+            console.log("error");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  });
+};
+
 onMounted(() => {
   window.scrollTo(0, 0);
   fetchProvinces();
@@ -1708,7 +1754,11 @@ onMounted(() => {
           color="primary"
           class="ml-2"
           @click="generateRegisPDF"
-          :disabled="student.status_id < 5"
+          :disabled="
+            student.status_id < 5 ||
+            student.status_id == 9 ||
+            student.status_id == 10
+          "
         >
           <VIcon
             size="16"
@@ -1723,7 +1773,11 @@ onMounted(() => {
           color="primary"
           class="ml-2"
           @click="generatePDF"
-          :disabled="student.status_id < 6"
+          :disabled="
+            student.status_id < 6 ||
+            student.status_id == 9 ||
+            student.status_id == 10
+          "
         >
           <VIcon
             size="16"
@@ -1738,7 +1792,11 @@ onMounted(() => {
           color="primary"
           class="ml-2"
           @click="generateSendPDF"
-          :disabled="student.status_id < 11"
+          :disabled="
+            student.status_id < 11 ||
+            student.status_id == 9 ||
+            student.status_id == 10
+          "
         >
           <VIcon
             size="16"
@@ -1981,6 +2039,15 @@ onMounted(() => {
                       }"
                     >
                       Edit
+                    </VBtn>
+
+                    <VBtn
+                      color="error"
+                      class="ml-2"
+                      :disabled="it.status_id > 5 || index != 0"
+                      @click="confirmCancel(it)"
+                    >
+                      ยกเลิกการสมัคร
                     </VBtn>
                   </VCol>
                 </VRow>

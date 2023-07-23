@@ -648,6 +648,7 @@ class FormController extends Controller
 
     public function edit($id, Request $request)
     {
+        // active = 0;
         $request->validate(["id as required"]);
 
         $item = Form::where("id", $request->id)->first();
