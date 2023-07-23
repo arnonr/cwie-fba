@@ -480,7 +480,7 @@ const format = (date) => {
               color="success"
               @click="
                 () => {
-                  document = [];
+                  document.send_document_number = 'อว 7125/';
                   onAddBook();
                 }
               "

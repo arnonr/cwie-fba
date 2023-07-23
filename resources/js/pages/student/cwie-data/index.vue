@@ -703,6 +703,18 @@ const generateRegisPDF = async () => {
     ...defaultSize,
   });
 
+  const photoUrl = student.value.photo_file;
+  const photoImageBytes = await fetch(photoUrl).then((res) =>
+    res.arrayBuffer()
+  );
+  const photoImage = await pdfDoc.embedPng(photoImageBytes);
+  existingPage.drawImage(photoImage, {
+    x: 473,
+    y: 684,
+    width: 70,
+    height: 90,
+  });
+
   existingPage.drawText(
     student.value.prefix_name +
       student.value.firstname +
@@ -751,13 +763,13 @@ const generateRegisPDF = async () => {
   });
 
   existingPage.drawText(student.value.email, {
-    x: 290,
-    y: 595,
+    x: 270,
+    y: 596,
     ...defaultSize,
   });
 
   existingPage.drawText(student.value.gpa.toString(), {
-    x: 505,
+    x: 520,
     y: 595,
     ...defaultSize,
   });
@@ -879,14 +891,19 @@ const generateRegisPDF = async () => {
     ...defaultSize,
   });
 
+  existingPage.drawText(student.value.firstname + " " + student.value.surname, {
+    x: 375,
+    y: 243,
+    ...defaultSize,
+  });
+
   existingPage.drawText(
-    student.value.prefix_name +
-      student.value.firstname +
-      " " +
-      student.value.surname,
+    dayjs(formActive.value.chairman_approved_at)
+      .locale("th")
+      .format("DD MMMM BBBB"),
     {
-      x: 360,
-      y: 218,
+      x: 375,
+      y: 215,
       ...defaultSize,
     }
   );
@@ -917,6 +934,61 @@ const generateRegisPDF = async () => {
   //   existingPage.drawText(chairman.value.executive_position, {
   //     x: 275,
   //     y: 96,
+  //     ...defaultSize,
+  //   });
+
+  const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
+  pdfDoc.addPage(existingPage2);
+
+  existingPage2.drawText(student.value.advisor_name, {
+    x: 250,
+    y: 508,
+    ...defaultSize,
+  });
+
+  existingPage2.drawText(
+    dayjs(formActive.value.advisor_verified_at)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 250,
+      y: 482,
+      ...defaultSize,
+    }
+  );
+
+  existingPage2.drawText(formActive.value.major_head_name, {
+    x: 250,
+    y: 304,
+    ...defaultSize,
+  });
+
+  existingPage2.drawText(
+    dayjs(formActive.value.chairman_approved_at)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 250,
+      y: 278,
+      ...defaultSize,
+    }
+  );
+
+  //   existingPage2.drawText(formActive.value.advisor_verified_at, {
+  //     x: 375,
+  //     y: 243,
+  //     ...defaultSize,
+  //   });
+
+  //   existingPage2.drawText(formActive.value.teacher.fullname, {
+  //     x: 375,
+  //     y: 243,
+  //     ...defaultSize,
+  //   });
+
+  //   existingPage2.drawText(formActive.value.chairman_approved_at, {
+  //     x: 375,
+  //     y: 243,
   //     ...defaultSize,
   //   });
 
@@ -962,7 +1034,7 @@ const generatePDF = async () => {
   };
 
   existingPage.drawText(formActive.value.request_document_number, {
-    x: 125, //คอลัมน์ ซ้ายไปขวา
+    x: 80, //คอลัมน์ ซ้ายไปขวา
     y: 757, //แถว ยิ่งมากยิ่งอยู่ด้านบน
     ...defaultSize,
   });
@@ -1081,18 +1153,18 @@ const generatePDF = async () => {
 
   //   Chairman_id
 
-  existingPage.drawText(
-    chairman.value.prefix +
-      " " +
-      chairman.value.firstname +
-      " " +
-      chairman.value.surname,
-    {
-      x: 300,
-      y: 135,
-      ...defaultSize,
-    }
-  );
+  //   existingPage.drawText(
+  //     chairman.value.prefix +
+  //       " " +
+  //       chairman.value.firstname +
+  //       " " +
+  //       chairman.value.surname,
+  //     {
+  //       x: 300,
+  //       y: 135,
+  //       ...defaultSize,
+  //     }
+  //   );
   const sigUrl = chairman.value.signature_file;
   const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
   const sigImage = await pdfDoc.embedPng(sigImageBytes);
@@ -1121,6 +1193,9 @@ const generatePDF = async () => {
     y: 96,
     ...defaultSize,
   });
+
+  const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
+  pdfDoc.addPage(existingPage2);
 
   const pdfBytes = await pdfDoc.save();
   let objectPdf = URL.createObjectURL(
@@ -1163,8 +1238,8 @@ const generateSendPDF = async () => {
     color: rgb(0, 0, 0),
   };
 
-  existingPage.drawText(formActive.value.request_document_number, {
-    x: 125, //คอลัมน์ ซ้ายไปขวา
+  existingPage.drawText(formActive.value.send_document_number, {
+    x: 80, //คอลัมน์ ซ้ายไปขวา
     y: 757, //แถว ยิ่งมากยิ่งอยู่ด้านบน
     ...defaultSize,
   });

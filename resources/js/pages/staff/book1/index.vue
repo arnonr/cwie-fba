@@ -22,7 +22,9 @@ const currentPage = ref(1);
 const totalPage = ref(1);
 const totalItems = ref(0);
 const items = ref([]);
-const document = ref({});
+const document = ref({
+  request_document_number: "อว 7125/",
+});
 const isOverlay = ref(true);
 const orderBy = ref("student.id");
 const order = ref("desc");
@@ -245,6 +247,7 @@ const onAddBook = () => {
   if (selectedItem.value.length != 0) {
     if (advancedSearch.semester_id != "") {
       isDialogVisible.value = true;
+      console.log(document.value.request_document_number);
     }
   } else {
     snackbarText.value = "โปรดเลือกนักศึกษา";
@@ -484,7 +487,9 @@ const format = (date) => {
               color="success"
               @click="
                 () => {
-                  document = [];
+                  //   document = [];
+                  document.request_document_number = 'อว 7125/';
+
                   onAddBook();
                 }
               "
@@ -582,7 +587,7 @@ const format = (date) => {
                       @click="
                         () => {
                           selectedItem = [it.form_id];
-                          document = [];
+                          document = {};
                           document.request_document_number =
                             it.request_document_number;
                           document.request_document_date =
