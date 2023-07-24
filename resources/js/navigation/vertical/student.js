@@ -4,7 +4,7 @@ export default [
     icon: { icon: "tabler-home" },
     to: { name: "dashboards" },
     action: "manage",
-    subject: "Auth",
+    subject: "StudentUser",
   },
   { heading: "นักศึกษา", action: "manage", subject: "StudentUser" },
 
