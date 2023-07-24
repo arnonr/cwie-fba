@@ -1,6 +1,7 @@
 <script setup>
 import dayjs from "dayjs";
 import "dayjs/locale/th";
+import Swal from "sweetalert2";
 import "sweetalert2/src/sweetalert2.scss";
 import { useRoute, useRouter } from "vue-router";
 ////
@@ -450,6 +451,51 @@ const onSubmit = () => {
     .catch((error) => {
       console.error(error);
     });
+};
+
+const confirmCancel = (it) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "เมื่อยกเลิกการสมัครแล้วจะไม่สามารถแก้ไขข้อมูลได้",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Cancel it!",
+    customClass: {
+      confirmButton:
+        "v-btn v-btn--elevated v-theme--light bg-primary v-btn--density-default v-btn--size-default v-btn--variant-elevated",
+      cancelButton:
+        "v-btn v-btn--elevated v-theme--light bg-error v-btn--density-default v-btn--size-default v-btn--variant-elevated ml-1",
+    },
+    buttonsStyling: false,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      cwieDataStore
+        .editForm({
+          id: it.id,
+          active: 0,
+          status_id: 10,
+          //
+        })
+        .then(async (response) => {
+          if (response.status == 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Cancel!",
+              text: "Your file has been cancel.",
+              customClass: {
+                confirmButton:
+                  "v-btn v-btn--elevated v-theme--light bg-success v-btn--density-default v-btn--size-default v-btn--variant-elevated",
+              },
+            });
+          } else {
+            console.log("error");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  });
 };
 
 onMounted(() => {
@@ -1052,6 +1098,19 @@ const responseProvinceName = (response_province_id) => {
                         class="mr-1"
                       ></VIcon>
                       อนุมัติ
+                    </VBtn>
+                  </VCol>
+
+                  <VCol cols="12" md="12" class="text-center">
+                    <VBtn
+                      color="error"
+                      class="ml-2"
+                      :disabled="
+                        index != 0 || it.status_id == 10 || it.status_id == 9
+                      "
+                      @click="confirmCancel(it)"
+                    >
+                      ยกเลิกการสมัคร
                     </VBtn>
                   </VCol>
                 </VRow>

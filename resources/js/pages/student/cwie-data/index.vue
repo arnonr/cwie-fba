@@ -1824,7 +1824,12 @@ onMounted(() => {
       </VCol>
 
       <VCol cols="12" md="12">
-        <VBtn color="success" :disabled="!isAdd" @click="onAddClick">
+        <VBtn
+          color="success"
+          :disabled="!isAdd"
+          @click="onAddClick"
+          id="btnAddForm"
+        >
           <VIcon
             size="16"
             icon="tabler-file-description"
@@ -2455,7 +2460,12 @@ onMounted(() => {
               </VBtn>
               <VBtn
                 v-if="formSteps.length - 1 !== currentStep"
-                @click="currentStep++"
+                @click="
+                  () => {
+                    currentStep++;
+                    // $vuetify.goTo('#btnAddForm');
+                  }
+                "
                 :disabled="
                   it.status_id < 5 ||
                   it.reject_status_id == 1 ||

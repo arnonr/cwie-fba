@@ -9,7 +9,7 @@ export default [
   },
   {
     title: "ข้อมูลสหกิจศึกษา",
-    icon: { icon: "tabler-user" },
+    icon: { icon: "tabler-book" },
     to: { name: "student-cwie-data" },
     action: "manage",
     subject: "StudentUser",
