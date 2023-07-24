@@ -167,7 +167,7 @@ class DocumentDownloadController extends Controller
         $item->document_name = $request->document_name;
         $item->document_type_id = $request->document_type_id;
         $item->document_file = $pathDocument;
-        $item->active = $request->active ? active : 1;
+        $item->active = $request->active ? $request->active : 1;
         $item->created_by = "arnonr";
         $item->save();
 
