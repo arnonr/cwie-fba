@@ -4,7 +4,7 @@ export default [
     icon: { icon: "tabler-home" },
     to: { name: "dashboards" },
     action: "manage",
-    subject: "StaffUser",
+    subject: "TeacherUser",
   },
   { heading: "อาจารย์ที่ปรึกษา", subject: "TeacherUser", action: "manage" },
   {

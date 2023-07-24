@@ -93,7 +93,7 @@ fetchDocumentDownload();
       <VCol cols="12" lg="12">
         <VRow>
           <!-- Card -->
-          <VCol cols="12" sm="6" md="3" v-for="nw in news" :key="nw.id">
+          <VCol cols="12" sm="6" md="4" v-for="nw in news" :key="nw.id">
             <VCard
               @click="
                 $router.push({
