@@ -486,6 +486,14 @@ const responseProvinceName = (response_province_id) => {
       <VCol cols="12" md="3">
         <VCard title="" class="pa-3">
           <VCardText>
+            <VImg
+              :src="student.photo_file"
+              width="100"
+              height="120"
+              class="mx-auto"
+            />
+          </VCardText>
+          <VCardText>
             <span class="font-weight-bold">ชื่อ : </span>
             <span
               >{{ student.prefix_name }}{{ student.firstname }}
@@ -496,11 +504,6 @@ const responseProvinceName = (response_province_id) => {
           <VCardText>
             <span class="font-weight-bold">รหัสนักศึกษา : </span>
             <span>{{ student.student_code }}</span></VCardText
-          >
-          <VDivider class="ml-4 mr-4" />
-          <VCardText>
-            <span class="font-weight-bold">คณะ : </span>
-            <span>{{ student.faculty_name }}</span></VCardText
           >
           <VDivider class="ml-4 mr-4" />
           <VCardText>
@@ -518,11 +521,6 @@ const responseProvinceName = (response_province_id) => {
             <VChip label :color="form_statuses[student.status_id]">{{
               statusShow(student.status_id)
             }}</VChip>
-          </VCardText>
-          <VDivider class="ml-4 mr-4" />
-          <VCardText>
-            <span class="font-weight-bold">การเข้าใช้งาน : </span>
-            <VChip label color="success">active</VChip>
           </VCardText>
         </VCard>
       </VCol>

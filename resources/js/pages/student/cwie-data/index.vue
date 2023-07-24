@@ -1503,6 +1503,15 @@ onMounted(() => {
       <VCol cols="12" md="3">
         <VCard title="" class="pa-3">
           <VCardText>
+            <VImg
+              :src="student.photo_file"
+              width="100"
+              height="120"
+              class="mx-auto"
+            />
+          </VCardText>
+
+          <VCardText>
             <span class="font-weight-bold">ชื่อ : </span>
             <span
               >{{ student.prefix_name }}{{ student.firstname }}
@@ -1515,11 +1524,11 @@ onMounted(() => {
             <span>{{ student.student_code }}</span></VCardText
           >
           <VDivider class="ml-4 mr-4" />
-          <VCardText>
+          <!-- <VCardText>
             <span class="font-weight-bold">คณะ : </span>
             <span>{{ student.faculty_name }}</span></VCardText
           >
-          <VDivider class="ml-4 mr-4" />
+          <VDivider class="ml-4 mr-4" /> -->
           <VCardText>
             <span class="font-weight-bold">สาขาวิชา : </span>
             <span>{{ student.major_name }}</span></VCardText
@@ -1536,11 +1545,11 @@ onMounted(() => {
               >{{ statusShow(student.status_id) }}
             </VChip>
           </VCardText>
-          <VDivider class="ml-4 mr-4" />
-          <VCardText>
+          <!-- <VDivider class="ml-4 mr-4" /> -->
+          <!-- <VCardText>
             <span class="font-weight-bold">การเข้าใช้งาน : </span>
             <VChip label color="success">active</VChip>
-          </VCardText>
+          </VCardText> -->
         </VCard>
       </VCol>
       <VCol cols="12" md="9">
@@ -2018,7 +2027,7 @@ onMounted(() => {
                         <VImg
                           :src="it.namecard_file"
                           style="max-width: 300px"
-                          class="mt-2"
+                          class="mt-2 mx-auto"
                         />
                       </a>
                     </span>

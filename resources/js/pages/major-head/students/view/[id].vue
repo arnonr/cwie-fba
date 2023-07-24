@@ -490,6 +490,15 @@ onMounted(() => {
       <VCol cols="12" md="3">
         <VCard title="" class="pa-3">
           <VCardText>
+            <VImg
+              :src="student.photo_file"
+              width="100"
+              height="120"
+              class="mx-auto"
+            />
+          </VCardText>
+
+          <VCardText>
             <span class="font-weight-bold">ชื่อ : </span>
             <span
               >{{ student.prefix_name }}{{ student.firstname }}
@@ -503,11 +512,6 @@ onMounted(() => {
           >
           <VDivider class="ml-4 mr-4" />
           <VCardText>
-            <span class="font-weight-bold">คณะ : </span>
-            <span>{{ student.faculty_name }}</span></VCardText
-          >
-          <VDivider class="ml-4 mr-4" />
-          <VCardText>
             <span class="font-weight-bold">สาขาวิชา : </span>
             <span>{{ student.major_name }}</span></VCardText
           >
@@ -516,18 +520,6 @@ onMounted(() => {
             <span class="font-weight-bold">ชั้นปี : </span>
             <span>{{ student.class_year }}</span></VCardText
           >
-          <VDivider class="ml-4 mr-4" />
-          <VCardText>
-            <span class="font-weight-bold">สถานะ : </span>
-            <VChip label :color="form_statuses[student.status_id]">{{
-              statusShow(student.status_id)
-            }}</VChip>
-          </VCardText>
-          <VDivider class="ml-4 mr-4" />
-          <VCardText>
-            <span class="font-weight-bold">การเข้าใช้งาน : </span>
-            <VChip label color="success">active</VChip>
-          </VCardText>
         </VCard>
       </VCol>
       <VCol cols="12" md="9">
