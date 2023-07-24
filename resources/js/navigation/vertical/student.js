@@ -1,5 +1,13 @@
 export default [
+  {
+    title: "หน้าหลัก",
+    icon: { icon: "tabler-home" },
+    to: { name: "dashboards" },
+    action: "manage",
+    subject: "Auth",
+  },
   { heading: "นักศึกษา", action: "manage", subject: "StudentUser" },
+
   {
     title: "ข้อมูลส่วนตัว",
     icon: { icon: "tabler-user" },

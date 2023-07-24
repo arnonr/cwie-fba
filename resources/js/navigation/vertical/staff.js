@@ -1,4 +1,11 @@
 export default [
+  {
+    title: "หน้าหลัก",
+    icon: { icon: "tabler-home" },
+    to: { name: "dashboards" },
+    action: "manage",
+    subject: "Auth",
+  },
   { heading: "เจ้าหน้าที่คณะ", action: "manage", subject: "StaffUser" },
   {
     title: "รายการนักศึกษา",
