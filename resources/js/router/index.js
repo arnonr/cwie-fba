@@ -15,14 +15,14 @@ const router = createRouter({
       redirect: (to) => {
         const userData = JSON.parse(localStorage.getItem("userData") || "{}");
         const userRole = userData && userData.role ? userData.role : null;
-        if (userRole === "admin") return { name: "dashboards-analytics" };
+        if (userRole === "admin") return { name: "dashboards" };
         if (userRole === "teacher") {
-          return { name: "dashboards-analytics" };
+          return { name: "dashboards" };
         }
 
-        if (userRole === "student") return { name: "dashboards-analytics" };
-        if (userRole === "staff") return { name: "dashboards-analytics" };
-        if (userRole === "admin") return { name: "dashboards-analytics" };
+        if (userRole === "student") return { name: "dashboards" };
+        if (userRole === "staff") return { name: "dashboards" };
+        if (userRole === "admin") return { name: "dashboards" };
         if (userRole === "client") return { name: "access-control" };
 
         return { name: "login", query: to.query };
