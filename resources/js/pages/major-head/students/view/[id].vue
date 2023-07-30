@@ -947,7 +947,7 @@ onMounted(() => {
                     <VList :items="qualifications" />
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol cols="12" md="6" class="text-error">
                     <VRow>
                       <VCol cols="12" md="12">
                         <h4>Remark</h4>
@@ -955,7 +955,7 @@ onMounted(() => {
                     </VRow>
                     <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id < 4">
-                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
                         <span>
                           {{
                             dayjs(rl.created_at)
@@ -966,15 +966,21 @@ onMounted(() => {
                       </VCol>
 
                       <VCol cols="12" md="8" v-if="rl.reject_status_id < 4">
-                        <h4 class="mb-0 d-inline mr-1">ผู้ตรวจ :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">ผู้ตรวจ :</h4>
                         <span>
                           {{ reject_status_show(rl.reject_status_id) }}</span
                         >
                       </VCol>
 
                       <VCol cols="12" md="12" v-if="rl.reject_status_id < 4">
-                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          รายละเอียด :
+                        </h4>
                         <span> {{ rl.comment }}</span>
+                      </VCol>
+
+                      <VCol cols="12" md="12" v-if="rl.reject_status_id < 4">
+                        <hr style="border: solid #eee 1px" />
                       </VCol>
                     </VRow>
                   </VCol>
@@ -1172,7 +1178,7 @@ onMounted(() => {
 
                   <VDivider></VDivider>
 
-                  <VCol cols="12" md="6">
+                  <VCol cols="12" md="6" class="text-error">
                     <VRow>
                       <VCol cols="12" md="12">
                         <h4>Remark</h4>
@@ -1180,7 +1186,7 @@ onMounted(() => {
                     </VRow>
                     <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id > 3">
-                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
                         <span>
                           {{
                             dayjs(rl.created_at)
@@ -1190,8 +1196,14 @@ onMounted(() => {
                         >
                       </VCol>
                       <VCol cols="12" md="8" v-if="rl.reject_status_id > 3">
-                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          รายละเอียด :
+                        </h4>
                         <span> {{ rl.comment }}</span>
+                      </VCol>
+
+                      <VCol cols="12" md="12" v-if="rl.reject_status_id > 3">
+                        <hr style="border: solid #eee 1px" />
                       </VCol>
                     </VRow>
                   </VCol>
@@ -1303,7 +1315,7 @@ onMounted(() => {
                   </VCol>
                   <VDivider></VDivider>
 
-                  <VCol cols="12" md="6">
+                  <VCol cols="12" md="6" class="text-error">
                     <VRow>
                       <VCol cols="12" md="12">
                         <h4>Remark</h4>
@@ -1311,7 +1323,7 @@ onMounted(() => {
                     </VRow>
                     <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id > 4">
-                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
                         <span>
                           {{
                             dayjs(rl.created_at)
@@ -1321,8 +1333,13 @@ onMounted(() => {
                         >
                       </VCol>
                       <VCol cols="12" md="8" v-if="rl.reject_status_id > 4">
-                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          รายละเอียด :
+                        </h4>
                         <span> {{ rl.comment }}</span>
+                      </VCol>
+                      <VCol cols="12" md="12" v-if="rl.reject_status_id > 4">
+                        <hr style="border: solid #eee 1px" />
                       </VCol>
                     </VRow>
                   </VCol>

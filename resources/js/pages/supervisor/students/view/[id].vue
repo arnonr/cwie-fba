@@ -541,6 +541,31 @@ const fetchTumbols = (type = 1) => {
     });
 };
 
+const reject_status_show = (reject_status_id) => {
+  if (reject_status_id) {
+    if (reject_status_id == 1) {
+      return "อาจารย์ที่ปรึกษา";
+    }
+
+    if (reject_status_id == 2) {
+      return "ประธานอาจารย์นิเทศ";
+    }
+
+    if (reject_status_id == 3) {
+      return "เจ้าหน้าที่คณะ";
+    }
+
+    if (reject_status_id == 4) {
+      return "เอกสารตอบรับ";
+    }
+
+    if (reject_status_id == 5) {
+      return "แผนการปฏิบัติงาน";
+    }
+  }
+  return "";
+};
+
 onMounted(() => {
   window.scrollTo(0, 0);
 
@@ -1068,7 +1093,7 @@ const responseTumbolName = (tumbol_id) => {
                     <!-- <VCheck  -->
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol cols="12" md="6" class="text-error">
                     <VRow>
                       <VCol cols="12" md="12">
                         <h4>Remark</h4>
@@ -1076,7 +1101,7 @@ const responseTumbolName = (tumbol_id) => {
                     </VRow>
                     <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id < 4">
-                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
                         <span>
                           {{
                             dayjs(rl.created_at)
@@ -1086,8 +1111,19 @@ const responseTumbolName = (tumbol_id) => {
                         >
                       </VCol>
                       <VCol cols="12" md="8" v-if="rl.reject_status_id < 4">
-                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">ผู้ตรวจ :</h4>
+                        <span>
+                          {{ reject_status_show(rl.reject_status_id) }}
+                        </span>
+                      </VCol>
+                      <VCol cols="12" md="12" v-if="rl.reject_status_id < 4">
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          รายละเอียด :
+                        </h4>
                         <span> {{ rl.comment }}</span>
+                      </VCol>
+                      <VCol cols="12" md="12" v-if="rl.reject_status_id < 4">
+                        <hr style="border: solid #eee 1px" />
                       </VCol>
                     </VRow>
 
@@ -1262,7 +1298,7 @@ const responseTumbolName = (tumbol_id) => {
 
                   <VDivider></VDivider>
 
-                  <VCol cols="12" md="6">
+                  <VCol cols="12" md="6" class="text-error">
                     <VRow>
                       <VCol cols="12" md="12">
                         <h4>Remark</h4>
@@ -1270,7 +1306,7 @@ const responseTumbolName = (tumbol_id) => {
                     </VRow>
                     <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id == 4">
-                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
                         <span>
                           {{
                             dayjs(rl.created_at)
@@ -1280,8 +1316,13 @@ const responseTumbolName = (tumbol_id) => {
                         >
                       </VCol>
                       <VCol cols="12" md="8" v-if="rl.reject_status_id == 4">
-                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          รายละเอียด :
+                        </h4>
                         <span> {{ rl.comment }}</span>
+                      </VCol>
+                      <VCol cols="12" md="12" v-if="rl.reject_status_id == 4">
+                        <hr style="border: solid #eee 1px" />
                       </VCol>
                     </VRow>
                   </VCol>
@@ -1406,7 +1447,7 @@ const responseTumbolName = (tumbol_id) => {
                   </VCol>
                   <VDivider></VDivider>
 
-                  <VCol cols="12" md="6">
+                  <VCol cols="12" md="6" class="text-error">
                     <VRow>
                       <VCol cols="12" md="12">
                         <h4>Remark</h4>
@@ -1414,7 +1455,7 @@ const responseTumbolName = (tumbol_id) => {
                     </VRow>
                     <VRow v-for="(rl, index) in it.reject_log" :key="index">
                       <VCol cols="12" md="4" v-if="rl.reject_status_id == 5">
-                        <h4 class="mb-0 d-inline mr-1">วันที่ :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
                         <span>
                           {{
                             dayjs(rl.created_at)
@@ -1424,8 +1465,13 @@ const responseTumbolName = (tumbol_id) => {
                         >
                       </VCol>
                       <VCol cols="12" md="8" v-if="rl.reject_status_id == 5">
-                        <h4 class="mb-0 d-inline mr-1">รายละเอียด :</h4>
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          รายละเอียด :
+                        </h4>
                         <span> {{ rl.comment }}</span>
+                      </VCol>
+                      <VCol cols="12" md="12" v-if="rl.reject_status_id == 5">
+                        <hr style="border: solid #eee 1px" />
                       </VCol>
                     </VRow>
                   </VCol>
