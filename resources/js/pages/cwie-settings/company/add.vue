@@ -6,7 +6,7 @@ import { useCompanyStore } from "./useCompanyStore";
 const route = useRoute();
 const router = useRouter();
 const companyStore = useCompanyStore();
-const props = defineProps(["isDialogAddCompanyVisible"]);
+const props = defineProps(["isDialogAddCompanyVisible", "isStudentAdd"]);
 const emit = defineEmits([
   "toggle:isDialogAddCompanyVisible",
   "update:companyItem",
@@ -326,11 +326,19 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="2">
+            <VCol
+              cols="12"
+              md="2"
+              v-if="typeof props.isStudentAdd === 'undefined'"
+            >
               <span class="font-weight-bold">นามบัตร : </span>
             </VCol>
 
-            <VCol cols="12" md="10">
+            <VCol
+              cols="12"
+              md="10"
+              v-if="typeof props.isStudentAdd === 'undefined'"
+            >
               <VFileInput
                 label="Upload Namecard"
                 id="namecard_file"
@@ -339,11 +347,19 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="2">
+            <VCol
+              cols="12"
+              md="2"
+              v-if="typeof props.isStudentAdd === 'undefined'"
+            >
               <span class="font-weight-bold">ภาพ Google Map : </span>
             </VCol>
 
-            <VCol cols="12" md="10">
+            <VCol
+              cols="12"
+              md="10"
+              v-if="typeof props.isStudentAdd === 'undefined'"
+            >
               <VFileInput
                 label="Upload Google Map"
                 id="location_file"

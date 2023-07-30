@@ -706,6 +706,7 @@ const format = (date) => {
       />
       <CompanyAdd
         :isDialogAddCompanyVisible="isDialogAddCompanyVisible"
+        :isStudentAdd="true"
         @toggle:isDialogAddCompanyVisible="
           (newValue) => (isDialogAddCompanyVisible = newValue)
         "
