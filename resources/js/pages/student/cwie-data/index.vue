@@ -670,6 +670,7 @@ const generateRegisPDF = async () => {
   const fontBytesBold = await fetch(urlFontBold).then((res) =>
     res.arrayBuffer()
   );
+
   let url = "";
   url = window.location.origin + "/storage/pdf/book_regis.pdf";
 
@@ -704,12 +705,18 @@ const generateRegisPDF = async () => {
   });
 
   const photoUrl = student.value.photo_file;
+
   const photoImageBytes = await fetch(photoUrl).then((res) =>
     res.arrayBuffer()
   );
 
-  const photoImage = await pdfDoc.embedPng(photoImageBytes);
-  //   const photoImage = await pdfDoc.embedJpg(photoImageBytes);
+  let photoImage;
+  try {
+    photoImage = await pdfDoc.embedPng(photoImageBytes);
+  } catch (error) {
+    photoImage = await pdfDoc.embedJpg(photoImageBytes);
+  }
+
   existingPage.drawImage(photoImage, {
     x: 473,
     y: 684,
@@ -1156,7 +1163,14 @@ const generatePDF = async () => {
 
   const sigUrl = chairman.value.signature_file;
   const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
-  const sigImage = await pdfDoc.embedPng(sigImageBytes);
+
+  let sigImage;
+  try {
+    sigImage = await pdfDoc.embedPng(sigImageBytes);
+  } catch (error) {
+    sigImage = await pdfDoc.embedJpg(sigImageBytes);
+  }
+
   existingPage.drawImage(sigImage, {
     x: 310,
     y: 120,
@@ -1324,7 +1338,14 @@ const generateSendPDF = async () => {
 
   const sigUrl = chairman.value.signature_file;
   const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
-  const sigImage = await pdfDoc.embedPng(sigImageBytes);
+
+  let sigImage;
+  try {
+    sigImage = await pdfDoc.embedPng(sigImageBytes);
+  } catch (error) {
+    sigImage = await pdfDoc.embedJpg(sigImageBytes);
+  }
+
   existingPage.drawImage(sigImage, {
     x: 310,
     y: 150,
