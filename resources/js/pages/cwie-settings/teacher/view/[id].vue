@@ -160,13 +160,13 @@ hr {
             <span class="font-italic">{{ item.province_name }}</span>
           </VCol>
           <VCol cols="12" md="1">
-            <span class="font-weight-bold">อำเภอ : </span>
+            <span class="font-weight-bold">อำเภอ/เขต : </span>
           </VCol>
           <VCol cols="12" md="3">
             <span class="font-italic">{{ item.amphur_name }}</span>
           </VCol>
           <VCol cols="12" md="1">
-            <span class="font-weight-bold">ตำบล : </span>
+            <span class="font-weight-bold">ตำบล/แขวง : </span>
           </VCol>
           <VCol cols="12" md="3">
             <span class="font-italic">{{ item.tumbol_name }}</span>

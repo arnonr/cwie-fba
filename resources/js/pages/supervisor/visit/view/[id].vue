@@ -697,11 +697,11 @@ const responseTumbolName = (tumbol_id) => {
                     <span>{{ student.province_name }} </span>
                   </VCol>
                   <VCol cols="12" md="4">
-                    <span>อำเภอ : </span>
+                    <span>อำเภอ/เขต : </span>
                     <span>{{ student.amphur_name }} </span>
                   </VCol>
                   <VCol cols="12" md="4">
-                    <span>ตำบล : </span>
+                    <span>ตำบล/แขวง : </span>
                     <span>{{ student.tumbol_name }} </span>
                   </VCol>
 
@@ -1308,14 +1308,14 @@ const responseTumbolName = (tumbol_id) => {
                   </VCol>
 
                   <VCol cols="12" md="6">
-                    <span>อำเภอ : </span>
+                    <span>อำเภอ/เขต : </span>
                     <span>{{
                       responseAmphurName(it.workplace_amphur_id)
                     }}</span>
                   </VCol>
 
                   <VCol cols="12" md="6">
-                    <span>ตำบล : </span>
+                    <span>ตำบล/แขวง : </span>
                     <span>{{
                       responseTumbolName(it.workplace_tumbol_id)
                     }}</span>

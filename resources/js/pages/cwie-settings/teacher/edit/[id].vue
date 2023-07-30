@@ -384,7 +384,7 @@ onMounted(() => {
                 for="amphur_id"
                 cols="12"
                 md="4"
-                >อำเภอ :
+                >อำเภอ/เขต :
               </label>
               <AppSelect
                 :items="selectOptions.amphurs"
@@ -397,7 +397,7 @@ onMounted(() => {
 
             <VCol cols="12" md="4" class="align-items-center">
               <label class="v-label font-weight-bold" for="tumbol_id"
-                >ตำบล :
+                >ตำบล/แขวง :
               </label>
               <AppSelect
                 :items="selectOptions.tumbols"
