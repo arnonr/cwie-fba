@@ -1143,7 +1143,7 @@ const responseProvinceName = (response_province_id) => {
 
                   <VCol cols="12" md="12" class="text-center">
                     <VBtn
-                      color="error"
+                      color="warning"
                       class="ml-2"
                       :disabled="
                         index != 0 || it.status_id == 10 || it.status_id == 9
