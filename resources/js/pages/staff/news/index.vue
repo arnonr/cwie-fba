@@ -90,6 +90,20 @@ const resolveActive = (active, type) => {
   return data[1];
 };
 
+const resolvePinned = (pinned, type) => {
+  let data = "";
+
+  if (pinned == 1) data = ["success", "Yes"];
+
+  if (pinned == 0) data = ["secondary", "No"];
+
+  if (type == "color") {
+    return data[0];
+  }
+
+  return data[1];
+};
+
 if (localStorage.getItem("deleted") == 1) {
   snackbarText.value = "Deleted News";
   snackbarColor.value = "success";
@@ -159,6 +173,9 @@ onMounted(() => {
                     สถานะ
                   </th>
                   <th scope="col" class="text-center font-weight-bold">
+                    ปักหมุด
+                  </th>
+                  <th scope="col" class="text-center font-weight-bold">
                     จัดการ
                   </th>
                 </tr>
@@ -177,6 +194,12 @@ onMounted(() => {
                     <VChip :color="resolveActive(it.active, 'color')">{{
                       resolveActive(it.active, "text")
                     }}</VChip>
+                  </td>
+
+                  <td class="text-center" style="min-width: 100px">
+                    <VChip :color="resolvePinned(it.pinned, 'color')">
+                      {{ resolvePinned(it.pinned, "text") }}</VChip
+                    >
                   </td>
 
                   <!-- 👉 Actions -->

@@ -13,6 +13,7 @@ const item = ref({
   news_detail: "",
   news_file: [],
   news_file_old: "",
+  pinned: 0,
   active: 1,
 });
 
@@ -24,6 +25,10 @@ const selectOptions = ref({
   actives: [
     { title: "Active", value: 1 },
     { title: "In Active", value: 0 },
+  ],
+  pins: [
+    { title: "Yes", value: 1 },
+    { title: "No", value: 0 },
   ],
 });
 
@@ -149,6 +154,18 @@ onMounted(() => {
                 v-model="item.active"
                 variant="outlined"
                 placeholder="Status"
+              />
+            </VCol>
+
+            <VCol cols="12" md="6" class="align-items-center">
+              <label class="v-label font-weight-bold" for="pinned"
+                >ปักหมุด :
+              </label>
+              <AppSelect
+                :items="selectOptions.pins"
+                v-model="item.pinned"
+                variant="outlined"
+                placeholder="Pin"
               />
             </VCol>
 

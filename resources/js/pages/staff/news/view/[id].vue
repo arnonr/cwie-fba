@@ -151,6 +151,20 @@ hr {
               <VChip color="default" v-else> In Active </VChip>
             </span>
           </VCol>
+
+          <VCol cols="12">
+            <hr />
+          </VCol>
+
+          <VCol cols="6" md="2">
+            <span class="font-weight-bold">ปักหมุด : </span>
+          </VCol>
+          <VCol cols="6" md="10">
+            <span class="font-italic">
+              <VChip color="success" v-if="item.pinned == 1"> Yes </VChip>
+              <VChip color="default" v-else> No </VChip>
+            </span>
+          </VCol>
           <VCol cols="12">
             <hr />
           </VCol>
