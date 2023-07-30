@@ -79,8 +79,11 @@ class NewsController extends Controller
 
         // Order
         if ($request->orderBy) {
-            $items = $items->orderBy($request->orderBy, $request->order);
+            // $items = $items->orderBy($request->orderBy, $request->order);
+            $items = $items->orderBy("pinned", "desc");
+            $items = $items->orderBy("id", "asc");
         } else {
+            $items = $items->orderBy("pinned", "desc");
             $items = $items->orderBy("id", "asc");
         }
 
