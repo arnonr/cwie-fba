@@ -2,10 +2,19 @@
 import { requiredValidator } from "@validators";
 import { useRoute, useRouter } from "vue-router";
 import { useNewsStore } from "../useNewsStore";
+
+import "froala-editor/css/froala_editor.pkgd.min.css";
+import FroalaEditor from "froala-editor/js/froala_editor.pkgd.min.js";
 // const route = useRoute();
 const route = useRoute();
 const router = useRouter();
 const newsStore = useNewsStore();
+
+let baseUrl = "http://co-op.fba.kmutnb.ac.th/api";
+console.log(location.hostname);
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  baseUrl = "http://localhost:8117/api";
+}
 
 const item = ref({
   id: null,
@@ -46,6 +55,8 @@ newsStore
         item.value.news_file_old = data.news_file;
       }
       item.value.news_file = [];
+
+      initFroala();
     } else {
       console.log("error");
     }
@@ -87,7 +98,178 @@ const onSubmit = () => {
   });
 };
 
+const initFroala = () => {
+  new FroalaEditor("#detail", {
+    height: 300,
+    // inlineMode: false,
+    pastePlain: true,
+    paragraphy: false,
+    quickInsertEnabled: false,
+    toolbarButtons: [
+      "undo",
+      "redo",
+      "fullscreen",
+      "|",
+      "fontSize",
+      "color",
+      "bold",
+      "italic",
+      "underline",
+      "inlineClass",
+      "|",
+      "paragraphFormat",
+      "align",
+      "outdent",
+      "indent",
+      "|",
+      "formatOL",
+      "formatUL",
+      "quote",
+      "-",
+      "insertLink",
+      "insertImage",
+      "insertVideo",
+      "insertFile",
+      "insertTable",
+      "|",
+      "fontAwesome",
+      "insertHR",
+      "selectAll",
+      "clearFormatting",
+      "|",
+      "print",
+      "getPDF",
+      "html",
+    ],
+    // Change buttons for XS screen.
+    toolbarButtonsXS: [
+      ["undo", "redo"],
+      ["bold", "italic", "underline"],
+    ],
+    placeholderText: "",
+    attribution: false,
+    key: "enter-your-license-key-here",
+    disableRightClick: true,
+
+    imageUploadURL: baseUrl + "/froala/image",
+    imageAllowedTypes: ["jpeg", "jpg", "png"],
+
+    fileUploadURL: baseUrl + "/froala/document",
+    videoUploadURL: baseUrl + "/froala/video",
+
+    // fileUpload: false,
+    // imageUpload: false,
+    imagePaste: false,
+    imagePasteProcess: false,
+    imageResize: true,
+    crossDomain: true,
+    events: {
+      keyup: function (inputEvent) {
+        item.value.detail = this.html.get();
+      },
+      click: function (clickEvent) {
+        item.value.detail = this.html.get();
+      },
+      "commands.after": function (cmd, param1, param2) {
+        item.value.detail = this.html.get();
+      },
+      "paste.after": function (pasteEvent) {
+        item.value.detail = this.html.get();
+      },
+    },
+  });
+
+  new FroalaEditor("#news_detail", {
+    height: 300,
+    // inlineMode: false,
+    pastePlain: true,
+    paragraphy: false,
+    quickInsertEnabled: false,
+    toolbarButtons: [
+      "undo",
+      "redo",
+      "fullscreen",
+      "|",
+      "fontSize",
+      "color",
+      "bold",
+      "italic",
+      "underline",
+      "inlineClass",
+      "|",
+      "paragraphFormat",
+      "align",
+      "outdent",
+      "indent",
+      "|",
+      "formatOL",
+      "formatUL",
+      "quote",
+      "-",
+      "insertLink",
+      "insertImage",
+      "insertVideo",
+      "insertFile",
+      "insertTable",
+      "|",
+      "fontAwesome",
+      "insertHR",
+      "selectAll",
+      "clearFormatting",
+      "|",
+      "print",
+      "getPDF",
+      "html",
+    ],
+    // Change buttons for XS screen.
+    toolbarButtonsXS: [
+      ["undo", "redo"],
+      ["bold", "italic", "underline"],
+    ],
+    placeholderText: "",
+    attribution: false,
+    key: "enter-your-license-key-here",
+    disableRightClick: true,
+
+    imageUploadURL: baseUrl + "/froala/image",
+    // imageAllowedTypes: ['jpeg', 'jpg', 'png'],
+
+    fileUploadURL: baseUrl + "/froala/document",
+    videoUploadURL: baseUrl + "/froala/video",
+
+    // fileUpload: false,
+    // imageUpload: false,
+    imagePaste: false,
+    imagePasteProcess: false,
+    imageResize: true,
+    crossDomain: true,
+    events: {
+      keyup: function (inputEvent) {
+        item.value.news_detail = this.html.get();
+      },
+      click: function (clickEvent) {
+        item.value.news_detail = this.html.get();
+      },
+      "commands.after": function (cmd, param1, param2) {
+        item.value.news_detail = this.html.get();
+      },
+      "paste.after": function (pasteEvent) {
+        item.value.news_detail = this.html.get();
+      },
+      initialized: function () {
+        this.html.insert(item.value.news_detail);
+      },
+    },
+  });
+};
+
 onMounted(() => {
+  let fr = document.querySelectorAll(
+    '[href="https://www.froala.com/wysiwyg-editor?k=u"]'
+  );
+  for (let i = 0; i < fr.length; ++i) {
+    fr[i].style.display = "none";
+  }
   window.scrollTo(0, 0);
 });
 </script>
@@ -137,12 +319,13 @@ onMounted(() => {
               <label class="font-weight-bold">เนื้อหาข่าว : </label>
             </VCol>
             <VCol cols="12" md="10">
-              <AppTextarea
+              <!-- <AppTextarea
                 id="news_detail"
                 v-model="item.news_detail"
                 placeholder="Detail"
                 persistent-placeholder
-              />
+              /> -->
+              <div id="news_detail"></div>
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">

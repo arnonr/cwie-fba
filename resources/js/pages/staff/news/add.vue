@@ -3,6 +3,9 @@ import { requiredValidator } from "@validators";
 import { useRoute, useRouter } from "vue-router";
 import { useNewsStore } from "./useNewsStore";
 
+import "froala-editor/css/froala_editor.pkgd.min.css";
+import FroalaEditor from "froala-editor/js/froala_editor.pkgd.min.js";
+
 const route = useRoute();
 const router = useRouter();
 const newsStore = useNewsStore();
@@ -11,6 +14,12 @@ const emit = defineEmits([
   "toggle:isDialogAddCompanyVisible",
   "update:companyItem",
 ]);
+
+let baseUrl = "http://co-op.fba.kmutnb.ac.th/api";
+console.log(location.hostname);
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  baseUrl = "http://localhost:8117/api";
+}
 
 // console.log(issetprops.isDialogAddCompanyVisible);
 
@@ -52,6 +61,10 @@ const onSubmit = () => {
           news_file:
             item.value.news_file.length !== 0 ? item.value.news_file[0] : null,
           news_cate_id: 1,
+          news_detail: item.value.news_detail.replace(
+            '<p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>',
+            ""
+          ),
         })
         .then((response) => {
           if (response.data.message == "success") {
@@ -75,7 +88,170 @@ const onSubmit = () => {
   });
 };
 
+const initFroala = () => {
+  new FroalaEditor("#detail", {
+    height: 300,
+    // inlineMode: false,
+    pastePlain: true,
+    paragraphy: false,
+    quickInsertEnabled: false,
+    toolbarButtons: [
+      "undo",
+      "redo",
+      "fullscreen",
+      "|",
+      "fontSize",
+      "color",
+      "bold",
+      "italic",
+      "underline",
+      "inlineClass",
+      "|",
+      "paragraphFormat",
+      "align",
+      "outdent",
+      "indent",
+      "|",
+      "formatOL",
+      "formatUL",
+      "quote",
+      "-",
+      "insertLink",
+      "insertImage",
+      "insertVideo",
+      "insertFile",
+      "insertTable",
+      "|",
+      "fontAwesome",
+      "insertHR",
+      "selectAll",
+      "clearFormatting",
+      "|",
+      "print",
+      "getPDF",
+      "html",
+    ],
+    // Change buttons for XS screen.
+    toolbarButtonsXS: [
+      ["undo", "redo"],
+      ["bold", "italic", "underline"],
+    ],
+    placeholderText: "",
+    attribution: false,
+    key: "enter-your-license-key-here",
+    disableRightClick: true,
+
+    imageUploadURL: baseUrl + "/froala/image",
+    imageAllowedTypes: ["jpeg", "jpg", "png"],
+
+    fileUploadURL: baseUrl + "/froala/document",
+    videoUploadURL: baseUrl + "/froala/video",
+
+    // fileUpload: false,
+    // imageUpload: false,
+    imagePaste: false,
+    imagePasteProcess: false,
+    imageResize: true,
+    crossDomain: true,
+    events: {
+      keyup: function (inputEvent) {
+        item.value.detail = this.html.get();
+      },
+      click: function (clickEvent) {
+        item.value.detail = this.html.get();
+      },
+      "commands.after": function (cmd, param1, param2) {
+        item.value.detail = this.html.get();
+      },
+      "paste.after": function (pasteEvent) {
+        item.value.detail = this.html.get();
+      },
+    },
+  });
+
+  new FroalaEditor("#news_detail", {
+    height: 300,
+    // inlineMode: false,
+    pastePlain: true,
+    paragraphy: false,
+    quickInsertEnabled: false,
+    toolbarButtons: [
+      "undo",
+      "redo",
+      "fullscreen",
+      "|",
+      "fontSize",
+      "color",
+      "bold",
+      "italic",
+      "underline",
+      "inlineClass",
+      "|",
+      "paragraphFormat",
+      "align",
+      "outdent",
+      "indent",
+      "|",
+      "formatOL",
+      "formatUL",
+      "quote",
+      "-",
+      "insertLink",
+      "insertImage",
+      "insertVideo",
+      "insertFile",
+      "insertTable",
+      "|",
+      "fontAwesome",
+      "insertHR",
+      "selectAll",
+      "clearFormatting",
+      "|",
+      "print",
+      "getPDF",
+      "html",
+    ],
+    // Change buttons for XS screen.
+    toolbarButtonsXS: [
+      ["undo", "redo"],
+      ["bold", "italic", "underline"],
+    ],
+    placeholderText: "",
+    attribution: false,
+    key: "enter-your-license-key-here",
+    disableRightClick: true,
+
+    imageUploadURL: baseUrl + "/froala/image",
+    // imageAllowedTypes: ['jpeg', 'jpg', 'png'],
+
+    fileUploadURL: baseUrl + "/froala/document",
+    videoUploadURL: baseUrl + "/froala/video",
+
+    // fileUpload: false,
+    // imageUpload: false,
+    imagePaste: false,
+    imagePasteProcess: false,
+    imageResize: true,
+    crossDomain: true,
+    events: {
+      keyup: function (inputEvent) {
+        item.value.news_detail = this.html.get();
+      },
+      click: function (clickEvent) {
+        item.value.news_detail = this.html.get();
+      },
+      "commands.after": function (cmd, param1, param2) {
+        item.value.news_detail = this.html.get();
+      },
+      "paste.after": function (pasteEvent) {
+        item.value.news_detail = this.html.get();
+      },
+    },
+  });
+};
+
 onMounted(() => {
+  initFroala();
   window.scrollTo(0, 0);
 });
 </script>
@@ -116,12 +292,14 @@ onMounted(() => {
               <label class="font-weight-bold">เนื้อหาข่าว : </label>
             </VCol>
             <VCol cols="12" md="10">
-              <AppTextarea
+              <!-- <AppTextarea
                 id="news_detail"
                 v-model="item.news_detail"
                 placeholder="Detail"
                 persistent-placeholder
-              />
+              /> -->
+
+              <div id="news_detail"></div>
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">

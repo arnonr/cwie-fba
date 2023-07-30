@@ -136,7 +136,7 @@ hr {
             <span class="font-weight-bold">เนื้อหาข่าว : </span>
           </VCol>
           <VCol cols="12" md="10">
-            <span class="font-italic">{{ item.news_detail }}</span>
+            <div v-html="item.news_detail"></div>
           </VCol>
           <VCol cols="12">
             <hr />

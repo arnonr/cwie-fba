@@ -42,7 +42,11 @@ fetchItem();
           <hr />
           <div class="mt-5">
             <VImg :src="item.news_file" cover width="500" class="mx-auto" />
-            <div class="mt-5 ml-5 mr-5">{{ item.news_detail }}</div>
+            <div
+              class="ml-5 mr-5"
+              style="margin-top: 3em"
+              v-html="item.news_detail"
+            ></div>
           </div>
         </VCard>
       </VCol>
