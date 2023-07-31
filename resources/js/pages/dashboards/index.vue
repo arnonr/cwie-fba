@@ -22,7 +22,18 @@ const dashboardStore = useDashboardStore();
 
 const news = ref([]);
 const documentDownloads = ref([]);
-const manuals = ref([]);
+const manuals = ref([
+  {
+    manual_file: "https://youtu.be/qL2st5Ls57c",
+    manual_url: "https://youtu.be/qL2st5Ls57c",
+    name: "การใช้งานระบบสำหรับนักศึกษา",
+  },
+  {
+    manual_file: "https://youtu.be/QFhDqZdy8ms",
+    manual_url: "https://youtu.be/QFhDqZdy8ms",
+    name: "การอัพโหลดแผนการปฏิบัติงาน",
+  },
+]);
 
 // 👉 Fetching
 const fetchItems = () => {
@@ -208,10 +219,10 @@ fetchDocumentDownload();
               <tbody>
                 <tr v-for="(mn, index) in manuals" :key="index">
                   <td>
-                    <a :href="mn.manual_file" target="_blank">{{ mn.name }}</a>
+                    <a :href="mn.manual_url" target="_blank">{{ mn.name }}</a>
                   </td>
                   <td class="text-center">
-                    <a :href="mn.manual_file" target="_blank">
+                    <a :href="mn.manual_url" target="_blank">
                       <VIcon
                         size="22"
                         icon="tabler-file"
