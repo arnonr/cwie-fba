@@ -529,6 +529,17 @@ class StudentController extends Controller
                     }
                 }
 
+                if ($request->plan_status) {
+                    if ($request->plan_status == 1) {
+                        $items->whereNotNull("form.plan_send_at");
+                        $items->whereNull("form.plan_accept_at");
+                    }
+
+                    if ($request->plan_status == 2) {
+                        $items->whereNotNull("form.plan_accept_at");
+                    }
+                }
+
                 // whereNotNull()
             }
         }
@@ -631,7 +642,11 @@ class StudentController extends Controller
         }
 
         if ($request->status_id) {
-            $items->where("student.status_id", $request->status_id);
+            if ($request->status_id == 11) {
+                $items->where("student.status_id", ">=", $request->status_id);
+            } else {
+                $items->where("student.status_id", $request->status_id);
+            }
         }
 
         if ($request->student_code) {

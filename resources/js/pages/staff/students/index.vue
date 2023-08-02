@@ -29,6 +29,7 @@ const advancedSearch = reactive({
   company_name: "",
   province_id: "",
   approve_status: "",
+  plan_status: "",
 });
 
 const selectOptions = ref({
@@ -60,6 +61,10 @@ const selectOptions = ref({
   approve_statuses: [
     { title: "รอการอนุมัติ", value: 5 },
     { title: "อนุมัติเรียบร้อย", value: 6 },
+  ],
+  plan_statuses: [
+    { title: "รออนุมัติแผน", value: 1 },
+    { title: "อนุมัติแผนเรียบร้อย", value: 2 },
   ],
 });
 
@@ -261,6 +266,18 @@ onMounted(() => {
             />
           </VCol>
           <VSpacer />
+
+          <VCol cols="12" sm="4">
+            <VSelect
+              label="สถานะแผนการปฏิบัติงาน"
+              v-model="advancedSearch.plan_status"
+              density="compact"
+              variant="outlined"
+              clearable
+              :items="selectOptions.plan_statuses"
+            />
+          </VCol>
+          <VSpacer />
           <VCol cols="12" sm="4">
             <VTextField
               v-model="advancedSearch.student_code"
@@ -269,7 +286,7 @@ onMounted(() => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol cols="12" sm="4">
             <VTextField
               v-model="advancedSearch.firstname"
               label="ชื่อ"
@@ -277,7 +294,7 @@ onMounted(() => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol cols="12" sm="4">
             <VTextField
               v-model="advancedSearch.surname"
               label="นามสกุล"
@@ -297,7 +314,7 @@ onMounted(() => {
           </VCol>
 
           <VSpacer />
-          <VCol cols="12" sm="2">
+          <VCol cols="12" sm="3">
             <VSelect
               label="ชั้นปี"
               v-model="advancedSearch.class_year"
@@ -320,7 +337,7 @@ onMounted(() => {
             />
           </VCol>
 
-          <VCol cols="12" sm="7">
+          <VCol cols="12" sm="12">
             <VTextField
               label="สถานประกอบการ"
               v-model="advancedSearch.company_name"

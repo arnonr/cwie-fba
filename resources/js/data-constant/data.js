@@ -415,8 +415,8 @@ export const statuses = [
   { value: 9, title: "สถานประกอบการปฏิเสธ" },
   { value: 10, title: "นักศึกษาสละสิทธิ์" },
   { value: 11, title: "ออกหนังสือส่งตัว" },
-  { value: 12, title: "ส่งแผนการปฏิบัติงาน" },
-  { value: 13, title: "อนุมัติแผนการปฏิบัติงาน" },
+  //   { value: 12, title: "ส่งแผนการปฏิบัติงาน" },
+  //   { value: 13, title: "อนุมัติแผนการปฏิบัติงาน" },
 ];
 
 export const statusShow = (
