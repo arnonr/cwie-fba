@@ -1060,17 +1060,22 @@ const generatePDF = async () => {
     }
   );
 
-  existingPage.drawText(
-    formActive.value.request_name +
+  let request_name = "";
+  if (formActive.value.request_name == "-") {
+    request_name = formActive.value.request_position;
+  } else {
+    request_name =
+      formActive.value.request_name +
       " (" +
       formActive.value.request_position +
-      ")",
-    {
-      x: 105,
-      y: 595,
-      ...defaultSize,
-    }
-  );
+      ")";
+  }
+
+  existingPage.drawText(request_name, {
+    x: 105,
+    y: 595,
+    ...defaultSize,
+  });
 
   existingPage.drawText(formActive.value.company_name, {
     x: 105, //คอลัมน์ ซ้ายไปขวา
@@ -1258,17 +1263,22 @@ const generateSendPDF = async () => {
     }
   );
 
-  existingPage.drawText(
-    formActive.value.request_name +
+  let request_name = "";
+  if (formActive.value.request_name == "-") {
+    request_name = formActive.value.request_position;
+  } else {
+    request_name =
+      formActive.value.request_name +
       " (" +
       formActive.value.request_position +
-      ")",
-    {
-      x: 105,
-      y: 595,
-      ...defaultSize,
-    }
-  );
+      ")";
+  }
+
+  existingPage.drawText(request_name, {
+    x: 105,
+    y: 595,
+    ...defaultSize,
+  });
 
   existingPage.drawText(formActive.value.company_name, {
     x: 220, //คอลัมน์ ซ้ายไปขวา
