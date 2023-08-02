@@ -80,8 +80,8 @@ const selectOptions = ref({
   teachers: [],
   companies: [],
   book_statuses: [
-    { title: "รอออกหนังสือขอความอนุเคราะห์", value: 1 },
-    { title: "ออกหนังสือขอความอนุเคราะห์แล้ว", value: 2 },
+    { title: "รอออกหนังสือขอความอนุเคราะห์", value: 3 },
+    { title: "ออกหนังสือขอความอนุเคราะห์แล้ว", value: 4 },
   ],
 });
 

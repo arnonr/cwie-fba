@@ -29,6 +29,7 @@ const advancedSearch = reactive({
   supervision_id: "",
   company_name: "",
   province_id: "",
+  approve_status: "",
 });
 
 const selectOptions = ref({
@@ -57,6 +58,10 @@ const selectOptions = ref({
   class_rooms: class_rooms,
   teachers: [],
   companies: [],
+  approve_statuses: [
+    { title: "รออการอนุมัติ", value: 1 },
+    { title: "อนุมัติเรียบร้อย", value: 2 },
+  ],
 });
 
 const fetchProvinces = () => {
@@ -240,6 +245,16 @@ onMounted(() => {
           <VSpacer />
           <VCol cols="12" sm="4">
             <VSelect
+              label="สถานะการอนุมัติ"
+              v-model="advancedSearch.approve_status"
+              density="compact"
+              variant="outlined"
+              clearable
+              :items="selectOptions.approve_statuses"
+            />
+          </VCol>
+          <!-- <VCol cols="12" sm="4">
+            <VSelect
               label="สถานะ"
               v-model="advancedSearch.status_id"
               density="compact"
@@ -247,7 +262,7 @@ onMounted(() => {
               clearable
               :items="selectOptions.statuses"
             />
-          </VCol>
+          </VCol> -->
           <VSpacer />
           <VCol cols="12" sm="2">
             <VTextField

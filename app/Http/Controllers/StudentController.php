@@ -501,6 +501,34 @@ class StudentController extends Controller
                     }
                 }
 
+                if ($request->approve_status) {
+                    if ($request->approve_status == 1) {
+                        $items->whereNull("form.advisor_verified_at");
+                    }
+
+                    if ($request->approve_status == 2) {
+                        $items->whereNotNull("form.advisor_verified_at");
+                    }
+
+                    if ($request->approve_status == 3) {
+                        $items->whereNotNull("form.advisor_verified_at");
+                        $items->whereNull("form.chairman_approved_at");
+                    }
+
+                    if ($request->approve_status == 4) {
+                        $items->whereNotNull("form.chairman_approved_at");
+                    }
+
+                    if ($request->approve_status == 5) {
+                        $items->whereNotNull("form.chairman_approved_at");
+                        $items->whereNull("form.faculty_confirmed_at");
+                    }
+
+                    if ($request->approve_status == 6) {
+                        $items->whereNotNull("form.faculty_confirmed_at");
+                    }
+                }
+
                 // whereNotNull()
             }
         }
