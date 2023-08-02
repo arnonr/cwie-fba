@@ -1248,7 +1248,7 @@ const generateSendPDF = async () => {
   });
 
   existingPage.drawText(
-    dayjs(formActive.value.request_document_date)
+    dayjs(formActive.value.send_document_date)
       .locale("th")
       .format("DD MMMM BBBB"),
     {
@@ -2712,8 +2712,7 @@ onMounted(() => {
                 />
               </VCol>
 
-              <VCol cols="12">
-                <!--  -->
+              <!-- <VCol cols="12">
                 <label class="v-label" for="workplace_googlemap_file">
                   ไฟล์ภาพ Google Map
                 </label>
@@ -2722,8 +2721,7 @@ onMounted(() => {
                   label="Upload File"
                   persistent-placeholder
                 />
-                <!--  -->
-              </VCol>
+              </VCol> -->
             </VRow>
           </VForm>
         </VCardItem>

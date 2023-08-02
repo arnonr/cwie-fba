@@ -342,6 +342,7 @@ const onSubmit = () => {
 };
 
 const onValidate = () => {
+  // แก้ไข
   refForm.value?.validate().then(({ valid }) => {
     if (!valid) {
       isOverlay.value = false;
