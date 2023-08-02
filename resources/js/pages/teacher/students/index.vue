@@ -18,7 +18,7 @@ const teacherData = JSON.parse(localStorage.getItem("teacherData"));
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: 2,
+  status_id: "",
   student_code: "",
   firstname: "",
   surname: "",

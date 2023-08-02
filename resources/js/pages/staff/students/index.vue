@@ -17,7 +17,7 @@ const order = ref("desc");
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: 4,
+  status_id: "",
   student_code: "",
   firstname: "",
   surname: "",
@@ -28,6 +28,7 @@ const advancedSearch = reactive({
   supervision_id: "",
   company_name: "",
   province_id: "",
+  approve_status: "",
 });
 
 const selectOptions = ref({
@@ -56,6 +57,10 @@ const selectOptions = ref({
   class_rooms: class_rooms,
   teachers: [],
   companies: [],
+  approve_statuses: [
+    { title: "รอการอนุมัติ", value: 5 },
+    { title: "อนุมัติเรียบร้อย", value: 6 },
+  ],
 });
 
 const fetchProvinces = () => {
@@ -235,6 +240,18 @@ onMounted(() => {
           <VSpacer />
           <VCol cols="12" sm="4">
             <VSelect
+              label="สถานะการอนุมัติ"
+              v-model="advancedSearch.approve_status"
+              density="compact"
+              variant="outlined"
+              clearable
+              :items="selectOptions.approve_statuses"
+            />
+          </VCol>
+          <VSpacer />
+
+          <VCol cols="12" sm="4">
+            <VSelect
               label="สถานะ"
               v-model="advancedSearch.status_id"
               density="compact"
@@ -244,7 +261,7 @@ onMounted(() => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="2">
+          <VCol cols="12" sm="4">
             <VTextField
               v-model="advancedSearch.student_code"
               label="รหัสนักศึกษา"
@@ -280,7 +297,7 @@ onMounted(() => {
           </VCol>
 
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol cols="12" sm="2">
             <VSelect
               label="ชั้นปี"
               v-model="advancedSearch.class_year"
@@ -303,7 +320,7 @@ onMounted(() => {
             />
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol cols="12" sm="7">
             <VTextField
               label="สถานประกอบการ"
               v-model="advancedSearch.company_name"
