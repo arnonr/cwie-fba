@@ -209,12 +209,13 @@ const onSubmit = () => {
                   class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4"
                 >
                   <VCheckbox v-model="rememberMe" label="Remember me" />
-                  <RouterLink
+                  <a
                     class="text-primary ms-2 mb-1"
-                    :to="{ name: 'forgot-password' }"
+                    href="https://account.kmutnb.ac.th/web/recovery/index"
+                    target="_blank"
                   >
                     Forgot Password?
-                  </RouterLink>
+                  </a>
                 </div>
 
                 <VBtn block type="submit"> Login </VBtn>
