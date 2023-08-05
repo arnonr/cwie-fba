@@ -567,7 +567,9 @@ const format = (date) => {
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="mail">เมล : </label>
+              <label class="v-label font-weight-bold" for="mail"
+                >เมล(@kmutnb.ac.th เท่านั้น) :
+              </label>
               <AppTextField
                 id="email"
                 v-model="companyItem.email"
