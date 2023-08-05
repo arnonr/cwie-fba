@@ -40,8 +40,8 @@ const readFileAsync = (file) => {
   });
 };
 //
-const studentStore = useStudentStore();
 const cwieDataStore = useCwieDataStore();
+const studentStore = useStudentStore();
 
 const rowPerPage = ref(20);
 const currentPage = ref(1);
