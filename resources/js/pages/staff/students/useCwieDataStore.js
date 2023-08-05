@@ -46,6 +46,26 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
       );
     },
 
+    fetchTeacher({ id }) {
+      return axios.get(
+        `/teacher/${id}`,
+        {},
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    fetchCompany({ id }) {
+      return axios.get(
+        `/company/${id}`,
+        {},
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
     fetchProvinces(params) {
       return axios.get(
         "/province",

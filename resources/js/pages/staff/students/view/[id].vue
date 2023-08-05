@@ -20,13 +20,45 @@ const cwieDataStore = useCwieDataStore();
 
 let userData = JSON.parse(localStorage.getItem("userData"));
 
+import { PDFDocument, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+
 const student = ref({});
 const item = ref({});
+const formActive = ref({});
 const rejectLog = ref({
   comment: "",
   reject_status_id: 3,
   form_id: null,
   user_id: userData.user_id,
+});
+
+const company = ref({
+  name_th: "",
+  tel: "",
+  address: "",
+  fax: "",
+  email: "",
+  province_name: "",
+  amphur_name: "",
+  tumbol_name: "",
+  zipcode: "",
+});
+
+const response_company = ref({
+  response_document_file: [],
+  status_id: "",
+  result: "",
+  response_send_at: "",
+  province_id: null,
+});
+
+const chairman = ref({
+  prefix: "",
+  firstname: "",
+  surname: "",
+  signature_file: "",
+  executive_position: "",
 });
 
 const rowPerPage = ref(20);
@@ -340,6 +372,39 @@ const fetchForms = () => {
         const { data } = response.data;
 
         for (let i = 0; i < data.length; i++) {
+          if (data[i].active == 1) {
+            response_company.value.form_id = data[i].id;
+            formActive.value = data[i];
+
+            await cwieDataStore
+              .fetchTeacher({ id: formActive.value.chairman_id })
+              .then((response) => {
+                if (response.status === 200) {
+                  chairman.value = response.data.data;
+                } else {
+                  console.log("error");
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+                isOverlay.value = false;
+              });
+
+            await cwieDataStore
+              .fetchCompany({ id: formActive.value.company_id })
+              .then((response) => {
+                if (response.status === 200) {
+                  company.value = response.data.data;
+                } else {
+                  console.log("error");
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+                isOverlay.value = false;
+              });
+          }
+
           await cwieDataStore
             .fetchMajorHeads({
               semester_id: data[i].semester_id,
@@ -540,6 +605,739 @@ const responseProvinceName = (response_province_id) => {
   } else {
     return "-";
   }
+};
+
+const generateRegisPDF = async () => {
+  isOverlay.value = true;
+  const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
+  const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
+  const fontBytes = await fetch(urlFont).then((res) => res.arrayBuffer());
+  const fontBytesBold = await fetch(urlFontBold).then((res) =>
+    res.arrayBuffer()
+  );
+
+  let url = "";
+  url = window.location.origin + "/storage/pdf/book_regis.pdf";
+
+  const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
+
+  const pdfTemplate = await PDFDocument.load(existingPdfBytes);
+  // Create PDF
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const sarabunFont = await pdfDoc.embedFont(fontBytes);
+  const sarabunBoldFont = await pdfDoc.embedFont(fontBytesBold);
+
+  const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
+  pdfDoc.addPage(existingPage);
+
+  const defaultSize = {
+    size: 16,
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  };
+
+  existingPage.drawText(formActive.value.term.toString(), {
+    x: 285, //คอลัมน์ ซ้ายไปขวา
+    y: 692, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.semester_year, {
+    x: 315, //คอลัมน์ ซ้ายไปขวา
+    y: 692, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  const photoUrl = student.value.photo_file;
+
+  const photoImageBytes = await fetch(photoUrl).then((res) =>
+    res.arrayBuffer()
+  );
+
+  let photoImage;
+  try {
+    photoImage = await pdfDoc.embedPng(photoImageBytes);
+  } catch (error) {
+    photoImage = await pdfDoc.embedJpg(photoImageBytes);
+  }
+
+  existingPage.drawImage(photoImage, {
+    x: 473,
+    y: 684,
+    width: 70,
+    height: 90,
+  });
+
+  existingPage.drawText(
+    student.value.prefix_name +
+      student.value.firstname +
+      " " +
+      student.value.surname,
+    {
+      x: 220,
+      y: 658,
+      ...defaultSize,
+    }
+  );
+  existingPage.drawText(student.value.student_code, {
+    x: 200,
+    y: 638,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.class_year.toString(), {
+    x: 433,
+    y: 638,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.class_room, {
+    x: 500,
+    y: 638,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.advisor_name, {
+    x: 150,
+    y: 616,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.major_name, {
+    x: 360, //คอลัมน์ ซ้ายไปขวา
+    y: 616, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.tel, {
+    x: 105,
+    y: 595,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.email, {
+    x: 270,
+    y: 596,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.gpa.toString(), {
+    x: 520,
+    y: 595,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.term.toString(), {
+    x: 343,
+    y: 574,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.semester_year, {
+    x: 370,
+    y: 574,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.start_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 455,
+      y: 574,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(formActive.value.end_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 109,
+      y: 553,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(formActive.value.round_no.toString(), {
+    x: 260,
+    y: 553,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.company_name, {
+    x: 230,
+    y: 523,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.address, {
+    x: 160,
+    y: 502,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.tumbol_name, {
+    x: 130,
+    y: 460,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.amphur_name, {
+    x: 300,
+    y: 460,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.province_name, {
+    x: 455,
+    y: 460,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.postcode, {
+    x: 160,
+    y: 439,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(company.value.tel, {
+    x: 250,
+    y: 439,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    company.value.email == null ? "" : company.value.email,
+    {
+      x: 380,
+      y: 439,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(student.value.contact1_name, {
+    x: 270,
+    y: 406,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.contact1_relation, {
+    x: 140,
+    y: 385,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.contact1_tel, {
+    x: 275,
+    y: 385,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.request_name, {
+    x: 130,
+    y: 330,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.request_position, {
+    x: 400,
+    y: 330,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.firstname + " " + student.value.surname, {
+    x: 375,
+    y: 243,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.chairman_approved_at)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 375,
+      y: 215,
+      ...defaultSize,
+    }
+  );
+
+  //   const sigUrl = chairman.value.signature_file;
+  //   const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
+  //   const sigImage = await pdfDoc.embedPng(sigImageBytes);
+  //   existingPage.drawImage(sigImage, {
+  //     x: 310,
+  //     y: 120,
+  //     width: 100,
+  //     height: 50,
+  //   });
+
+  //   existingPage.drawText(
+  //     chairman.value.prefix +
+  //       " " +
+  //       chairman.value.firstname +
+  //       " " +
+  //       chairman.value.surname,
+  //     {
+  //       x: 300,
+  //       y: 117,
+  //       ...defaultSize,
+  //     }
+  //   );
+
+  //   existingPage.drawText(chairman.value.executive_position, {
+  //     x: 275,
+  //     y: 96,
+  //     ...defaultSize,
+  //   });
+
+  const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
+  pdfDoc.addPage(existingPage2);
+
+  existingPage2.drawText(student.value.advisor_name, {
+    x: 250,
+    y: 508,
+    ...defaultSize,
+  });
+
+  existingPage2.drawText(
+    dayjs(formActive.value.advisor_verified_at)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 250,
+      y: 482,
+      ...defaultSize,
+    }
+  );
+
+  existingPage2.drawText(formActive.value.major_head_name, {
+    x: 250,
+    y: 304,
+    ...defaultSize,
+  });
+
+  existingPage2.drawText(
+    dayjs(formActive.value.chairman_approved_at)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 250,
+      y: 278,
+      ...defaultSize,
+    }
+  );
+
+  //   existingPage2.drawText(formActive.value.advisor_verified_at, {
+  //     x: 375,
+  //     y: 243,
+  //     ...defaultSize,
+  //   });
+
+  //   existingPage2.drawText(formActive.value.teacher.fullname, {
+  //     x: 375,
+  //     y: 243,
+  //     ...defaultSize,
+  //   });
+
+  //   existingPage2.drawText(formActive.value.chairman_approved_at, {
+  //     x: 375,
+  //     y: 243,
+  //     ...defaultSize,
+  //   });
+
+  const pdfBytes = await pdfDoc.save();
+  let objectPdf = URL.createObjectURL(
+    new Blob([pdfBytes.buffer], { type: "application/pdf" } /* (1) */)
+  );
+
+  const link = document.createElement("a");
+  link.href = objectPdf;
+  //
+  link.download = "book.pdf";
+  link.click();
+
+  isOverlay.value = false;
+};
+
+const generatePDF = async () => {
+  isOverlay.value = true;
+  const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
+  const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
+  const fontBytes = await fetch(urlFont).then((res) => res.arrayBuffer());
+  const fontBytesBold = await fetch(urlFontBold).then((res) =>
+    res.arrayBuffer()
+  );
+  let url = "";
+  url = window.location.origin + "/storage/pdf/book1.pdf";
+
+  const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
+  const pdfTemplate = await PDFDocument.load(existingPdfBytes);
+  // Create PDF
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const sarabunFont = await pdfDoc.embedFont(fontBytes);
+  const sarabunBoldFont = await pdfDoc.embedFont(fontBytesBold);
+
+  const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
+  pdfDoc.addPage(existingPage);
+
+  const defaultSize = {
+    size: 16,
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  };
+
+  existingPage.drawText(formActive.value.request_document_number, {
+    x: 80, //คอลัมน์ ซ้ายไปขวา
+    y: 757, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.request_document_date)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 335,
+      y: 668,
+      ...defaultSize,
+    }
+  );
+
+  let request_name = "";
+  if (formActive.value.request_name == "-") {
+    request_name = formActive.value.request_position;
+  } else {
+    request_name =
+      formActive.value.request_name +
+      " (" +
+      formActive.value.request_position +
+      ")";
+  }
+
+  existingPage.drawText(request_name, {
+    x: 105,
+    y: 595,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.company_name, {
+    x: 105, //คอลัมน์ ซ้ายไปขวา
+    y: 565, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.major_name, {
+    x: 210, //คอลัมน์ ซ้ายไปขวา
+    y: 365, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.term.toString(), {
+    x: 291,
+    y: 345,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.semester_year, {
+    x: 358,
+    y: 345,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.start_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 434,
+      y: 345,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(formActive.value.end_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 95,
+      y: 324,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(student.value.firstname, {
+    x: 104,
+    y: 303,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.surname, {
+    x: 248,
+    y: 303,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.class_year.toString(), {
+    x: 390,
+    y: 303,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.student_code, {
+    x: 460,
+    y: 303,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.email, {
+    x: 170,
+    y: 283,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.tel, {
+    x: 410,
+    y: 283,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.max_response_date)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 75,
+      y: 198,
+      ...defaultSize,
+    }
+  );
+
+  const sigUrl = chairman.value.signature_file;
+  const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
+
+  let sigImage;
+  try {
+    sigImage = await pdfDoc.embedPng(sigImageBytes);
+  } catch (error) {
+    sigImage = await pdfDoc.embedJpg(sigImageBytes);
+  }
+
+  existingPage.drawImage(sigImage, {
+    x: 310,
+    y: 120,
+    width: 100,
+    height: 50,
+  });
+
+  existingPage.drawText(
+    chairman.value.prefix +
+      " " +
+      chairman.value.firstname +
+      " " +
+      chairman.value.surname,
+    {
+      x: 300,
+      y: 117,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(chairman.value.executive_position, {
+    x: 275,
+    y: 96,
+    ...defaultSize,
+  });
+
+  const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
+  pdfDoc.addPage(existingPage2);
+
+  const pdfBytes = await pdfDoc.save();
+  let objectPdf = URL.createObjectURL(
+    new Blob([pdfBytes.buffer], { type: "application/pdf" } /* (1) */)
+  );
+
+  const link = document.createElement("a");
+  link.href = objectPdf;
+  link.download = "book.pdf";
+  link.click();
+
+  isOverlay.value = false;
+};
+
+const generateSendPDF = async () => {
+  isOverlay.value = true;
+  const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
+  const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
+  const fontBytes = await fetch(urlFont).then((res) => res.arrayBuffer());
+  const fontBytesBold = await fetch(urlFontBold).then((res) =>
+    res.arrayBuffer()
+  );
+  let url = "";
+  url = window.location.origin + "/storage/pdf/book2.pdf";
+
+  const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
+  const pdfTemplate = await PDFDocument.load(existingPdfBytes);
+  // Create PDF
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const sarabunFont = await pdfDoc.embedFont(fontBytes);
+  const sarabunBoldFont = await pdfDoc.embedFont(fontBytesBold);
+
+  const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
+  pdfDoc.addPage(existingPage);
+
+  const defaultSize = {
+    size: 16,
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  };
+
+  existingPage.drawText(formActive.value.send_document_number, {
+    x: 80, //คอลัมน์ ซ้ายไปขวา
+    y: 757, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.send_document_date)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 335,
+      y: 668,
+      ...defaultSize,
+    }
+  );
+
+  let request_name = "";
+  if (formActive.value.request_name == "-") {
+    request_name = formActive.value.request_position;
+  } else {
+    request_name =
+      formActive.value.request_name +
+      " (" +
+      formActive.value.request_position +
+      ")";
+  }
+
+  existingPage.drawText(request_name, {
+    x: 105,
+    y: 595,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(formActive.value.company_name, {
+    x: 220, //คอลัมน์ ซ้ายไปขวา
+    y: 523, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.major_name, {
+    x: 280, //คอลัมน์ ซ้ายไปขวา
+    y: 502, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(formActive.value.start_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 165,
+      y: 460,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(formActive.value.end_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 290,
+      y: 460,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(student.value.firstname, {
+    x: 104,
+    y: 418,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.surname, {
+    x: 248,
+    y: 418,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.class_year.toString(), {
+    x: 390,
+    y: 418,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.student_code, {
+    x: 460,
+    y: 418,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.email, {
+    x: 170,
+    y: 397,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(student.value.tel, {
+    x: 410,
+    y: 397,
+    ...defaultSize,
+  });
+
+  const sigUrl = chairman.value.signature_file;
+  const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
+
+  let sigImage;
+  try {
+    sigImage = await pdfDoc.embedPng(sigImageBytes);
+  } catch (error) {
+    sigImage = await pdfDoc.embedJpg(sigImageBytes);
+  }
+
+  existingPage.drawImage(sigImage, {
+    x: 310,
+    y: 150,
+    width: 100,
+    height: 50,
+  });
+
+  existingPage.drawText(
+    chairman.value.prefix +
+      " " +
+      chairman.value.firstname +
+      " " +
+      chairman.value.surname,
+    {
+      x: 300,
+      y: 145,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(chairman.value.executive_position, {
+    x: 275,
+    y: 125,
+    ...defaultSize,
+  });
+
+  const pdfBytes = await pdfDoc.save();
+  let objectPdf = URL.createObjectURL(
+    new Blob([pdfBytes.buffer], { type: "application/pdf" } /* (1) */)
+  );
+
+  const link = document.createElement("a");
+  link.href = objectPdf;
+  link.download = "book.pdf";
+  link.click();
+
+  isOverlay.value = false;
 };
 </script>
 <style lang="scss">
@@ -852,6 +1650,93 @@ const responseProvinceName = (response_province_id) => {
             </VWindow>
           </VCardText>
         </VCard>
+      </VCol>
+
+      <VCol cols="12" md="12">
+        <VBtn
+          color="primary"
+          class="ml-2"
+          @click="generateRegisPDF"
+          :disabled="
+            student.status_id < 5 ||
+            student.status_id == 9 ||
+            student.status_id == 10
+          "
+        >
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
+          ใบสมัครโครงการ</VBtn
+        >
+
+        <VBtn
+          color="primary"
+          class="ml-2"
+          @click="generatePDF"
+          :disabled="
+            student.status_id < 6 ||
+            student.status_id == 9 ||
+            student.status_id == 10
+          "
+        >
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
+          หนังสือขอความอนุเคราะห์</VBtn
+        >
+
+        <VBtn
+          color="primary"
+          class="ml-2"
+          @click="generateSendPDF"
+          :disabled="
+            student.status_id < 11 ||
+            student.status_id == 9 ||
+            student.status_id == 10
+          "
+        >
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
+          หนังสือส่งตัว</VBtn
+        >
+
+        <VBtn
+          color="success"
+          class="ml-2"
+          style="float: right"
+          @click="
+            router.push({
+              path: '/student/cwie-data/edit/' + formActive.id,
+              query: {
+                student_id: student.id,
+              },
+            })
+          "
+        >
+          แก้ไขข้อมูลใบสมัคร</VBtn
+        >
+
+        <VBtn
+          color="warning"
+          style="float: right"
+          @click="
+            router.push({
+              path: '/student/personal-data/' + route.params.id,
+            })
+          "
+        >
+          แก้ไขข้อมูลทั่วไป</VBtn
+        >
       </VCol>
 
       <VCol cols="12" md="12" v-for="(it, index) in items" :key="index">

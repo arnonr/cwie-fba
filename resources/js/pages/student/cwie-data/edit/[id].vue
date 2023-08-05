@@ -10,11 +10,11 @@ import { useCwieDataStore } from "../useCwieDataStore";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
+const cwieDataStore = useCwieDataStore();
 dayjs.extend(buddhistEra);
 // const route = useRoute();
 const route = useRoute();
 const router = useRouter();
-const cwieDataStore = useCwieDataStore();
 
 const item = ref({
   id: null,
@@ -199,11 +199,24 @@ const fetchCompanies = () => {
 fetchCompanies();
 
 let userData = JSON.parse(localStorage.getItem("userData"));
+
 const fetchStudent = () => {
+  let searh = {};
+
+  if (userData.role == "admin" || userData.role == "staff") {
+    searh = {
+      id: route.query.student_id,
+    };
+  } else {
+    searh = {
+      student_code: userData.username.slice(1, userData.username.length),
+    };
+  }
+
   cwieDataStore
     .fetchStudents({
       // id: route.params.id,
-      student_code: userData.username.slice(1, userData.username.length),
+      ...searh,
       includeAll: true,
       // get id self
     })
@@ -213,6 +226,8 @@ const fetchStudent = () => {
         // student.value = { ...data[0] };
 
         item.value.student_id = data[0].id;
+
+        fetchForm();
       } else {
         console.log("error");
       }
@@ -245,7 +260,6 @@ const fetchForm = () => {
       isOverlay.value = false;
     });
 };
-fetchForm();
 
 watch(
   () => item.value.province_id,
@@ -317,6 +331,13 @@ watch(
   }
 );
 
+const onCheckSubmit = () => {
+  if (userData.role == "admin" || userData.role == "staff") {
+    onStaffSubmit();
+  } else {
+    onSubmit();
+  }
+};
 const onSubmit = () => {
   isOverlay.value = true;
   refForm.value?.validate().then(({ valid }) => {
@@ -339,6 +360,43 @@ const onSubmit = () => {
             nextTick(() => {
               router.push({
                 name: "student-cwie-data",
+              });
+            });
+          } else {
+            isOverlay.value = false;
+            isDialogConfirmVisible.value = false;
+            console.log("error");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          //   isOverlay.value = false;
+        });
+    } else {
+      isOverlay.value = false;
+      isDialogConfirmVisible.value = false;
+    }
+  });
+};
+
+const onStaffSubmit = () => {
+  isOverlay.value = true;
+  refForm.value?.validate().then(({ valid }) => {
+    if (valid) {
+      cwieDataStore
+        .editForm({
+          ...item.value,
+          namecard_file:
+            item.value.namecard_file.length !== 0
+              ? item.value.namecard_file[0]
+              : null,
+        })
+        .then((response) => {
+          if (response.data.message == "success") {
+            localStorage.setItem("updated", 1);
+            nextTick(() => {
+              router.push({
+                path: "/staff/students/view/" + route.query.student_id,
               });
             });
           } else {
@@ -771,7 +829,7 @@ const format = (date) => {
           >
             Cancel
           </VBtn>
-          <VBtn @click="onSubmit()" color="error"> ส่งข้อมูล </VBtn>
+          <VBtn @click="onCheckSubmit()" color="error"> ส่งข้อมูล </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
