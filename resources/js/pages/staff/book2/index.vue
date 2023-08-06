@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import { useCwieDataStore } from "./useCwieDataStore";
-import { useStudentStore } from "./useStudentStore";
 
 import { form_statuses, statusShow } from "@/data-constant/data";
 
@@ -15,7 +14,6 @@ import "@vuepic/vue-datepicker/dist/main.css";
 dayjs.extend(buddhistEra);
 
 const cwieDataStore = useCwieDataStore();
-const studentStore = useStudentStore();
 
 const rowPerPage = ref(20);
 const currentPage = ref(1);
