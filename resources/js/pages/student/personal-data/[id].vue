@@ -905,7 +905,7 @@ const repeateAgain = () => {
                     for="Email"
                     cols="12"
                     md="2"
-                    >เมล
+                    >เมล(@kmutnb.ac.th เท่านั้น)
                   </label>
                   <AppTextField
                     id="email"
