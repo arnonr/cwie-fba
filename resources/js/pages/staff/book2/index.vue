@@ -82,7 +82,7 @@ const selectOptions = ref({
 });
 
 const fetchProvinces = () => {
-  studentStore
+  cwieDataStore
     .fetchProvinces({})
     .then((response) => {
       if (response.status === 200) {
@@ -102,7 +102,7 @@ const fetchProvinces = () => {
 fetchProvinces();
 
 const fetchSemesters = () => {
-  studentStore
+  cwieDataStore
     .fetchSemesters()
     .then((response) => {
       if (response.status === 200) {
@@ -132,7 +132,7 @@ const fetchSemesters = () => {
 fetchSemesters();
 
 const fetchTeachers = () => {
-  studentStore
+  cwieDataStore
     .fetchTeachers({})
     .then((response) => {
       if (response.status === 200) {
@@ -155,7 +155,7 @@ const fetchTeachers = () => {
 fetchTeachers();
 
 const fetchMajors = () => {
-  studentStore
+  cwieDataStore
     .fetchMajors({})
     .then((response) => {
       if (response.status === 200) {
@@ -185,7 +185,7 @@ const fetchItems = () => {
       ...advancedSearch,
       includeAll: true,
     };
-    studentStore
+    cwieDataStore
       .fetchListStudents({
         perPage: rowPerPage.value,
         currentPage: currentPage.value,
