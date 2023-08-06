@@ -36,7 +36,7 @@ const isDialogVisible = ref(false);
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: 8,
+  status_id: "",
   student_code: "",
   firstname: "",
   surname: "",

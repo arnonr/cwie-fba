@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import { useCwieDataStore } from "./useCwieDataStore";
-import { useStudentStore } from "./useStudentStore";
 
 import { form_statuses, statusShow } from "@/data-constant/data";
 
@@ -15,7 +14,6 @@ import "@vuepic/vue-datepicker/dist/main.css";
 dayjs.extend(buddhistEra);
 
 const cwieDataStore = useCwieDataStore();
-const studentStore = useStudentStore();
 
 const rowPerPage = ref(20);
 const currentPage = ref(1);
@@ -38,7 +36,7 @@ const isDialogVisible = ref(false);
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: 5,
+  status_id: "",
   student_code: "",
   firstname: "",
   surname: "",
@@ -86,7 +84,7 @@ const selectOptions = ref({
 });
 
 const fetchProvinces = () => {
-  studentStore
+  cwieDataStore
     .fetchProvinces({})
     .then((response) => {
       if (response.status === 200) {
@@ -106,7 +104,7 @@ const fetchProvinces = () => {
 fetchProvinces();
 
 const fetchSemesters = () => {
-  studentStore
+  cwieDataStore
     .fetchSemesters()
     .then((response) => {
       if (response.status === 200) {
@@ -136,7 +134,7 @@ const fetchSemesters = () => {
 fetchSemesters();
 
 const fetchTeachers = () => {
-  studentStore
+  cwieDataStore
     .fetchTeachers({})
     .then((response) => {
       if (response.status === 200) {
@@ -159,7 +157,7 @@ const fetchTeachers = () => {
 fetchTeachers();
 
 const fetchMajors = () => {
-  studentStore
+  cwieDataStore
     .fetchMajors({})
     .then((response) => {
       if (response.status === 200) {
@@ -188,7 +186,7 @@ const fetchItems = () => {
       ...advancedSearch,
       includeAll: true,
     };
-    studentStore
+    cwieDataStore
       .fetchListStudents({
         perPage: rowPerPage.value,
         currentPage: currentPage.value,

@@ -3,6 +3,56 @@ import { defineStore } from "pinia";
 
 export const useCwieDataStore = defineStore("CwieDataStore", {
   actions: {
+    fetchProvinces(params) {
+      return axios.get(
+        "/province",
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    fetchSemesters(params) {
+      return axios.get(
+        "/semester",
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    fetchTeachers(params) {
+      return axios.get(
+        `/teacher`,
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    fetchListStudents(params) {
+      return axios.get(
+        `/student`,
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    fetchMajors(params) {
+      return axios.get(
+        "/major",
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
     async fetchForms(params) {
       return axios.get(
         `/form`,
