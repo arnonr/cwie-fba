@@ -445,6 +445,7 @@ onMounted(() => {
                   <td class="text-center" style="min-width: 80px">
                     <VBtn
                       color="info"
+                      target="_blank"
                       :to="{
                         name: 'staff-students-view-id',
                         params: { id: it.id },
