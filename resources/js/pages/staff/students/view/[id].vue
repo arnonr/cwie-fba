@@ -12,11 +12,11 @@ import { useCwieDataStore } from "../useCwieDataStore";
 
 import { form_statuses, statusShow } from "@/data-constant/data";
 
+const cwieDataStore = useCwieDataStore();
 // const route = useRoute();
 dayjs.extend(buddhistEra);
 const route = useRoute();
 const router = useRouter();
-const cwieDataStore = useCwieDataStore();
 
 let userData = JSON.parse(localStorage.getItem("userData"));
 
