@@ -205,7 +205,6 @@ Route::group(["prefix" => "news"], function () {
     Route::delete("/{id}", [NewsController::class, "delete"]);
 });
 
-
 Route::group(["prefix" => "document-download-type"], function () {
     Route::get("/{id}", [DocumentDownloadTypeController::class, "get"]);
     Route::get("/", [DocumentDownloadTypeController::class, "getAll"]);
@@ -256,6 +255,14 @@ Route::group(["prefix" => "reject-log"], function () {
     Route::post("/", [RejectLogController::class, "add"]);
     Route::put("/{id}", [RejectLogController::class, "edit"]);
     Route::delete("/{id}", [RejectLogController::class, "delete"]);
+});
+
+Route::group(["prefix" => "visit"], function () {
+    Route::get("/{id}", [VisitController::class, "get"]);
+    Route::get("/", [VisitController::class, "getAll"]);
+    Route::post("/", [VisitController::class, "add"]);
+    Route::put("/{id}", [VisitController::class, "edit"]);
+    Route::delete("/{id}", [VisitController::class, "delete"]);
 });
 
 // Route::group(['prefix' => ''], function () {
