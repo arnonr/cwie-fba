@@ -26,6 +26,7 @@ use App\Http\Controllers\MajorHeadController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormStatusController;
 use App\Http\Controllers\RejectLogController;
+use App\Http\Controllers\VisitRejectLogController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\DocumentDownloadController;
 use App\Http\Controllers\VisitController;
@@ -255,6 +256,14 @@ Route::group(["prefix" => "reject-log"], function () {
     Route::post("/", [RejectLogController::class, "add"]);
     Route::put("/{id}", [RejectLogController::class, "edit"]);
     Route::delete("/{id}", [RejectLogController::class, "delete"]);
+});
+
+Route::group(["prefix" => "visit-reject-log"], function () {
+    Route::get("/{id}", [VisitRejectLogController::class, "get"]);
+    Route::get("/", [VisitRejectLogController::class, "getAll"]);
+    Route::post("/", [VisitRejectLogController::class, "add"]);
+    Route::put("/{id}", [VisitRejectLogController::class, "edit"]);
+    Route::delete("/{id}", [VisitRejectLogController::class, "delete"]);
 });
 
 Route::group(["prefix" => "visit"], function () {
