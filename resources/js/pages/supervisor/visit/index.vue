@@ -15,10 +15,12 @@ const isOverlay = ref(true);
 const orderBy = ref("student.id");
 const order = ref("desc");
 const teacherData = JSON.parse(localStorage.getItem("teacherData"));
+const semester = ref([]);
+const major = ref([]);
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: 13,
+  //   status_id: 13,
   student_code: "",
   firstname: "",
   surname: "",
@@ -29,6 +31,7 @@ const advancedSearch = reactive({
   supervision_id: "",
   company_name: "",
   province_id: "",
+  visit_status: "",
 });
 
 const selectOptions = ref({
@@ -57,6 +60,10 @@ const selectOptions = ref({
   class_rooms: class_rooms,
   teachers: [],
   companies: [],
+  visit_statuses: [
+    { title: "รออการขอออกนิเทศ", value: 1 },
+    { title: "ขอออกนิเทศเรียบร้อยแล้ว", value: 2 },
+  ],
 });
 
 const fetchProvinces = () => {
@@ -170,6 +177,7 @@ const fetchItems = () => {
       order: order.value,
       ...search,
       includeForm: true,
+      includeVisit: true,
     })
     .then((response) => {
       if (response.status === 200) {
@@ -279,12 +287,12 @@ onMounted(() => {
           <VSpacer />
           <VCol cols="12" sm="4">
             <VSelect
-              label="สถานะ"
-              v-model="advancedSearch.status_id"
+              label="สถานะการขอออกนิเทศ"
+              v-model="advancedSearch.visit_status"
               density="compact"
               variant="outlined"
               clearable
-              :items="selectOptions.statuses"
+              :items="selectOptions.visit_statuses"
             />
           </VCol>
           <VSpacer />
@@ -463,6 +471,28 @@ onMounted(() => {
                       }"
                     >
                       View</VBtn
+                    >
+
+                    <VBtn
+                      color="warning"
+                      class="ml-2"
+                      :to="{
+                        name: 'supervisor-visit-add',
+                        params: { id: it.id },
+                      }"
+                    >
+                      ขอออกนิเทศ</VBtn
+                    >
+
+                    <VBtn
+                      color="success"
+                      class="ml-2"
+                      :to="{
+                        name: 'supervisor-students-view-id',
+                        params: { id: it.id },
+                      }"
+                    >
+                      ดูข้อมูลออกนิเทศ</VBtn
                     >
                   </td>
                 </tr>
