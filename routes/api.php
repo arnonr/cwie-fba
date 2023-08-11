@@ -26,6 +26,7 @@ use App\Http\Controllers\MajorHeadController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormStatusController;
 use App\Http\Controllers\RejectLogController;
+use App\Http\Controllers\VisitRejectLogController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\DocumentDownloadController;
 use App\Http\Controllers\VisitController;
@@ -205,7 +206,6 @@ Route::group(["prefix" => "news"], function () {
     Route::delete("/{id}", [NewsController::class, "delete"]);
 });
 
-
 Route::group(["prefix" => "document-download-type"], function () {
     Route::get("/{id}", [DocumentDownloadTypeController::class, "get"]);
     Route::get("/", [DocumentDownloadTypeController::class, "getAll"]);
@@ -256,6 +256,22 @@ Route::group(["prefix" => "reject-log"], function () {
     Route::post("/", [RejectLogController::class, "add"]);
     Route::put("/{id}", [RejectLogController::class, "edit"]);
     Route::delete("/{id}", [RejectLogController::class, "delete"]);
+});
+
+Route::group(["prefix" => "visit-reject-log"], function () {
+    Route::get("/{id}", [VisitRejectLogController::class, "get"]);
+    Route::get("/", [VisitRejectLogController::class, "getAll"]);
+    Route::post("/", [VisitRejectLogController::class, "add"]);
+    Route::put("/{id}", [VisitRejectLogController::class, "edit"]);
+    Route::delete("/{id}", [VisitRejectLogController::class, "delete"]);
+});
+
+Route::group(["prefix" => "visit"], function () {
+    Route::get("/{id}", [VisitController::class, "get"]);
+    Route::get("/", [VisitController::class, "getAll"]);
+    Route::post("/", [VisitController::class, "add"]);
+    Route::put("/{id}", [VisitController::class, "edit"]);
+    Route::delete("/{id}", [VisitController::class, "delete"]);
 });
 
 // Route::group(['prefix' => ''], function () {
