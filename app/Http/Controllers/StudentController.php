@@ -1078,6 +1078,11 @@ class StudentController extends Controller
             $req->major_code = $json_data["DIV_CODE"];
             $req->major_name = $json_data["DIV_NAME_THAI"];
 
+            if ($req->major_code == "140101") {
+                $req->major_code = "140102";
+                $req->major_name = "บริหารธุรกิจอุตสาหกรรมและโลจิสติกส์";
+            }
+
             return $req;
             // return [
             //     student_code => $json_data['STU_CODE'],
@@ -1104,7 +1109,6 @@ class StudentController extends Controller
 
         if (!$item) {
             $result = $this->icitAccountApiStudentInfo($student_code);
-            // print_r($result);
 
             $faculty = app("App\Http\Controllers\FacultyController")->import(
                 $result->faculty_code,

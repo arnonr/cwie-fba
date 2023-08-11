@@ -2150,7 +2150,7 @@ onMounted(() => {
                         params: { id: it.id },
                       }"
                     >
-                      Edit
+                      ส่งใบสมัครอีกครั้ง
                     </VBtn>
 
                     <VBtn
