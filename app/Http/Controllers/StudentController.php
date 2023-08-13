@@ -142,6 +142,20 @@ class StudentController extends Controller
                 });
                 $items->where("form.semester_id", $request->semester_id);
             }
+
+            if ($request->includeVisit) {
+                $items->addSelect("visit.id as visit_id");
+                $items->addSelect("visit_status as visit_status");
+                // $items->addSelect(
+                //     "form.confirm_response_at as confirm_response_at"
+                // );
+                $items->leftJoin("visit", function ($join) {
+                    $join
+                        ->on("form.id", "=", "visit.form_id")
+                        ->where("visit.active", 1);
+                });
+                $items->where("form.semester_id", $request->semester_id);
+            }
         }
 
         if ($request->includePrefixName) {
@@ -538,6 +552,21 @@ class StudentController extends Controller
                     if ($request->plan_status == 2) {
                         $items->whereNotNull("form.plan_accept_at");
                     }
+                }
+
+                if ($request->includeVisit) {
+                    $items->addSelect("visit.visit_id as visit_id");
+                    $items->addSelect("visit_status as visit_status");
+                    $items->addSelect("visit_date as visit_date");
+                    $items->addSelect("visit_time as visit_time");
+                    // $items->addSelect(
+                    //     "form.confirm_response_at as confirm_response_at"
+                    // );
+                    $items->leftJoin("visit", function ($join) {
+                        $join
+                            ->on("form.id", "=", "visit.form_id")
+                            ->where("visit.active", 1);
+                    });
                 }
 
                 // whereNotNull()
@@ -1067,7 +1096,19 @@ class StudentController extends Controller
 
             $req = new Request();
             $req->student_code = $json_data["STU_CODE"];
-            $req->prefix_id = $json_data["STU_PRE_NAME"];
+
+            if ($json_data["STU_PRE_NAME"] == "นางสาว") {
+                $req->prefix_id = "03";
+            }
+
+            if ($json_data["STU_PRE_NAME"] == "นาง") {
+                $req->prefix_id = "02";
+            }
+
+            if ($json_data["STU_PRE_NAME"] == "นาย") {
+                $req->prefix_id = "01";
+            }
+
             $req->firstname = $json_data["STU_FIRST_NAME_THAI"];
             $req->surname = $json_data["STU_LAST_NAME_THAI"];
             $req->citizen_id = $json_data["ID_CARD"];
