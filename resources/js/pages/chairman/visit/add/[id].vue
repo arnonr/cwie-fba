@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import { useRoute, useRouter } from "vue-router";
-import { useCwieDataStore } from "./useCwieDataStore";
+import { useCwieDataStore } from "../useCwieDataStore";
 import { form_statuses, statusShow } from "@/data-constant/data";
 
 import VueDatePicker from "@vuepic/vue-datepicker";
@@ -65,7 +65,7 @@ const visit = ref({
   visit_time: null,
   co_name: null,
   co_position: null,
-  visit_type: null,
+  visit_type: { title: "onsite", value: "onsite" },
   address: null,
   googlemap_url: null,
   province_id: null,
@@ -214,6 +214,9 @@ const fetchForms = () => {
         visit.value.province_id = formItem.value.workplace_province_id;
         visit.value.amphur_id = formItem.value.workplace_amphur_id;
         visit.value.tumbol_id = formItem.value.workplace_tumbol_id;
+
+        // time
+        console.log(visit.value);
       } else {
         console.log("error");
       }
@@ -258,10 +261,14 @@ const onSubmit = () => {
       cwieDataStore
         .addVisit({
           ...visit.value,
-          start_date:
-            item.value.visit_date != "" && item.value.visit_date != null
-              ? dayjs(item.value.visit_date).format("YYYY-MM-DD")
+          visit_type: visit.value.visit_type.value,
+          visit_date:
+            visit.value.visit_date != "" && visit.value.visit_date != null
+              ? dayjs(visit.value.visit_date).format("YYYY-MM-DD")
               : null,
+          visit_time: `${visit.value.visit_time.hours}:${visit.value.visit_time.minutes}:${visit.value.visit_time.seconds}`,
+
+          //   visit_time: dayjs(visit.value.visit_time).format("HH:mm:ss"),
         })
         .then((response) => {
           if (response.data.message == "success") {
@@ -432,19 +439,12 @@ const responseTumbolName = (tumbol_id) => {
                 >เวลาออกนิเทศ :
               </label>
               <VueDatePicker
-                v-model="visit.visit_date"
-                :enable-time-picker="false"
+                v-model="visit.visit_time"
+                time-picker
                 locale="th"
                 auto-apply
-                :format="format"
                 :rules="[requiredValidator]"
               >
-                <template #year-overlay-value="{ text }">
-                  {{ parseInt(text) + 543 }}
-                </template>
-                <template #year="{ year }">
-                  {{ year + 543 }}
-                </template>
               </VueDatePicker>
             </VCol>
 
@@ -468,6 +468,18 @@ const responseTumbolName = (tumbol_id) => {
                 id="co_position"
                 v-model="visit.co_position"
                 placeholder="Position"
+                persistent-placeholder
+              />
+            </VCol>
+
+            <VCol cols="12" md="6" class="align-items-center">
+              <label class="v-label font-weight-bold" for="co_phone"
+                >เบอร์ติดต่อ พี่เลี้ยง :
+              </label>
+              <AppTextField
+                id="co_phone"
+                v-model="visit.co_phone"
+                placeholder="phone"
                 persistent-placeholder
               />
             </VCol>
@@ -568,12 +580,12 @@ const responseTumbolName = (tumbol_id) => {
                   </span>
                 </VCol>
 
-                <VCol cols="12" md="4">
+                <!-- <VCol cols="12" md="4">
                   <span>ตำบล : </span>
                   <span>
                     {{ responseTumbolName(formItem.workplace_tumbol_id) }}
                   </span>
-                </VCol>
+                </VCol> -->
 
                 <VCol cols="12" md="4">
                   <span>ลิงค์แผนที่ : </span>

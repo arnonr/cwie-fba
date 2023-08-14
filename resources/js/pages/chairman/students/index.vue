@@ -15,20 +15,25 @@ const isOverlay = ref(true);
 const orderBy = ref("student.id");
 const order = ref("desc");
 const teacherData = JSON.parse(localStorage.getItem("teacherData"));
+const semester = ref([]);
+const major = ref([]);
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: "",
+  //   status_id: 3,
   student_code: "",
   firstname: "",
   surname: "",
   major_id: "",
   class_year: "",
   class_room: "",
-  advisor_id: teacherData.id,
+  advisor_id: "",
   supervision_id: "",
   company_name: "",
   province_id: "",
+  approve_status: "",
+  //   major_id: "",
+  //   teacherData.id
 });
 
 const selectOptions = ref({
@@ -57,6 +62,10 @@ const selectOptions = ref({
   class_rooms: class_rooms,
   teachers: [],
   companies: [],
+  approve_statuses: [
+    { title: "รออการอนุมัติ", value: 3 },
+    { title: "อนุมัติเรียบร้อย", value: 4 },
+  ],
 });
 
 const fetchProvinces = () => {
@@ -81,7 +90,10 @@ fetchProvinces();
 
 const fetchSemesters = () => {
   studentStore
-    .fetchSemesters()
+    .fetchSemesters({
+      chairman_id: teacherData.id,
+      perPage: 100,
+    })
     .then((response) => {
       if (response.status === 200) {
         selectOptions.value.semesters = response.data.data.map((r) => {
@@ -95,6 +107,8 @@ const fetchSemesters = () => {
             end_date: r.end_date,
           };
         });
+
+        console.log(selectOptions.value);
         isOverlay.value = false;
       } else {
         console.log("error");
@@ -155,36 +169,38 @@ fetchMajors();
 
 // 👉 Fetching
 const fetchItems = () => {
-  let search = {
-    ...advancedSearch,
-    includeAll: true,
-  };
+  if (advancedSearch.semester_id != "") {
+    let search = {
+      ...advancedSearch,
+      includeAll: true,
+    };
 
-  //   console.log(localStorage.getItem("userData"));
-
-  studentStore
-    .fetchListStudents({
-      perPage: rowPerPage.value,
-      currentPage: currentPage.value,
-      orderBy: orderBy.value,
-      order: order.value,
-      ...search,
-      includeForm: true,
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        items.value = response.data.data;
-        totalPage.value = response.data.totalPage;
-        totalItems.value = response.data.totalData;
+    studentStore
+      .fetchListStudents({
+        perPage: rowPerPage.value,
+        currentPage: currentPage.value,
+        orderBy: orderBy.value,
+        order: order.value,
+        ...search,
+        includeForm: true,
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          items.value = response.data.data;
+          totalPage.value = response.data.totalPage;
+          totalItems.value = response.data.totalData;
+          isOverlay.value = false;
+        } else {
+          console.log("error");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
         isOverlay.value = false;
-      } else {
-        console.log("error");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
+      });
+  } else {
+    items.value = [];
+  }
 };
 
 watchEffect(fetchItems);
@@ -226,17 +242,6 @@ const resolveBlacklist = (b, type) => {
   return data[1];
 };
 
-const responseProvinceName = (response_province_id) => {
-  if (response_province_id) {
-    let response_province_select = selectOptions.value.provinces.find((x) => {
-      return x.value == response_province_id;
-    });
-    return response_province_select.title;
-  } else {
-    return "-";
-  }
-};
-
 if (localStorage.getItem("deleted") == 1) {
   snackbarText.value = "Deleted Company";
   snackbarColor.value = "success";
@@ -272,11 +277,11 @@ onMounted(() => {
               v-model="advancedSearch.semester_id"
               density="compact"
               variant="outlined"
-              clearable
               :items="selectOptions.semesters"
             />
           </VCol>
           <VSpacer />
+
           <VCol cols="12" sm="4">
             <VSelect
               label="สถานะ"
@@ -402,11 +407,9 @@ onMounted(() => {
                     สาขาวิชา
                   </th>
                   <th scope="col" class="text-center font-weight-bold">
-                    สถานประกอบการ
+                    ชั้นปี
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    จังหวัด
-                  </th>
+                  <th scope="col" class="text-center font-weight-bold">ห้อง</th>
                   <th scope="col" class="text-center font-weight-bold">
                     สถานะ
                   </th>
@@ -432,21 +435,23 @@ onMounted(() => {
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    {{ it.company_name }}
+                    {{ it.class_year }}
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    {{ responseProvinceName(it.response_province_id) }}
+                    {{ it.class_room }}
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    <VChip label :color="form_statuses[it.status_id]">{{
-                      statusShow(
-                        it.status_id,
-                        it.request_document_date,
-                        it.confirm_response_at
-                      )
-                    }}</VChip>
+                    <VChip label :color="form_statuses[it.status_id]">
+                      {{
+                        statusShow(
+                          it.status_id,
+                          it.request_document_date,
+                          it.confirm_response_at
+                        )
+                      }}</VChip
+                    >
                   </td>
 
                   <!-- 👉 Actions -->
@@ -454,7 +459,7 @@ onMounted(() => {
                     <VBtn
                       color="info"
                       :to="{
-                        name: 'supervisor-students-view-id',
+                        name: 'chairman-students-view-id',
                         params: { id: it.id },
                       }"
                     >
@@ -467,7 +472,7 @@ onMounted(() => {
               <!-- 👉 table footer  -->
               <tfoot v-show="!items.length">
                 <tr>
-                  <td colspan="7" class="text-center">No data available</td>
+                  <td colspan="7" class="text-center">โปรดเลือกปีการศึกษา</td>
                 </tr>
               </tfoot>
               <tfoot v-show="items.length"></tfoot>

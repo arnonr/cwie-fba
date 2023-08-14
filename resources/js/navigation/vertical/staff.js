@@ -35,6 +35,13 @@ export default [
     action: "manage",
     subject: "StaffUser",
   },
+  {
+    title: "หนังสือขอออกนิเทศ",
+    icon: { icon: "tabler-book" },
+    to: { name: "staff-book3" },
+    action: "manage",
+    subject: "StaffUser",
+  },
 
   { heading: "ข่าวและเอกสารดาวน์โหลด", action: "manage", subject: "StaffUser" },
   {

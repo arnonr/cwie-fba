@@ -464,10 +464,12 @@ export const book_statuses = [
   { value: 4, title: "ออกหนังสือส่งตัวแล้ว" },
 ];
 
-// it.status_id != 2
-// ? text_statuses[it.status_id] == "คณะยืนยันข้อมูล"
-//   ? it.request_document_date != null
-//     ? "ออกหนังสือขอความอนุเคราะห์แล้ว"
-//     : text_statuses[it.status_id]
-//   : it.form_status_name
-// : "อยู่ระหว่างอาจารย์ที่ปรึกษาตรวจสอบ"
+export const visit_status = [
+  { value: 1, title: "ส่งใบขอออกนิเทศ", color: "warning" },
+  { value: 2, title: "อยู่ระหว่างอนุมัติ", color: "warning" },
+  { value: 3, title: "อยู่ระหว่างผู้บริหารอนุมัติ", color: "warning" },
+  { value: 4, title: "อยู่ระหว่างคณะออกหนังสือ", color: "warning" },
+  { value: 5, title: "ออกหนังสือสำเร็จ", color: "success" },
+  { value: 6, title: "อยู่ระหว่างตรวจสอบรายงานผล", color: "primary" },
+  { value: 7, title: "สำเร็จ", color: "success" },
+];

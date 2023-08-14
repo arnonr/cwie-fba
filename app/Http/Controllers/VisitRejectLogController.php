@@ -25,7 +25,7 @@ class VisitRejectLogController extends Controller
             "visit_reject_log.created_at as created_at",
             "visit_reject_log.updated_at as updated_at",
             "visit_reject_log.created_by as created_by",
-            "visit_reject_log.updated_by as updated_by",
+            "visit_reject_log.updated_by as updated_by"
         )->where("visit_reject_log.deleted_at", null);
 
         if ($request->log_id) {
@@ -81,10 +81,10 @@ class VisitRejectLogController extends Controller
             "visit_reject_log.created_at as created_at",
             "visit_reject_log.updated_at as updated_at",
             "visit_reject_log.created_by as created_by",
-            "visit_reject_log.updated_by as updated_by",
+            "visit_reject_log.updated_by as updated_by"
         )
-        ->where("visit_reject_log.log_id", $id)
-        ->first();
+            ->where("visit_reject_log.log_id", $id)
+            ->first();
 
         return response()->json(
             [

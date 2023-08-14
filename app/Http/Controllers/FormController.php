@@ -167,6 +167,19 @@ class FormController extends Controller
             $items->with("reject_log");
         }
 
+        if ($request->includeVisit) {
+            $items->addSelect("visit.visit_id as visit_id");
+            $items->addSelect("visit_status as visit_status");
+            // $items->addSelect(
+            //     "form.confirm_response_at as confirm_response_at"
+            // );
+            $items->leftJoin("visit", function ($join) {
+                $join
+                    ->on("form.id", "=", "visit.form_id")
+                    ->where("visit.active", 1);
+            });
+        }
+
         if ($request->includeSupervision) {
             $items->addSelect(
                 DB::raw(

@@ -20,6 +20,7 @@ const route = useRoute();
 const router = useRouter();
 const cwieDataStore = useCwieDataStore();
 const teacherData = JSON.parse(localStorage.getItem("teacherData"));
+let userData = JSON.parse(localStorage.getItem("userData"));
 
 const item = ref({
   id: null,
@@ -62,6 +63,13 @@ const item = ref({
   active: 1,
 });
 
+const rejectLog = ref({
+  comment: "",
+  reject_status_id: 2,
+  visit_id: null,
+  user_id: userData.user_id,
+});
+
 const visitActive = ref({
   supervision_id: teacherData.id,
   form_id: null,
@@ -86,6 +94,8 @@ const isOverlay = ref(false);
 const isFormValid = ref(false);
 const refForm = ref();
 const isDialogConfirmVisible = ref(false);
+const isDialogVisible = ref(false);
+const isDialogRejectVisible = ref(false);
 
 const chairman = ref({
   prefix: "",
@@ -140,7 +150,6 @@ const fetchAmphurs = (type = 1) => {
         selectOptions.value.amphurs = response.data.data.map((r) => {
           return { title: r.name_th, value: r.amphur_id };
         });
-        fetchTumbols();
         isOverlay.value = false;
       } else {
         console.log("error");
@@ -153,7 +162,6 @@ const fetchAmphurs = (type = 1) => {
 };
 
 const fetchTumbols = (type = 1) => {
-  console.log("FREEDOM");
   cwieDataStore
     .fetchTumbols({
       amphur_id:
@@ -174,8 +182,6 @@ const fetchTumbols = (type = 1) => {
       isOverlay.value = false;
     });
 };
-
-let userData = JSON.parse(localStorage.getItem("userData"));
 
 const fetchStudent = () => {
   cwieDataStore
@@ -382,449 +388,68 @@ const responseTumbolName = (tumbol_id) => {
   }
 };
 
-const generatePDF1 = async () => {
-  isOverlay.value = true;
-  const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
-  const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
-  const fontBytes = await fetch(urlFont).then((res) => res.arrayBuffer());
-  const fontBytesBold = await fetch(urlFontBold).then((res) =>
-    res.arrayBuffer()
-  );
-  let url = "";
-  url = window.location.origin + "/storage/pdf/book3.pdf";
-
-  const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
-  const pdfTemplate = await PDFDocument.load(existingPdfBytes);
-  // Create PDF
-  const pdfDoc = await PDFDocument.create();
-  pdfDoc.registerFontkit(fontkit);
-  const sarabunFont = await pdfDoc.embedFont(fontBytes);
-  const sarabunBoldFont = await pdfDoc.embedFont(fontBytesBold);
-
-  const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
-  pdfDoc.addPage(existingPage);
-
-  const defaultSize = {
-    size: 16,
-    font: sarabunFont,
-    color: rgb(0, 0, 0),
-  };
-
-  existingPage.drawText(formItem.value.term.toString(), {
-    x: 355, //คอลัมน์ ซ้ายไปขวา
-    y: 734, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(formItem.value.semester_year.toString(), {
-    x: 377, //คอลัมน์ ซ้ายไปขวา
-    y: 734, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(formItem.value.supervision_name, {
-    x: 190, //คอลัมน์ ซ้ายไปขวา
-    y: 710, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(formItem.value.semester_year.toString(), {
-    x: 500, //คอลัมน์ ซ้ายไปขวา
-    y: 690, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(formItem.value.company_name, {
-    x: 170, //คอลัมน์ ซ้ายไปขวา
-    y: 647, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(
-    visitActive.value.address != null ? visitActive.value.address : "",
-    {
-      x: 100,
-      y: 622,
-      ...defaultSize,
-    }
-  );
-
-  console.log(visitActive.value.tumbol_id);
-  console.log(selectOptions.value.tumbols);
-  existingPage.drawText(responseTumbolName(visitActive.value.tumbol_id), {
-    x: 115,
-    y: 597,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(responseAmphurName(visitActive.value.amphur_id), {
-    x: 290,
-    y: 597,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(responseProvinceName(visitActive.value.province_id), {
-    x: 435,
-    y: 597,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(visitActive.value.co_name, {
-    x: 130,
-    y: 573,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(visitActive.value.co_position, {
-    x: 320,
-    y: 574,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(visitActive.value.co_phone, {
-    x: 475,
-    y: 574,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(
-    item.value.prefix_name + item.value.firstname + " " + item.value.surname,
-    {
-      x: 135,
-      y: 550,
-      ...defaultSize,
-    }
-  );
-
-  existingPage.drawText(item.value.student_code, {
-    x: 370,
-    y: 550,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(
-    dayjs(visitActive.value.visit_date).locale("th").format("DD MMMM BBBB"),
-    {
-      x: 72,
-      y: 525,
-      ...defaultSize,
-    }
-  );
-  console.log(visitActive.value.visit_time);
-  existingPage.drawText(visitActive.value.visit_time.toString(), {
-    x: 180,
-    y: 525,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(formItem.value.supervision_name, {
-    x: 420, //คอลัมน์ ซ้ายไปขวา
-    y: 338, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(
-    dayjs(visitActive.value.created_at).locale("th").format("DD MMMM BBBB"),
-    {
-      x: 420, //คอลัมน์ ซ้ายไปขวา
-      y: 296, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-      ...defaultSize,
-    }
-  );
-
-  existingPage.drawText(formItem.value.major_head_name, {
-    x: 110, //คอลัมน์ ซ้ายไปขวา
-    y: 267, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(
-    dayjs(visitActive.value.created_at).locale("th").format("DD MMMM BBBB"),
-    {
-      x: 110, //คอลัมน์ ซ้ายไปขวา
-      y: 247, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-      ...defaultSize,
-    }
-  );
-
-  //   const sigUrl = chairman.value.signature_file;
-  //   const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
-
-  //   let sigImage;
-  //   try {
-  //     sigImage = await pdfDoc.embedPng(sigImageBytes);
-  //   } catch (error) {
-  //     sigImage = await pdfDoc.embedJpg(sigImageBytes);
-  //   }
-
-  //   existingPage.drawImage(sigImage, {
-  //     x: 110,
-  //     y: 115,
-  //     width: 100,
-  //     height: 50,
-  //   });
-
-  existingPage.drawText(
-    chairman.value.prefix +
-      " " +
-      chairman.value.firstname +
-      " " +
-      chairman.value.surname,
-    {
-      x: 110,
-      y: 115,
-      ...defaultSize,
-    }
-  );
-
-  existingPage.drawText(
-    dayjs(visitActive.value.created_at).locale("th").format("DD MMMM BBBB"),
-    {
-      x: 110, //คอลัมน์ ซ้ายไปขวา
-      y: 94, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-      ...defaultSize,
-    }
-  );
-
-  //   const sigUrl = chairman.value.signature_file;
-  //   const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
-
-  //   let sigImage;
-  //   try {
-  //     sigImage = await pdfDoc.embedPng(sigImageBytes);
-  //   } catch (error) {
-  //     sigImage = await pdfDoc.embedJpg(sigImageBytes);
-  //   }
-
-  //   existingPage.drawImage(sigImage, {
-  //     x: 310,
-  //     y: 120,
-  //     width: 100,
-  //     height: 50,
-  //   });
-
-  //   existingPage.drawText(
-  //     chairman.value.prefix +
-  //       " " +
-  //       chairman.value.firstname +
-  //       " " +
-  //       chairman.value.surname,
-  //     {
-  //       x: 300,
-  //       y: 117,
-  //       ...defaultSize,
-  //     }
-  //   );
-
-  //   existingPage.drawText(chairman.value.executive_position, {
-  //     x: 275,
-  //     y: 96,
-  //     ...defaultSize,
-  //   });
-
-  //   const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
-  //   pdfDoc.addPage(existingPage2);
-
-  const pdfBytes = await pdfDoc.save();
-  let objectPdf = URL.createObjectURL(
-    new Blob([pdfBytes.buffer], { type: "application/pdf" } /* (1) */)
-  );
-
-  const link = document.createElement("a");
-  link.href = objectPdf;
-  link.download = "book.pdf";
-  link.click();
-
-  isOverlay.value = false;
+const onRejectSubmit = () => {
+  if (rejectLog.comment != "") {
+    cwieDataStore
+      .addVisitRejectLog({
+        ...rejectLog.value,
+        active: 1,
+      })
+      .then((response) => {
+        if (response.data.message == "success") {
+          localStorage.setItem("Rejected", 1);
+          nextTick(() => {
+            fetchStudent();
+            fetchForms();
+            snackbarText.value = "Rejected";
+            snackbarColor.value = "success";
+            isSnackbarVisible.value = true;
+            isOverlay.value = false;
+            isDialogRejectVisible.value = false;
+          });
+        } else {
+          isOverlay.value = false;
+          console.log("error");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  } else {
+    snackbarText.value = "โปรดระบุเหตุผล";
+    snackbarColor.value = "error";
+    isSnackbarVisible.value = true;
+    isOverlay.value = false;
+  }
 };
 
-const generatePDF2 = async () => {
-  isOverlay.value = true;
-  const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
-  const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
-  const fontBytes = await fetch(urlFont).then((res) => res.arrayBuffer());
-  const fontBytesBold = await fetch(urlFontBold).then((res) =>
-    res.arrayBuffer()
-  );
-  let url = "";
-  url = window.location.origin + "/storage/pdf/book4.pdf";
-
-  const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
-  const pdfTemplate = await PDFDocument.load(existingPdfBytes);
-  // Create PDF
-  const pdfDoc = await PDFDocument.create();
-  pdfDoc.registerFontkit(fontkit);
-  const sarabunFont = await pdfDoc.embedFont(fontBytes);
-  const sarabunBoldFont = await pdfDoc.embedFont(fontBytesBold);
-
-  const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
-  pdfDoc.addPage(existingPage);
-
-  const defaultSize = {
-    size: 16,
-    font: sarabunFont,
-    color: rgb(0, 0, 0),
-  };
-
-  existingPage.drawText(formItem.value.request_document_number, {
-    x: 80, //คอลัมน์ ซ้ายไปขวา
-    y: 728, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(
-    dayjs(formItem.value.request_document_date)
-      .locale("th")
-      .format("DD MMMM BBBB"),
-    {
-      x: 335,
-      y: 624,
-      ...defaultSize,
-    }
-  );
-
-  let co_name = "";
-  if (visitActive.value.co_name == "-") {
-    co_name = visitActive.value.co_position;
-  } else {
-    co_name =
-      visitActive.value.co_name + " (" + visitActive.value.co_position + ")";
-  }
-
-  existingPage.drawText(co_name, {
-    x: 105,
-    y: 559,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(formItem.value.company_name, {
-    x: 205, //คอลัมน์ ซ้ายไปขวา
-    y: 528, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(item.value.major_name, {
-    x: 208, //คอลัมน์ ซ้ายไปขวา
-    y: 506, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(formItem.value.term.toString(), {
-    x: 75,
-    y: 465,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(formItem.value.semester_year, {
-    x: 95,
-    y: 465,
-    ...defaultSize,
-  });
-
-  existingPage.drawText("1", {
-    x: 165,
-    y: 465,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(item.value.prefix_name + item.value.firstname, {
-    x: 120,
-    y: 432,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(item.value.surname, {
-    x: 260,
-    y: 432,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(item.value.class_year.toString(), {
-    x: 391,
-    y: 432,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(item.value.student_code, {
-    x: 460,
-    y: 432,
-    ...defaultSize,
-  });
-
-  //
-  existingPage.drawText(
-    dayjs(visitActive.value.visit_date).locale("th").format("DD MMMM BBBB"),
-    {
-      x: 355,
-      y: 357,
-      ...defaultSize,
-    }
-  );
-
-  existingPage.drawText(visitActive.value.visit_time, {
-    x: 477,
-    y: 357,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(formItem.value.supervision_name, {
-    x: 180,
-    y: 303,
-    ...defaultSize,
-  });
-
-  //
-
-  const sigUrl = chairman.value.signature_file;
-  const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
-
-  let sigImage;
-  try {
-    sigImage = await pdfDoc.embedPng(sigImageBytes);
-  } catch (error) {
-    sigImage = await pdfDoc.embedJpg(sigImageBytes);
-  }
-
-  existingPage.drawImage(sigImage, {
-    x: 310,
-    y: 173,
-    width: 100,
-    height: 50,
-  });
-
-  existingPage.drawText(
-    chairman.value.prefix +
-      " " +
-      chairman.value.firstname +
-      " " +
-      chairman.value.surname,
-    {
-      x: 310,
-      y: 168,
-      ...defaultSize,
-    }
-  );
-
-  existingPage.drawText(chairman.value.executive_position, {
-    x: 285,
-    y: 150,
-    ...defaultSize,
-  });
-
-  const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
-  pdfDoc.addPage(existingPage2);
-
-  const pdfBytes = await pdfDoc.save();
-  let objectPdf = URL.createObjectURL(
-    new Blob([pdfBytes.buffer], { type: "application/pdf" } /* (1) */)
-  );
-
-  const link = document.createElement("a");
-  link.href = objectPdf;
-  link.download = "book.pdf";
-  link.click();
-
-  isOverlay.value = false;
+const onSubmit = () => {
+  cwieDataStore
+    .visitApprove({
+      id: item.value.id,
+      status_id: 4,
+      chairman_approved_at: dayjs().format("YYYY-MM-DD"),
+    })
+    .then((response) => {
+      if (response.data.message == "success") {
+        localStorage.setItem("Approved", 1);
+        nextTick(() => {
+          fetchStudent();
+          fetchForms();
+          snackbarText.value = "Approved";
+          snackbarColor.value = "success";
+          isSnackbarVisible.value = true;
+          isOverlay.value = false;
+          isDialogVisible.value = false;
+        });
+      } else {
+        isOverlay.value = false;
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 </script>
 <style lang="scss">
@@ -834,12 +459,6 @@ const generatePDF2 = async () => {
 </style>
 <template>
   <div>
-    <div class="mb-2 text-right">
-      <VBtn @click="generatePDF1" color="primary"> แบบฟอร์มขอออกนิเทศ</VBtn>
-      <VBtn @click="generatePDF2" color="primary" class="ml-2">
-        หนังสือขอเข้านิเทศ</VBtn
-      >
-    </div>
     <VCard title="ข้อมูลขอออกนิเทศ (ปัจจุบัน)">
       <VCardItem>
         <VForm
@@ -897,6 +516,47 @@ const generatePDF2 = async () => {
                     <!-- {{ visitActive.visit_status }} -->
                     {{ visit_status[visitActive.visit_status].title }}
                   </span>
+                </VCol>
+
+                <VCol cols="12" md="12" class="text-center">
+                  <VBtn
+                    color="error"
+                    :disabled="visitActive.visit_status != 1"
+                    @click="
+                      () => {
+                        rejectLog.visit_id = visitActive.visit_id;
+                        isDialogRejectVisible = true;
+                      }
+                    "
+                  >
+                    <VIcon
+                      size="16"
+                      icon="tabler-edit"
+                      style="opacity: 1"
+                      class="mr-1"
+                    ></VIcon>
+                    ส่งกลับให้แก้ไข
+                  </VBtn>
+
+                  <VBtn
+                    class="ml-2"
+                    color="success"
+                    :disabled="visitActive.visit_status != 1"
+                    @click="
+                      () => {
+                        approve = it;
+                        isDialogVisible = true;
+                      }
+                    "
+                  >
+                    <VIcon
+                      size="16"
+                      icon="tabler-file-description"
+                      style="opacity: 1"
+                      class="mr-1"
+                    ></VIcon>
+                    อนุมัติ
+                  </VBtn>
                 </VCol>
               </VRow>
             </VCol>
@@ -1089,17 +749,7 @@ const generatePDF2 = async () => {
 
                   <VCol cols="12" md="6">
                     <span>เอกสารการยกเลิก : </span>
-                    <span>
-                      <a :href="vs.cancel_file" target="_blank">
-                        <span>
-                          <VIcon
-                            size="16"
-                            icon="tabler-file"
-                            style="opacity: 1"
-                            class="mr-1"
-                        /></span>
-                      </a>
-                    </span>
+                    <span>-</span>
                   </VCol>
 
                   <VCol cols="12" md="6">
@@ -1129,6 +779,56 @@ const generatePDF2 = async () => {
     >
       <VProgressCircular indeterminate />
     </VOverlay>
+
+    <!-- Dialog -->
+    <VDialog v-model="isDialogVisible" persistent class="v-dialog-sm">
+      <!-- Dialog close btn -->
+      <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" />
+
+      <!-- Dialog Content -->
+      <VCard title="Are You Sure?">
+        <VCardText> ยืนยันการอนุมัติ </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn @click="isDialogVisible = !isDialogVisible" color="error">
+            Cancel
+          </VBtn>
+          <VBtn @click="onSubmit()" color="success"> Approve </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+
+    <VDialog v-model="isDialogRejectVisible" persistent class="v-dialog-sm">
+      <!-- Dialog close btn -->
+      <DialogCloseBtn @click="isDialogRejectVisible = !isDialogRejectVisible" />
+
+      <!-- Dialog Content -->
+      <VCard title="แบบฟอร์มส่งข้อมูลกลับให้แก้ไข">
+        <VCardText>
+          <VCol cols="12" md="12" class="align-items-center">
+            <label class="v-label font-weight-bold" for="comment"
+              >ระบุเหตุผล :
+            </label>
+            <AppTextarea
+              id="comment"
+              v-model="rejectLog.comment"
+              rows="5"
+              persistent-placeholder
+            />
+          </VCol>
+        </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            @click="isDialogRejectVisible = !isDialogRejectVisible"
+            color="error"
+          >
+            Cancel
+          </VBtn>
+          <VBtn @click="onRejectSubmit()" color="success"> Reject </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </div>
 </template>
 

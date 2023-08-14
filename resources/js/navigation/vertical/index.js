@@ -1,5 +1,6 @@
 import appAndPages from "./app-and-pages";
 import BasicSettings from "./basic-settings";
+import Chairman from "./chairman";
 import charts from "./charts";
 import company from "./company";
 import CwieSettings from "./cwie-settings";
@@ -18,6 +19,7 @@ export default [
   ...Staff,
   ...Teacher,
   ...MajorHead,
+  ...Chairman,
   ...company,
   ...BasicSettings,
   ...CwieSettings,

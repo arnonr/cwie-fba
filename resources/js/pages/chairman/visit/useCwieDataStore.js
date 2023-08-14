@@ -200,14 +200,10 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
       });
     },
 
-    async fetchVisitRejectLogs(params) {
-      return axios.get(
-        `/visit-reject-log`,
-        { params },
-        {
-          validateStatus: () => true,
-        }
-      );
+    async addVisitRejectLog(dataSend) {
+      return await axios.post(`/visit-reject-log`, dataSend, {
+        validateStatus: () => true,
+      });
     },
   },
 });

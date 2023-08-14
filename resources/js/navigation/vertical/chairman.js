@@ -1,16 +1,20 @@
 export default [
-  { heading: "ประธานอาจารย์นิเทศ", subject: "TeacherUser", action: "manage" },
+  {
+    heading: "ประธานบริหารโครงหารสหกิจ",
+    subject: "TeacherUser",
+    action: "manage",
+  },
   {
     title: "รายการนักศึกษา",
     icon: { icon: "tabler-user" },
-    to: { name: "major-head-students" },
+    to: { name: "chairman-students" },
     subject: "TeacherUser",
     action: "manage",
   },
   {
     title: "รายการออกนิเทศ",
     icon: { icon: "tabler-user" },
-    to: { name: "major-head-visit" },
+    to: { name: "chairman-visit" },
     subject: "TeacherUser",
     action: "manage",
   },

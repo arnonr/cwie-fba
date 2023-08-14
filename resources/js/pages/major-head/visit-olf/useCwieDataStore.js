@@ -9,30 +9,11 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
       });
     },
 
-    // async deleteVisit(dataSend) {
-    //   return await axios.put(`/visit/${dataSend.visit_id}`, dataSend, {
-    //     validateStatus: () => true,
-    //   });
-    // },
-
-    async editVisit(dataSend) {
-      var form_data = new FormData();
-      for (var key in dataSend) {
-        form_data.append(key, dataSend[key]);
-        if (dataSend[key] == null) {
-          dataSend[key] = "";
-        }
-      }
-      form_data.append("_method", "PUT");
-      return await axios.post(`/visit/${dataSend.visit_id}`, form_data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+    async deleteVisit(dataSend) {
+      return await axios.put(`/visit/${dataSend.visit_id}`, dataSend, {
         validateStatus: () => true,
       });
     },
-
-    //
 
     async fetchForms(params) {
       return axios.get(
@@ -198,16 +179,6 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
       return await axios.put(`/form/${dataSend.id}`, dataSend, {
         validateStatus: () => true,
       });
-    },
-
-    async fetchVisitRejectLogs(params) {
-      return axios.get(
-        `/visit-reject-log`,
-        { params },
-        {
-          validateStatus: () => true,
-        }
-      );
     },
   },
 });

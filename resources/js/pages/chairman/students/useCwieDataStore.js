@@ -3,60 +3,9 @@ import { defineStore } from "pinia";
 
 export const useCwieDataStore = defineStore("CwieDataStore", {
   actions: {
-    async addVisit(dataSend) {
-      return await axios.post(`/visit`, dataSend, {
-        validateStatus: () => true,
-      });
-    },
-
-    // async deleteVisit(dataSend) {
-    //   return await axios.put(`/visit/${dataSend.visit_id}`, dataSend, {
-    //     validateStatus: () => true,
-    //   });
-    // },
-
-    async editVisit(dataSend) {
-      var form_data = new FormData();
-      for (var key in dataSend) {
-        form_data.append(key, dataSend[key]);
-        if (dataSend[key] == null) {
-          dataSend[key] = "";
-        }
-      }
-      form_data.append("_method", "PUT");
-      return await axios.post(`/visit/${dataSend.visit_id}`, form_data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        validateStatus: () => true,
-      });
-    },
-
-    //
-
     async fetchForms(params) {
       return axios.get(
         `/form`,
-        { params },
-        {
-          validateStatus: () => true,
-        }
-      );
-    },
-
-    async fetchTeachers(params) {
-      return axios.get(
-        `/teacher`,
-        { params },
-        {
-          validateStatus: () => true,
-        }
-      );
-    },
-
-    async fetchVisits(params) {
-      return axios.get(
-        `/visit`,
         { params },
         {
           validateStatus: () => true,
@@ -195,19 +144,9 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
 
     async approve(dataSend) {
       console.log(dataSend);
-      return await axios.put(`/form/${dataSend.id}`, dataSend, {
+      return await axios.put(`/form/approve/${dataSend.id}`, dataSend, {
         validateStatus: () => true,
       });
-    },
-
-    async fetchVisitRejectLogs(params) {
-      return axios.get(
-        `/visit-reject-log`,
-        { params },
-        {
-          validateStatus: () => true,
-        }
-      );
     },
   },
 });

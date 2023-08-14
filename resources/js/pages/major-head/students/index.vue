@@ -96,7 +96,9 @@ const fetchMajorHeads = () => {
     })
     .then((response) => {
       if (response.status === 200) {
+        console.log(response.data.data);
         semester.value = response.data.data.map((r) => {
+          console.log(r.semester_id);
           return r.semester_id;
         });
 
@@ -307,7 +309,6 @@ onMounted(() => {
               v-model="advancedSearch.semester_id"
               density="compact"
               variant="outlined"
-              clearable
               :items="selectOptions.semesters"
             />
           </VCol>

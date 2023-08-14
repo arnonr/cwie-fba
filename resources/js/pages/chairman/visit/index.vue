@@ -2,8 +2,11 @@
 import { class_rooms, class_years, statuses } from "@/data-constant/data";
 import { useStudentStore } from "./useStudentStore";
 
-import { form_statuses, statusShow } from "@/data-constant/data";
-
+import { form_statuses, statusShow, visit_status } from "@/data-constant/data";
+import dayjs from "dayjs";
+import "dayjs/locale/th";
+import buddhistEra from "dayjs/plugin/buddhistEra";
+dayjs.extend(buddhistEra);
 const studentStore = useStudentStore();
 
 const rowPerPage = ref(20);
@@ -15,20 +18,22 @@ const isOverlay = ref(true);
 const orderBy = ref("student.id");
 const order = ref("desc");
 const teacherData = JSON.parse(localStorage.getItem("teacherData"));
+const major = ref([]);
+const semester = ref([]);
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: "",
   student_code: "",
   firstname: "",
   surname: "",
   major_id: "",
   class_year: "",
   class_room: "",
-  advisor_id: teacherData.id,
+  advisor_id: "",
   supervision_id: "",
   company_name: "",
   province_id: "",
+  visit_status: "",
 });
 
 const selectOptions = ref({
@@ -57,6 +62,10 @@ const selectOptions = ref({
   class_rooms: class_rooms,
   teachers: [],
   companies: [],
+  visit_statuses: [
+    { title: "รออการอนุมัติจากประธานบริหาร", value: 21 },
+    { title: "อนุมัติแล้ว", value: 3 },
+  ],
 });
 
 const fetchProvinces = () => {
@@ -81,7 +90,10 @@ fetchProvinces();
 
 const fetchSemesters = () => {
   studentStore
-    .fetchSemesters()
+    .fetchSemesters({
+      chairman_id: teacherData.id,
+      perPage: 100,
+    })
     .then((response) => {
       if (response.status === 200) {
         selectOptions.value.semesters = response.data.data.map((r) => {
@@ -95,6 +107,7 @@ const fetchSemesters = () => {
             end_date: r.end_date,
           };
         });
+
         isOverlay.value = false;
       } else {
         console.log("error");
@@ -155,36 +168,37 @@ fetchMajors();
 
 // 👉 Fetching
 const fetchItems = () => {
-  let search = {
-    ...advancedSearch,
-    includeAll: true,
-  };
-
-  //   console.log(localStorage.getItem("userData"));
-
-  studentStore
-    .fetchListStudents({
-      perPage: rowPerPage.value,
-      currentPage: currentPage.value,
-      orderBy: orderBy.value,
-      order: order.value,
-      ...search,
-      includeForm: true,
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        items.value = response.data.data;
-        totalPage.value = response.data.totalPage;
-        totalItems.value = response.data.totalData;
+  if (advancedSearch.semester_id != "") {
+    let search = {
+      ...advancedSearch,
+      includeAll: true,
+      major_id_array: major.value,
+    };
+    studentStore
+      .fetchListStudents({
+        perPage: rowPerPage.value,
+        currentPage: currentPage.value,
+        orderBy: orderBy.value,
+        order: order.value,
+        ...search,
+        includeForm: true,
+        includeVisit: true,
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          items.value = response.data.data;
+          totalPage.value = response.data.totalPage;
+          totalItems.value = response.data.totalData;
+          isOverlay.value = false;
+        } else {
+          console.log("error");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
         isOverlay.value = false;
-      } else {
-        console.log("error");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
+      });
+  }
 };
 
 watchEffect(fetchItems);
@@ -198,34 +212,6 @@ const isSnackbarVisible = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("success");
 
-const resolveActive = (active, type) => {
-  let data = "";
-
-  if (active == 1) data = ["success", "Active"];
-
-  if (active == 0) data = ["secondary", "In Active"];
-
-  if (type == "color") {
-    return data[0];
-  }
-
-  return data[1];
-};
-
-const resolveBlacklist = (b, type) => {
-  let data = "";
-
-  if (b == 1) data = ["error", "Blacklist"];
-
-  if (b == 0) data = ["secondary", "None"];
-
-  if (type == "color") {
-    return data[0];
-  }
-
-  return data[1];
-};
-
 const responseProvinceName = (response_province_id) => {
   if (response_province_id) {
     let response_province_select = selectOptions.value.provinces.find((x) => {
@@ -236,13 +222,6 @@ const responseProvinceName = (response_province_id) => {
     return "-";
   }
 };
-
-if (localStorage.getItem("deleted") == 1) {
-  snackbarText.value = "Deleted Company";
-  snackbarColor.value = "success";
-  isSnackbarVisible.value = true;
-  localStorage.removeItem("deleted");
-}
 
 onMounted(() => {
   window.scrollTo(0, 0);
@@ -279,12 +258,12 @@ onMounted(() => {
           <VSpacer />
           <VCol cols="12" sm="4">
             <VSelect
-              label="สถานะ"
-              v-model="advancedSearch.status_id"
+              label="สถานะการขอออกนิเทศ"
+              v-model="advancedSearch.visit_status"
               density="compact"
               variant="outlined"
               clearable
-              :items="selectOptions.statuses"
+              :items="selectOptions.visit_statuses"
             />
           </VCol>
           <VSpacer />
@@ -346,132 +325,105 @@ onMounted(() => {
               :items="selectOptions.class_rooms"
             />
           </VCol>
-          <!-- 
-          <VCol cols="12" sm="6">
-            <VSelect
-              label="อาจารย์ที่ปรึกษา"
-              v-model="advancedSearch.advisor_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.teachers"
-            />
-          </VCol> -->
-
-          <!-- <VCol cols="12" sm="6">
-            <VSelect
-              label="อาจารย์นิเทศ"
-              v-model="advancedSearch.supervision_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.teachers"
-            />
-          </VCol> -->
-
-          <!-- <VCol cols="12" sm="6">
-            <VTextField
-              label="สถานประกอบการ"
-              v-model="advancedSearch.company_name"
-              density="compact"
-            />
-          </VCol> -->
-
-          <!-- <VCol cols="12" sm="6">
-            <VSelect
-              label="จังหวัดที่ออกปฏิบัติ"
-              v-model="advancedSearch.province_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.provinces"
-            />
-          </VCol> -->
 
           <!-- Table -->
+
           <VCol cols="12" sm="12">
-            <VTable class="text-no-wrap">
-              <!-- 👉 table head -->
-              <thead>
-                <tr>
-                  <th scope="col" class="font-weight-bold">รหัสนักศึกษา</th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    ชื่อ-นามสกุล
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    สาขาวิชา
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    สถานประกอบการ
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    จังหวัด
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    สถานะ
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    จัดการ
-                  </th>
-                </tr>
-              </thead>
-              <!-- 👉 table body -->
-              <tbody>
-                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
-                  <!-- 👉 User -->
-                  <td>
-                    <span>
-                      {{ it.student_code }}
-                    </span>
-                  </td>
-                  <td class="text-center">
-                    {{ it.firstname + " " + it.surname }}
-                  </td>
-                  <td class="text-center">
-                    {{ it.major_name }}
-                  </td>
+            <div style="overflow-x: auto">
+              <VTable class="">
+                <!-- 👉 table head -->
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-center font-weight-bold">
+                      อาจารย์นิเทศ
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      ชื่อ-นามสกุล
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      สถานประกอบการ
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      จังหวัด
+                    </th>
+                    <!-- <th scope="col" class="text-center font-weight-bold">
+                      สถานะ
+                    </th> -->
+                    <th scope="col" class="text-center font-weight-bold">
+                      สถานะใบขอออกนิเทศ
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      วันที่ออกนิเทศ
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      จัดการ
+                    </th>
+                  </tr>
+                </thead>
+                <!-- 👉 table body -->
+                <tbody>
+                  <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
+                    <td class="text-center">
+                      {{ it.supervision_name }}
+                    </td>
+                    <td class="text-center">
+                      {{ it.firstname + " " + it.surname }}
+                    </td>
+                    <td class="text-center" style="min-width: 100px">
+                      {{ it.company_name }}
+                    </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    {{ it.company_name }}
-                  </td>
+                    <td class="text-center" style="min-width: 100px">
+                      {{ responseProvinceName(it.response_province_id) }}
+                    </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    {{ responseProvinceName(it.response_province_id) }}
-                  </td>
+                    <td class="text-center">
+                      <span v-if="it.visit_status">
+                        <VChip
+                          label
+                          :color="visit_status[it.visit_status].color"
+                          >{{ visit_status[it.visit_status].title }}</VChip
+                        >
+                      </span>
+                    </td>
+                    <td class="text-center" style="min-width: 100px">
+                      {{
+                        it.visit_date
+                          ? dayjs(it.visit_date)
+                              .locale("th")
+                              .format("DD MMM BB") +
+                            " " +
+                            it.visit_time
+                          : ""
+                      }}
+                    </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    <VChip label :color="form_statuses[it.status_id]">{{
-                      statusShow(
-                        it.status_id,
-                        it.request_document_date,
-                        it.confirm_response_at
-                      )
-                    }}</VChip>
-                  </td>
+                    <!-- 👉 Actions -->
+                    <td class="text-center" style="min-width: 80px">
+                      <VBtn
+                        v-if="it.visit_id != null"
+                        color="success"
+                        class="ml-2"
+                        :to="{
+                          name: 'chairman-visit-view-id',
+                          params: { id: it.id },
+                        }"
+                      >
+                        ดูข้อมูล
+                      </VBtn>
+                    </td>
+                  </tr>
+                </tbody>
 
-                  <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px">
-                    <VBtn
-                      color="info"
-                      :to="{
-                        name: 'supervisor-students-view-id',
-                        params: { id: it.id },
-                      }"
-                    >
-                      View</VBtn
-                    >
-                  </td>
-                </tr>
-              </tbody>
-
-              <!-- 👉 table footer  -->
-              <tfoot v-show="!items.length">
-                <tr>
-                  <td colspan="7" class="text-center">No data available</td>
-                </tr>
-              </tfoot>
-              <tfoot v-show="items.length"></tfoot>
-            </VTable>
+                <!-- 👉 table footer  -->
+                <tfoot v-show="!items.length">
+                  <tr>
+                    <td colspan="7" class="text-center">No data available</td>
+                  </tr>
+                </tfoot>
+                <tfoot v-show="items.length"></tfoot>
+              </VTable>
+            </div>
           </VCol>
 
           <VCol cols="12" sm="12">

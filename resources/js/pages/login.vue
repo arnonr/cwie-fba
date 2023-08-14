@@ -88,6 +88,14 @@ const login = () => {
             subject: "TeacherUser",
             action: "manage",
           });
+
+          //   if (userData.chairman == 1) {
+          //     userData.role = "chairman";
+          //     userData.ability.push({
+          //       subject: "ChairmanUser",
+          //       action: "manage",
+          //     });
+          //   }
         } else if (userData.account_type == 3) {
           userData.role = "staff";
           userData.ability.push({
@@ -106,7 +114,6 @@ const login = () => {
           });
         }
 
-        console.log(userData);
         localStorage.setItem("userAbilities", JSON.stringify(userData.ability));
         ability.update(userData.ability);
         localStorage.setItem("userData", JSON.stringify(userData));

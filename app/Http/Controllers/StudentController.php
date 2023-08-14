@@ -146,9 +146,7 @@ class StudentController extends Controller
             if ($request->includeVisit) {
                 $items->addSelect("visit.id as visit_id");
                 $items->addSelect("visit_status as visit_status");
-                // $items->addSelect(
-                //     "form.confirm_response_at as confirm_response_at"
-                // );
+
                 $items->leftJoin("visit", function ($join) {
                     $join
                         ->on("form.id", "=", "visit.form_id")
@@ -559,14 +557,91 @@ class StudentController extends Controller
                     $items->addSelect("visit_status as visit_status");
                     $items->addSelect("visit_date as visit_date");
                     $items->addSelect("visit_time as visit_time");
-                    // $items->addSelect(
-                    //     "form.confirm_response_at as confirm_response_at"
-                    // );
-                    $items->leftJoin("visit", function ($join) {
-                        $join
-                            ->on("form.id", "=", "visit.form_id")
-                            ->where("visit.active", 1);
-                    });
+                    $items->addSelect(
+                        "visit_reject_status_id as visit_reject_status_id"
+                    );
+
+                    if ($request->visit_status) {
+                        if ($request->visit_status == 1) {
+                            $items->join("visit", function ($join) {
+                                $join
+                                    ->on("form.id", "=", "visit.form_id")
+                                    ->where("visit.active", 1);
+                            });
+                        } elseif ($request->visit_status == 11) {
+                            $items
+                                ->join("visit", function ($join) {
+                                    $join
+                                        ->on("form.id", "=", "visit.form_id")
+                                        ->where("visit.active", 1);
+                                })
+                                ->where("visit.visit_status", 1);
+                        } elseif ($request->visit_status == 2) {
+                            $items
+                                ->join("visit", function ($join) {
+                                    $join
+                                        ->on("form.id", "=", "visit.form_id")
+                                        ->where("visit.active", 1);
+                                })
+                                ->where("visit.visit_status", ">", 1);
+                        } elseif ($request->visit_status == 21) {
+                            $items
+                                ->join("visit", function ($join) {
+                                    $join
+                                        ->on("form.id", "=", "visit.form_id")
+                                        ->where("visit.active", 1);
+                                })
+                                ->where("visit.visit_status", "=", 2);
+                        } elseif ($request->visit_status == 3) {
+                            $items
+                                ->join("visit", function ($join) {
+                                    $join
+                                        ->on("form.id", "=", "visit.form_id")
+                                        ->where("visit.active", 1);
+                                })
+                                ->where("visit.visit_status", ">", 2);
+                        } elseif ($request->visit_status == 31) {
+                            $items->join("visit", function ($join) {
+                                $join
+                                    ->on("form.id", "=", "visit.form_id")
+                                    ->where("visit.active", 1)
+                                    ->where("visit.visit_status", "=", 3);
+                            });
+                        } elseif ($request->visit_status == 4) {
+                            $items->join("visit", function ($join) {
+                                $join
+                                    ->on("form.id", "=", "visit.form_id")
+                                    ->where("visit.active", 1)
+                                    ->where("visit.visit_status", ">", 3);
+                            });
+                        } elseif ($request->visit_status == 41) {
+                            $items->join("visit", function ($join) {
+                                $join
+                                    ->on("form.id", "=", "visit.form_id")
+                                    ->where("visit.active", 1)
+                                    ->where("visit.visit_status", "=", 4);
+                            });
+                        } else {
+                            // status = 0
+                            $items
+                                ->leftJoin("visit", function ($join) {
+                                    $join->on("form.id", "=", "visit.form_id");
+                                })
+                                ->whereNull("visit.visit_id");
+                        }
+                    } elseif ($request->visit_status === "0") {
+                        $items
+                            ->leftJoin("visit", function ($join) {
+                                $join->on("form.id", "=", "visit.form_id");
+                            })
+                            ->whereNull("visit.visit_id");
+                    } else {
+                        $items->leftJoin("visit", function ($join) {
+                            $join
+                                ->on("form.id", "=", "visit.form_id")
+                                ->where("visit.active", 1);
+                        });
+                    }
                 }
 
                 // whereNotNull()
@@ -664,6 +739,10 @@ class StudentController extends Controller
                 "=",
                 "student.advisor_id"
             );
+        }
+
+        if ($request->major_id_array) {
+            $items->whereIn("student.major_id", $request->major_id_array);
         }
 
         if ($request->id) {
