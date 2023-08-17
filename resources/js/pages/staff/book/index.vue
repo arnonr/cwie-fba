@@ -1,10 +1,10 @@
 <script setup>
-import StudentList from "@/components/student-list/StudentList.vue";
+import StudentList from "@/components/book/StudentList.vue";
 </script>
 
 <template>
   <div>
-    <StudentList :user_type="'chairman'" />
+    <StudentList :user_type="'staff'" :book_type="'book_request'" />
   </div>
 </template>
 

@@ -1,39 +1,36 @@
 <script setup>
 import { class_rooms, class_years, statuses } from "@/data-constant/data";
+import { useStudentStore } from "./useStudentStore";
 import { requiredValidator } from "@validators";
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import buddhistEra from "dayjs/plugin/buddhistEra";
-import { useCwieDataStore } from "./useCwieDataStore";
-
-import { form_statuses, statusShow } from "@/data-constant/data";
 
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
+import { form_statuses, statusShow, visit_status } from "@/data-constant/data";
+import dayjs from "dayjs";
+import "dayjs/locale/th";
+import buddhistEra from "dayjs/plugin/buddhistEra";
 dayjs.extend(buddhistEra);
-
-const cwieDataStore = useCwieDataStore();
+const studentStore = useStudentStore();
 
 const rowPerPage = ref(20);
 const currentPage = ref(1);
 const totalPage = ref(1);
 const totalItems = ref(0);
-const items = ref([]);
 const document = ref({});
+const items = ref([]);
 const isOverlay = ref(true);
 const orderBy = ref("student.id");
 const order = ref("desc");
+const major = ref([]);
 const selectedItem = ref([]);
 
 const refAddBook = ref();
 const isAddBookValid = ref(false);
-
 const isDialogVisible = ref(false);
 
 const advancedSearch = reactive({
   semester_id: "",
-  status_id: "",
   student_code: "",
   firstname: "",
   surname: "",
@@ -44,6 +41,7 @@ const advancedSearch = reactive({
   supervision_id: "",
   company_name: "",
   province_id: "",
+  visit_status: "",
   book_status: "",
 });
 
@@ -52,7 +50,6 @@ const selectOptions = ref({
     { title: "20", value: 20 },
     { title: "40", value: 40 },
     { title: "60", value: 60 },
-    { title: "500", value: 500 },
   ],
   orderBy: [{ title: "ลำดับ/level", value: "level" }],
   order: [
@@ -75,13 +72,13 @@ const selectOptions = ref({
   teachers: [],
   companies: [],
   book_statuses: [
-    { title: "รอออกหนังสือส่งตัว", value: 3 },
-    { title: "ออกหนังสือส่งตัวแล้ว", value: 4 },
+    { title: "รอออกหนังสือขอเข้านิเทศ", value: 31 },
+    { title: "ออกหนังสือขอเข้านิเทศแล้ว", value: 4 },
   ],
 });
 
 const fetchProvinces = () => {
-  cwieDataStore
+  studentStore
     .fetchProvinces({})
     .then((response) => {
       if (response.status === 200) {
@@ -101,8 +98,10 @@ const fetchProvinces = () => {
 fetchProvinces();
 
 const fetchSemesters = () => {
-  cwieDataStore
-    .fetchSemesters()
+  studentStore
+    .fetchSemesters({
+      perPage: 100,
+    })
     .then((response) => {
       if (response.status === 200) {
         selectOptions.value.semesters = response.data.data.map((r) => {
@@ -114,10 +113,9 @@ const fetchSemesters = () => {
             value: r.id,
             start_date: r.start_date,
             end_date: r.end_date,
-            default_request_doc_no: r.default_request_doc_no,
-            default_request_doc_date: r.default_request_doc_date,
           };
         });
+
         isOverlay.value = false;
       } else {
         console.log("error");
@@ -131,7 +129,7 @@ const fetchSemesters = () => {
 fetchSemesters();
 
 const fetchTeachers = () => {
-  cwieDataStore
+  studentStore
     .fetchTeachers({})
     .then((response) => {
       if (response.status === 200) {
@@ -154,7 +152,7 @@ const fetchTeachers = () => {
 fetchTeachers();
 
 const fetchMajors = () => {
-  cwieDataStore
+  studentStore
     .fetchMajors({})
     .then((response) => {
       if (response.status === 200) {
@@ -178,13 +176,13 @@ fetchMajors();
 
 // 👉 Fetching
 const fetchItems = () => {
-  console.log(advancedSearch.book_status);
   if (advancedSearch.semester_id != "") {
     let search = {
       ...advancedSearch,
       includeAll: true,
+      major_id_array: major.value,
     };
-    cwieDataStore
+    studentStore
       .fetchListStudents({
         perPage: rowPerPage.value,
         currentPage: currentPage.value,
@@ -192,6 +190,7 @@ const fetchItems = () => {
         order: order.value,
         ...search,
         includeForm: true,
+        includeVisit: true,
       })
       .then((response) => {
         if (response.status === 200) {
@@ -199,7 +198,6 @@ const fetchItems = () => {
           totalPage.value = response.data.totalPage;
           totalItems.value = response.data.totalData;
           isOverlay.value = false;
-          console.log(items.value);
         } else {
           console.log("error");
         }
@@ -213,16 +211,29 @@ const fetchItems = () => {
 
 watchEffect(fetchItems);
 
+// 👉 watching current page
 watchEffect(() => {
   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
 });
 
-watch(
-  () => selectedItem.value,
-  () => {
-    console.log(selectedItem.value);
+const isSnackbarVisible = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("success");
+
+const responseProvinceName = (response_province_id) => {
+  if (response_province_id) {
+    let response_province_select = selectOptions.value.provinces.find((x) => {
+      return x.value == response_province_id;
+    });
+    return response_province_select.title;
+  } else {
+    return "-";
   }
-);
+};
+
+onMounted(() => {
+  window.scrollTo(0, 0);
+});
 
 // selectItem
 const onSelectItemAll = () => {
@@ -257,14 +268,13 @@ const onSubmit = () => {
   refAddBook.value?.validate().then(({ valid }) => {
     //
     if (valid) {
-      cwieDataStore
-        .addSendBook({
-          id: selectedItem.value,
-          send_document_number: document.value.send_document_number,
-          send_document_date:
-            document.value.send_document_date &&
-            document.value.send_document_date != null
-              ? dayjs(document.value.send_document_date).format("YYYY-MM-DD")
+      studentStore
+        .addVisitBook({
+          visit_id: selectedItem.value,
+          document_number: document.value.document_number,
+          document_date:
+            document.value.document_date && document.value.document_date != null
+              ? dayjs(document.value.document_date).format("YYYY-MM-DD")
               : null,
         })
         .then((response) => {
@@ -290,14 +300,6 @@ const onSubmit = () => {
   //
 };
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
-
-onMounted(() => {
-  window.scrollTo(0, 0);
-});
-
 const format = (date) => {
   const day = dayjs(date).locale("th").format("DD");
   const month = dayjs(date).locale("th").format("MMM");
@@ -306,6 +308,7 @@ const format = (date) => {
   return `${day} ${month} ${year}`;
 };
 </script>
+
 <style lang="scss">
 .v-card,
 .v-card-item__content {
@@ -319,7 +322,7 @@ const format = (date) => {
 <template>
   <div>
     <!-- Table -->
-    <VCard title="หนังสือส่งตัว">
+    <VCard title="หนังสือขอออกนิเทศ">
       <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Search -->
@@ -346,12 +349,12 @@ const format = (date) => {
           <VSpacer />
           <VCol cols="12" sm="4">
             <VSelect
-              label="สถานะ"
-              v-model="advancedSearch.status_id"
+              label="สถานะการขอออกนิเทศ"
+              v-model="advancedSearch.visit_status"
               density="compact"
               variant="outlined"
               clearable
-              :items="selectOptions.statuses"
+              :items="selectOptions.book_statuses"
             />
           </VCol>
           <VSpacer />
@@ -416,17 +419,6 @@ const format = (date) => {
 
           <VCol cols="12" sm="6">
             <VSelect
-              label="อาจารย์ที่ปรึกษา"
-              v-model="advancedSearch.advisor_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.teachers"
-            />
-          </VCol>
-
-          <VCol cols="12" sm="6">
-            <VSelect
               label="อาจารย์นิเทศ"
               v-model="advancedSearch.supervision_id"
               density="compact"
@@ -444,29 +436,8 @@ const format = (date) => {
             />
           </VCol>
 
-          <VCol cols="12" sm="6">
-            <VSelect
-              label="สถานะการออกหนังสือ"
-              v-model="advancedSearch.book_status"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.book_statuses"
-            />
-          </VCol>
-
-          <!-- <VCol cols="12" sm="6">
-            <VSelect
-              label="จังหวัดที่ออกปฏิบัติ"
-              v-model="advancedSearch.province_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.provinces"
-            />
-          </VCol> -->
-
           <!-- Table -->
+
           <VCol cols="12" class="mb-2 d-flex">
             <VBtn color="primary" @click="onSelectItemAll"> เลือกทั้งหมด</VBtn>
             <VBtn color="error" @click="onDisSelectItemAll" class="ml-2">
@@ -477,7 +448,7 @@ const format = (date) => {
               color="success"
               @click="
                 () => {
-                  document.send_document_number = 'อว 7125/';
+                  document.document_number = 'อว 7125/';
                   onAddBook();
                 }
               "
@@ -485,125 +456,138 @@ const format = (date) => {
               ออกหนังสือ</VBtn
             >
           </VCol>
+
           <VCol cols="12" sm="12">
-            <VTable class="text-no-wrap">
-              <!-- 👉 table head -->
-              <thead>
-                <tr>
-                  <th scope="col" class="font-weight-bold">เลือก</th>
-                  <th scope="col" class="font-weight-bold">รหัสนักศึกษา</th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    ชื่อ-นามสกุล
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    สาขาวิชา
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    ชั้นปี
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">ห้อง</th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    สถานะ
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    เลขที่หนังสือ
-                  </th>
-                  <th scope="col" class="text-center font-weight-bold">
-                    จัดการ
-                  </th>
-                </tr>
-              </thead>
-              <!-- 👉 table body -->
-              <tbody>
-                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
-                  <!-- 👉 User -->
-                  <td>
-                    <VCheckbox
-                      v-model="selectedItem"
-                      class="chkItem"
-                      :value="it.form_id"
-                      v-if="it.status_id > 5"
-                    />
-                    <!-- @click="onSelectItem(it.id)" -->
-                  </td>
-                  <td>
-                    <span>
-                      {{ it.student_code }}
-                    </span>
-                  </td>
-                  <td class="text-center">
-                    {{ it.firstname + " " + it.surname }}
-                  </td>
-                  <td class="text-center">
-                    {{ it.major_name }}
-                  </td>
+            <div style="overflow-x: auto">
+              <VTable class="">
+                <!-- 👉 table head -->
+                <thead>
+                  <tr>
+                    <th scope="col" class="font-weight-bold">เลือก</th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      อาจารย์นิเทศ
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      ชื่อ-นามสกุล
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      สถานประกอบการ
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      จังหวัด
+                    </th>
+                    <!-- <th scope="col" class="text-center font-weight-bold">
+                      สถานะ
+                    </th> -->
+                    <th scope="col" class="text-center font-weight-bold">
+                      สถานะใบขอออกนิเทศ
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      วันที่ออกนิเทศ
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      เลขที่หนังสือ
+                    </th>
+                    <th scope="col" class="text-center font-weight-bold">
+                      จัดการ
+                    </th>
+                  </tr>
+                </thead>
+                <!-- 👉 table body -->
+                <tbody>
+                  <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
+                    <td>
+                      <VCheckbox
+                        v-model="selectedItem"
+                        class="chkItem"
+                        :value="it.visit_id"
+                        v-if="it.visit_status > 2"
+                      />
+                      <!-- @click="onSelectItem(it.id)" -->
+                    </td>
+                    <td class="text-center">
+                      {{ it.supervision_name }}
+                    </td>
+                    <td class="text-center">
+                      {{ it.firstname + " " + it.surname }}
+                    </td>
+                    <td class="text-center" style="min-width: 100px">
+                      {{ it.company_name }}
+                    </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    {{ it.class_year }}
-                  </td>
+                    <td class="text-center" style="min-width: 100px">
+                      {{ responseProvinceName(it.response_province_id) }}
+                    </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    {{ it.class_room }}
-                  </td>
-
-                  <td class="text-center" style="min-width: 100px">
-                    <VChip label :color="form_statuses[it.status_id]">
+                    <td class="text-center">
+                      <span v-if="it.visit_status">
+                        <VChip
+                          label
+                          :color="visit_status[it.visit_status].color"
+                          >{{ visit_status[it.visit_status].title }}</VChip
+                        >
+                      </span>
+                    </td>
+                    <td class="text-center" style="min-width: 100px">
                       {{
-                        statusShow(
-                          it.status_id,
-                          it.request_document_date,
-                          it.confirm_response_at
-                        )
-                      }}</VChip
-                    >
-                  </td>
+                        it.visit_date
+                          ? dayjs(it.visit_date)
+                              .locale("th")
+                              .format("DD MMM BB") +
+                            " " +
+                            it.visit_time
+                          : ""
+                      }}
+                    </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    {{ it.send_document_number }}
-                  </td>
+                    <td class="text-center" style="min-width: 100px">
+                      {{ it.visit_document_number }}
+                    </td>
 
-                  <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px">
-                    <VBtn
-                      color="info"
-                      target="_blank"
-                      :to="{
-                        name: 'staff-students-view-id',
-                        params: { id: it.id },
-                      }"
-                    >
-                      View</VBtn
-                    >
+                    <!-- 👉 Actions -->
+                    <td class="text-center" style="min-width: 80px">
+                      <VBtn
+                        v-if="it.visit_id != null"
+                        color="info"
+                        class="ml-2"
+                        target="_blank"
+                        :to="{
+                          name: 'staff-book3-view-id',
+                          params: { id: it.id },
+                        }"
+                      >
+                        View
+                      </VBtn>
+                      <!-- <VBtn
+                        color="primary"
+                        class="ml-2"
+                        :disabled="it.send_document_date == null"
+                        @click="
+                          () => {
+                            selectedItem = [it.form_id];
+                            document = [];
+                            document.send_document_number =
+                              it.send_document_number;
+                            document.send_document_date = it.send_document_date;
+                            onAddBook();
+                          }
+                        "
+                      >
+                        Edit</VBtn
+                      > -->
+                    </td>
+                  </tr>
+                </tbody>
 
-                    <VBtn
-                      color="primary"
-                      class="ml-2"
-                      :disabled="it.send_document_date == null"
-                      @click="
-                        () => {
-                          selectedItem = [it.form_id];
-                          document = [];
-                          document.send_document_number =
-                            it.send_document_number;
-                          document.send_document_date = it.send_document_date;
-                          onAddBook();
-                        }
-                      "
-                    >
-                      Edit</VBtn
-                    >
-                  </td>
-                </tr>
-              </tbody>
-
-              <!-- 👉 table footer  -->
-              <tfoot v-show="!items.length">
-                <tr>
-                  <td colspan="7" class="text-center">No data available</td>
-                </tr>
-              </tfoot>
-              <tfoot v-show="items.length"></tfoot>
-            </VTable>
+                <!-- 👉 table footer  -->
+                <tfoot v-show="!items.length">
+                  <tr>
+                    <td colspan="7" class="text-center">No data available</td>
+                  </tr>
+                </tfoot>
+                <tfoot v-show="items.length"></tfoot>
+              </VTable>
+            </div>
           </VCol>
 
           <VCol cols="12" sm="12">
@@ -643,7 +627,7 @@ const format = (date) => {
       <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" absolute />
 
       <!-- Dialog Content -->
-      <VCard title="แบบฟอร์มออกหนังสือส่งตัว">
+      <VCard title="แบบฟอร์มออกหนังสือ">
         <VCardItem>
           <VForm ref="refAddBook" v-model="isAddBookValid">
             <!-- @submit.prevent="onAddSubmit" -->
@@ -652,7 +636,7 @@ const format = (date) => {
                 <AppTextField
                   id="send_document_number"
                   label="เลขที่หนังสือ"
-                  v-model="document.send_document_number"
+                  v-model="document.document_number"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -666,7 +650,7 @@ const format = (date) => {
                   >วันที่หนังสือ :
                 </label>
                 <VueDatePicker
-                  v-model="document.send_document_date"
+                  v-model="document.document_date"
                   :enable-time-picker="false"
                   locale="th"
                   auto-apply

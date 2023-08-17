@@ -1,7 +1,7 @@
 import axios from "@axios";
 import { defineStore } from "pinia";
 
-export const useStudentStore = defineStore("StudentStore", {
+export const useCwieDataStore = defineStore("CwieDataStore", {
   actions: {
     async fetchForms(params) {
       return axios.get(
@@ -23,9 +23,22 @@ export const useStudentStore = defineStore("StudentStore", {
       );
     },
 
-    fetchListStudents(params) {
+    fetchStudent({ id }) {
+      return axios.get(`/student/${id}`, {
+        validateStatus: () => true,
+      });
+    },
+
+    async editStudent(dataSend) {
+      //
+      return await axios.put(`/student/${dataSend.id}`, dataSend, {
+        validateStatus: () => true,
+      });
+    },
+
+    fetchTeachers(params) {
       return axios.get(
-        `/student`,
+        "/teacher",
         { params },
         {
           validateStatus: () => true,
@@ -33,10 +46,24 @@ export const useStudentStore = defineStore("StudentStore", {
       );
     },
 
-    fetchStudent({ id }) {
-      return axios.get(`/student/${id}`, {
-        validateStatus: () => true,
-      });
+    fetchTeacher({ id }) {
+      return axios.get(
+        `/teacher/${id}`,
+        {},
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    fetchCompany({ id }) {
+      return axios.get(
+        `/company/${id}`,
+        {},
+        {
+          validateStatus: () => true,
+        }
+      );
     },
 
     fetchProvinces(params) {
@@ -129,28 +156,34 @@ export const useStudentStore = defineStore("StudentStore", {
       );
     },
 
-    fetchMajors(params) {
-      return axios.get(
-        "/major",
-        { params },
-        {
-          validateStatus: () => true,
-        }
-      );
+    async addRejectLog(dataSend) {
+      return await axios.post(`/reject-log`, dataSend, {
+        validateStatus: () => true,
+      });
     },
 
-    fetchTeachers(params) {
-      return axios.get(
-        `/teacher`,
-        { params },
-        {
-          validateStatus: () => true,
-        }
-      );
+    async approve(dataSend) {
+      console.log(dataSend);
+      return await axios.put(`/form/approve/${dataSend.id}`, dataSend, {
+        validateStatus: () => true,
+      });
     },
 
-    async addVisitBook(dataSend) {
-      return await axios.post(`/visit/add-visit-book`, dataSend, {
+    async editForm(dataSend) {
+      var form_data = new FormData();
+
+      for (var key in dataSend) {
+        form_data.append(key, dataSend[key]);
+        if (dataSend[key] == null) {
+          dataSend[key] = "";
+        }
+      }
+      form_data.append("_method", "PUT");
+
+      return await axios.post(`/form/${dataSend.id}`, form_data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
         validateStatus: () => true,
       });
     },

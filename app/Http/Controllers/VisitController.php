@@ -604,4 +604,27 @@ class VisitController extends Controller
 
         return response()->json($responseData, 200);
     }
+
+    public function addVisitBook(Request $request)
+    {
+        $request->validate(["visit_id as required"]);
+
+        Visit::whereIn("visit_id", $request->visit_id)->update([
+            "document_number" => $request->document_number,
+            "document_date" => $request->document_date,
+            "updated_by" => "arnonr",
+        ]);
+
+        Visit::whereIn("visit_id", $request->visit_id)
+            ->where("visit_status", "<", "4")
+            ->update([
+                "visit_status" => 4,
+            ]);
+
+        $responseData = [
+            "message" => "success",
+        ];
+
+        return response()->json($responseData, 200);
+    }
 }

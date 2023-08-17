@@ -198,11 +198,5 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         validateStatus: () => true,
       });
     },
-
-    async addSendBook(dataSend) {
-      return await axios.post(`/form/add-send-book`, dataSend, {
-        validateStatus: () => true,
-      });
-    },
   },
 });

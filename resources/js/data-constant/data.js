@@ -465,11 +465,11 @@ export const book_statuses = [
 ];
 
 export const visit_status = [
-  { value: 1, title: "ส่งใบขอออกนิเทศ", color: "warning" },
-  { value: 2, title: "อยู่ระหว่างอนุมัติ", color: "warning" },
-  { value: 3, title: "อยู่ระหว่างผู้บริหารอนุมัติ", color: "warning" },
-  { value: 4, title: "อยู่ระหว่างคณะออกหนังสือ", color: "warning" },
-  { value: 5, title: "ออกหนังสือสำเร็จ", color: "success" },
-  { value: 6, title: "อยู่ระหว่างตรวจสอบรายงานผล", color: "primary" },
-  { value: 7, title: "สำเร็จ", color: "success" },
+  { value: 0, title: "ส่งใบขอออกนิเทศ", color: "warning" },
+  { value: 1, title: "อยู่ระหว่างอนุมัติ", color: "warning" },
+  { value: 2, title: "อยู่ระหว่างผู้บริหารอนุมัติ", color: "warning" },
+  { value: 3, title: "อยู่ระหว่างคณะออกหนังสือ", color: "warning" },
+  { value: 4, title: "ออกหนังสือสำเร็จ", color: "success" },
+  { value: 5, title: "อยู่ระหว่างตรวจสอบรายงานผล", color: "primary" },
+  { value: 6, title: "สำเร็จ", color: "success" },
 ];

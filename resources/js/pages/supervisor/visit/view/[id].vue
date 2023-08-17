@@ -666,16 +666,14 @@ const generatePDF2 = async () => {
     color: rgb(0, 0, 0),
   };
 
-  existingPage.drawText(formItem.value.request_document_number, {
+  existingPage.drawText(visitActive.value.document_number, {
     x: 80, //คอลัมน์ ซ้ายไปขวา
     y: 728, //แถว ยิ่งมากยิ่งอยู่ด้านบน
     ...defaultSize,
   });
 
   existingPage.drawText(
-    dayjs(formItem.value.request_document_date)
-      .locale("th")
-      .format("DD MMMM BBBB"),
+    dayjs(visitActive.value.document_date).locale("th").format("DD MMMM BBBB"),
     {
       x: 335,
       y: 624,
@@ -835,8 +833,23 @@ const generatePDF2 = async () => {
 <template>
   <div>
     <div class="mb-2 text-right">
-      <VBtn @click="generatePDF1" color="primary"> แบบฟอร์มขอออกนิเทศ</VBtn>
-      <VBtn @click="generatePDF2" color="primary" class="ml-2">
+      <VBtn color="success" v-if="visitActive.visit_status == 4">
+        รายงานผล</VBtn
+      >
+      <VBtn
+        @click="generatePDF1"
+        class="ml-2"
+        color="primary"
+        v-if="visitActive.document_number != null"
+      >
+        แบบฟอร์มขอออกนิเทศ</VBtn
+      >
+      <VBtn
+        @click="generatePDF2"
+        color="primary"
+        class="ml-2"
+        v-if="visitActive.document_number != null"
+      >
         หนังสือขอเข้านิเทศ</VBtn
       >
     </div>

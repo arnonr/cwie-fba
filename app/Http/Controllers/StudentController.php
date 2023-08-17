@@ -30,339 +30,6 @@ class StudentController extends Controller
     public $errorCode;
     public $errorMessage;
 
-    public function getList(Request $request)
-    {
-        if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
-            $this->uploadUrl = "http://localhost:8117/storage/";
-        }
-
-        $items = Student::select(
-            "student.id as id",
-            "student.student_code as student_code",
-            "student.prefix_id as prefix_id",
-            "student.firstname as firstname",
-            "student.surname as surname",
-            "student.citizen_id as citizen_id",
-            "student.address as address",
-            "student.province_id as province_id",
-            "student.amphur_id as amphur_id",
-            "student.tumbol_id as tumbol_id",
-            "student.tel as tel",
-            "student.email as email",
-            "student.faculty_id as faculty_id",
-            "student.department_id as department_id",
-            "student.major_id as major_id",
-            "student.class_year as class_year",
-            "student.class_room as class_room",
-            "student.advisor_id as advisor_id",
-            "student.gpa as gpa",
-            "student.contact1_name as contact1_name",
-            "student.contact1_relation as contact1_relation",
-            "student.contact1_tel as contact1_tel",
-            "student.contact2_name as contact2_name",
-            "student.contact2_relation as contact2_relation",
-            "student.contact2_tel as contact2_tel",
-            "student.blood_group as blood_group",
-            "student.congenital_disease as congenital_disease",
-            "student.drug_allergy as drug_allergy",
-            "student.emergency_tel as emergency_tel",
-            "student.height as height",
-            "student.weight as weight",
-            "student.active as active",
-            "student.status_id as status_id",
-            DB::raw(
-                "(CASE WHEN photo_file = NULL THEN ''
-             ELSE CONCAT('" .
-                    $this->uploadUrl .
-                    "',photo_file) END) AS photo_file"
-            )
-        )->where("student.deleted_at", null);
-
-        // Include
-        if ($request->includeAll) {
-            $items->addSelect(
-                "province.name_th as province_name",
-                "amphur.name_th as amphur_name",
-                "tumbol.name_th as tumbol_name",
-                "faculty.name_th as faculty_name",
-                "department.name_th as department_name",
-                "major.name_th as major_name",
-                "prefix_name.prefix_name as prefix_name",
-                DB::raw(
-                    'CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'
-                )
-            );
-            $items
-                ->leftJoin(
-                    "province",
-                    "province.province_id",
-                    "=",
-                    "student.province_id"
-                )
-                ->leftJoin(
-                    "amphur",
-                    "amphur.amphur_id",
-                    "=",
-                    "student.amphur_id"
-                )
-                ->leftJoin(
-                    "tumbol",
-                    "tumbol.tumbol_id",
-                    "=",
-                    "student.tumbol_id"
-                )
-                ->leftJoin("faculty", "faculty.id", "=", "student.faculty_id")
-                ->leftJoin(
-                    "department",
-                    "department.id",
-                    "=",
-                    "student.department_id"
-                )
-                ->leftJoin("major", "major.id", "=", "student.major_id")
-                ->leftJoin("teacher", "teacher.id", "=", "student.advisor_id")
-                ->leftJoin(
-                    "prefix_name",
-                    "prefix_name.id",
-                    "=",
-                    "student.prefix_id"
-                );
-        }
-
-        if ($request->includeForm) {
-            if ($request->semester_id) {
-                $items->addSelect("form.id as form_id");
-                $items->addSelect("form.semester_id as semester_id");
-                // $items->addSelect(
-                //     "form.confirm_response_at as confirm_response_at"
-                // );
-                $items->leftJoin("form", function ($join) {
-                    $join
-                        ->on("form.student_id", "=", "student.id")
-                        ->where("form.active", 1);
-                });
-                $items->where("form.semester_id", $request->semester_id);
-            }
-
-            if ($request->includeVisit) {
-                $items->addSelect("visit.id as visit_id");
-                $items->addSelect("visit_status as visit_status");
-
-                $items->leftJoin("visit", function ($join) {
-                    $join
-                        ->on("form.id", "=", "visit.form_id")
-                        ->where("visit.active", 1);
-                });
-                $items->where("form.semester_id", $request->semester_id);
-            }
-        }
-
-        if ($request->includePrefixName) {
-            $items->addSelect("prefix_name.prefix_name as prefix_name");
-            $items->leftJoin(
-                "prefix_name",
-                "prefix_name.id",
-                "=",
-                "student.prefix_id"
-            );
-        }
-
-        if ($request->includeAdvisor) {
-            $items->addSelect(
-                DB::raw(
-                    'CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'
-                )
-            );
-            $items->leftJoin(
-                "teacher",
-                "teacher.id",
-                "=",
-                "student.advisor_id"
-            );
-        }
-
-        if ($request->includeFaculty) {
-            $items->addSelect("faculty.name_th as faculty_name");
-            $items->leftJoin(
-                "faculty",
-                "faculty.id",
-                "=",
-                "student.faculty_id"
-            );
-        }
-
-        if ($request->includeDepartment) {
-            $items->addSelect("department.name_th as department_name");
-            $items->leftJoin(
-                "department",
-                "department.id",
-                "=",
-                "student.department_id"
-            );
-        }
-
-        if ($request->includeMajor) {
-            $items->addSelect("major.name_th as major_name");
-            $items->leftJoin("major", "major.id", "=", "student.major_id");
-        }
-
-        if ($request->includeProvince) {
-            $items->addSelect("province.name_th as province_name");
-            $items->leftJoin(
-                "province",
-                "province.province_id",
-                "=",
-                "student.province_id"
-            );
-        }
-
-        if ($request->includeAmphur) {
-            $items->addSelect("amphur.name_th as amphur_name");
-            $items->leftJoin(
-                "amphur",
-                "amphur.amphur_id",
-                "=",
-                "student.amphur_id"
-            );
-        }
-
-        if ($request->includeTumbol) {
-            $items->addSelect("tumbol.name_th as tumbol_name");
-            $items->leftJoin(
-                "tumbol",
-                "tumbol.tumbol_id",
-                "=",
-                "student.tumbol_id"
-            );
-        }
-
-        if ($request->includeAdvisor) {
-            $items->addSelect(
-                DB::raw(
-                    'CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'
-                )
-            );
-            $items->leftJoin(
-                "teacher",
-                "teacher.id",
-                "=",
-                "student.advisor_id"
-            );
-        }
-
-        if ($request->id) {
-            $items->where("student.id", $request->id);
-        }
-
-        if ($request->major_id_array) {
-            $items->whereIn("student.major_id", $request->major_id_array);
-        }
-
-        if ($request->student_code) {
-            $items->where("student.student_code", $request->student_code);
-        }
-
-        if ($request->prefix_id) {
-            $items->where("student.prefix_id", $request->prefix_id);
-        }
-
-        if ($request->firstname) {
-            $items->where(
-                "student.firstname",
-                "LIKE",
-                "%" . $request->firstname . "%"
-            );
-        }
-
-        if ($request->surname) {
-            $items->where(
-                "student.surname",
-                "LIKE",
-                "%" . $request->surname . "%"
-            );
-        }
-
-        if ($request->email) {
-            $items->where("student.email", "LIKE", "%" . $request->email . "%");
-        }
-
-        if ($request->citizen_id) {
-            $items->where(
-                "student.citizen_id",
-                "LIKE",
-                "%" . $request->citizen_id . "%"
-            );
-        }
-
-        if ($request->province_id) {
-            $items->where("student.province_id", $request->province_id);
-        }
-
-        if ($request->amphur_id) {
-            $items->where("student.amphur_id", $request->amphur_id);
-        }
-
-        if ($request->tumbol_id) {
-            $items->where("student.tumbol_id", $request->tumbolid);
-        }
-
-        if ($request->faculty_id) {
-            $items->where("student.faculty_id", $request->faculty_id);
-        }
-
-        if ($request->department_id) {
-            $items->where("student.department_id", $request->department_id);
-        }
-
-        if ($request->major_id) {
-            $items->where("student.major_id", $request->major_id);
-        }
-
-        if ($request->class_year) {
-            $items->where("student.class_year", $request->class_year);
-        }
-
-        if ($request->class_room) {
-            $items->where("student.class_room", $request->class_room);
-        }
-
-        if ($request->advisor_id) {
-            $items->where("student.advisor_id", $request->advisor_id);
-        }
-
-        if ($request->status_id) {
-            $items->where("student.status_id", $request->status_id);
-        }
-
-        if ($request->active) {
-            $items->where("student.active", $request->active);
-        }
-
-        if ($request->orderBy) {
-            $items = $items->orderBy($request->orderBy, $request->order);
-        } else {
-            $items = $items->orderBy("id", "asc");
-        }
-
-        $count = $items->count();
-        $perPage = $request->perPage ? $request->perPage : $count;
-        $currentPage = $request->currentPage ? $request->currentPage : 1;
-
-        $totalPage = ceil($count / $perPage) == 0 ? 1 : ceil($count / $perPage);
-        $offset = $perPage * ($currentPage - 1);
-        $items = $items->skip($offset)->take($perPage);
-        $items = $items->get();
-
-        return response()->json(
-            [
-                "message" => "success",
-                "data" => $items,
-                "totalPage" => $totalPage,
-                "totalData" => $count,
-            ],
-            200
-        );
-    }
-
     public function getAll(Request $request)
     {
         if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
@@ -473,7 +140,7 @@ class StudentController extends Controller
                     "send_document_date",
                     "send_document_number",
                     "company.name_th as company_name",
-                    "form.response_province_id",
+                    "form.response_province_id as response_province_id",
                     DB::raw(
                         'CONCAT(supervision.prefix,supervision.firstname," ", supervision.surname) AS supervision_name'
                     )
@@ -492,6 +159,13 @@ class StudentController extends Controller
                     $join->on("form.supervision_id", "=", "supervision.id");
                 });
                 $items->where("form.semester_id", $request->semester_id);
+
+                if ($request->supervision_id) {
+                    $items->where(
+                        "form.supervision_id",
+                        $request->supervision_id
+                    );
+                }
 
                 if ($request->book_status) {
                     if ($request->book_status == 1) {
@@ -539,6 +213,15 @@ class StudentController extends Controller
                     if ($request->approve_status == 6) {
                         $items->whereNotNull("form.faculty_confirmed_at");
                     }
+
+                    if ($request->approve_status == 7) {
+                        $items->whereNotNull("form.response_send_at");
+                        $items->whereNull("form.confirm_response_at");
+                    }
+
+                    if ($request->approve_status == 8) {
+                        $items->whereNotNull("form.confirm_response_at");
+                    }
                 }
 
                 if ($request->plan_status) {
@@ -559,6 +242,9 @@ class StudentController extends Controller
                     $items->addSelect("visit_time as visit_time");
                     $items->addSelect(
                         "visit_reject_status_id as visit_reject_status_id"
+                    );
+                    $items->addSelect(
+                        "visit.document_number as visit_document_number"
                     );
 
                     if ($request->visit_status) {
@@ -1254,4 +940,337 @@ class StudentController extends Controller
 
         return response()->json(["message" => $message], 200);
     }
+
+    // public function getList(Request $request)
+    // {
+    //     if (in_array($_SERVER["HTTP_HOST"], whitelist)) {
+    //         $this->uploadUrl = "http://localhost:8117/storage/";
+    //     }
+
+    //     $items = Student::select(
+    //         "student.id as id",
+    //         "student.student_code as student_code",
+    //         "student.prefix_id as prefix_id",
+    //         "student.firstname as firstname",
+    //         "student.surname as surname",
+    //         "student.citizen_id as citizen_id",
+    //         "student.address as address",
+    //         "student.province_id as province_id",
+    //         "student.amphur_id as amphur_id",
+    //         "student.tumbol_id as tumbol_id",
+    //         "student.tel as tel",
+    //         "student.email as email",
+    //         "student.faculty_id as faculty_id",
+    //         "student.department_id as department_id",
+    //         "student.major_id as major_id",
+    //         "student.class_year as class_year",
+    //         "student.class_room as class_room",
+    //         "student.advisor_id as advisor_id",
+    //         "student.gpa as gpa",
+    //         "student.contact1_name as contact1_name",
+    //         "student.contact1_relation as contact1_relation",
+    //         "student.contact1_tel as contact1_tel",
+    //         "student.contact2_name as contact2_name",
+    //         "student.contact2_relation as contact2_relation",
+    //         "student.contact2_tel as contact2_tel",
+    //         "student.blood_group as blood_group",
+    //         "student.congenital_disease as congenital_disease",
+    //         "student.drug_allergy as drug_allergy",
+    //         "student.emergency_tel as emergency_tel",
+    //         "student.height as height",
+    //         "student.weight as weight",
+    //         "student.active as active",
+    //         "student.status_id as status_id",
+    //         DB::raw(
+    //             "(CASE WHEN photo_file = NULL THEN ''
+    //          ELSE CONCAT('" .
+    //                 $this->uploadUrl .
+    //                 "',photo_file) END) AS photo_file"
+    //         )
+    //     )->where("student.deleted_at", null);
+
+    //     // Include
+    //     if ($request->includeAll) {
+    //         $items->addSelect(
+    //             "province.name_th as province_name",
+    //             "amphur.name_th as amphur_name",
+    //             "tumbol.name_th as tumbol_name",
+    //             "faculty.name_th as faculty_name",
+    //             "department.name_th as department_name",
+    //             "major.name_th as major_name",
+    //             "prefix_name.prefix_name as prefix_name",
+    //             DB::raw(
+    //                 'CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'
+    //             )
+    //         );
+    //         $items
+    //             ->leftJoin(
+    //                 "province",
+    //                 "province.province_id",
+    //                 "=",
+    //                 "student.province_id"
+    //             )
+    //             ->leftJoin(
+    //                 "amphur",
+    //                 "amphur.amphur_id",
+    //                 "=",
+    //                 "student.amphur_id"
+    //             )
+    //             ->leftJoin(
+    //                 "tumbol",
+    //                 "tumbol.tumbol_id",
+    //                 "=",
+    //                 "student.tumbol_id"
+    //             )
+    //             ->leftJoin("faculty", "faculty.id", "=", "student.faculty_id")
+    //             ->leftJoin(
+    //                 "department",
+    //                 "department.id",
+    //                 "=",
+    //                 "student.department_id"
+    //             )
+    //             ->leftJoin("major", "major.id", "=", "student.major_id")
+    //             ->leftJoin("teacher", "teacher.id", "=", "student.advisor_id")
+    //             ->leftJoin(
+    //                 "prefix_name",
+    //                 "prefix_name.id",
+    //                 "=",
+    //                 "student.prefix_id"
+    //             );
+    //     }
+
+    //     if ($request->includeForm) {
+    //         if ($request->semester_id) {
+    //             $items->addSelect("form.id as form_id");
+    //             $items->addSelect("form.semester_id as semester_id");
+    //             // $items->addSelect(
+    //             //     "form.confirm_response_at as confirm_response_at"
+    //             // );
+    //             $items->leftJoin("form", function ($join) {
+    //                 $join
+    //                     ->on("form.student_id", "=", "student.id")
+    //                     ->where("form.active", 1);
+    //             });
+    //             $items->where("form.semester_id", $request->semester_id);
+    //         }
+
+    //         if ($request->includeVisit) {
+    //             $items->addSelect("visit.id as visit_id");
+    //             $items->addSelect("visit_status as visit_status");
+
+    //             $items->leftJoin("visit", function ($join) {
+    //                 $join
+    //                     ->on("form.id", "=", "visit.form_id")
+    //                     ->where("visit.active", 1);
+    //             });
+    //             $items->where("form.semester_id", $request->semester_id);
+    //         }
+    //     }
+
+    //     if ($request->includePrefixName) {
+    //         $items->addSelect("prefix_name.prefix_name as prefix_name");
+    //         $items->leftJoin(
+    //             "prefix_name",
+    //             "prefix_name.id",
+    //             "=",
+    //             "student.prefix_id"
+    //         );
+    //     }
+
+    //     if ($request->includeAdvisor) {
+    //         $items->addSelect(
+    //             DB::raw(
+    //                 'CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'
+    //             )
+    //         );
+    //         $items->leftJoin(
+    //             "teacher",
+    //             "teacher.id",
+    //             "=",
+    //             "student.advisor_id"
+    //         );
+    //     }
+
+    //     if ($request->includeFaculty) {
+    //         $items->addSelect("faculty.name_th as faculty_name");
+    //         $items->leftJoin(
+    //             "faculty",
+    //             "faculty.id",
+    //             "=",
+    //             "student.faculty_id"
+    //         );
+    //     }
+
+    //     if ($request->includeDepartment) {
+    //         $items->addSelect("department.name_th as department_name");
+    //         $items->leftJoin(
+    //             "department",
+    //             "department.id",
+    //             "=",
+    //             "student.department_id"
+    //         );
+    //     }
+
+    //     if ($request->includeMajor) {
+    //         $items->addSelect("major.name_th as major_name");
+    //         $items->leftJoin("major", "major.id", "=", "student.major_id");
+    //     }
+
+    //     if ($request->includeProvince) {
+    //         $items->addSelect("province.name_th as province_name");
+    //         $items->leftJoin(
+    //             "province",
+    //             "province.province_id",
+    //             "=",
+    //             "student.province_id"
+    //         );
+    //     }
+
+    //     if ($request->includeAmphur) {
+    //         $items->addSelect("amphur.name_th as amphur_name");
+    //         $items->leftJoin(
+    //             "amphur",
+    //             "amphur.amphur_id",
+    //             "=",
+    //             "student.amphur_id"
+    //         );
+    //     }
+
+    //     if ($request->includeTumbol) {
+    //         $items->addSelect("tumbol.name_th as tumbol_name");
+    //         $items->leftJoin(
+    //             "tumbol",
+    //             "tumbol.tumbol_id",
+    //             "=",
+    //             "student.tumbol_id"
+    //         );
+    //     }
+
+    //     if ($request->includeAdvisor) {
+    //         $items->addSelect(
+    //             DB::raw(
+    //                 'CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS advisor_name'
+    //             )
+    //         );
+    //         $items->leftJoin(
+    //             "teacher",
+    //             "teacher.id",
+    //             "=",
+    //             "student.advisor_id"
+    //         );
+    //     }
+
+    //     if ($request->id) {
+    //         $items->where("student.id", $request->id);
+    //     }
+
+    //     if ($request->major_id_array) {
+    //         $items->whereIn("student.major_id", $request->major_id_array);
+    //     }
+
+    //     if ($request->student_code) {
+    //         $items->where("student.student_code", $request->student_code);
+    //     }
+
+    //     if ($request->prefix_id) {
+    //         $items->where("student.prefix_id", $request->prefix_id);
+    //     }
+
+    //     if ($request->firstname) {
+    //         $items->where(
+    //             "student.firstname",
+    //             "LIKE",
+    //             "%" . $request->firstname . "%"
+    //         );
+    //     }
+
+    //     if ($request->surname) {
+    //         $items->where(
+    //             "student.surname",
+    //             "LIKE",
+    //             "%" . $request->surname . "%"
+    //         );
+    //     }
+
+    //     if ($request->email) {
+    //         $items->where("student.email", "LIKE", "%" . $request->email . "%");
+    //     }
+
+    //     if ($request->citizen_id) {
+    //         $items->where(
+    //             "student.citizen_id",
+    //             "LIKE",
+    //             "%" . $request->citizen_id . "%"
+    //         );
+    //     }
+
+    //     if ($request->province_id) {
+    //         $items->where("student.province_id", $request->province_id);
+    //     }
+
+    //     if ($request->amphur_id) {
+    //         $items->where("student.amphur_id", $request->amphur_id);
+    //     }
+
+    //     if ($request->tumbol_id) {
+    //         $items->where("student.tumbol_id", $request->tumbolid);
+    //     }
+
+    //     if ($request->faculty_id) {
+    //         $items->where("student.faculty_id", $request->faculty_id);
+    //     }
+
+    //     if ($request->department_id) {
+    //         $items->where("student.department_id", $request->department_id);
+    //     }
+
+    //     if ($request->major_id) {
+    //         $items->where("student.major_id", $request->major_id);
+    //     }
+
+    //     if ($request->class_year) {
+    //         $items->where("student.class_year", $request->class_year);
+    //     }
+
+    //     if ($request->class_room) {
+    //         $items->where("student.class_room", $request->class_room);
+    //     }
+
+    //     if ($request->advisor_id) {
+    //         $items->where("student.advisor_id", $request->advisor_id);
+    //     }
+
+    //     if ($request->status_id) {
+    //         $items->where("student.status_id", $request->status_id);
+    //     }
+
+    //     if ($request->active) {
+    //         $items->where("student.active", $request->active);
+    //     }
+
+    //     if ($request->orderBy) {
+    //         $items = $items->orderBy($request->orderBy, $request->order);
+    //     } else {
+    //         $items = $items->orderBy("id", "asc");
+    //     }
+
+    //     $count = $items->count();
+    //     $perPage = $request->perPage ? $request->perPage : $count;
+    //     $currentPage = $request->currentPage ? $request->currentPage : 1;
+
+    //     $totalPage = ceil($count / $perPage) == 0 ? 1 : ceil($count / $perPage);
+    //     $offset = $perPage * ($currentPage - 1);
+    //     $items = $items->skip($offset)->take($perPage);
+    //     $items = $items->get();
+
+    //     return response()->json(
+    //         [
+    //             "message" => "success",
+    //             "data" => $items,
+    //             "totalPage" => $totalPage,
+    //             "totalData" => $count,
+    //         ],
+    //         200
+    //     );
+    // }
 }

@@ -10,3 +10,15 @@
 .v-input--disabled {
   background-color: #eee;
 }
+
+@media only screen and (min-width: 960px){
+    .v-dialog.v-dialog-lg .v-overlay__content, .v-dialog.v-dialog-xl .v-overlay__content {
+        inline-size: 90% !important;
+    }
+}
+
+@media only screen and (min-width: 600px){
+    .v-dialog.v-dialog-lg .v-overlay__content, .v-dialog.v-dialog-xl .v-overlay__content {
+        inline-size: 90% !important;
+    }
+}

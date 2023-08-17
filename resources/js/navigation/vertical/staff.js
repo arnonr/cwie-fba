@@ -17,14 +17,14 @@ export default [
   {
     title: "หนังสือขอความอนุเคราะห์",
     icon: { icon: "tabler-book" },
-    to: { name: "staff-book1" },
+    to: { name: "staff-book" },
     action: "manage",
     subject: "StaffUser",
   },
   {
     title: "หนังสือส่งตัว",
     icon: { icon: "tabler-book" },
-    to: { name: "staff-book2" },
+    to: { name: "staff-book-send" },
     action: "manage",
     subject: "StaffUser",
   },
