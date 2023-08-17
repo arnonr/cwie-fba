@@ -1,5 +1,5 @@
 <script setup>
-import StudentList from "@/components/book/StudentList.vue";
+import StudentList from "@/components/book/BookList.vue";
 </script>
 
 <template>
