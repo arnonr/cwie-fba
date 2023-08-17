@@ -104,7 +104,7 @@ if (props.user_type == "teacher") {
             checkSemester.value = false;
           }
           fetchSemesters();
-          setTimeout(fetchItems(), 5000);
+          fetchItems();
         } else {
           console.log("error");
         }
@@ -228,40 +228,42 @@ const fetchItems = () => {
     ...advancedSearch,
   };
 
-  if (props.user_type == "major-head") {
-    search["major_id_array"] = major.value;
-  }
+  if (advancedSearch.semester_id != "") {
+    if (props.user_type == "major-head") {
+      search["major_id_array"] = major.value;
+    }
 
-  if (props.user_type == "supervisor") {
-    search["supervision_id"] = JSON.parse(
-      localStorage.getItem("teacherData")
-    ).id;
-  }
+    if (props.user_type == "supervisor") {
+      search["supervision_id"] = JSON.parse(
+        localStorage.getItem("teacherData")
+      ).id;
+    }
 
-  studentListStore
-    .fetchListStudents({
-      perPage: rowPerPage.value,
-      currentPage: currentPage.value,
-      orderBy: orderBy.value,
-      order: order.value,
-      ...search,
-      includeAll: true,
-      includeForm: true,
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        items.value = response.data.data;
-        totalPage.value = response.data.totalPage;
-        totalItems.value = response.data.totalData;
+    studentListStore
+      .fetchListStudents({
+        perPage: rowPerPage.value,
+        currentPage: currentPage.value,
+        orderBy: orderBy.value,
+        order: order.value,
+        ...search,
+        includeAll: true,
+        includeForm: true,
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          items.value = response.data.data;
+          totalPage.value = response.data.totalPage;
+          totalItems.value = response.data.totalData;
+          isOverlay.value = false;
+        } else {
+          console.log("error");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
         isOverlay.value = false;
-      } else {
-        console.log("error");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
+      });
+  }
 };
 
 const getProvince = (province_id) => {
