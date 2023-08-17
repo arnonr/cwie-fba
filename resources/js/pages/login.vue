@@ -55,7 +55,8 @@ const login = () => {
     .then((r) => {
       if (r.status === 200) {
         // const { accessToken, userData, userAbilities } = r.data;
-        const { accessToken, userData, teacherData } = r.data;
+        const { accessToken, userData, teacherData, chairman, majorHead } =
+          r.data;
 
         // localStorage.setItem("userAbilities", JSON.stringify(userAbilities));
         // ability.update(userAbilities);
@@ -88,6 +89,20 @@ const login = () => {
             subject: "TeacherUser",
             action: "manage",
           });
+
+          if (chairman == true) {
+            userData.ability.push({
+              subject: "ChairmanUser",
+              action: "manage",
+            });
+          }
+
+          if (majorHead == true) {
+            userData.ability.push({
+              subject: "MajorHeadUser",
+              action: "manage",
+            });
+          }
 
           //   if (userData.chairman == 1) {
           //     userData.role = "chairman";

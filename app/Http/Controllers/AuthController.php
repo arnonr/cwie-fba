@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\MajorHead;
+use App\Models\Semester;
 use App\Models\Teacher;
 use Validator;
 use Illuminate\Support\Facades\DB;
@@ -73,8 +75,25 @@ class AuthController extends Controller
                 ->first();
 
             $teacher = null;
+            $chairman = false;
+            $majorHead = false;
             if ($userDB->account_type == 2) {
                 $teacher = Teacher::where("user_id", $userDB->id)->first();
+                $checkChairman = Semester::where("chairman_id", $teacher->id)
+                    ->where("deleted_at", null)
+                    ->first();
+
+                $checkMajorHead = MajorHead::where("teacher_id", $teacher->id)
+                    ->where("deleted_at", null)
+                    ->first();
+
+                if ($checkChairman) {
+                    $chairman = true;
+                }
+
+                if ($checkMajorHead) {
+                    $majorHead = true;
+                }
             }
 
             $user = $userDB;
@@ -91,6 +110,8 @@ class AuthController extends Controller
                     "message" => "success",
                     "userData" => $userDB,
                     "teacherData" => $teacher,
+                    "chairman" => $chairman,
+                    "majorHead" => $majorHead,
                     "accessToken" => $tokenResult->accessToken,
                     "token_type" => "Bearer",
                     "expires_at" => Carbon::parse(

@@ -1,21 +1,21 @@
 export default [
   {
     heading: "ประธานบริหารโครงหารสหกิจ",
-    subject: "TeacherUser",
+    subject: "ChairmanUser",
     action: "manage",
   },
   {
     title: "รายการนักศึกษา",
     icon: { icon: "tabler-user" },
     to: { name: "chairman-students" },
-    subject: "TeacherUser",
+    subject: "ChairmanUser",
     action: "manage",
   },
   {
     title: "รายการออกนิเทศ",
     icon: { icon: "tabler-user" },
     to: { name: "chairman-visit" },
-    subject: "TeacherUser",
+    subject: "ChairmanUser",
     action: "manage",
   },
 ];
