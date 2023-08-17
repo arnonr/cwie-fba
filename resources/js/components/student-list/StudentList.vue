@@ -104,7 +104,7 @@ if (props.user_type == "teacher") {
             checkSemester.value = false;
           }
           fetchSemesters();
-          fetchItems();
+          setTimeout(fetchItems(), 5000);
         } else {
           console.log("error");
         }
