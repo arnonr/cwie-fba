@@ -160,6 +160,13 @@ const fetchForms = () => {
               isCheck.value = false;
             }
             status_id.value = data[0].status_id;
+            if (data[0].namecard_file != null) {
+              let namecard_file = data[0].namecard_file.split(".");
+              if (namecard_file[namecard_file.length - 1] == "pdf") {
+                data[0].namecard_file_type = "pdf";
+              }
+            }
+
             formActive.value = data[0];
           }
         }
@@ -400,10 +407,25 @@ const refreshData = () => {
                     <span>
                       <a :href="formActive.namecard_file" target="_blank">
                         <VImg
+                          v-if="formActive.namecard_file_type != 'pdf'"
                           :src="formActive.namecard_file"
                           style="max-width: 300px"
                           class="mt-2"
                         />
+
+                        <a
+                          v-if="formActive.namecard_file_type == 'pdf'"
+                          :href="formActive.namecard_file"
+                          target="_blank"
+                          ><span>
+                            <VIcon
+                              size="16"
+                              icon="tabler-file"
+                              style="opacity: 1"
+                              class="mr-1"
+                            />นามบัตร</span
+                          >
+                        </a>
                       </a>
                     </span>
                   </VCol>
