@@ -27,6 +27,7 @@ const isSnackbarVisible = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("success");
 
+const checkSemester = ref(true);
 const items = ref([]);
 const provinces = ref([]);
 const view_student_id = ref(null);
@@ -99,7 +100,11 @@ if (props.user_type == "teacher") {
             return r.major_id;
           });
 
-          fetchSemesters(semester);
+          if (semester.length == 0) {
+            checkSemester.value = false;
+          }
+          fetchSemesters();
+          fetchItems();
         } else {
           console.log("error");
         }
@@ -125,6 +130,9 @@ if (props.user_type == "teacher") {
 const fetchSemesters = () => {
   let search = {};
 
+  if (checkSemester.value == false) {
+    return;
+  }
   if (props.user_type == "chairman") {
     search["chairman_id"] = JSON.parse(localStorage.getItem("teacherData")).id;
   }
@@ -153,7 +161,10 @@ const fetchSemesters = () => {
       isOverlay.value = false;
     });
 };
-fetchSemesters();
+
+if (props.user_type != "major-head") {
+  fetchSemesters();
+}
 
 // เฉพาะเมนูของคณะและประธานบริหาร
 const fetchTeachers = () => {
