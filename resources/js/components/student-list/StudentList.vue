@@ -445,7 +445,8 @@ const refreshData = () => {
             <VTable
               class=""
               v-if="
-                advancedSearch.semester_id != null || props.user_type == 'staff'
+                selectOptions.semesters.length != 0 ||
+                props.user_type == 'staff'
               "
             >
               <!-- 👉 table head -->
