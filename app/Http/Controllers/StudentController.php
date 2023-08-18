@@ -151,6 +151,7 @@ class StudentController extends Controller
                         ->on("form.student_id", "=", "student.id")
                         ->where("form.active", 1);
                 });
+
                 $items->leftJoin("company", function ($join) {
                     $join->on("form.company_id", "=", "company.id");
                 });
@@ -159,6 +160,14 @@ class StudentController extends Controller
                     $join->on("form.supervision_id", "=", "supervision.id");
                 });
                 $items->where("form.semester_id", $request->semester_id);
+
+                if ($request->company_name) {
+                    $items->where(
+                        "company.name_th",
+                        "LIKE",
+                        "%" . $request->company_name . "%"
+                    );
+                }
 
                 if ($request->supervision_id) {
                     $items->where(

@@ -349,6 +349,7 @@ declare module '@vue/runtime-core' {
     StudentApprove: typeof import('./resources/js/components/student-view/StudentApprove.vue')['default']
     StudentList: typeof import('./resources/js/components/student-list/StudentList.vue')['default']
     StudentView: typeof import('./resources/js/components/student-view/StudentView.vue')['default']
+    StudentVisitList: typeof import('./resources/js/components/student-list/StudentVisitList.vue')['default']
     TheCustomizer: typeof import('./resources/js/@core/components/TheCustomizer.vue')['default']
     ThemeSwitcher: typeof import('./resources/js/@core/components/ThemeSwitcher.vue')['default']
     TimelineBasic: typeof import('./resources/js/views/demos/components/timeline/TimelineBasic.vue')['default']
@@ -357,5 +358,6 @@ declare module '@vue/runtime-core' {
     TwoFactorAuthDialog: typeof import('./resources/js/components/dialogs/TwoFactorAuthDialog.vue')['default']
     UserInfoEditDialog: typeof import('./resources/js/components/dialogs/UserInfoEditDialog.vue')['default']
     UserUpgradePlanDialog: typeof import('./resources/js/components/dialogs/UserUpgradePlanDialog.vue')['default']
+    VisitForm: typeof import('./resources/js/components/visit/VisitForm.vue')['default']
   }
 }
