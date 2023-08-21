@@ -350,6 +350,7 @@ declare module '@vue/runtime-core' {
     StudentList: typeof import('./resources/js/components/student-list/StudentList.vue')['default']
     StudentView: typeof import('./resources/js/components/student-view/StudentView.vue')['default']
     StudentVisitList: typeof import('./resources/js/components/student-list/StudentVisitList.vue')['default']
+    TeacherVisitList: typeof import('./resources/js/components/student-list/TeacherVisitList.vue')['default']
     TheCustomizer: typeof import('./resources/js/@core/components/TheCustomizer.vue')['default']
     ThemeSwitcher: typeof import('./resources/js/@core/components/ThemeSwitcher.vue')['default']
     TimelineBasic: typeof import('./resources/js/views/demos/components/timeline/TimelineBasic.vue')['default']
@@ -358,6 +359,11 @@ declare module '@vue/runtime-core' {
     TwoFactorAuthDialog: typeof import('./resources/js/components/dialogs/TwoFactorAuthDialog.vue')['default']
     UserInfoEditDialog: typeof import('./resources/js/components/dialogs/UserInfoEditDialog.vue')['default']
     UserUpgradePlanDialog: typeof import('./resources/js/components/dialogs/UserUpgradePlanDialog.vue')['default']
+    VisitApprove: typeof import('./resources/js/components/visit/VisitApprove.vue')['default']
+    VisitBook: typeof import('./resources/js/components/book/VisitBook.vue')['default']
+    VisitBookList: typeof import('./resources/js/components/book/VisitBookList.vue')['default']
+    VisitDownload: typeof import('./resources/js/components/visit/VisitDownload.vue')['default']
     VisitForm: typeof import('./resources/js/components/visit/VisitForm.vue')['default']
+    VisitView: typeof import('./resources/js/components/visit/VisitView.vue')['default']
   }
 }

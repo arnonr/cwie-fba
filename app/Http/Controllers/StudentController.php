@@ -141,6 +141,7 @@ class StudentController extends Controller
                     "send_document_number",
                     "company.name_th as company_name",
                     "form.response_province_id as response_province_id",
+                    "form.workplace_province_id as workplace_province_id",
                     DB::raw(
                         'CONCAT(supervision.prefix,supervision.firstname," ", supervision.surname) AS supervision_name'
                     )
@@ -249,11 +250,17 @@ class StudentController extends Controller
                     $items->addSelect("visit_status as visit_status");
                     $items->addSelect("visit_date as visit_date");
                     $items->addSelect("visit_time as visit_time");
+                    $items->addSelect("visit.province_id as visit_province_id");
+
                     $items->addSelect(
                         "visit_reject_status_id as visit_reject_status_id"
                     );
                     $items->addSelect(
                         "visit.document_number as visit_document_number"
+                    );
+
+                    $items->addSelect(
+                        "visit.report_status_id as visit_report_status_id"
                     );
 
                     if ($request->visit_status) {

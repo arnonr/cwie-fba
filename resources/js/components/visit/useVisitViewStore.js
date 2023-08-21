@@ -1,7 +1,7 @@
 import axios from "@axios";
 import { defineStore } from "pinia";
 
-export const useVisitFormStore = defineStore("VisitFormStore", {
+export const useVisitViewStore = defineStore("VisitViewStore", {
   actions: {
     async fetchForms(params) {
       return axios.get(
@@ -168,25 +168,6 @@ export const useVisitFormStore = defineStore("VisitFormStore", {
       });
     },
 
-    async editVisit(dataSend) {
-      var form_data = new FormData();
-
-      for (var key in dataSend) {
-        form_data.append(key, dataSend[key]);
-        if (dataSend[key] == null) {
-          dataSend[key] = "";
-        }
-      }
-      form_data.append("_method", "PUT");
-
-      return await axios.post(`/visit/${dataSend.visit_id}`, form_data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        validateStatus: () => true,
-      });
-    },
-
     fetchVisits(params) {
       return axios.get(
         `/visit`,
@@ -206,24 +187,5 @@ export const useVisitFormStore = defineStore("VisitFormStore", {
         }
       );
     },
-
-    // async addVisit1(dataSend) {
-    //     var form_data = new FormData();
-
-    //     for (var key in dataSend) {
-    //       form_data.append(key, dataSend[key]);
-    //       if (dataSend[key] == null) {
-    //         dataSend[key] = "";
-    //       }
-    //     }
-    //       form_data.append("_method", "PUT");
-
-    //     return await axios.post(`/visit/${dataSend.id}`, form_data, {
-    //       headers: {
-    //         "Content-Type": "multipart/form-data",
-    //       },
-    //       validateStatus: () => true,
-    //     });
-    //   },
   },
 });

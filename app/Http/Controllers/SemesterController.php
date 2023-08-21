@@ -29,7 +29,8 @@ class SemesterController extends Controller
             "semester.active as active",
             "semester.is_current as is_current",
             "semester.student_report_due_date as student_report_due_date",
-            "semester.supervisor_report_due_date as supervisor_report_due_date"
+            "semester.supervisor_report_due_date as supervisor_report_due_date",
+            "semester.semester_visit_expense as semester_visit_expense"
         )->where("semester.deleted_at", null);
 
         // Include
@@ -174,6 +175,7 @@ class SemesterController extends Controller
             "semester.is_current as is_current",
             "semester.student_report_due_date as student_report_due_date",
             "semester.supervisor_report_due_date as supervisor_report_due_date",
+            "semester.semester_visit_expense as semester_visit_expense",
             DB::raw(
                 'CONCAT(teacher.prefix,teacher.firstname," ", teacher.surname) AS chairman_name'
             )
@@ -215,6 +217,7 @@ class SemesterController extends Controller
         $item->student_report_due_date = $request->student_report_due_date;
         $item->supervisor_report_due_date =
             $request->supervisor_report_due_date;
+        $item->semester_visit_expense = $request->semester_visit_expense;
 
         $item->created_by = "arnonr";
         $item->save();
@@ -285,6 +288,10 @@ class SemesterController extends Controller
         )
             ? $request->supervisor_report_due_date
             : $item->supervisor_report_due_date;
+
+        $item->semester_visit_expense = $request->has("semester_visit_expense")
+            ? $request->semester_visit_expense
+            : $item->semester_visit_expense;
 
         $item->updated_by = "arnonr";
         $item->save();

@@ -59,6 +59,13 @@ class VisitController extends Controller
                     $this->uploadUrl .
                     "',visit.report_file) END) AS report_file"
             ),
+            DB::raw(
+                "(CASE WHEN visit.report2_file = NULL THEN ''
+            ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',visit.report2_file) END) AS report2_file"
+            ),
+            "visit.is_recruit as is_recruit",
             "visit.visit_expense as visit_expense",
             "visit.travel_expense as travel_expense",
             "visit.active as active",
@@ -399,9 +406,9 @@ class VisitController extends Controller
 
     public function edit($id, Request $request)
     {
-        $request->validate(["id as required"]);
+        $request->validate(["visit_id as required"]);
 
-        $item = Visit::where("visit_id", $request->id)->first();
+        $item = Visit::where("visit_id", $id)->first();
 
         $pathMap = null;
         if (
@@ -442,7 +449,28 @@ class VisitController extends Controller
                 file_get_contents($request->report_file)
             );
         } else {
-            $pathMap = $item->report_file;
+            $pathReport = $item->report_file;
+        }
+
+        $pathReport2 = null;
+        if (
+            $request->report2_file != "" &&
+            $request->report2_file != "null" &&
+            $request->report2_file != "undefined"
+        ) {
+            $fileReport2 =
+                date("YmdHis") .
+                "_report_" .
+                rand(1, 10000) .
+                "." .
+                $request->file("report2_file")->extension();
+            $pathReport2 = "visit/" . $fileReport2;
+            Storage::disk("public")->put(
+                $pathReport2,
+                file_get_contents($request->report2_file)
+            );
+        } else {
+            $pathReport2 = $item->report_file;
         }
 
         $pathCancel = null;
@@ -500,7 +528,6 @@ class VisitController extends Controller
         $item->co_position = $request->has("co_position")
             ? $request->co_position
             : $item->co_position;
-
         $item->co_phone = $request->has("co_phone")
             ? $request->co_phone
             : $item->co_phone;
@@ -576,9 +603,13 @@ class VisitController extends Controller
         $item->cancel_at = $request->has("cancel_at")
             ? $request->cancel_at
             : $item->cancel_at;
+        $item->is_recruit = $request->has("is_recruit")
+            ? $request->is_recruit
+            : $item->is_recruit;
 
         $item->googlemap_file = $pathMap;
         $item->report_file = $pathReport;
+        $item->report2_file = $pathReport2;
         $item->cancel_file = $pathCancel;
         $item->updated_by = "arnonr";
         $item->save();
@@ -605,17 +636,61 @@ class VisitController extends Controller
         return response()->json($responseData, 200);
     }
 
+    public function approve($id, Request $request)
+    {
+        $request->validate(["visit_id as required"]);
+
+        $item = Visit::where("visit_id", $request->visit_id)->first();
+
+        $data = $request->all();
+
+        foreach ($data as $key => $value) {
+            if ($value == "null") {
+                $request->$key = null;
+            }
+        }
+
+        $item->visit_reject_status_id = null;
+        $item->visit_status = $request->has("visit_status")
+            ? $request->visit_status
+            : $item->visit_status;
+        $item->major_head_approve_at = $request->has("major_head_approve_at")
+            ? $request->major_head_approve_at
+            : $item->major_head_approve_at;
+        $item->chairman_approved_at = $request->has("chairman_approved_at")
+            ? $request->chairman_approved_at
+            : $item->chairman_approved_at;
+        $item->active = $request->has("active")
+            ? $request->active
+            : $item->active;
+        $item->report_status_id = $request->has("report_status_id")
+            ? $request->report_status_id
+            : $item->report_status_id;
+        $item->confirm_report_at = $request->has("confirm_report_at")
+            ? $request->confirm_report_at
+            : $item->confirm_report_at;
+        $item->updated_by = "arnonr";
+        $item->save();
+
+        $responseData = [
+            "message" => "success",
+            "data" => $item,
+        ];
+
+        return response()->json($responseData, 200);
+    }
+
     public function addVisitBook(Request $request)
     {
         $request->validate(["visit_id as required"]);
 
-        Visit::whereIn("visit_id", $request->visit_id)->update([
+        Visit::whereIn("visit_id", $request->id)->update([
             "document_number" => $request->document_number,
             "document_date" => $request->document_date,
             "updated_by" => "arnonr",
         ]);
 
-        Visit::whereIn("visit_id", $request->visit_id)
+        Visit::whereIn("visit_id", $request->id)
             ->where("visit_status", "<", "4")
             ->update([
                 "visit_status" => 4,
@@ -623,6 +698,111 @@ class VisitController extends Controller
 
         $responseData = [
             "message" => "success",
+        ];
+
+        return response()->json($responseData, 200);
+    }
+
+    public function sendReport($id, Request $request)
+    {
+        $request->validate(["visit_id as required"]);
+
+        $item = Visit::where("visit_id", $id)->first();
+
+        $pathReport = null;
+        if (
+            $request->report_file != "" &&
+            $request->report_file != "null" &&
+            $request->report_file != "undefined"
+        ) {
+            $fileReport =
+                date("YmdHis") .
+                "_report_" .
+                rand(1, 10000) .
+                "." .
+                $request->file("report_file")->extension();
+            $pathReport = "visit/" . $fileReport;
+            Storage::disk("public")->put(
+                $pathReport,
+                file_get_contents($request->report_file)
+            );
+        } else {
+            $pathReport = $item->report_file;
+        }
+
+        $pathReport2 = null;
+        if (
+            $request->report2_file != "" &&
+            $request->report2_file != "null" &&
+            $request->report2_file != "undefined"
+        ) {
+            $fileReport2 =
+                date("YmdHis") .
+                "_report_" .
+                rand(1, 10000) .
+                "." .
+                $request->file("report2_file")->extension();
+            $pathReport2 = "visit/" . $fileReport2;
+            Storage::disk("public")->put(
+                $pathReport2,
+                file_get_contents($request->report2_file)
+            );
+        } else {
+            $pathReport2 = $item->report_file;
+        }
+
+        $item->send_report_at = $request->has("send_report_at")
+            ? $request->send_report_at
+            : $item->send_report_at;
+        $item->report_status_id = $request->has("report_status_id")
+            ? $request->report_status_id
+            : $item->report_status_id;
+        $item->confirm_report_at = $request->has("confirm_report_at")
+            ? $request->confirm_report_at
+            : $item->confirm_report_at;
+        $item->reject_report_comment = $request->has("reject_report_comment")
+            ? $request->reject_report_comment
+            : $item->reject_report_comment;
+        $item->visit_detail = $request->has("visit_detail")
+            ? $request->visit_detail
+            : $item->visit_detail;
+        $item->visit_expense = $request->has("visit_expense")
+            ? $request->visit_expense
+            : $item->visit_expense;
+        $item->travel_expense = $request->has("travel_expense")
+            ? $request->travel_expense
+            : $item->travel_expense;
+        $item->active = $request->has("active")
+            ? $request->active
+            : $item->active;
+        $item->visit_status = $request->has("visit_status")
+            ? $request->visit_status
+            : $item->visit_status;
+        $item->chairman_approved_at = $request->has("chairman_approved_at")
+            ? $request->chairman_approved_at
+            : $item->chairman_approved_at;
+        $item->major_head_approve_at = $request->has("major_head_approve_at")
+            ? $request->major_head_approve_at
+            : $item->major_head_approve_at;
+        $item->visit_reject_status_id = $request->has("visit_reject_status_id")
+            ? $request->visit_reject_status_id
+            : $item->visit_reject_status_id;
+        $item->cancel_description = $request->has("cancel_description")
+            ? $request->cancel_description
+            : $item->cancel_description;
+        $item->cancel_at = $request->has("cancel_at")
+            ? $request->cancel_at
+            : $item->cancel_at;
+
+        $item->googlemap_file = $pathMap;
+        $item->report_file = $pathReport;
+        $item->cancel_file = $pathCancel;
+        $item->updated_by = "arnonr";
+        $item->save();
+
+        $responseData = [
+            "message" => "success",
+            "data" => $item,
         ];
 
         return response()->json($responseData, 200);

@@ -6,6 +6,7 @@ import buddhistEra from "dayjs/plugin/buddhistEra";
 import { useRoute, useRouter } from "vue-router";
 import { useVisitFormStore } from "./useVisitFormStore";
 
+// import Select2 from "vue3-select2-component";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
@@ -43,8 +44,11 @@ const item = ref({
   travel_expense: null,
   active: 1,
   visit_status: 1,
+  province_name: null,
+  is_edit: 0,
 });
 const formActive = ref(null);
+const visitRejectLog = ref([]);
 const selectOptions = ref({
   provinces: [],
   amphurs: [],
@@ -71,7 +75,11 @@ const fetchProvinces = () => {
         selectOptions.value.provinces = response.data.data.map((r) => {
           return { title: r.name_th, value: r.province_id };
         });
+        provinces.value = response.data.data.map((r) => {
+          return { title: r.name_th, value: r.province_id };
+        });
         isOverlay.value = false;
+        fetchAmphurs();
       } else {
         console.log("error");
       }
@@ -91,7 +99,12 @@ const fetchAmphurs = () => {
         selectOptions.value.amphurs = response.data.data.map((r) => {
           return { title: r.name_th, value: r.amphur_id };
         });
+
+        amphurs.value = response.data.data.map((r) => {
+          return { title: r.name_th, value: r.amphur_id };
+        });
         isOverlay.value = false;
+        fetchTumbols();
       } else {
         console.log("error");
       }
@@ -101,7 +114,6 @@ const fetchAmphurs = () => {
       isOverlay.value = false;
     });
 };
-fetchAmphurs();
 
 const fetchTumbols = () => {
   visitFormStore
@@ -111,7 +123,13 @@ const fetchTumbols = () => {
         selectOptions.value.tumbols = response.data.data.map((r) => {
           return { title: r.name_th, value: r.tumbol_id };
         });
+
+        tumbols.value = response.data.data.map((r) => {
+          return { title: r.name_th, value: r.tumbol_id };
+        });
         isOverlay.value = false;
+        fetchStudent();
+        fetchForms();
       } else {
         console.log("error");
       }
@@ -132,7 +150,6 @@ const fetchStudent = () => {
       if (response.data.message == "success") {
         const { data } = response.data;
         student.value = data[0];
-        console.log(item.value);
       } else {
         console.log("error");
       }
@@ -142,7 +159,6 @@ const fetchStudent = () => {
       isOverlay.value = false;
     });
 };
-fetchStudent();
 
 const fetchForms = () => {
   visitFormStore
@@ -167,6 +183,7 @@ const fetchForms = () => {
         item.value.tumbol_id = data[0].workplace_tumbol_id;
 
         formActive.value = { ...data[0] };
+        fetchVisit();
       } else {
         console.log("error");
       }
@@ -176,29 +193,119 @@ const fetchForms = () => {
       isOverlay.value = false;
     });
 };
-fetchForms();
+
+const fetchVisit = () => {
+  visitFormStore
+    .fetchVisits({
+      form_id: formActive.id,
+      perPage: 1,
+      currentPage: 1,
+      active: 1,
+      orderBy: "active",
+      order: "desc",
+      includeAll: true,
+    })
+    .then(async (response) => {
+      if (response.data.message == "success") {
+        const { data } = response.data;
+        if (data.length != 0) {
+          item.value = data[0];
+          item.value.visit_type = {
+            title: data[0].visit_type,
+            value: data[0].visit_type,
+          };
+
+          const timeArray = data[0].visit_time.split(":");
+          item.value.visit_time = {
+            hours: timeArray[0],
+            minutes: timeArray[1],
+            seconds: "00",
+          };
+          item.value.cancel_file = [];
+          item.value.cancel_description = "";
+          item.value.is_edit = 1;
+
+          fetchVisitRejectLog();
+        }
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+};
+
+const fetchVisitRejectLog = () => {
+  visitFormStore
+    .fetchVisitRejectLogs({
+      visit_id: item.value.visit_id,
+    })
+    .then(async (response) => {
+      if (response.data.message == "success") {
+        visitRejectLog.value = response.data.data;
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+};
 
 const onSubmit = () => {
   isOverlay.value = true;
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
+      console.log(item.value);
       visitFormStore
         .addVisit({
-          ...visit.value,
-          visit_type: visit.value.visit_type.value,
+          ...item.value,
+          visit_type: item.value.visit_type.value,
           visit_date:
-            visit.value.visit_date != "" && visit.value.visit_date != null
-              ? dayjs(visit.value.visit_date).format("YYYY-MM-DD")
+            item.value.visit_date != "" && item.value.visit_date != null
+              ? dayjs(item.value.visit_date).format("YYYY-MM-DD")
               : null,
-          visit_time: `${visit.value.visit_time.hours}:${visit.value.visit_time.minutes}:${visit.value.visit_time.seconds}`,
+          visit_time: `${item.value.visit_time.hours}:${item.value.visit_time.minutes}:${item.value.visit_time.seconds}`,
+          visit_id: null,
+          cancel_description: null,
+          visit_status: 1,
+          cancel_file: null,
+          cancel_at: null,
+          visit_reject_status_id: null,
         })
         .then((response) => {
           if (response.data.message == "success") {
-            localStorage.setItem("added", 1);
-            nextTick(() => {
+            if (item.value.is_edit == 1) {
+              visitFormStore
+                .editVisit({
+                  active: 0,
+                  visit_id: item.value.visit_id,
+                  cancel_description: item.value.cancel_description,
+                  cancel_at: dayjs().format("YYYY-MM-DD"),
+                  cancel_file:
+                    item.value.cancel_file.length !== 0
+                      ? item.value.cancel_file[0]
+                      : null,
+                })
+                .then((response) => {
+                  localStorage.setItem("updated", 1);
+                  nextTick(() => {
+                    isOverlay.value = false;
+                    isDialogConfirmVisible.value = false;
+                    emit("refresh-data");
+                    //   router.push({
+                    //     name: "supervisor-visit",
+                    //   });
+                  });
+                });
+            } else {
+              isOverlay.value = false;
               isDialogConfirmVisible.value = false;
               emit("refresh-data");
-            });
+            }
           } else {
             isOverlay.value = false;
             isDialogConfirmVisible.value = false;
@@ -219,15 +326,14 @@ const onValidate = () => {
   // แก้ไข
   refForm.value?.validate().then(({ valid }) => {
     if (!valid) {
-      console.log("FREEDOM");
       isOverlay.value = false;
       isDialogConfirmVisible.value = false;
     } else {
-      console.log("FREEDOM1");
       isDialogConfirmVisible.value = true;
     }
   });
 };
+
 onMounted(() => {
   window.scrollTo(0, 0);
 });
@@ -240,28 +346,29 @@ const format = (date) => {
   return `${day} ${month} ${year}`;
 };
 
+// Province มัน
 const getProvince = (province_id) => {
-  if (province_id == null) return "";
+  if (province_id == null || provinces.value.length == 0) return "";
   let res = provinces.value.find((e) => {
-    return (e.province_id = province_id);
+    return e.value == province_id;
   });
-  return res.name_th;
+  return res.title;
 };
 
 const getAmphur = (amphur_id) => {
-  if (amphur_id == null) return "";
-  let res = amhpurs.value.find((e) => {
-    return (e.amphur_id = amphur_id);
+  if (amphur_id == null || amphurs.value.length == 0) return "";
+  let res = amphurs.value.find((e) => {
+    return e.value == amphur_id;
   });
-  return res.name_th;
+  return res.title;
 };
 
 const getTumbol = (tumbol_id) => {
-  if (tumbol_id == null) return "";
+  if (tumbol_id == null || tumbols.value.length == 0) return "";
   let res = tumbols.value.find((e) => {
-    return (e.tumbol_id = tumbol_id);
+    return e.value == tumbol_id;
   });
-  return res.name_th;
+  return res.title;
 };
 </script>
 <style lang="scss">
@@ -271,7 +378,17 @@ const getTumbol = (tumbol_id) => {
 </style>
 <template>
   <div>
-    <VCard title="แบบฟอร์มขอออกนิเทศ">
+    <VCard class="mb-3 pa-5" v-if="visitRejectLog.length != 0">
+      <h2>ประวัติการ Reject</h2>
+      <div class="text-red" v-for="(rj, index) in visitRejectLog" :key="index">
+        วันที่ :
+        {{ dayjs(rj.created_at).locale("th").format("DD MMM BB") }}, ผู้ตรวจ :
+        {{ rj.reject_status_id == 1 ? "ประธานอาจารย์นิเทศ" : "ประธานบริหาร" }},
+        รายละเอียด {{ rj.comment }}
+      </div>
+    </VCard>
+
+    <VCard title="">
       <VCardItem>
         <VForm
           ref="refForm"
@@ -279,14 +396,6 @@ const getTumbol = (tumbol_id) => {
           @submit.prevent="onValidate()"
         >
           <VRow class="mb-1">
-            <VCol cols="12" md="12" class="d-flex">
-              <VIcon size="22" icon="tabler-user" style="opacity: 1" />
-              <h4 class="pt-1 pl-1">ข้อมูลการขอออกนิเทศ</h4>
-            </VCol>
-            <VCol style="margin-top: -1.5em" cols="12" md="12">
-              <small> หมายเหตุ : โปรดระบุข้อมูลให้ครบถ้วน </small>
-            </VCol>
-
             <VCol cols="12" md="12" class="align-items-center">
               <label
                 class="v-label font-weight-bold"
@@ -301,8 +410,7 @@ const getTumbol = (tumbol_id) => {
                 variant="outlined"
                 clearable
                 :items="selectOptions.visit_types"
-                style="z-index: 20001 !important; max-height: 200px"
-                max-height="200px"
+                style="z-index: 20001 !important"
               />
             </VCol>
 
@@ -380,6 +488,40 @@ const getTumbol = (tumbol_id) => {
                 id="co_phone"
                 v-model="item.co_phone"
                 placeholder="phone"
+                persistent-placeholder
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+              v-if="item.is_edit == 1"
+            >
+              <label class="v-label font-weight-bold" for="co_phone"
+                >ไฟล์หลักฐานการยกเลิก :
+              </label>
+              <VFileInput
+                label="Upload Cancel File"
+                id="candel_file"
+                v-model="item.cancel_file"
+                persistent-placeholder
+              />
+            </VCol>
+
+            <VCol
+              cols="12"
+              md="12"
+              class="align-items-center"
+              v-if="item.is_edit == 1"
+            >
+              <label class="v-label font-weight-bold" for="cancel_description"
+                >เหตุผลการยกเลิก :
+              </label>
+              <AppTextField
+                id="cancel_description"
+                v-model="item.cancel_description"
+                placeholder="cancel description"
                 persistent-placeholder
               />
             </VCol>
@@ -474,7 +616,7 @@ const getTumbol = (tumbol_id) => {
                 <VCol cols="12" md="4">
                   <span>อำเภอ : </span>
                   <span>
-                    {{ formActive.workplace_amphur_id }}
+                    {{ getAmphur(formActive.workplace_amphur_id) }}
                   </span>
                 </VCol>
 
@@ -536,6 +678,9 @@ const getTumbol = (tumbol_id) => {
       <!-- Dialog Content -->
       <VCard title="ยืนยันการส่งข้อมูล">
         <VCardText> โปรดตรวจสอบข้อมูลให้ถูกต้องก่อนกดยืนยัน! </VCardText>
+        <VCardText v-if="item.is_edit == 1" class="text-error font-weight-bold">
+          การแก้ไขข้อมูลต้องอนุมัติใหม่ทั้งหมด!
+        </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
           <VBtn

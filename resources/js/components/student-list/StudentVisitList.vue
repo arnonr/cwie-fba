@@ -1,15 +1,25 @@
 <script setup>
 import StudentView from "@/components/student-view/StudentView.vue";
 import VisitForm from "@/components/visit/VisitForm.vue";
+import VisitView from "@/components/visit/VisitView.vue";
+import Vue3Html2pdf from "vue3-html2pdf";
+// import "@/font/Sarabun-normal";
+import Swal from "sweetalert2";
 import {
   class_rooms,
   class_years,
   statuses,
   form_statuses,
   statusShow,
+  visit_status,
 } from "@/data-constant/data";
 import { useStudentListStore } from "./useStudentListStore";
+import { jsPDF } from "jspdf";
 import axios from "@axios";
+import dayjs from "dayjs";
+import "dayjs/locale/th";
+import buddhistEra from "dayjs/plugin/buddhistEra";
+dayjs.extend(buddhistEra);
 
 const studentListStore = useStudentListStore();
 
@@ -22,6 +32,7 @@ const totalItems = ref(0);
 const isOverlay = ref(true);
 const orderBy = ref("student.id");
 const order = ref("desc");
+const isDialogFormVisitStudent = ref(false);
 const isDialogViewVisitStudent = ref(false);
 
 const isSnackbarVisible = ref(false);
@@ -31,6 +42,10 @@ const snackbarColor = ref("success");
 const checkSemester = ref(true);
 const items = ref([]);
 const provinces = ref([]);
+const amphurs = ref([]);
+const tumbols = ref([]);
+const supervisor_id = ref(null);
+const supervisor = ref({});
 const view_student_id = ref(null);
 const major = ref([]); // สำหรับประธานอาจารย์นิเทศ
 const advancedSearch = reactive({
@@ -50,7 +65,7 @@ const advancedSearch = reactive({
   plan_status: "",
   visit_status: "",
 });
-
+const teacherData = ref({});
 const selectOptions = ref({
   perPage: [
     { title: "20", value: 20 },
@@ -74,16 +89,21 @@ const selectOptions = ref({
   ],
 });
 
+// PDF
+const countPDF = ref(0);
+const studentListPDF = ref([]);
+const chairmanPDF = ref({ data: {} });
+
 if (props.user_type == "teacher") {
-  const teacherData = JSON.parse(localStorage.getItem("teacherData"));
-  advancedSearch.advisor_id = teacherData.id;
+  teacherData.value = JSON.parse(localStorage.getItem("teacherData"));
+  advancedSearch.advisor_id = teacherData.value.id;
 
   selectOptions.value.approve_statuses = [
     { title: "รอที่ปรึกษาอนุมัติ", value: 1 },
     { title: "ที่ปรึกษาอนุมัติเรียบร้อย", value: 2 },
   ];
 } else if (props.user_type == "major-head") {
-  const teacherData = JSON.parse(localStorage.getItem("teacherData"));
+  teacherData.value = JSON.parse(localStorage.getItem("teacherData"));
   selectOptions.value.approve_statuses = [
     { title: "รอประธานอาจารย์นิเทศอนุมัติ", value: 3 },
     { title: "ประธานอาจารย์นิเทศอนุมัติเรียบร้อย", value: 4 },
@@ -98,7 +118,6 @@ if (props.user_type == "teacher") {
       .then((response) => {
         if (response.status === 200) {
           let semester = response.data.data.map((r) => {
-            console.log(r.semester_id);
             return r.semester_id;
           });
 
@@ -122,6 +141,8 @@ if (props.user_type == "teacher") {
   };
   fetchMajorHeads();
 } else if (props.user_type == "supervisor") {
+  teacherData.value = JSON.parse(localStorage.getItem("teacherData"));
+  supervisor_id.value = teacherData.value.id;
   selectOptions.value.approve_statuses = [];
   //
 } else if (props.user_type == "chairman") {
@@ -132,6 +153,35 @@ if (props.user_type == "teacher") {
     { title: "คณะอนุมัติเรียบร้อย", value: 6 },
   ];
 }
+
+//
+const fetchProvince = async () => {
+  let res = await axios.get("/province", {
+    validateStatus: () => true,
+  });
+  provinces.value = res.data.data;
+};
+fetchProvince();
+
+const fetchAmphur = async () => {
+  let res = await axios.get("/amphur", {
+    validateStatus: () => true,
+  });
+  amphurs.value = res.data.data;
+};
+fetchAmphur();
+
+const fetchTumbol = async () => {
+  let res = await axios.get(
+    "/tumbol",
+    { perPage: 20000 },
+    {
+      validateStatus: () => true,
+    }
+  );
+  tumbols.value = res.data.data;
+};
+fetchTumbol();
 
 const fetchSemesters = () => {
   let search = {};
@@ -155,6 +205,10 @@ const fetchSemesters = () => {
             value: r.id,
             start_date: r.start_date,
             end_date: r.end_date,
+            term: r.term,
+            semester_year: r.semester_year,
+            semester_visit_expense: r.semester_visit_expense,
+            chairman_id: r.chairman_id,
           };
         });
         isOverlay.value = false;
@@ -182,7 +236,16 @@ const fetchTeachers = () => {
           return {
             title: r.prefix + r.firstname + " " + r.surname,
             value: r.id,
+            data: r,
           };
+        });
+
+        supervisor.value = response.data.data.find((r) => {
+          return r.id == supervisor_id.value;
+        });
+
+        chairmanPDF.value = selectOptions.value.teachers.find((e) => {
+          return e.value == semesterPDF.value.chairman_id;
         });
         isOverlay.value = false;
       } else {
@@ -221,20 +284,13 @@ const fetchMajors = () => {
 fetchMajors();
 
 // 👉 Fetching
-const fetchProvince = async () => {
-  let res = await axios.get("/province", {
-    validateStatus: () => true,
-  });
-  provinces.value = res.data.data;
-};
-fetchProvince();
 
 const fetchItems = () => {
   let search = {
     ...advancedSearch,
   };
 
-  if (advancedSearch.semester_id != "") {
+  if (advancedSearch.semester_id != "" && advancedSearch.semester_id != null) {
     if (props.user_type == "major-head") {
       search["major_id_array"] = major.value;
     }
@@ -270,6 +326,8 @@ const fetchItems = () => {
         console.error(error);
         isOverlay.value = false;
       });
+  } else {
+    items.value = [];
   }
 };
 
@@ -281,10 +339,35 @@ const getProvince = (province_id) => {
   return res.name_th;
 };
 
+const getAmphur = (id) => {
+  if (id == null || amphurs.value.length == 0) return "";
+  let res = amphurs.value.find((e) => {
+    return (e.amphur_id = id);
+  });
+  return res.name_th;
+};
+
+const getTumbol = (id) => {
+  if (id == null || tumbols.value.length == 0) return "";
+  let res = tumbols.value.find((e) => {
+    return (e.tumbol_id = id);
+  });
+  return res.name_th;
+};
+
 watchEffect(fetchItems);
 
 watchEffect(() => {
   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
+});
+
+const semesterPDF = ref({});
+watch(advancedSearch, (value) => {
+  if (advancedSearch.semester_id != null) {
+    semesterPDF.value = selectOptions.value.semesters.find((e) => {
+      return e.value == advancedSearch.semester_id;
+    });
+  }
 });
 
 onMounted(() => {
@@ -292,7 +375,72 @@ onMounted(() => {
 });
 
 const refreshData = () => {
+  isDialogFormVisitStudent.value = false;
+  isDialogViewVisitStudent.value = false;
   fetchItems();
+};
+
+const onPayment = () => {
+  let search = {
+    ...advancedSearch,
+  };
+
+  if (props.user_type == "supervisor") {
+    search["supervision_id"] = JSON.parse(
+      localStorage.getItem("teacherData")
+    ).id;
+  }
+
+  studentListStore
+    .fetchListStudents({
+      perPage: 10000,
+      currentPage: 1,
+      orderBy: orderBy.value,
+      order: order.value,
+      ...search,
+      includeAll: true,
+      includeForm: true,
+      includeVisit: true,
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        let check = response.data.data.find((e) => {
+          return e.visit_status < 6;
+        });
+
+        if (check) {
+          Swal.fire({
+            icon: "error",
+            title: "ยังส่งรายงานการออกนิเทศไม่ครบ!",
+            text: "โปรดตรวจสอบการส่งรายงานการออกนิเทศ",
+            customClass: {
+              confirmButton:
+                "v-btn v-btn--elevated v-theme--light bg-success v-btn--density-default v-btn--size-default v-btn--variant-elevated",
+            },
+          });
+        } else {
+          // Generate PDF
+          studentListPDF.value = response.data.data;
+          countPDF.value = response.data.data.length;
+          generatePayment();
+        }
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+
+  // if()
+  // check ว่าครบทุกคนไหม ถ้าไม่ครบ alert
+  // ถ้าครบแล้วกดออกใบได้ที่ function PDF
+};
+
+const html2Pdf = ref(null);
+const generatePayment = () => {
+  html2Pdf.value.generatePdf();
 };
 </script>
 
@@ -451,6 +599,24 @@ const refreshData = () => {
 
           <!-- Table -->
           <VCol cols="12" sm="12">
+            <VBtn
+              color="primary"
+              class="ml-2"
+              :disabled="
+                advancedSearch.semester_id == null ||
+                advancedSearch.semester_id == ''
+              "
+              @click="
+                () => {
+                  onPayment();
+                }
+              "
+            >
+              พิมพ์เอกสารเบิกจ่าย
+            </VBtn>
+          </VCol>
+
+          <VCol cols="12" sm="12">
             <VTable
               class=""
               v-if="
@@ -496,7 +662,7 @@ const refreshData = () => {
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    {{ getProvince(it.response_province_id) }}
+                    {{ getProvince(it.workplace_province_id) }}
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
@@ -518,6 +684,16 @@ const refreshData = () => {
                         >{{ visit_status[it.visit_status].title }}</VChip
                       >
                       <VChip label v-else color="error">รอแก้ไขข้อมูล</VChip>
+
+                      <VChip
+                        label
+                        color="error"
+                        class="mt-2"
+                        v-if="
+                          it.visit_status == 4 && it.visit_report_status_id == 3
+                        "
+                        >รอแก้ไขรายงาน</VChip
+                      >
                     </span>
                   </td>
 
@@ -528,14 +704,16 @@ const refreshData = () => {
                             .locale("th")
                             .format("DD MMM BB") +
                           " " +
-                          it.visit_time
+                          it.visit_time.substring(0, it.visit_time.length - 3) +
+                          " น."
                         : ""
                     }}
                   </td>
 
                   <td class="text-center">
                     <VBtn
-                      color="warning"
+                      v-if="it.visit_id != null"
+                      color="success"
                       class="ml-2"
                       @click="
                         () => {
@@ -544,14 +722,23 @@ const refreshData = () => {
                         }
                       "
                     >
-                      <!-- :to="{
-                        name:
-                          it.visit_id != null
-                            ? 'supervisor-visit-edit-id'
-                            : 'supervisor-visit-add-id',
-                        params: { id: it.id },
-                      }" -->
-                      {{ it.visit_id != null ? "แก้ไขข้อมูล" : "ออกนิเทศ" }}
+                      ดูข้อมูล
+                    </VBtn>
+
+                    <VBtn
+                      color="warning"
+                      class="ml-2 mt-2"
+                      v-if="it.visit_status < 5"
+                      @click="
+                        () => {
+                          view_student_id = it.id;
+                          isDialogFormVisitStudent = true;
+                        }
+                      "
+                    >
+                      {{
+                        it.visit_id != null ? "แก้ไขใบขอออกนิเทศ" : "ออกนิเทศ"
+                      }}
                     </VBtn>
                   </td>
                 </tr>
@@ -602,11 +789,34 @@ const refreshData = () => {
       v-model="isDialogViewVisitStudent"
       persistent
       class="v-dialog-lg"
-      style="z-index: 20001"
+      style="z-index: 2000"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn
         @click="isDialogViewVisitStudent = !isDialogViewVisitStudent"
+      />
+
+      <!-- Dialog Content -->
+      <VCard title="ข้อมูลขอออกนิเทศ">
+        <VCardText>
+          <VisitView
+            :user_type="props.user_type"
+            :student_id="view_student_id"
+            @refresh-data="refreshData"
+            @close="isDialogViewVisitStudent = false"
+        /></VCardText>
+      </VCard>
+    </VDialog>
+
+    <VDialog
+      v-model="isDialogFormVisitStudent"
+      persistent
+      class="v-dialog-lg"
+      style="z-index: 2000"
+    >
+      <!-- Dialog close btn -->
+      <DialogCloseBtn
+        @click="isDialogFormVisitStudent = !isDialogFormVisitStudent"
       />
 
       <!-- Dialog Content -->
@@ -616,14 +826,486 @@ const refreshData = () => {
             :user_type="props.user_type"
             :student_id="view_student_id"
             @refresh-data="refreshData"
-            @close="isDialogViewVisitStudent = false"
+            @close="isDialogFormVisitStudent = false"
         /></VCardText>
       </VCard>
     </VDialog>
+
+    <!--  -->
+    <vue3-html2pdf
+      :show-layout="false"
+      :float-layout="true"
+      :enable-download="true"
+      :preview-modal="true"
+      :paginate-elements-by-height="1400"
+      filename="payment"
+      :pdf-quality="2"
+      :manual-pagination="false"
+      pdf-format="a4"
+      pdf-orientation="portrait"
+      pdf-content-width="800px"
+      ref="html2Pdf"
+    >
+      <!-- @progress="onProgress($event)"
+      @hasStartedGeneration="hasStartedGeneration()"
+      @hasGenerated="hasGenerated($event)" -->
+
+      <template v-slot:pdf-content>
+        <!-- PDF Content Here -->
+        <div
+          style="
+            margin-top: 50px;
+            margin-right: 50px;
+            margin-left: 50px;
+            margin-bottom: 50px;
+          "
+          class="payment-pdf"
+        >
+          <div class="text-right">
+            ที่คณะบริหารธุรกิจมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
+          </div>
+
+          <div class="text-center font-weight-bold" style="margin-top: 50px">
+            ใบสำคัญรับเงิน
+          </div>
+
+          <div class="" style="margin-left: 400px; margin-top: 20px">
+            วันที่
+            ......................................................................
+          </div>
+
+          <div class="" style="margin-left: 120px; margin-top: 20px">
+            ข้าพเจ้า
+            ...............................................................
+            อยู่บ้านเลขที่.......................................................
+          </div>
+          <div class="" style="margin-top: 20px">
+            แขวง/ตำบล ..............................................
+            เขต/อำเภอ..........................................
+            จังหวัด.............................................
+          </div>
+
+          <div class="" style="margin-top: 20px">
+            ได้รับเงินจากมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือดังรายการต่อไปนี้
+          </div>
+          <div class="" style="margin-top: 20px">
+            <table class="table-payment">
+              <tr>
+                <th class="text-center" style="width: 500px">รายการ</th>
+                <th class="text-center" style="width: 200px">จำนวนเงิน</th>
+              </tr>
+              <tr>
+                <td
+                  class=""
+                  style="
+                    padding-left: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                    height: 300px;
+                    vertical-align: top;
+                  "
+                >
+                  <span>
+                    ค่าตอบแทนการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษา<br />
+                    โครงการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษาคณะบริหารธุรกิจ<br />
+                    ภาคการศึกษาที่ &nbsp; &nbsp; ปีการศึกษา <br />
+                    (จำนวน.............คน คนละ............บาท)
+                  </span>
+                </td>
+                <td
+                  class="text-right"
+                  style="
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                    height: 300px;
+                    vertical-align: top;
+                  "
+                ></td>
+              </tr>
+              <tr>
+                <td
+                  class="text-right"
+                  style="
+                    padding-left: 10px;
+                    padding-top: 10px;
+                    padding-right: 10px;
+                    padding-bottom: 10px;
+                    vertical-align: top;
+                  "
+                >
+                  <span> รวมเป็นเงิน (บาท) </span>
+                </td>
+                <td
+                  class="text-right"
+                  style="
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                    vertical-align: top;
+                  "
+                ></td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="margin-top: 20px">
+            <span>จำนวนเงิน (ตัวอักษร)</span>
+            <span
+              >..................................................................</span
+            >
+          </div>
+
+          <div style="margin-top: 80px; margin-left: 300px">
+            <span
+              >...............................................................................</span
+            >
+            <span>ผู้รับเงิน</span><br />
+            <span style="padding-left: 40px"></span>
+          </div>
+
+          <div style="margin-top: 80px; margin-left: 300px">
+            <span
+              >...............................................................................</span
+            >
+            <span>ผู้จ่ายเงิน</span><br />
+            <span style="padding-left: 40px"></span>
+          </div>
+        </div>
+
+        <!-- Absolute Page1 -->
+        <span style="position: absolute; top: 162px; left: 500px"
+          >{{ dayjs().locale("th").format("DD MMMM BBBB") }}
+        </span>
+        <span style="position: absolute; top: 205px; left: 230px">{{
+          supervisor.prefix + supervisor.firstname + " " + supervisor.surname
+        }}</span>
+        <span style="position: absolute; top: 205px; left: 550px"
+          >{{ supervisor.address }}
+        </span>
+        <span style="position: absolute; top: 248px; left: 140px"
+          >{{ getTumbol(supervisor.tumbol_id) }}
+        </span>
+
+        <span style="position: absolute; top: 248px; left: 380px"
+          >{{ getAmphur(supervisor.amphur_id) }}
+        </span>
+
+        <span style="position: absolute; top: 248px; left: 580px"
+          >{{ getProvince(supervisor.province_id) }}
+        </span>
+
+        <span style="position: absolute; top: 414px; left: 160px"
+          >{{ semesterPDF.term }}
+        </span>
+
+        <span style="position: absolute; top: 414px; left: 240px"
+          >{{ semesterPDF.semester_year }}
+        </span>
+
+        <span style="position: absolute; top: 435px; left: 125px"
+          >{{ countPDF }}
+        </span>
+
+        <span style="position: absolute; top: 435px; left: 220px"
+          >{{ semesterPDF.semester_visit_expense }}
+        </span>
+
+        <span style="position: absolute; top: 370px; left: 680px"
+          >{{ countPDF * semesterPDF.semester_visit_expense }}.00
+        </span>
+
+        <span style="position: absolute; top: 670px; left: 680px"
+          >{{ countPDF * semesterPDF.semester_visit_expense }}.00
+        </span>
+
+        <span style="position: absolute; top: 850px; left: 400px">{{
+          "( " +
+          supervisor.prefix +
+          supervisor.firstname +
+          " " +
+          supervisor.surname +
+          " )"
+        }}</span>
+
+        <span style="position: absolute; top: 975px; left: 400px">{{
+          "( " +
+          chairmanPDF.data.prefix +
+          chairmanPDF.data.firstname +
+          " " +
+          chairmanPDF.data.surname +
+          " )"
+        }}</span>
+
+        <div class="html2pdf__page-break" />
+        <!-- Page2 -->
+        <div
+          style="
+            margin-top: 50px;
+            margin-right: 50px;
+            margin-left: 50px;
+            margin-bottom: 50px;
+          "
+          class="payment-pdf"
+        >
+          <div class="text-center font-weight-bold">
+            ตารางสรุปค่าตอบแทนการนิเทศและค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา<br />
+            ของอาจารยน์เิทศคณะบริหารธุรกิจ
+          </div>
+
+          <div class="" style="margin-top: 20px">
+            <span></span>
+          </div>
+
+          <div class="" style="margin-top: 60px">
+            <table class="table-payment">
+              <tr>
+                <th class="text-center" style="width: 150px">ว-ด-ป</th>
+                <th class="text-center" style="width: 150px">รหัสนักศึกษา</th>
+                <th class="text-center" style="width: 300px">ชื่อ-สกุล</th>
+                <th class="text-center" style="width: 300px">บริษัท</th>
+                <th class="text-center" style="width: 150px">จังหวัด</th>
+              </tr>
+              <tr v-for="(it, index) in studentListPDF" :key="index">
+                <td
+                  class="text-center"
+                  style="
+                    padding-left: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                  "
+                >
+                  <span>
+                    {{ dayjs(it.visit_date).locale("th").format("DD MMM BB") }}
+                  </span>
+                </td>
+                <td
+                  style="
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                  "
+                  class="text-center"
+                >
+                  {{ it.student_code }}
+                </td>
+                <td
+                  style="
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                  "
+                >
+                  {{ it.prefix_name + it.firstname + " " + it.surname }}
+                </td>
+                <td
+                  style="
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                  "
+                >
+                  {{ it.company_name }}
+                </td>
+                <td
+                  class="text-center"
+                  style="
+                    padding-left: 10px;
+                    padding-top: 10px;
+                    padding-right: 10px;
+                    padding-bottom: 10px;
+                  "
+                >
+                  <span> {{ getProvince(it.visit_province_id) }} </span>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="margin-top: 20px">
+            <span
+              >1. ค่าตอบแทนการนิเทศนักศึกษาสหกิจศึกษา
+              (อัตราค่าตอบแทนเหมาจ่ายไม่เกิน 600.00 บาท/นักศึกษา 1 คน)</span
+            ><br />
+            <span style="padding-left: 15 px"
+              >ค่าตอบแทนการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษาจํานวน
+              {{ countPDF }} คนรวมเป็นเงิน
+              {{ semesterPDF.semester_visit_expense * countPDF }}.00 บาท</span
+            >
+          </div>
+
+          <div style="margin-top: 40px">
+            <span>2. ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา</span><br />
+            <table>
+              <tr v-for="(it, index) in studentListPDF" :key="index">
+                <td style="width: 400px; padding-left: 30px">
+                  {{ it.company_name }}
+                </td>
+                <td>
+                  จังหวัด {{ getProvince(it.visit_province_id) }} เหมาจ่าย
+                  {{ "800" }}.00 บาท
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Absolute Page2 -->
+        <span style="position: absolute; top: 1240px; left: 50px">{{
+          supervisor.prefix + supervisor.firstname + " " + supervisor.surname
+        }}</span>
+
+        <div class="html2pdf__page-break" />
+        <!-- Page3 -->
+        <div
+          style="
+            margin-top: 50px;
+            margin-right: 50px;
+            margin-left: 50px;
+            margin-bottom: 50px;
+          "
+          class="payment-pdf"
+        >
+          <div class="text-center font-weight-bold">
+            มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ<br />ใบรับรองการจ่ายเงิน
+          </div>
+
+          <div class="" style="margin-top: 20px">
+            <table class="table-payment">
+              <tr>
+                <th class="text-center" style="width: 110px">วัน เดือน ปี</th>
+                <th class="text-center" style="width: 450px">
+                  รายละเอียดรายจ่าย
+                </th>
+                <th class="text-center" style="width: 80px">จำนวนเงิน</th>
+                <th class="text-center" style="width: 150px">หมายเหตุ</th>
+              </tr>
+              <tr v-for="(it, index) in studentListPDF" :key="index">
+                <td
+                  class="text-center"
+                  style="
+                    padding-left: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                  "
+                >
+                  <span>
+                    {{
+                      dayjs(it.visit_date).locale("th").format("DD MMM BBBB")
+                    }}
+                  </span>
+                </td>
+                <td
+                  style="
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                  "
+                >
+                  ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา<br />
+                  เริ่มต้นที่ มจพ.วิทยาเขตระยอง ถีง {{ it.company_name }}<br />
+                  จังหวัด{{ getProvince(it.visit_province_id) }} เหมาจ่าย
+                </td>
+                <td
+                  style="
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                  "
+                  class="text-right"
+                >
+                  {{ "800" }}.00
+                </td>
+                <td
+                  class="text-center"
+                  style="
+                    padding-left: 10px;
+                    padding-top: 10px;
+                    padding-right: 10px;
+                    padding-bottom: 10px;
+                  "
+                >
+                  <span> </span>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="" style="margin-top: 20px">
+            <span
+              >รวมทั้งสิ้น
+              (ตัวอักษร)..................................................................................</span
+            >
+          </div>
+          <div class="" style="margin-top: 20px; margin-left: 40px">
+            ข้าพเจ้า
+            <span>{{
+              supervisor.prefix +
+              supervisor.firstname +
+              " " +
+              supervisor.surname
+            }}</span>
+            ตำแหน่ง อาจารย์
+          </div>
+          <div class="">
+            <span>หน่วยงาน คณะบริหารธุรกิจ</span><br />
+            <span
+              >ขอรับรองว่ารายจ่ายข้างต้นไม่อาจเรียกใบเสร็จรับเงินจากผู้รับได้และข้าพเจ้าได้จ่ายเงินไปในงานของมหาวิทยาลัยจริง</span
+            >
+          </div>
+
+          <!--  -->
+
+          <div style="margin-top: 80px; margin-left: 300px">
+            <span
+              >ลงชื่อ...............................................................................</span
+            >
+            <br />
+            <span style="padding-left: 50px"
+              >(
+              {{
+                supervisor.prefix +
+                supervisor.firstname +
+                " " +
+                supervisor.surname
+              }}
+              )</span
+            >
+            <br />
+            <span style="padding-left: 50px">ตำแหน่งอาจารย์</span>
+            <br />
+            <span style="padding-left: 50px"
+              >วันที่ {{ dayjs().locale("th").format("DD MMM BBBB") }}</span
+            >
+          </div>
+        </div>
+      </template>
+    </vue3-html2pdf>
+
+    <!--  -->
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+@import url("https://fonts.googleapis.com/css2?family=Sarabun&display=swap");
+.payment-pdf {
+  font-family: "Sarabun", sans-serif;
+}
+
+.table-payment,
+.table-payment th,
+.table-payment td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
 
 <route lang="yaml">
 meta:
