@@ -786,7 +786,7 @@ const generatePDF1 = async () => {
               <VCol cols="12">
                 <!--  -->
                 <label class="v-label" for="report_file">
-                  ไฟล์รายงานผลการนิเทศ
+                  ไฟล์แบบแจ้งยืนยันตอบรับการนิเทศ บธส07
                 </label>
                 <VFileInput
                   v-model="visit_report.report_file"
@@ -800,7 +800,7 @@ const generatePDF1 = async () => {
               <VCol cols="12">
                 <!--  -->
                 <label class="v-label" for="report2_file">
-                  ไฟล์รายงานผลการนิเทศ2
+                  ไฟล์ใบรายงานผลการนิเทศ บธส08
                 </label>
                 <VFileInput
                   v-model="visit_report.report2_file"
