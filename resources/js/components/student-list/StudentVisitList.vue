@@ -49,7 +49,7 @@ const supervisor_id = ref(null);
 const supervisor = ref({});
 const view_student_id = ref(null);
 const major = ref([]); // สำหรับประธานอาจารย์นิเทศ
-const date1 = ref([]);
+let travel_array = ref([]);
 const advancedSearch = reactive({
   semester_id: "",
   status_id: "",
@@ -436,84 +436,59 @@ const onPayment = () => {
             (a, b) => new Date(a.visit_date) - new Date(b.visit_date)
           );
 
-          let travel_array1 = [
-            {
-              date: "2022-07-18",
-              companies: [
-                {
-                  id: 1,
-                  name: "บ....",
-                  province_id: 1,
-                },
-              ],
-              price: { id: 1, expense: 800 },
-            },
-            {
-              date: "2022-07-19",
-              companies: [
-                {
-                  id: 1,
-                  name: "บ....",
-                  province_id: 1,
-                },
-              ],
-              price: { id: 1, expense: 800 },
-            },
-          ];
-
-          let travel_array = [];
+          let ta = [];
 
           students.forEach((e) => {
-            let findDate = travel_array1.find((x) => x.date == e.visit_date);
+            let findDate = ta.find((x) => x.date == e.visit_date);
             if (findDate) {
+              let checkCompany = findDate.companies.find((x) => {
+                return x.id == e.company_id;
+              });
+
+              if (!checkCompany) {
+                findDate.companies.push({
+                  id: e.company_id,
+                  name: e.company_name,
+                  province_id: e.visit_province_id,
+                });
+              }
+
+              findDate.companies2.push({
+                id: e.company_id,
+                name: e.company_name,
+                province_id: e.visit_province_id,
+              });
+
+              if (findDate.price.expense < e.visit_travel_expense) {
+                findDate.price = {
+                  id: e.company_id,
+                  expense: e.visit_travel_expense,
+                };
+              }
             } else {
+              ta.push({
+                date: e.visit_date,
+                companies: [
+                  {
+                    id: e.company_id,
+                    name: e.company_name,
+                    province_id: e.visit_province_id,
+                  },
+                ],
+                companies2: [
+                  {
+                    id: e.company_id,
+                    name: e.company_name,
+                    province_id: e.visit_province_id,
+                  },
+                ],
+                price: { id: e.company_id, expense: e.visit_travel_expense },
+              });
             }
-            // if (date1.value.hasOwnProperty(e.visit_date)) {
-            //   if (
-            //     date1.value[e.visit_date]["amount"] < e.visit_travel_expense
-            //   ) {
-            //     date1.value[e.visit_date]["amount"] = e.visit_travel_expense;
-            //   }
-
-            //   //   if (!date1[e.visit_date].company_ids.includes(e.company_id)) {
-            //   //     // date1[e.visit_date].company_ids.push(e.company_id);
-            //   //   }
-            // } else {
-            //   date1.value[e.visit_date] = {
-            //     amount: e.visit_travel_expense,
-            //     showed: 0,
-            //   };
-            //   if (!date1.value.hasOwnProperty("companies")) {
-            //     date1.value[e.visit_date]["companies"] = [];
-            //   }
-            //   date1.value[e.visit_date]["companies"].push({
-            //     company_name: e.company_name,
-            //     visit_province_id: e.visit_province_id,
-            //   });
-            // }
           });
-
-          console.log(travel_array);
-
-          // วนรอบ 2
-          //   let students2 = students.map((e) => {
-          //     // if (date1.hasOwnProperty(e.visit_date)) {
-          //     if (
-          //       e.visit_travel_expense == date1[e.visit_date].amount &&
-          //       date1[e.visit_date].showed == 0
-          //     ) {
-          //       e.show = "เหมาจ่าย " + date1[e.visit_date].amount + ".00 บาท";
-          //       date1[e.visit_date].showed = 1;
-          //     } else {
-          //       e.show = "";
-          //     }
-          //     // }
-
-          //     return e;
-          //   });
-
+          travel_array.value = ta;
+          console.log(travel_array.value);
           studentListPDF.value = students;
-
           generatePayment();
         }
       } else {
@@ -1068,9 +1043,9 @@ const generatePayment = () => {
         </div>
 
         <!-- Absolute Page1 -->
-        <span style="position: absolute; top: 162px; left: 500px"
+        <!-- <span style="position: absolute; top: 162px; left: 500px"
           >{{ dayjs().locale("th").format("DD MMMM BBBB") }}
-        </span>
+        </span> -->
         <span style="position: absolute; top: 205px; left: 230px">{{
           supervisor.prefix + supervisor.firstname + " " + supervisor.surname
         }}</span>
@@ -1240,28 +1215,23 @@ const generatePayment = () => {
 
           <div style="margin-top: 40px">
             <span>2. ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา</span><br />
-            <table>
-              <tbody v-for="(it, index) in date1" :key="index">
+            <table v-if="travel_array.length != 0">
+              <tbody v-for="(it, index) in travel_array" :key="index">
                 <tr v-for="(cp, idx) in it.companies" :key="idx">
                   <td style="width: 400px; padding-left: 30px">
-                    {{ cp.company_name }}
+                    {{ cp.name }}
                   </td>
                   <td>
                     จังหวัด
-                    {{ getProvince(cp.visit_province_id) }} เหมาจ่าย
-                    {{ it.amount }}.00บาท
+                    {{ getProvince(cp.province_id) }}
+                    {{
+                      it.price.id == cp.id
+                        ? `เหมาจ่าย ${it.price.expense}.00 บาท`
+                        : ""
+                    }}
                   </td>
                 </tr>
               </tbody>
-              <!-- <tr v-for="(it, index) in studentListPDF" :key="index">
-                <td style="width: 400px; padding-left: 30px">
-                  {{ it.company_name }}
-                </td>
-                <td>
-                  จังหวัด {{ getProvince(it.visit_province_id) }}
-                  {{ it.show }}
-                </td>
-              </tr> -->
             </table>
           </div>
         </div>
@@ -1288,64 +1258,66 @@ const generatePayment = () => {
 
           <div class="" style="margin-top: 20px">
             <table class="table-payment">
-              <tr>
-                <th class="text-center" style="width: 110px">วัน เดือน ปี</th>
-                <th class="text-center" style="width: 450px">
-                  รายละเอียดรายจ่าย
-                </th>
-                <th class="text-center" style="width: 80px">จำนวนเงิน</th>
-                <th class="text-center" style="width: 150px">หมายเหตุ</th>
-              </tr>
-              <tr v-for="(it, index) in studentListPDF" :key="index">
-                <td
-                  class="text-center"
-                  style="
-                    padding-left: 10px;
-                    padding-top: 10px;
-                    padding-bottom: 10px;
-                  "
-                >
-                  <span>
-                    {{
-                      dayjs(it.visit_date).locale("th").format("DD MMM BBBB")
-                    }}
-                  </span>
-                </td>
-                <td
-                  style="
-                    padding-left: 10px;
-                    padding-right: 10px;
-                    padding-top: 10px;
-                    padding-bottom: 10px;
-                  "
-                >
-                  ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา<br />
-                  เริ่มต้นที่ มจพ.วิทยาเขตระยอง ถีง {{ it.company_name }}<br />
-                  จังหวัด{{ getProvince(it.visit_province_id) }} เหมาจ่าย
-                </td>
-                <td
-                  style="
-                    padding-left: 10px;
-                    padding-right: 10px;
-                    padding-top: 10px;
-                    padding-bottom: 10px;
-                  "
-                  class="text-right"
-                >
-                  {{ "800" }}.00
-                </td>
-                <td
-                  class="text-center"
-                  style="
-                    padding-left: 10px;
-                    padding-top: 10px;
-                    padding-right: 10px;
-                    padding-bottom: 10px;
-                  "
-                >
-                  <span> </span>
-                </td>
-              </tr>
+              <thead>
+                <tr>
+                  <th class="text-center" style="width: 110px">วัน เดือน ปี</th>
+                  <th class="text-center" style="width: 450px">
+                    รายละเอียดรายจ่าย
+                  </th>
+                  <th class="text-center" style="width: 80px">จำนวนเงิน</th>
+                  <th class="text-center" style="width: 150px">หมายเหตุ</th>
+                </tr>
+              </thead>
+              <tbody v-for="(it, index) in travel_array" :key="index">
+                <tr v-for="(cp, idx) in it.companies2" :key="idx">
+                  <td
+                    class="text-center"
+                    style="
+                      padding-left: 10px;
+                      padding-top: 10px;
+                      padding-bottom: 10px;
+                    "
+                  >
+                    <span>
+                      {{ dayjs(it.date).locale("th").format("DD MMM BBBB") }}
+                    </span>
+                  </td>
+                  <td
+                    style="
+                      padding-left: 10px;
+                      padding-right: 10px;
+                      padding-top: 10px;
+                      padding-bottom: 10px;
+                    "
+                  >
+                    ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา<br />
+                    เริ่มต้นที่ มจพ.วิทยาเขตระยอง ถีง {{ cp.name }}<br />
+                    จังหวัด{{ getProvince(cp.province_id) }} เหมาจ่าย
+                  </td>
+                  <td
+                    style="
+                      padding-left: 10px;
+                      padding-right: 10px;
+                      padding-top: 10px;
+                      padding-bottom: 10px;
+                    "
+                    class="text-right"
+                  >
+                    {{ cp.id == it.price.id ? `${it.price.expense}.00` : "" }}
+                  </td>
+                  <td
+                    class="text-center"
+                    style="
+                      padding-left: 10px;
+                      padding-top: 10px;
+                      padding-right: 10px;
+                      padding-bottom: 10px;
+                    "
+                  >
+                    <span> </span>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
 
@@ -1395,7 +1367,7 @@ const generatePayment = () => {
             <span style="padding-left: 50px">ตำแหน่งอาจารย์</span>
             <br />
             <span style="padding-left: 50px"
-              >วันที่ {{ dayjs().locale("th").format("DD MMM BBBB") }}</span
+              >วันที่..........................................</span
             >
           </div>
         </div>
