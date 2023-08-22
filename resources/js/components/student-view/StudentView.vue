@@ -91,6 +91,7 @@ const snackbarText = ref("");
 const snackbarColor = ref("success");
 const isCheck = ref(false);
 const company = ref({});
+const isClose = ref(true);
 
 // Var
 // const student = ref({});
@@ -248,7 +249,12 @@ onMounted(() => {
 const refreshData = () => {
   fetchForms();
   emit("refresh-data");
-  setTimeout(emit("close"), 4000);
+  if (isClose.value == false) {
+    isClose.value = true;
+  } else {
+    setTimeout(emit("close"), 4000);
+  }
+  //
 };
 </script>
 <style lang="scss">
@@ -277,6 +283,7 @@ const refreshData = () => {
           :user_type="props.user_type"
           :isCheck="isCheck"
           @refresh-data="refreshData"
+          @change-close="isClose = false"
         />
       </VCol>
 

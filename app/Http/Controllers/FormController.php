@@ -970,7 +970,7 @@ class FormController extends Controller
     public function addRequestBook(Request $request)
     {
         $request->validate(["id as required"]);
-
+        //
         $updateForm = Form::whereIn("id", $request->id)->update([
             "request_document_number" => $request->request_document_number,
             "request_document_date" => $request->request_document_date,
@@ -978,18 +978,21 @@ class FormController extends Controller
             "updated_by" => "arnonr",
         ]);
 
-        Form::whereIn("id", $request->id)
+        $check = Form::whereIn("id", $request->id)
             ->where("status_id", "<", "6")
             ->update([
                 "status_id" => 6,
             ]);
 
         $student_id = [];
-        $form = Form::where("id", $request->id)->get();
+
+        $form = Form::whereIn("id", $request->id)->get();
         foreach ($form as $value) {
             array_push($student_id, $value->student_id);
         }
-        Student::whereIn("id", $student_id)
+        // $student_id
+
+        $check1 = Student::whereIn("id", $student_id)
             ->where("status_id", "<", "6")
             ->update([
                 "status_id" => 6,
@@ -1037,7 +1040,7 @@ class FormController extends Controller
             ]);
 
         $student_id = [];
-        $form = Form::where("id", $request->id)->get();
+        $form = Form::whereIn("id", $request->id)->get();
         foreach ($form as $value) {
             array_push($student_id, $value->student_id);
         }

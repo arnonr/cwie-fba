@@ -4,13 +4,15 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import { onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const studentApproveStore = useStudentApproveStore();
 const props = defineProps(["user_type", "student_id", "formActive", "isCheck"]);
-const emit = defineEmits(["refresh-data"]);
+const emit = defineEmits(["refresh-data", "change-close"]);
 
 const isDialogVisible = ref(false);
 const isDialogRejectVisible = ref(false);
+const router = useRouter();
 
 let userData = JSON.parse(localStorage.getItem("userData"));
 
@@ -71,7 +73,6 @@ const onRejectSubmit = () => {
         if (response.data.message == "success") {
           localStorage.setItem("Rejected", 1);
           nextTick(() => {
-            // isOverlay.value = false;
             isDialogRejectVisible.value = false;
             emit("refresh-data");
           });
@@ -113,6 +114,11 @@ const onSubmit = () => {
     .catch((error) => {
       console.error(error);
     });
+};
+
+const reload = () => {
+  emit("change-close");
+  emit("refresh-data");
 };
 </script>
 <style scoped>
@@ -352,6 +358,57 @@ const onSubmit = () => {
             class="mr-1"
           ></VIcon>
           รับทราบผลการตอบรับ
+        </VBtn>
+      </VCol>
+
+      <VCol cols="12" md="12" class="text-left" v-if="props.formActive != null">
+        <!-- @click=" router.push({ path: '/student/cwie-data/edit/' + formActive.id,
+        query: { student_id: props.student_id, }, }) " -->
+
+        <VBtn
+          color="success"
+          class="ml-2"
+          :to="{
+            path: '/student/cwie-data/edit/' + formActive.id,
+            query: {
+              student_id: student_id,
+            },
+          }"
+          target="_blank"
+        >
+          แก้ไขข้อมูลใบสมัคร</VBtn
+        >
+
+        <VBtn
+          color="warning"
+          class="ml-2"
+          :to="{
+            path: '/student/personal-data/' + props.student_id,
+          }"
+          target="_blank"
+        >
+          แก้ไขข้อมูลทั่วไป</VBtn
+        >
+
+        <VBtn
+          color="primary"
+          class="ml-2"
+          :to="{
+            name: 'cwie-settings-company-edit-id',
+            params: { id: formActive.company_id },
+          }"
+          target="_blank"
+        >
+          แก้ไขข้อมูลสถานประกอบการ
+        </VBtn>
+
+        <VBtn color="success" class="ml-2" @click="reload()">
+          <VIcon
+            size="16"
+            icon="tabler-refresh"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
         </VBtn>
       </VCol>
     </div>
