@@ -139,6 +139,7 @@ class StudentController extends Controller
                     "confirm_response_at",
                     "send_document_date",
                     "send_document_number",
+                    "form.company_id as company_id",
                     "company.name_th as company_name",
                     "form.response_province_id as response_province_id",
                     "form.workplace_province_id as workplace_province_id",
@@ -250,6 +251,9 @@ class StudentController extends Controller
                     $items->addSelect("visit_status as visit_status");
                     $items->addSelect("visit_date as visit_date");
                     $items->addSelect("visit_time as visit_time");
+                    $items->addSelect(
+                        "visit.travel_expense as visit_travel_expense"
+                    );
                     $items->addSelect("visit.province_id as visit_province_id");
 
                     $items->addSelect(

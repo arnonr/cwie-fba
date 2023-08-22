@@ -155,7 +155,7 @@ const fetchForms = () => {
 const fetchVisit = () => {
   visitViewStore
     .fetchVisits({
-      form_id: formActive.id,
+      form_id: formActive.value.id,
       perPage: 10,
       currentPage: 1,
       orderBy: "active",

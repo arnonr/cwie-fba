@@ -134,6 +134,8 @@ const onSubmit = () => {
       console.error(error);
     });
 };
+
+console.log(props.visitActive);
 </script>
 <style scoped>
 /* .swal2-container {

@@ -141,6 +141,7 @@ const fetchTumbols = () => {
 };
 
 const fetchStudent = () => {
+  console.log(props.student_id);
   visitFormStore
     .fetchStudents({
       id: props.student_id,
@@ -197,7 +198,7 @@ const fetchForms = () => {
 const fetchVisit = () => {
   visitFormStore
     .fetchVisits({
-      form_id: formActive.id,
+      form_id: formActive.value.id,
       perPage: 1,
       currentPage: 1,
       active: 1,

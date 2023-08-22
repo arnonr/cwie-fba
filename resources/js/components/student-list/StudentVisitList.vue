@@ -18,6 +18,7 @@ import { jsPDF } from "jspdf";
 import axios from "@axios";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
+import { bahttext } from "bahttext";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 dayjs.extend(buddhistEra);
 
@@ -48,6 +49,7 @@ const supervisor_id = ref(null);
 const supervisor = ref({});
 const view_student_id = ref(null);
 const major = ref([]); // สำหรับประธานอาจารย์นิเทศ
+const date1 = ref([]);
 const advancedSearch = reactive({
   semester_id: "",
   status_id: "",
@@ -314,9 +316,17 @@ const fetchItems = () => {
       })
       .then((response) => {
         if (response.status === 200) {
-          items.value = response.data.data;
+          let itemsSort = response.data.data;
+
+          items.value = itemsSort;
           totalPage.value = response.data.totalPage;
           totalItems.value = response.data.totalData;
+
+          //   items
+          //   items.value.sort(function (a, b) {
+          //     return new Date(b.visit_date) - new Date(a.visit_date);
+          //   });
+
           isOverlay.value = false;
         } else {
           console.log("error");
@@ -334,7 +344,7 @@ const fetchItems = () => {
 const getProvince = (province_id) => {
   if (province_id == null) return "";
   let res = provinces.value.find((e) => {
-    return (e.province_id = province_id);
+    return e.province_id == province_id;
   });
   return res.name_th;
 };
@@ -342,7 +352,7 @@ const getProvince = (province_id) => {
 const getAmphur = (id) => {
   if (id == null || amphurs.value.length == 0) return "";
   let res = amphurs.value.find((e) => {
-    return (e.amphur_id = id);
+    return e.amphur_id == id;
   });
   return res.name_th;
 };
@@ -350,7 +360,7 @@ const getAmphur = (id) => {
 const getTumbol = (id) => {
   if (id == null || tumbols.value.length == 0) return "";
   let res = tumbols.value.find((e) => {
-    return (e.tumbol_id = id);
+    return e.tumbol_id == id;
   });
   return res.name_th;
 };
@@ -420,8 +430,90 @@ const onPayment = () => {
           });
         } else {
           // Generate PDF
-          studentListPDF.value = response.data.data;
           countPDF.value = response.data.data.length;
+
+          let students = response.data.data.sort(
+            (a, b) => new Date(a.visit_date) - new Date(b.visit_date)
+          );
+
+          let travel_array1 = [
+            {
+              date: "2022-07-18",
+              companies: [
+                {
+                  id: 1,
+                  name: "บ....",
+                  province_id: 1,
+                },
+              ],
+              price: { id: 1, expense: 800 },
+            },
+            {
+              date: "2022-07-19",
+              companies: [
+                {
+                  id: 1,
+                  name: "บ....",
+                  province_id: 1,
+                },
+              ],
+              price: { id: 1, expense: 800 },
+            },
+          ];
+
+          let travel_array = [];
+
+          students.forEach((e) => {
+            let findDate = travel_array1.find((x) => x.date == e.visit_date);
+            if (findDate) {
+            } else {
+            }
+            // if (date1.value.hasOwnProperty(e.visit_date)) {
+            //   if (
+            //     date1.value[e.visit_date]["amount"] < e.visit_travel_expense
+            //   ) {
+            //     date1.value[e.visit_date]["amount"] = e.visit_travel_expense;
+            //   }
+
+            //   //   if (!date1[e.visit_date].company_ids.includes(e.company_id)) {
+            //   //     // date1[e.visit_date].company_ids.push(e.company_id);
+            //   //   }
+            // } else {
+            //   date1.value[e.visit_date] = {
+            //     amount: e.visit_travel_expense,
+            //     showed: 0,
+            //   };
+            //   if (!date1.value.hasOwnProperty("companies")) {
+            //     date1.value[e.visit_date]["companies"] = [];
+            //   }
+            //   date1.value[e.visit_date]["companies"].push({
+            //     company_name: e.company_name,
+            //     visit_province_id: e.visit_province_id,
+            //   });
+            // }
+          });
+
+          console.log(travel_array);
+
+          // วนรอบ 2
+          //   let students2 = students.map((e) => {
+          //     // if (date1.hasOwnProperty(e.visit_date)) {
+          //     if (
+          //       e.visit_travel_expense == date1[e.visit_date].amount &&
+          //       date1[e.visit_date].showed == 0
+          //     ) {
+          //       e.show = "เหมาจ่าย " + date1[e.visit_date].amount + ".00 บาท";
+          //       date1[e.visit_date].showed = 1;
+          //     } else {
+          //       e.show = "";
+          //     }
+          //     // }
+
+          //     return e;
+          //   });
+
+          studentListPDF.value = students;
+
           generatePayment();
         }
       } else {
@@ -1001,7 +1093,7 @@ const generatePayment = () => {
           >{{ semesterPDF.term }}
         </span>
 
-        <span style="position: absolute; top: 414px; left: 240px"
+        <span style="position: absolute; top: 414px; left: 245px"
           >{{ semesterPDF.semester_year }}
         </span>
 
@@ -1020,6 +1112,12 @@ const generatePayment = () => {
         <span style="position: absolute; top: 670px; left: 680px"
           >{{ countPDF * semesterPDF.semester_visit_expense }}.00
         </span>
+
+        <span style="position: absolute; top: 720px; left: 200px"
+          >{{ bahttext(countPDF * semesterPDF.semester_visit_expense) }}
+        </span>
+
+        <!-- bahttext() -->
 
         <span style="position: absolute; top: 850px; left: 400px">{{
           "( " +
@@ -1052,7 +1150,7 @@ const generatePayment = () => {
         >
           <div class="text-center font-weight-bold">
             ตารางสรุปค่าตอบแทนการนิเทศและค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา<br />
-            ของอาจารยน์เิทศคณะบริหารธุรกิจ
+            ของอาจารย์นิเทศคณะบริหารธุรกิจ
           </div>
 
           <div class="" style="margin-top: 20px">
@@ -1130,7 +1228,8 @@ const generatePayment = () => {
           <div style="margin-top: 20px">
             <span
               >1. ค่าตอบแทนการนิเทศนักศึกษาสหกิจศึกษา
-              (อัตราค่าตอบแทนเหมาจ่ายไม่เกิน 600.00 บาท/นักศึกษา 1 คน)</span
+              (อัตราค่าตอบแทนเหมาจ่ายไม่เกิน
+              {{ semesterPDF.semester_visit_expense }} บาท/นักศึกษา 1 คน)</span
             ><br />
             <span style="padding-left: 15 px"
               >ค่าตอบแทนการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษาจํานวน
@@ -1142,15 +1241,27 @@ const generatePayment = () => {
           <div style="margin-top: 40px">
             <span>2. ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา</span><br />
             <table>
-              <tr v-for="(it, index) in studentListPDF" :key="index">
+              <tbody v-for="(it, index) in date1" :key="index">
+                <tr v-for="(cp, idx) in it.companies" :key="idx">
+                  <td style="width: 400px; padding-left: 30px">
+                    {{ cp.company_name }}
+                  </td>
+                  <td>
+                    จังหวัด
+                    {{ getProvince(cp.visit_province_id) }} เหมาจ่าย
+                    {{ it.amount }}.00บาท
+                  </td>
+                </tr>
+              </tbody>
+              <!-- <tr v-for="(it, index) in studentListPDF" :key="index">
                 <td style="width: 400px; padding-left: 30px">
                   {{ it.company_name }}
                 </td>
                 <td>
-                  จังหวัด {{ getProvince(it.visit_province_id) }} เหมาจ่าย
-                  {{ "800" }}.00 บาท
+                  จังหวัด {{ getProvince(it.visit_province_id) }}
+                  {{ it.show }}
                 </td>
-              </tr>
+              </tr> -->
             </table>
           </div>
         </div>
@@ -1240,8 +1351,10 @@ const generatePayment = () => {
 
           <div class="" style="margin-top: 20px">
             <span
-              >รวมทั้งสิ้น
-              (ตัวอักษร)..................................................................................</span
+              >รวมทั้งสิ้น (ตัวอักษร)
+              {{
+                bahttext(countPDF * semesterPDF.semester_visit_expense)
+              }}</span
             >
           </div>
           <div class="" style="margin-top: 20px; margin-left: 40px">
