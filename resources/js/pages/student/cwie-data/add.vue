@@ -463,13 +463,13 @@ const format = (date) => {
               <small> หมายเหตุ : โปรดระบุข้อมูลให้ครบถ้วน </small>
             </VCol> -->
 
-            <VCol cols="12" md="7" class="align-items-center">
+            <VCol cols="12" md="12" class="align-items-center">
               <label
                 class="v-label font-weight-bold"
                 for="company_id"
                 cols="12"
                 md="4"
-                >สถานประกอบการ (ค้นหาสถานประกอบการ) :
+                >เลือก สถานประกอบการ :
               </label>
               <!-- <AppSelect variant="outlined" placeholder="Province" clearable /> -->
               <AppAutocomplete
@@ -479,7 +479,13 @@ const format = (date) => {
                 placeholder="ค้นหาชื่อสถานประกอบการ"
                 clearable
               />
+              <span
+                style="margin-top: 20px; cursor: pointer; float: right"
+                @click="isDialogAddCompanyVisible = true"
+                >ไม่พบชื่อสถานประกอบการ ?</span
+              >
             </VCol>
+            <!-- 
             <VCol cols="12" md="5">
               <VBtn
                 class="mt-6"
@@ -488,7 +494,7 @@ const format = (date) => {
                 style="width: 100%"
                 >คลิกเพิ่มสถานประกอบการ (ใช้ในกรณีไม่พบชื่อสถานประกอบการ)
               </VBtn>
-            </VCol>
+            </VCol> -->
 
             <VCol cols="12" md="8">
               <label
