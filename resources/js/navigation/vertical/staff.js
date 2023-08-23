@@ -42,6 +42,14 @@ export default [
     action: "manage",
     subject: "StaffUser",
   },
+  { heading: "รายงาน", action: "manage", subject: "StaffUser" },
+  {
+    title: "รายงาน1",
+    icon: { icon: "tabler-book" },
+    to: { name: "staff-report-report1" },
+    action: "manage",
+    subject: "StaffUser",
+  },
 
   { heading: "ข่าวและเอกสารดาวน์โหลด", action: "manage", subject: "StaffUser" },
   {

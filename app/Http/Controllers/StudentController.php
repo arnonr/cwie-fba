@@ -138,6 +138,8 @@ class StudentController extends Controller
                     "max_response_date",
                     "confirm_response_at",
                     "send_document_date",
+                    "start_date",
+                    "end_date",
                     "send_document_number",
                     "form.company_id as company_id",
                     "company.name_th as company_name",
@@ -145,7 +147,8 @@ class StudentController extends Controller
                     "form.workplace_province_id as workplace_province_id",
                     DB::raw(
                         'CONCAT(supervision.prefix,supervision.firstname," ", supervision.surname) AS supervision_name'
-                    )
+                    ),
+                    "supervision.email as supervision_email"
                 );
                 // $items->addSelect('form.* as form');
                 $items->leftJoin("form", function ($join) {
@@ -348,6 +351,19 @@ class StudentController extends Controller
                                 ->where("visit.active", 1);
                         });
                     }
+                }
+
+                //
+                if ($request->report_status) {
+                    $operater = "=";
+                    if ($request->report_status_operater) {
+                        $operater = $request->report_status_operater;
+                    }
+                    $items->where(
+                        "form.status_id",
+                        $operater,
+                        $request->report_status
+                    );
                 }
 
                 // whereNotNull()

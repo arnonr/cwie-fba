@@ -309,6 +309,7 @@ const onSubmit = () => {
               document.value.max_response_date != null
                 ? dayjs(document.value.max_response_date).format("YYYY-MM-DD")
                 : null,
+            // send_mail: 1,
           })
           .then((response) => {
             if (response.status === 200) {

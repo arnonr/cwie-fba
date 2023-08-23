@@ -12,6 +12,7 @@ import { form_statuses, statusShow } from "@/data-constant/data";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
+import JsonExcel from "vue-json-excel3";
 import XLSX from "xlsx";
 dayjs.extend(buddhistEra);
 //

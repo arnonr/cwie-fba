@@ -2115,6 +2115,11 @@ domutils@^3.0.1:
     domelementtype "^2.3.0"
     domhandler "^5.0.3"
 
+downloadjs@^1.4.7:
+  version "1.4.7"
+  resolved "https://registry.npmjs.org/downloadjs/-/downloadjs-1.4.7.tgz"
+  integrity sha512-LN1gO7+u9xjU5oEScGFKvXhYf7Y/empUIIEAGBs1LzUq/rg5duiDrkuH5A2lQGd5jfMOb9X9usDa2oVXwJ0U/Q==
+
 ecc-jsbn@~0.1.1:
   version "0.1.2"
   resolved "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.2.tgz"
@@ -5965,6 +5970,13 @@ vue-i18n@*, vue-i18n@^9.0.0, vue-i18n@9.2.2:
     "@intlify/shared" "9.2.2"
     "@intlify/vue-devtools" "9.2.2"
     "@vue/devtools-api" "^6.2.1"
+
+vue-json-excel3@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/vue-json-excel3/-/vue-json-excel3-1.0.1.tgz"
+  integrity sha512-eZIcFN+b2JYgMoqrORmPnc+mAHUQWlB8rwTeGeV76rHzvIOeIwmu+4GQvz9YinYznXx6Gdhp4MPu30+j/mJEfg==
+  dependencies:
+    downloadjs "^1.4.7"
 
 vue-prism-component@2.0.0:
   version "2.0.0"
