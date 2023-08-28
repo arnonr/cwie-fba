@@ -869,7 +869,7 @@ class StudentController extends Controller
     {
         $this->errorCode = self::ERROR_NONE;
 
-        $access_token = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu"; // <----- API - Access Token Here
+        $access_token = "b9uSJchxbwxCWLtQ-oGUH-NPQuy1pKA4"; // <----- API - Access Token Here
 
         $data = [
             "id" => $student_code,

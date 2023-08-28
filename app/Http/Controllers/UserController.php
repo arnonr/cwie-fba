@@ -274,7 +274,7 @@ class UserController extends Controller
 
     public function getIcitAccount($id)
     {
-        $access_token = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu"; // <----- API - Access Token Here
+        $access_token = "b9uSJchxbwxCWLtQ-oGUH-NPQuy1pKA4"; // <----- API - Access Token Here
         //
         $data = [
             "username" => $id, // <----- Password for authen

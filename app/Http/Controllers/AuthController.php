@@ -132,7 +132,7 @@ class AuthController extends Controller
 
     public function icitAccountApi($username, $password)
     {
-        $access_token = "v_6atHl-nF8ZSoN6QQMRPakdbQQIAdQu"; // <----- API - Access Token Here
+        $access_token = "b9uSJchxbwxCWLtQ-oGUH-NPQuy1pKA4"; // <----- API - Access Token Here
         //
         $data = [
             "scopes" => "personel,student,exchange_student,alumni", // <----- Scopes for search account type
