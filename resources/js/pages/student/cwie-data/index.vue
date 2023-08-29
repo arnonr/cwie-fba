@@ -809,13 +809,13 @@ const generateRegisPDF = async () => {
   });
 
   existingPage.drawText(student.value.email, {
-    x: 260,
+    x: 257,
     y: 596,
     ...defaultSize,
   });
 
   existingPage.drawText(student.value.gpa.toString(), {
-    x: 520,
+    x: 515,
     y: 595,
     ...defaultSize,
   });
@@ -857,7 +857,7 @@ const generateRegisPDF = async () => {
   });
 
   existingPage.drawText(formActive.value.company_name, {
-    x: 230,
+    x: 190,
     y: 523,
     ...defaultSize,
   });
@@ -932,14 +932,14 @@ const generateRegisPDF = async () => {
   });
 
   existingPage.drawText(formActive.value.request_position, {
-    x: 400,
-    y: 330,
+    x: 130,
+    y: 310,
     ...defaultSize,
   });
 
   existingPage.drawText(student.value.firstname + " " + student.value.surname, {
     x: 375,
-    y: 243,
+    y: 222,
     ...defaultSize,
   });
 
@@ -949,7 +949,7 @@ const generateRegisPDF = async () => {
       .format("DD MMMM BBBB"),
     {
       x: 375,
-      y: 215,
+      y: 193,
       ...defaultSize,
     }
   );
@@ -989,24 +989,6 @@ const generateRegisPDF = async () => {
       ...defaultSize,
     }
   );
-
-  //   existingPage2.drawText(formActive.value.advisor_verified_at, {
-  //     x: 375,
-  //     y: 243,
-  //     ...defaultSize,
-  //   });
-
-  //   existingPage2.drawText(formActive.value.teacher.fullname, {
-  //     x: 375,
-  //     y: 243,
-  //     ...defaultSize,
-  //   });
-
-  //   existingPage2.drawText(formActive.value.chairman_approved_at, {
-  //     x: 375,
-  //     y: 243,
-  //     ...defaultSize,
-  //   });
 
   const pdfBytes = await pdfDoc.save();
   let objectPdf = URL.createObjectURL(
@@ -1288,8 +1270,8 @@ const generateSendPDF = async () => {
   });
 
   existingPage.drawText(formActive.value.company_name, {
-    x: 220, //คอลัมน์ ซ้ายไปขวา
-    y: 523, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    x: 180, //คอลัมน์ ซ้ายไปขวา
+    y: 524, //แถว ยิ่งมากยิ่งอยู่ด้านบน
     ...defaultSize,
   });
 
@@ -1342,7 +1324,7 @@ const generateSendPDF = async () => {
   });
 
   existingPage.drawText(student.value.email, {
-    x: 170,
+    x: 155,
     y: 397,
     ...defaultSize,
   });
