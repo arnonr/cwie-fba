@@ -724,25 +724,42 @@ const generateRegisPDF = async () => {
     ...defaultSize,
   });
 
+  const getImageOrFallback = (path, fallback) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = path;
+      img.onload = () => resolve(path);
+      img.onerror = () => resolve(fallback);
+    });
+  };
+
   const photoUrl = student.value.photo_file;
 
-  const photoImageBytes = await fetch(photoUrl).then((res) =>
-    res.arrayBuffer()
-  );
+  if (photoUrl) {
+    const link = await getImageOrFallback(photoUrl, "").then(
+      (result) => console.log(result) || result
+    );
 
-  let photoImage;
-  try {
-    photoImage = await pdfDoc.embedPng(photoImageBytes);
-  } catch (error) {
-    photoImage = await pdfDoc.embedJpg(photoImageBytes);
+    if (link != "") {
+      const photoImageBytes = await fetch(photoUrl).then((res) =>
+        res.arrayBuffer()
+      );
+
+      let photoImage;
+      try {
+        photoImage = await pdfDoc.embedPng(photoImageBytes);
+      } catch (error) {
+        photoImage = await pdfDoc.embedJpg(photoImageBytes);
+      }
+
+      existingPage.drawImage(photoImage, {
+        x: 473,
+        y: 684,
+        width: 70,
+        height: 90,
+      });
+    }
   }
-
-  existingPage.drawImage(photoImage, {
-    x: 473,
-    y: 684,
-    width: 70,
-    height: 90,
-  });
 
   existingPage.drawText(
     student.value.prefix_name +
@@ -792,7 +809,7 @@ const generateRegisPDF = async () => {
   });
 
   existingPage.drawText(student.value.email, {
-    x: 270,
+    x: 260,
     y: 596,
     ...defaultSize,
   });
@@ -875,7 +892,7 @@ const generateRegisPDF = async () => {
     ...defaultSize,
   });
 
-  existingPage.drawText(company.value.tel, {
+  existingPage.drawText(company.value.tel == null ? "" : company.value.tel, {
     x: 250,
     y: 439,
     ...defaultSize,
@@ -937,38 +954,8 @@ const generateRegisPDF = async () => {
     }
   );
 
-  //   const sigUrl = chairman.value.signature_file;
-  //   const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
-  //   const sigImage = await pdfDoc.embedPng(sigImageBytes);
-  //   existingPage.drawImage(sigImage, {
-  //     x: 310,
-  //     y: 120,
-  //     width: 100,
-  //     height: 50,
-  //   });
-
-  //   existingPage.drawText(
-  //     chairman.value.prefix +
-  //       " " +
-  //       chairman.value.firstname +
-  //       " " +
-  //       chairman.value.surname,
-  //     {
-  //       x: 300,
-  //       y: 117,
-  //       ...defaultSize,
-  //     }
-  //   );
-
-  //   existingPage.drawText(chairman.value.executive_position, {
-  //     x: 275,
-  //     y: 96,
-  //     ...defaultSize,
-  //   });
-
   const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
   pdfDoc.addPage(existingPage2);
-
   existingPage2.drawText(student.value.advisor_name, {
     x: 250,
     y: 508,
