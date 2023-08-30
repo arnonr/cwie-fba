@@ -293,7 +293,7 @@ const refreshData = () => {
   <div>
     <!-- Table -->
     <VCard title="ข้อมูลนักศึกษา">
-      <VCardItem>
+      <VCardItem style="display: block">
         <VRow class="mt-1 mb-1">
           <!-- Search -->
           <VCol cols="12" sm="4">
@@ -456,7 +456,6 @@ const refreshData = () => {
           <!-- Table -->
           <VCol cols="12" sm="12">
             <VTable
-              class=""
               v-if="
                 selectOptions.semesters.length != 0 ||
                 props.user_type == 'staff'
