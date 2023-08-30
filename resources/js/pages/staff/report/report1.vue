@@ -363,7 +363,7 @@ const refreshData = () => {
   <div>
     <!-- Table -->
     <VCard title="ออกรายงานสำหรับจับคู่อาจารย์นิเทศ">
-      <VCardItem style="display: block">
+      <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Search -->
           <VCol cols="12" sm="4">
@@ -457,8 +457,7 @@ const refreshData = () => {
               <v-btn color="success">Export Excel</v-btn>
             </json-excel>
           </VCol>
-        </VRow>
-        <VRow>
+
           <!-- Table -->
           <VCol cols="12" sm="12">
             <VTable

@@ -374,7 +374,7 @@ const onSubmit = () => {
           : 'หนังสือส่งตัว'
       "
     >
-      <VCardItem style="display: block">
+      <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Search -->
           <VCol cols="12" sm="4">
