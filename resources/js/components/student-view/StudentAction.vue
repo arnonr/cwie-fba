@@ -1027,10 +1027,16 @@ const onPlanSubmit = () => {
   ``;
 };
 </script>
-<style scoped>
+<style lang="scss">
 /* .swal2-container {
   z-index: 20001 !important;
 } */
+
+// div.v-list-item {
+//   z-index: 20000001 !important;
+//   transform: translateY(-80%) !important;
+//   overflow: visible !important;
+// }
 </style>
 <template>
   <div>
@@ -1140,11 +1146,11 @@ const onPlanSubmit = () => {
           class="ml-2"
           v-if="props.formActive"
           @click="isDialogResponseVisible = true"
-          :disabled="
+        >
+          <!-- :disabled="
             props.formActive.request_document_date == null ||
             props.formActive.status_id != 6
-          "
-        >
+          " -->
           อัพโหลดเอกสารตอบรับ
         </VBtn>
 
@@ -1182,9 +1188,9 @@ const onPlanSubmit = () => {
 
     <!-- Response Form Dialog -->
     <VDialog
-      persistent
-      v-if="formActive != null"
       v-model="isDialogResponseVisible"
+      persistent
+      style="z-index: 2000"
       class="v-dialog-sm"
     >
       <!-- Dialog close btn -->
@@ -1193,13 +1199,12 @@ const onPlanSubmit = () => {
         absolute
       />
       <!-- Dialog Content -->
-      <VCard title="แบบฟอร์มอัพโหลดเอกสารตอบรับ" style="overflow: visible">
-        <VCardItem style="overflow: visible">
+      <VCard title="แบบฟอร์มอัพโหลดเอกสารตอบรับ">
+        <VCardItem>
           <VForm
             ref="refResponseForm"
             v-model="isResponseFormValid"
             @submit.prevent="onResponseSubmit"
-            style="overflow: visible"
           >
             <VRow>
               <VCol cols="12">
@@ -1207,8 +1212,7 @@ const onPlanSubmit = () => {
                 <label class="v-label" for="status_id">
                   ผลการตอบกลับจากสถานประกอบการ
                 </label>
-                <AppSelect
-                  style="overflow: visible"
+                <VSelect
                   :items="[
                     { title: 'ตอบรับ', value: 8 },
                     { title: 'ปฏิเสธ', value: 9 },
@@ -1219,6 +1223,7 @@ const onPlanSubmit = () => {
                   variant="outlined"
                   placeholder="Status"
                   clearable
+                  style="z-index: 20001 !important"
                 />
                 <!--  -->
               </VCol>
