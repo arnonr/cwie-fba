@@ -265,7 +265,11 @@ const fetchStudent = () => {
         const { data } = response.data;
         item.value = { ...data[0] };
 
-        if (item.value.status_id < 2) {
+        if (
+          item.value.status_id < 2 ||
+          item.value.status_id == 10 ||
+          item.value.status_id == 9
+        ) {
           disabled.value = true;
         }
 
