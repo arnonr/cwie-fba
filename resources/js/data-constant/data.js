@@ -452,7 +452,7 @@ export const statusShow = (
   } else if (status == 13) {
     text = "อนุมัติแผนการปฏิบัติงาน";
   } else {
-    text = "FREEDOM";
+    text = "ร่าง";
   }
   return text;
 };
