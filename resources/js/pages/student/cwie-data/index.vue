@@ -102,7 +102,7 @@ const amphurs = ref([]);
 const tumbols = ref([]);
 const status_id = ref(null);
 
-const selectOptions = ref({});
+// const selectOptions = ref({});
 
 // 👉 Fetching
 const fetchProvince = async () => {
@@ -337,12 +337,17 @@ const refreshData = () => {
   <div>
     <VRow>
       <VCol cols="12" md="12">
-        <PersonalData :student_id="student_id" :status_id="status_id" />
+        <PersonalData
+          :student_id="student_id"
+          :status_id="status_id"
+          v-if="student_id"
+        />
       </VCol>
 
       <VCol cols="12" md="12">
         <!-- Action -->
         <StudentAction
+          v-if="student_id"
           :student_id="student_id"
           :student="student"
           :formActive="formActive"

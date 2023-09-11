@@ -197,7 +197,11 @@ const fetchStudent = () => {
 
 onMounted(() => {
   window.scrollTo(0, 0);
-  fetchDocumentTypes();
+  // fetchDocumentTypes();
+  console.log(props.student_id);
+  if (props.student_id) {
+    fetchDocumentTypes();
+  }
 });
 </script>
 <style lang="scss">

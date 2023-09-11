@@ -554,7 +554,7 @@ const format = (date) => {
                 clearable
               />
               <span
-                style="margin-top: 20px; cursor: pointer; float: right"
+                style="margin-top: 20px; cursor: pointer; float: inline-end"
                 @click="isDialogAddCompanyVisible = true"
                 >ไม่พบชื่อสถานประกอบการ ?</span
               >
