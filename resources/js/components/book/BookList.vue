@@ -567,12 +567,14 @@ const onSubmit = () => {
               ออกหนังสือ</VBtn
             >
           </VCol>
-
+        </VRow>
+      </VCardItem>
+      <VCardItem class="list-table">
+        <VRow>
           <!-- Table -->
           <VCol cols="12" sm="12">
             <VTable
               class="table"
-              style="width: 100%"
               v-if="
                 advancedSearch.semester_id != null || props.user_type == 'staff'
               "
@@ -871,13 +873,21 @@ const onSubmit = () => {
   </div>
 </template>
 
-<style lang="scss">
-.card-modal,
+<style lang="scss" scoped>
 .v-card-item__content {
+  overflow: visible;
+}
+
+.card-modal {
   overflow: visible !important;
 }
+
 .dp__input {
   color: #787878;
+}
+
+.list-table > .v-card-item__content {
+  overflow: auto !important;
 }
 </style>
 

@@ -452,9 +452,12 @@ const refreshData = () => {
               density="compact"
             />
           </VCol>
-
+        </VRow>
+      </VCardItem>
+      <VCardItem>
+        <VRow>
           <!-- Table -->
-          <VCol cols="12" sm="12">
+          <VCol cols="12" md="12" sm="12">
             <VTable
               class=""
               v-if="
@@ -618,7 +621,23 @@ const refreshData = () => {
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.v-card-item__content {
+  overflow: visible;
+}
+
+.card-modal {
+  overflow: visible !important;
+}
+
+.dp__input {
+  color: #787878;
+}
+
+.list-table > .v-card-item__content {
+  overflow: auto !important;
+}
+</style>
 
 <route lang="yaml">
 meta:
