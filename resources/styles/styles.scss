@@ -4,21 +4,35 @@
 );
 
 .header-action {
-  color: #7367F0
+  color: #7367f0;
 }
 
 .v-input--disabled {
   background-color: #eee;
 }
 
-@media only screen and (min-width: 960px){
-    .v-dialog.v-dialog-lg .v-overlay__content, .v-dialog.v-dialog-xl .v-overlay__content {
-        inline-size: 90% !important;
-    }
+.card-modal {
+  overflow: visible !important;
 }
 
-@media only screen and (min-width: 600px){
-    .v-dialog.v-dialog-lg .v-overlay__content, .v-dialog.v-dialog-xl .v-overlay__content {
-        inline-size: 90% !important;
-    }
+.card-modal > .v-card-item__content {
+  overflow: visible !important;
+}
+
+.card-item-modal > .v-card-item__content {
+  overflow: visible !important;
+}
+
+@media only screen and (min-width: 960px) {
+  .v-dialog.v-dialog-lg .v-overlay__content,
+  .v-dialog.v-dialog-xl .v-overlay__content {
+    inline-size: 90% !important;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .v-dialog.v-dialog-lg .v-overlay__content,
+  .v-dialog.v-dialog-xl .v-overlay__content {
+    inline-size: 90% !important;
+  }
 }

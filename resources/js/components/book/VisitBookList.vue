@@ -547,7 +547,10 @@ const onSubmit = () => {
               ออกหนังสือ</VBtn
             >
           </VCol>
-
+        </VRow>
+      </VCardItem>
+      <VCardItem class="list-table">
+        <VRow>
           <!-- Table -->
           <VCol cols="12" sm="12">
             <VTable
@@ -786,13 +789,13 @@ const onSubmit = () => {
   </div>
 </template>
 
-<style lang="scss">
-.card-modal,
-.v-card-item__content {
-  overflow: visible !important;
-}
+<style lang="scss" scoped>
 .dp__input {
   color: #787878;
+}
+
+.list-table > .v-card-item__content {
+  overflow: auto !important;
 }
 </style>
 

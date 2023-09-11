@@ -337,11 +337,12 @@ const format = (date) => {
   return `${day} ${month} ${year}`;
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .v-card,
 .v-card-item__content {
   overflow: visible !important;
 }
+
 .dp__input {
   color: #787878;
 }

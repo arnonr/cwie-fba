@@ -8,8 +8,6 @@ import StudentList from "@/components/book/BookList.vue";
   </div>
 </template>
 
-<style lang="scss"></style>
-
 <route lang="yaml">
 meta:
   action: read

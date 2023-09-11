@@ -874,14 +874,6 @@ const onSubmit = () => {
 </template>
 
 <style lang="scss" scoped>
-.v-card-item__content {
-  overflow: visible;
-}
-
-.card-modal {
-  overflow: visible !important;
-}
-
 .dp__input {
   color: #787878;
 }

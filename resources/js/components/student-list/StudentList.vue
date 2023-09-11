@@ -454,7 +454,7 @@ const refreshData = () => {
           </VCol>
         </VRow>
       </VCardItem>
-      <VCardItem>
+      <VCardItem class="list-table">
         <VRow>
           <!-- Table -->
           <VCol cols="12" md="12" sm="12">
@@ -622,14 +622,6 @@ const refreshData = () => {
 </template>
 
 <style lang="scss" scoped>
-.v-card-item__content {
-  overflow: visible;
-}
-
-.card-modal {
-  overflow: visible !important;
-}
-
 .dp__input {
   color: #787878;
 }
