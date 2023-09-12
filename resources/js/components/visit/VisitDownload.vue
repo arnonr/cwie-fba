@@ -385,12 +385,13 @@ const generatePDF = async () => {
       ...defaultSize,
     }
   );
-  console.log(props.visitActive.visit_time);
-  existingPage.drawText(props.visitActive.visit_time.toString(), {
-    x: 180,
-    y: 525,
-    ...defaultSize,
-  });
+
+  let visit_time = "";
+  if (props.visitActive.visit_time) {
+    let visit_time_arr = props.visitActive.visit_time.split(":");
+    visit_time = visit_time_arr[0] + ":" + visit_time_arr[1];
+  }
+  existingPage.drawText(visit_time, { x: 187, y: 525, ...defaultSize });
 
   existingPage.drawText(props.formActive.supervision_name, {
     x: 420, //คอลัมน์ ซ้ายไปขวา
