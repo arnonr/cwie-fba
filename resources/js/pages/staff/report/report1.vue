@@ -302,7 +302,10 @@ const fetchItems = () => {
               วันเริ่มฝึก: e.text_start_date,
               วันฝึกเสร็จสิ้น: e.text_end_date,
               สถานะ: e.text_status,
-              อาจารย์นิเทศ: e.supervision_name,
+              ชื่ออาจารย์นิเทศ: e.supervision_name,
+              // ชื่ออาจารย์นิเทศ: s_firstname,
+              // คำนำหน้าอาจารย์นิเทศ: s_name_prefix,
+              // นามสกุลอาจารย์นิเทศ: s_surname,
               email: e.supervision_email,
             });
 

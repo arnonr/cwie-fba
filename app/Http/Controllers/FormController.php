@@ -1199,6 +1199,24 @@ class FormController extends Controller
         return response()->json($responseData, 200);
     }
 
+    public function editSupervision(Request $request)
+    {
+        $request->validate(["id as required"]);
+
+        $item = Form::where("id", $request->id)->first();
+
+        $item->supervision_id = $request->supervision_id;
+        $item->updated_by = "arnonr";
+        $item->save();
+
+        $responseData = [
+            "message" => "success",
+            "data" => $item,
+        ];
+
+        return response()->json($responseData, 200);
+    }
+
     public function delete($id)
     {
         $item = Form::where("id", $id)->first();
@@ -1214,7 +1232,7 @@ class FormController extends Controller
         return response()->json($responseData, 200);
     }
 
-    public function importFormSupervisor(Request $request)
+    public function importFormSupervision(Request $request)
     {
         if (!$request->has("semester_id")) {
             return response()->json(["message" => "No semester_id"], 400);
@@ -1281,10 +1299,15 @@ class FormController extends Controller
                     }
                 }
 
-                $data[$student_code] = [
+                array_push($data, [
+                    "student_code" => $student_code,
                     "status" => $status,
                     "message" => implode(", ", $import_message),
-                ];
+                ]);
+                // $data[$student_code] = [
+                //     "status" => $status,
+                //     "message" => implode(", ", $import_message),
+                // ];
             } /* !-- foreach */
         }
 

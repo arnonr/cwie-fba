@@ -52,5 +52,21 @@ export const useStudentListStore = defineStore("StudentListStore", {
         }
       );
     },
+
+    async editSupervision(dataSend) {
+      return await axios.put(
+        `/form/edit-supervision/${dataSend.id}`,
+        dataSend,
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    async importSupervision(dataSend) {
+      return await axios.post(`/form/import-form-supervision`, dataSend, {
+        validateStatus: () => true,
+      });
+    },
   },
 });

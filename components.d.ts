@@ -349,6 +349,7 @@ declare module '@vue/runtime-core' {
     StudentAction: typeof import('./resources/js/components/student-view/StudentAction.vue')['default']
     StudentApprove: typeof import('./resources/js/components/student-view/StudentApprove.vue')['default']
     StudentList: typeof import('./resources/js/components/student-list/StudentList.vue')['default']
+    StudentMapTeacherList: typeof import('./resources/js/components/student-list/StudentMapTeacherList.vue')['default']
     StudentView: typeof import('./resources/js/components/student-view/StudentView.vue')['default']
     StudentVisitList: typeof import('./resources/js/components/student-list/StudentVisitList.vue')['default']
     TeacherVisitList: typeof import('./resources/js/components/student-list/TeacherVisitList.vue')['default']

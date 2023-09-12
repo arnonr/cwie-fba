@@ -233,9 +233,9 @@ Route::group(["prefix" => "document-download"], function () {
 Route::group(["prefix" => "form"], function () {
     Route::get("/{id}", [FormController::class, "get"]);
     Route::get("/", [FormController::class, "getAll"]);
-    Route::post("/import-form-supervisor", [
+    Route::post("/import-form-supervision", [
         FormController::class,
-        "importFormSupervisor",
+        "importFormSupervision",
     ]);
     Route::post("/", [FormController::class, "add"]);
     Route::post("/add-request-book", [FormController::class, "addRequestBook"]);
@@ -246,6 +246,10 @@ Route::group(["prefix" => "form"], function () {
     ]);
     Route::post("/add-plan", [FormController::class, "AddPlan"]);
     Route::put("/approve/{id}", [FormController::class, "approve"]);
+    Route::put("/edit-supervision/{id}", [
+        FormController::class,
+        "EditSupervision",
+    ]);
     Route::put("/{id}", [FormController::class, "edit"]);
     Route::delete("/{id}", [FormController::class, "delete"]);
 });

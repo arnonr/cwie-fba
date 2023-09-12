@@ -175,10 +175,14 @@ class StudentController extends Controller
                 }
 
                 if ($request->supervision_id) {
-                    $items->where(
-                        "form.supervision_id",
-                        $request->supervision_id
-                    );
+                    if ($request->supervision_id == 999) {
+                        $items->whereNull("form.supervision_id");
+                    } else {
+                        $items->where(
+                            "form.supervision_id",
+                            $request->supervision_id
+                        );
+                    }
                 }
 
                 if ($request->book_status) {
