@@ -330,7 +330,7 @@ const refreshData = () => {
                 </span>
               </VCol>
               <VCol cols="12" md="6">
-                <span>วันที่ขอเข้านิเทศ: </span>
+                <span>วันที่หนังสือขอเข้านิเทศ: </span>
                 <span>
                   {{
                     item.document_date

@@ -521,7 +521,7 @@ const generatePDF1 = async () => {
     res.arrayBuffer()
   );
   let url = "";
-  url = window.location.origin + "/storage/pdf/book4.pdf";
+  url = window.location.origin + "/storage/pdf/visit_book.pdf";
 
   const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
   const pdfTemplate = await PDFDocument.load(existingPdfBytes);
@@ -576,7 +576,7 @@ const generatePDF1 = async () => {
   });
 
   existingPage.drawText(props.student.major_name, {
-    x: 208, //คอลัมน์ ซ้ายไปขวา
+    x: 280, //คอลัมน์ ซ้ายไปขวา
     y: 506, //แถว ยิ่งมากยิ่งอยู่ด้านบน
     ...defaultSize,
   });
@@ -611,7 +611,7 @@ const generatePDF1 = async () => {
   });
 
   existingPage.drawText(props.student.class_year.toString(), {
-    x: 391,
+    x: 380,
     y: 432,
     ...defaultSize,
   });
@@ -632,8 +632,13 @@ const generatePDF1 = async () => {
     }
   );
 
-  existingPage.drawText(props.visitActive.visit_time, {
-    x: 477,
+  let visit_time = "";
+  if (props.visitActive.visit_time) {
+    let visit_time_arr = props.visitActive.visit_time.split(":");
+    visit_time = visit_time_arr[0] + ":" + visit_time_arr[1];
+  }
+  existingPage.drawText(visit_time, {
+    x: 485,
     y: 357,
     ...defaultSize,
   });
@@ -677,8 +682,8 @@ const generatePDF1 = async () => {
   );
 
   existingPage.drawText(chairman.value.executive_position, {
-    x: 285,
-    y: 150,
+    x: 275,
+    y: 135,
     ...defaultSize,
   });
 
@@ -692,7 +697,7 @@ const generatePDF1 = async () => {
 
   const link = document.createElement("a");
   link.href = objectPdf;
-  link.download = "book.pdf";
+  link.download = "visit_book_" + dayjs().format("YYYY_MM_DD") + ".pdf";
   link.click();
 
   isOverlay.value = false;
