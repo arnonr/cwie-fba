@@ -5,10 +5,12 @@ import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import Swal from "sweetalert2";
+import "sweetalert2/src/sweetalert2.scss";
 
 const studentApproveStore = useStudentApproveStore();
 const props = defineProps(["user_type", "student_id", "formActive", "isCheck"]);
-const emit = defineEmits(["refresh-data", "change-close"]);
+const emit = defineEmits(["refresh-data", "change-close", "change-close1"]);
 
 const isDialogVisible = ref(false);
 const isDialogRejectVisible = ref(false);
@@ -119,6 +121,54 @@ const onSubmit = () => {
 const reload = () => {
   emit("change-close");
   emit("refresh-data");
+};
+
+const confirmCancel = (it) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "เมื่อยกเลิกการสมัครแล้วจะไม่สามารถแก้ไขข้อมูลได้",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Cancel it!",
+    customClass: {
+      confirmButton:
+        "v-btn v-btn--elevated v-theme--light bg-primary v-btn--density-default v-btn--size-default v-btn--variant-elevated",
+      cancelButton:
+        "v-btn v-btn--elevated v-theme--light bg-error v-btn--density-default v-btn--size-default v-btn--variant-elevated ml-1",
+    },
+    buttonsStyling: false,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      studentApproveStore
+        .editForm({
+          id: it.id,
+          active: 0,
+          status_id: 10,
+          //
+        })
+        .then(async (response) => {
+          if (response.status == 200) {
+            //
+            emit("change-close1");
+            emit("refresh-data");
+            Swal.fire({
+              icon: "success",
+              title: "Cancel!",
+              text: "Your file has been cancel.",
+              customClass: {
+                confirmButton:
+                  "v-btn v-btn--elevated v-theme--light bg-success v-btn--density-default v-btn--size-default v-btn--variant-elevated",
+              },
+            });
+          } else {
+            console.log("error");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  });
 };
 </script>
 <style scoped>
@@ -409,6 +459,15 @@ const reload = () => {
             style="opacity: 1"
             class="mr-1"
           ></VIcon>
+        </VBtn>
+
+        <VBtn
+          color="error"
+          class="ml-2"
+          v-if="formActive"
+          @click="confirmCancel(formActive)"
+        >
+          ยกเลิกการสมัคร
         </VBtn>
       </VCol>
     </div>

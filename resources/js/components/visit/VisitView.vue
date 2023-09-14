@@ -261,6 +261,7 @@ const refreshData = () => {
         :student_id="props.student_id"
         :formActive="formActive"
         :visitActive="item"
+        :visitAll="items"
         :user_type="props.user_type"
         @refresh-data="refreshData"
       />
@@ -279,6 +280,12 @@ const refreshData = () => {
     <VCard title="">
       <VCardItem>
         <VRow class="mb-1">
+          <VCol cols="12" md="12" class="text-center">
+            <h3 v-if="items.length > 1" class="text-red">
+              ขอแก้ไขข้อมูลออกนิเทศ
+            </h3>
+          </VCol>
+
           <VCol cols="12" md="12">
             <VRow>
               <VCol cols="12" md="6">

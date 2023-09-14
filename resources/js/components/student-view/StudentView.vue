@@ -250,8 +250,10 @@ const refreshData = () => {
   fetchForms();
   emit("refresh-data");
   if (isClose.value == false) {
+    console.log("FREEDOM1");
     isClose.value = true;
   } else {
+    console.log("FREEDOM");
     setTimeout(emit("close"), 4000);
   }
   //
@@ -284,6 +286,7 @@ const refreshData = () => {
           :isCheck="isCheck"
           @refresh-data="refreshData"
           @change-close="isClose = false"
+          @change-close1="isClose = true"
         />
       </VCol>
 

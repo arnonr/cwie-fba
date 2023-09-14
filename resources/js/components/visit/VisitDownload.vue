@@ -16,6 +16,7 @@ const props = defineProps([
   "student",
   "formActive",
   "visitActive",
+  "visitAll",
 ]);
 const emit = defineEmits(["refresh-data"]);
 
@@ -95,6 +96,8 @@ watch(props, () => {
   if (props.formActive != null) {
     fetchTeachers();
   }
+
+  // if(props.visitAll != )
 });
 
 // Function
@@ -703,8 +706,198 @@ const generatePDF1 = async () => {
 
   isOverlay.value = false;
 };
+
+const generatePDF2 = async () => {
+  const urlFont = window.location.origin + "/storage/THSarabunNew.ttf";
+  const urlFontBold = window.location.origin + "/storage/THSarabunNewBold.ttf";
+  const fontBytes = await fetch(urlFont).then((res) => res.arrayBuffer());
+  const fontBytesBold = await fetch(urlFontBold).then((res) =>
+    res.arrayBuffer()
+  );
+  let url = "";
+  url = window.location.origin + "/storage/pdf/change_visit_book.pdf";
+
+  const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
+  const pdfTemplate = await PDFDocument.load(existingPdfBytes);
+  // Create PDF
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const sarabunFont = await pdfDoc.embedFont(fontBytes);
+  const sarabunBoldFont = await pdfDoc.embedFont(fontBytesBold);
+
+  const [existingPage] = await pdfDoc.copyPages(pdfTemplate, [0]);
+  pdfDoc.addPage(existingPage);
+
+  const defaultSize = {
+    size: 16,
+    font: sarabunFont,
+    color: rgb(0, 0, 0),
+  };
+
+  existingPage.drawText(props.formActive.supervision_name, {
+    x: 200, //คอลัมน์ ซ้ายไปขวา
+    y: 650, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(
+    dayjs(props.visitActive.document_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 335,
+      y: 624,
+      ...defaultSize,
+    }
+  );
+
+  let co_name = "";
+  if (props.visitActive.co_name == "-") {
+    co_name = props.visitActive.co_position;
+  } else {
+    co_name =
+      props.visitActive.co_name + " (" + props.visitActive.co_position + ")";
+  }
+
+  existingPage.drawText(co_name, {
+    x: 105,
+    y: 559,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(props.formActive.company_name, {
+    x: 205, //คอลัมน์ ซ้ายไปขวา
+    y: 528, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage.drawText(props.student.major_name, {
+    x: 280, //คอลัมน์ ซ้ายไปขวา
+    y: 506, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+  existingPage.drawText(props.formActive.term.toString(), {
+    x: 75,
+    y: 465,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(props.formActive.semester_year, {
+    x: 95,
+    y: 465,
+    ...defaultSize,
+  });
+
+  existingPage.drawText("1", {
+    x: 165,
+    y: 465,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(props.student.prefix_name + props.student.firstname, {
+    x: 120,
+    y: 432,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(props.student.surname, {
+    x: 260,
+    y: 432,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(props.student.class_year.toString(), {
+    x: 380,
+    y: 432,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(props.student.student_code, {
+    x: 460,
+    y: 432,
+    ...defaultSize,
+  });
+
+  //
+  existingPage.drawText(
+    dayjs(props.visitActive.visit_date).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 355,
+      y: 357,
+      ...defaultSize,
+    }
+  );
+
+  let visit_time = "";
+  if (props.visitActive.visit_time) {
+    let visit_time_arr = props.visitActive.visit_time.split(":");
+    visit_time = visit_time_arr[0] + ":" + visit_time_arr[1];
+  }
+  existingPage.drawText(visit_time, {
+    x: 485,
+    y: 357,
+    ...defaultSize,
+  });
+
+  existingPage.drawText(props.formActive.supervision_name, {
+    x: 180,
+    y: 303,
+    ...defaultSize,
+  });
+
+  //
+
+  const sigUrl = chairman.value.signature_file;
+  const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
+
+  let sigImage;
+  try {
+    sigImage = await pdfDoc.embedPng(sigImageBytes);
+  } catch (error) {
+    sigImage = await pdfDoc.embedJpg(sigImageBytes);
+  }
+
+  existingPage.drawImage(sigImage, {
+    x: 310,
+    y: 173,
+    width: 100,
+    height: 50,
+  });
+
+  existingPage.drawText(
+    chairman.value.prefix +
+      " " +
+      chairman.value.firstname +
+      " " +
+      chairman.value.surname,
+    {
+      x: 310,
+      y: 168,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(chairman.value.executive_position, {
+    x: 275,
+    y: 135,
+    ...defaultSize,
+  });
+
+  const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
+  pdfDoc.addPage(existingPage2);
+
+  const pdfBytes = await pdfDoc.save();
+  let objectPdf = URL.createObjectURL(
+    new Blob([pdfBytes.buffer], { type: "application/pdf" } /* (1) */)
+  );
+
+  const link = document.createElement("a");
+  link.href = objectPdf;
+  link.download = "visit_book_" + dayjs().format("YYYY_MM_DD") + ".pdf";
+  link.click();
+
+  isOverlay.value = false;
+};
 </script>
-<style scoped></style>
+
 <template>
   <div>
     <div v-if="props.user_type == 'supervisor'">
@@ -749,6 +942,25 @@ const generatePDF1 = async () => {
             class="mr-1"
           ></VIcon>
           หนังสือขอเข้านิเทศ
+        </VBtn>
+
+        <VBtn
+          class="ml-2"
+          color="success"
+          v-if="props.visitActive.visit_status > 3 && props.visitAll"
+          @click="
+            () => {
+              generatePDF2();
+            }
+          "
+        >
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
+          เอกสารขอเปลี่ยนแปลงการออกนิเทศ
         </VBtn>
 
         <VBtn
