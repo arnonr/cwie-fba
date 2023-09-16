@@ -270,6 +270,7 @@ const refreshData = () => {
         v-if="props.user_type == 'supervisor'"
         :student_id="props.student_id"
         :formActive="formActive"
+        :visitAll="items"
         :visitActive="item"
         :student="student"
         :user_type="props.user_type"

@@ -96,11 +96,10 @@ watch(props, () => {
   if (props.formActive != null) {
     fetchTeachers();
   }
-
-  // if(props.visitAll != )
 });
 
 // Function
+onMounted(() => {});
 const fetchTeachers = async () => {
   await visitDownloadStore
     .fetchTeachers({ id: props.formActive.chairman_id })
@@ -735,93 +734,117 @@ const generatePDF2 = async () => {
   };
 
   existingPage.drawText(props.formActive.supervision_name, {
-    x: 200, //คอลัมน์ ซ้ายไปขวา
-    y: 650, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    x: 180, //คอลัมน์ ซ้ายไปขวา
+    y: 622, //แถว ยิ่งมากยิ่งอยู่ด้านบน
     ...defaultSize,
   });
 
-  existingPage.drawText(
-    dayjs(props.visitActive.document_date).locale("th").format("DD MMMM BBBB"),
-    {
-      x: 335,
-      y: 624,
-      ...defaultSize,
-    }
-  );
-
-  let co_name = "";
-  if (props.visitActive.co_name == "-") {
-    co_name = props.visitActive.co_position;
-  } else {
-    co_name =
-      props.visitActive.co_name + " (" + props.visitActive.co_position + ")";
-  }
-
-  existingPage.drawText(co_name, {
-    x: 105,
-    y: 559,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(props.formActive.company_name, {
-    x: 205, //คอลัมน์ ซ้ายไปขวา
-    y: 528, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
-
-  existingPage.drawText(props.student.major_name, {
-    x: 280, //คอลัมน์ ซ้ายไปขวา
-    y: 506, //แถว ยิ่งมากยิ่งอยู่ด้านบน
-    ...defaultSize,
-  });
   existingPage.drawText(props.formActive.term.toString(), {
-    x: 75,
-    y: 465,
+    x: 385,
+    y: 598,
     ...defaultSize,
   });
 
   existingPage.drawText(props.formActive.semester_year, {
-    x: 95,
-    y: 465,
+    x: 410,
+    y: 598,
     ...defaultSize,
   });
 
-  existingPage.drawText("1", {
-    x: 165,
-    y: 465,
-    ...defaultSize,
-  });
+  existingPage.drawText(
+    props.student.prefix_name +
+      props.student.firstname +
+      " " +
+      props.student.surname,
+    {
+      x: 130,
+      y: 550,
+      ...defaultSize,
+    }
+  );
 
-  existingPage.drawText(props.student.prefix_name + props.student.firstname, {
-    x: 120,
-    y: 432,
-    ...defaultSize,
-  });
-
-  existingPage.drawText(props.student.surname, {
-    x: 260,
-    y: 432,
+  existingPage.drawText(props.student.student_code, {
+    x: 405,
+    y: 550,
     ...defaultSize,
   });
 
   existingPage.drawText(props.student.class_year.toString(), {
-    x: 380,
-    y: 432,
+    x: 530,
+    y: 550,
     ...defaultSize,
   });
 
-  existingPage.drawText(props.student.student_code, {
-    x: 460,
-    y: 432,
+  existingPage.drawText(props.formActive.company_name, {
+    x: 250, //คอลัมน์ ซ้ายไปขวา
+    y: 526, //แถว ยิ่งมากยิ่งอยู่ด้านบน
     ...defaultSize,
   });
 
-  //
+  // วันเก่า
   existingPage.drawText(
-    dayjs(props.visitActive.visit_date).locale("th").format("DD MMMM BBBB"),
+    dayjs(props.visitAll[1].visit_date).locale("th").format("DD"),
     {
-      x: 355,
-      y: 357,
+      x: 240,
+      y: 502,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(props.visitAll[1].visit_date).locale("th").format("MMMM"),
+    {
+      x: 300,
+      y: 502,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(props.visitAll[1].visit_date).locale("th").format("BBBB"),
+    {
+      x: 395,
+      y: 502,
+      ...defaultSize,
+    }
+  );
+
+  let visit_time_old = "";
+  if (props.visitAll[1].visit_time) {
+    let visit_time_arr_old = props.visitAll[1].visit_time.split(":");
+    visit_time_old = visit_time_arr_old[0] + ":" + visit_time_arr_old[1];
+  }
+  existingPage.drawText(visit_time_old, {
+    x: 455,
+    y: 502,
+    ...defaultSize,
+  });
+  //
+
+  // วันใหม่
+  existingPage.drawText(
+    dayjs(props.visitActive.visit_date).locale("th").format("DD"),
+    {
+      x: 100,
+      y: 478,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(props.visitActive.visit_date).locale("th").format("MMMM"),
+    {
+      x: 160,
+      y: 478,
+      ...defaultSize,
+    }
+  );
+
+  existingPage.drawText(
+    dayjs(props.visitActive.visit_date).locale("th").format("BBBB"),
+    {
+      x: 260,
+      y: 478,
       ...defaultSize,
     }
   );
@@ -832,35 +855,45 @@ const generatePDF2 = async () => {
     visit_time = visit_time_arr[0] + ":" + visit_time_arr[1];
   }
   existingPage.drawText(visit_time, {
-    x: 485,
-    y: 357,
+    x: 325,
+    y: 478,
+    ...defaultSize,
+  });
+  //
+
+  existingPage.drawText(props.formActive.supervision_name, {
+    x: 410,
+    y: 427,
     ...defaultSize,
   });
 
-  existingPage.drawText(props.formActive.supervision_name, {
-    x: 180,
-    y: 303,
-    ...defaultSize,
-  });
+  existingPage.drawText(
+    dayjs(props.visitActive.created_at).locale("th").format("DD MMMM BBBB"),
+    {
+      x: 410,
+      y: 380,
+      ...defaultSize,
+    }
+  );
 
   //
 
-  const sigUrl = chairman.value.signature_file;
-  const sigImageBytes = await fetch(sigUrl).then((res) => res.arrayBuffer());
-
-  let sigImage;
-  try {
-    sigImage = await pdfDoc.embedPng(sigImageBytes);
-  } catch (error) {
-    sigImage = await pdfDoc.embedJpg(sigImageBytes);
-  }
-
-  existingPage.drawImage(sigImage, {
-    x: 310,
-    y: 173,
-    width: 100,
-    height: 50,
+  existingPage.drawText(major_head_name.value, {
+    x: 110,
+    y: 248,
+    ...defaultSize,
   });
+
+  existingPage.drawText(
+    dayjs(props.visitActive.major_head_approve_at)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 110,
+      y: 228,
+      ...defaultSize,
+    }
+  );
 
   existingPage.drawText(
     chairman.value.prefix +
@@ -869,20 +902,22 @@ const generatePDF2 = async () => {
       " " +
       chairman.value.surname,
     {
-      x: 310,
-      y: 168,
+      x: 110,
+      y: 94,
       ...defaultSize,
     }
   );
 
-  existingPage.drawText(chairman.value.executive_position, {
-    x: 275,
-    y: 135,
-    ...defaultSize,
-  });
-
-  const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
-  pdfDoc.addPage(existingPage2);
+  existingPage.drawText(
+    dayjs(props.visitActive.chairman_approved_at)
+      .locale("th")
+      .format("DD MMMM BBBB"),
+    {
+      x: 110,
+      y: 73,
+      ...defaultSize,
+    }
+  );
 
   const pdfBytes = await pdfDoc.save();
   let objectPdf = URL.createObjectURL(
@@ -946,8 +981,8 @@ const generatePDF2 = async () => {
 
         <VBtn
           class="ml-2"
-          color="success"
-          v-if="props.visitActive.visit_status > 3 && props.visitAll"
+          color="warning"
+          v-if="props.visitActive.visit_status > 3 && props.visitAll.length > 1"
           @click="
             () => {
               generatePDF2();
