@@ -76,7 +76,7 @@ const response_company = ref({
   province_id: null,
 });
 
-watch(props, async () => {
+const checkFormActive = async () => {
   if (props.formActive != null) {
     if (props.formActive.length != 0) {
       response_company.value.form_id = props.formActive.id;
@@ -84,6 +84,7 @@ watch(props, async () => {
       if (props.formActive.status_id == 9 || props.formActive.status_id == 10) {
         isDisabledAdd.value = false;
       }
+
       if (
         props.formActive.id &&
         props.formActive.prefix_id &&
@@ -146,6 +147,14 @@ watch(props, async () => {
   } else {
     isCheck.value = true;
   }
+};
+
+watch(props, async () => {
+  checkFormActive();
+});
+
+onMounted(async () => {
+  checkFormActive();
 });
 
 // fetch

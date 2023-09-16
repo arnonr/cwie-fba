@@ -1117,7 +1117,7 @@ const repeateAgain = () => {
                     for="congenital_disease"
                     cols="12"
                     md="2"
-                    >โรคประจำตัว
+                    >โรคประจำตัว (กรณีไม่มีข้อมูลให้ทำการใช้เครื่องหมาย "-")
                   </label>
                   <AppTextarea
                     id="congenital_disease"
@@ -1133,7 +1133,7 @@ const repeateAgain = () => {
                     for="drug_allergy"
                     cols="12"
                     md="2"
-                    >ประวัติการแพ้ยา
+                    >ประวัติการแพ้ยา (กรณีไม่มีข้อมูลให้ทำการใช้เครื่องหมาย "-")
                   </label>
                   <AppTextarea
                     id="drug_allergy"
