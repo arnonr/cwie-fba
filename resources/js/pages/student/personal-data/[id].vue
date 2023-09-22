@@ -1,24 +1,25 @@
 <script setup>
-import { requiredValidator } from "@validators";
-import Swal from "sweetalert2";
-import { useRoute, useRouter } from "vue-router";
+import { requiredValidator } from "@validators"
+import Swal from "sweetalert2"
+import { useRoute, useRouter } from "vue-router"
 
-import "sweetalert2/src/sweetalert2.scss";
+import "sweetalert2/src/sweetalert2.scss"
 
 import {
   blood_groups,
   class_rooms,
   class_years,
   prefix_names,
-} from "@/data-constant/data";
+} from "@/data-constant/data"
 
-import { usePersonalDataStore } from "./usePersonalDataStore";
+import { usePersonalDataStore } from "./usePersonalDataStore"
+
 // const route = useRoute();
-const route = useRoute();
-const router = useRouter();
-const personalDataStore = usePersonalDataStore();
+const route = useRoute()
+const router = useRouter()
+const personalDataStore = usePersonalDataStore()
 
-const item = ref({});
+const item = ref({})
 
 const documents_certificate = ref([
   {
@@ -37,13 +38,14 @@ const documents_certificate = ref([
     document_name: null,
     student_id: null,
   },
-]);
+])
 
-const isOverlay = ref(false);
-const isFormValid = ref(false);
-const refForm = ref();
-const currentStep = ref(0);
-const disabled = ref(true);
+const isOverlay = ref(false)
+const isFormValid = ref(false)
+const refForm = ref()
+const currentStep = ref(0)
+const disabled = ref(true)
+
 const studentSteps = [
   {
     title: "ข้อมูลทั่วไป",
@@ -60,11 +62,11 @@ const studentSteps = [
     size: 24,
     icon: "tabler-books",
   },
-];
+]
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
 
 const selectOptions = ref({
   provinces: [],
@@ -80,153 +82,154 @@ const selectOptions = ref({
     { title: "Active", value: 1 },
     { title: "In Active", value: 0 },
   ],
-});
+})
 
 const fetchProvinces = () => {
   personalDataStore
     .fetchProvinces({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.provinces = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.province_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.provinces = response.data.data.map(r => {
+          return { title: r.name_th, value: r.province_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchAmphurs = () => {
   personalDataStore
     .fetchAmphurs({
       province_id: item.value.province_id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.amphurs = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.amphur_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.amphurs = response.data.data.map(r => {
+          return { title: r.name_th, value: r.amphur_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchTumbols = () => {
   personalDataStore
     .fetchTumbols({
       amphur_id: item.value.amphur_id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.tumbols = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.tumbol_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.tumbols = response.data.data.map(r => {
+          return { title: r.name_th, value: r.tumbol_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchTeachers = () => {
   personalDataStore
     .fetchTeachers()
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.teachers = response.data.data.map((r) => {
+        selectOptions.value.teachers = response.data.data.map(r => {
           return {
             title: r.prefix + r.firstname + " " + r.surname,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchDocumentTypes = () => {
   personalDataStore
     .fetchDocumentTypes({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.document_types = response.data.data.map((r) => {
-          return { title: r.name, value: r.id };
-        });
+        selectOptions.value.document_types = response.data.data.map(r => {
+          return { title: r.name, value: r.id }
+        })
 
         selectOptions.value.document_types =
-          selectOptions.value.document_types.filter((d) => {
-            return d.value != 1;
-          });
+          selectOptions.value.document_types.filter(d => {
+            return d.value != 1
+          })
 
-        fetchStudent();
+        fetchStudent()
 
-        isOverlay.value = false;
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchStudentDocuments = () => {
   personalDataStore
     .fetchStudentDocuments({
       student_id: item.value.id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        const { data } = response.data;
+        const { data } = response.data
 
-        let document = data.filter((d) => {
-          return d.document_type_id != 1;
-        });
+        let document = data.filter(d => {
+          return d.document_type_id != 1
+        })
 
-        item.value.documents = item.value.documents.map((d) => {
-          let index = document.find((e) => {
-            return d.document_type_id == e.document_type_id;
-          });
+        item.value.documents = item.value.documents.map(d => {
+          let index = document.find(e => {
+            return d.document_type_id == e.document_type_id
+          })
           if (index) {
-            d.id = index.id;
-            d.document_file_old = index.document_file;
-            d.document_file = [];
+            d.id = index.id
+            d.document_file_old = index.document_file
+            d.document_file = []
           }
-          return d;
-        });
+
+          return d
+        })
 
         // Cert
-        let document_cert = data.filter((d) => {
-          return d.document_type_id == 1;
-        });
+        let document_cert = data.filter(d => {
+          return d.document_type_id == 1
+        })
 
         if (document_cert.length > 0) {
-          documents_certificate.value = [];
+          documents_certificate.value = []
 
           for (let index = 0; index < document_cert.length; index++) {
-            let d = document_cert[index];
+            let d = document_cert[index]
             documents_certificate.value.push({
               id: d.id,
               document_type_id: 1,
@@ -235,20 +238,20 @@ const fetchStudentDocuments = () => {
               document_file_old:
                 d.document_file != null ? d.document_file : null,
               document_file: [],
-            });
+            })
           }
         }
 
-        isOverlay.value = false;
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchStudent = () => {
   personalDataStore
@@ -256,31 +259,33 @@ const fetchStudent = () => {
       // id: route.params.id,
       id: route.params.id,
       includeAll: true,
+
       // get id self
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        const { data } = response.data;
-        item.value = { ...data[0] };
+        const { data } = response.data
 
-        console.log(item.value.status_id + "FREEDOM");
+        item.value = { ...data[0] }
+
+        console.log(item.value.status_id + "FREEDOM")
         if (
           item.value.status_id < 2 ||
           item.value.status_id == 10 ||
           item.value.status_id == 9
         ) {
-          disabled.value = true;
+          disabled.value = true
         }
 
         // item.value.photo_file = [];
-        item.value.photo_file_old = null;
+        item.value.photo_file_old = null
         if (data[0].photo_file != null) {
-          item.value.photo_file_old = data[0].photo_file;
+          item.value.photo_file_old = data[0].photo_file
         }
-        console.log(data[0].photo_file);
-        item.value.photo_file = [];
+        console.log(data[0].photo_file)
+        item.value.photo_file = []
 
-        item.value.documents = selectOptions.value.document_types.map((d) => {
+        item.value.documents = selectOptions.value.document_types.map(d => {
           return {
             id: null,
             document_file: null,
@@ -288,47 +293,48 @@ const fetchStudent = () => {
             document_type_id: d.value,
             document_name: d.title,
             student_id: item.value.id,
-          };
-        });
-        fetchStudentDocuments();
+          }
+        })
+        fetchStudentDocuments()
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 watch(
   () => item.value.province_id,
   (value, oldValue) => {
     if (value != null) {
-      fetchAmphurs();
+      fetchAmphurs()
       if (oldValue != null) {
-        item.value.amphur_id = null;
-        item.value.tumbol_id = null;
+        item.value.amphur_id = null
+        item.value.tumbol_id = null
       }
     }
-  }
-);
+  },
+)
 
 watch(
   () => item.value.amphur_id,
   (value, oldValue) => {
     if (value != null) {
-      fetchTumbols();
+      fetchTumbols()
       if (oldValue != null) {
-        item.value.tumbol_id = null;
+        item.value.tumbol_id = null
       }
     }
+
     // console.log(value);
-  }
-);
+  },
+)
 
 const onSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
       personalDataStore
@@ -339,36 +345,37 @@ const onSubmit = () => {
               ? item.value.photo_file[0]
               : null,
         })
-        .then((response) => {
+        .then(response => {
           if (response.data.message == "success") {
-            localStorage.setItem("updated", 1);
+            localStorage.setItem("updated", 1)
 
-            onStudentDocumentSubmit();
+            onStudentDocumentSubmit()
 
             nextTick(() => {
-              console.log("Success");
-            });
+              console.log("Success")
+            })
           } else {
-            isOverlay.value = false;
-            console.log("error");
+            isOverlay.value = false
+            console.log("error")
           }
         })
-        .catch((error) => {
-          console.error(error);
+        .catch(error => {
+          console.error(error)
+
           //   isOverlay.value = false;
-        });
+        })
     } else {
-      snackbarText.value = "ข้อมูลไม่ครบถ้วน";
-      snackbarColor.value = "error";
-      isSnackbarVisible.value = true;
+      snackbarText.value = "ข้อมูลไม่ครบถ้วน"
+      snackbarColor.value = "error"
+      isSnackbarVisible.value = true
     }
-    isOverlay.value = false;
-  });
-};
+    isOverlay.value = false
+  })
+}
 
 const onStudentDocumentCertificateSubmit = async () => {
   for (let index = 0; index < documents_certificate.value.length; index++) {
-    const d = documents_certificate.value[index];
+    const d = documents_certificate.value[index]
 
     if (d.document_name != null && d.document_file != null) {
       if (d.document_file.length !== 0) {
@@ -378,45 +385,45 @@ const onStudentDocumentCertificateSubmit = async () => {
           document_name: d.document_name,
           document_file:
             d.document_file.length !== 0 ? d.document_file[0] : null,
-        };
+        }
 
         if (d.id == null) {
           await personalDataStore
             .addStudentDocument(dataSend)
-            .then((response) => {
+            .then(response => {
               if (response.status == 200) {
               } else {
-                console.log("error");
+                console.log("error")
               }
             })
-            .catch((error) => {
-              console.error(error);
-            });
+            .catch(error => {
+              console.error(error)
+            })
         } else {
-          dataSend["id"] = d.id;
+          dataSend["id"] = d.id
           await personalDataStore
             .editStudentDocument(dataSend)
-            .then((response) => {
+            .then(response => {
               if (response.status == 200) {
               } else {
-                console.log("error");
+                console.log("error")
               }
             })
-            .catch((error) => {
-              console.log(error);
-            });
+            .catch(error => {
+              console.log(error)
+            })
         }
       }
     }
   }
-};
+}
 
 const onStudentDocumentSubmit = async () => {
-  isOverlay.value = true;
+  isOverlay.value = true
 
   // Document
   for (let index = 0; index < item.value.documents.length; index++) {
-    const d = item.value.documents[index];
+    const d = item.value.documents[index]
     if (d.document_file != null) {
       if (d.document_file.length !== 0) {
         let dataSend = {
@@ -425,45 +432,45 @@ const onStudentDocumentSubmit = async () => {
             d.document_file.length !== 0 ? d.document_file[0] : null,
           document_type_id: d.document_type_id,
           document_name: d.document_name,
-        };
+        }
 
         if (d.id == null) {
           await personalDataStore
             .addStudentDocument(dataSend)
-            .then((response) => {
+            .then(response => {
               if (response.status == 200) {
                 // let { data } = response;
               } else {
-                console.log("error");
+                console.log("error")
               }
             })
-            .catch((error) => {
-              console.error(error);
-            });
+            .catch(error => {
+              console.error(error)
+            })
         } else {
-          dataSend["id"] = d.id;
+          dataSend["id"] = d.id
           await personalDataStore
             .editStudentDocument(dataSend)
-            .then((response) => {
+            .then(response => {
               if (response.status == 200) {
                 // let { data } = response;
                 // resolve(true);
               } else {
-                console.log("error");
+                console.log("error")
               }
             })
-            .catch((error) => {
-              console.log(error);
-            });
+            .catch(error => {
+              console.log(error)
+            })
         }
       }
     }
   }
 
   // Cert
-  await onStudentDocumentCertificateSubmit();
+  await onStudentDocumentCertificateSubmit()
 
-  isOverlay.value = false;
+  isOverlay.value = false
   Swal.fire({
     title: "Success",
     text: "บันทึกข้อมูลส่วนตัวเสร็จสิ้น",
@@ -474,15 +481,15 @@ const onStudentDocumentSubmit = async () => {
         "v-btn v-btn--elevated v-theme--light bg-primary v-btn--density-default v-btn--size-default v-btn--variant-elevated",
     },
   }).then(() => {
-    isOverlay.value = false;
+    isOverlay.value = false
 
     router.push({
       path: "/staff/students/view/" + route.params.id,
-    });
-  });
-};
+    })
+  })
+}
 
-const removeCertificateItem = (index) => {
+const removeCertificateItem = index => {
   if (documents_certificate.value[index].id != null) {
     Swal.fire({
       title: "Are you sure?",
@@ -497,19 +504,19 @@ const removeCertificateItem = (index) => {
           "v-btn v-btn--elevated v-theme--light bg-error v-btn--density-default v-btn--size-default v-btn--variant-elevated ml-1",
       },
       buttonsStyling: false,
-    }).then((result) => {
+    }).then(result => {
       if (result.isConfirmed) {
-        isOverlay.value = true;
+        isOverlay.value = true
 
         personalDataStore
           .deleteStudentDocument({
             id: documents_certificate.value[index].id,
           })
-          .then(async (response) => {
+          .then(async response => {
             if (response.status == 204) {
-              documents_certificate.value.splice(index, 1);
+              documents_certificate.value.splice(index, 1)
 
-              isOverlay.value = false;
+              isOverlay.value = false
 
               Swal.fire({
                 icon: "success",
@@ -519,31 +526,31 @@ const removeCertificateItem = (index) => {
                   confirmButton:
                     "v-btn v-btn--elevated v-theme--light bg-success v-btn--density-default v-btn--size-default v-btn--variant-elevated",
                 },
-              });
+              })
             } else {
-              console.log("error");
-              isOverlay.value = false;
+              console.log("error")
+              isOverlay.value = false
             }
           })
-          .catch((error) => {
-            console.error(error);
-            isOverlay.value = false;
-          });
+          .catch(error => {
+            console.error(error)
+            isOverlay.value = false
+          })
       }
-    });
+    })
   } else {
-    documents_certificate.value.splice(index, 1);
+    documents_certificate.value.splice(index, 1)
   }
-};
+}
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-  fetchProvinces();
-  fetchTeachers();
-  fetchDocumentTypes();
-});
+  window.scrollTo(0, 0)
+  fetchProvinces()
+  fetchTeachers()
+  fetchDocumentTypes()
+})
 
-const nextTodoId = ref(1);
+const nextTodoId = ref(1)
 
 const repeateAgain = () => {
   documents_certificate.value.push({
@@ -554,25 +561,17 @@ const repeateAgain = () => {
     document_type_id: 1,
     document_name: null,
     student_id: null,
-  });
+  })
 
   // this.$nextTick(() => {
   //   this.trAddHeight(this.$refs.row[0].offsetHeight);
   // });
-};
-</script>
-<style lang="scss">
-.checkout-stepper {
-  .stepper-icon-step {
-    .step-wrapper + svg {
-      margin-inline: 3.5rem !important;
-    }
-  }
 }
-</style>
+</script>
+
 <template>
   <div>
-    <VCard title="ข้อมูลส่วนตัว">
+    <VCard title="ข้อมูลส่วนตัว1">
       <VCardText>
         <!-- 👉 Stepper -->
         <AppStepper
@@ -587,25 +586,47 @@ const repeateAgain = () => {
 
       <VCardText>
         <!-- 👉 stepper content -->
-        <VForm ref="refForm" v-model="isFormValid" @submit.prevent="onSubmit">
-          <VWindow v-model="currentStep" class="disable-tab-transition">
+        <VForm
+          ref="refForm"
+          v-model="isFormValid"
+          @submit.prevent="onSubmit"
+        >
+          <VWindow
+            v-model="currentStep"
+            class="disable-tab-transition"
+          >
             <!-- ข้อมูลทั่วไป -->
             <VWindowItem>
               <VRow>
-                <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-user" style="opacity: 1" />
-                  <h4 class="pt-1 pl-1">ข้อมูลทั่วไป</h4>
+                <VCol
+                  cols="12"
+                  md="12"
+                  class="d-flex"
+                >
+                  <VIcon
+                    size="22"
+                    icon="tabler-user"
+                    style="opacity: 1;"
+                  />
+                  <h4 class="pt-1">
+                    ข้อมูลทั่วไป
+                  </h4>
                 </VCol>
-                <VCol style="margin-top: -1.5em">
+                <VCol>
                   <small> หมายเหตุ : โปรดระบุข้อมูลให้ครบถ้วน </small>
                 </VCol>
               </VRow>
 
               <VRow>
                 <!--  -->
-                <VCol cols="12" md="10">
-                  <label class="v-label font-weight-bold" for="document_name"
-                    >รูปภาพนักศึกษา (1x1.5 นิ้ว)
+                <VCol
+                  cols="12"
+                  md="10"
+                >
+                  <label
+                    class="v-label font-weight-bold"
+                    for="document_name"
+                  >รูปภาพนักศึกษา (1x1.5 นิ้ว ไฟล์รูปภาพ PNG, JPG)
                   </label>
                   <VFileInput
                     v-model="item.photo_file"
@@ -615,9 +636,13 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="2" class="pl-2 align-self-end">
+                <VCol
+                  cols="12"
+                  md="2"
+                  class="align-self-end"
+                >
                   <VBtn
-                    style="width: 100%"
+                    style="width: 100%;"
                     :color="
                       item.photo_file_old == null ? 'secondary' : 'primary'
                     "
@@ -632,13 +657,17 @@ const repeateAgain = () => {
                 </VCol>
                 <!--  -->
 
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="student_code"
                     cols="12"
                     md="4"
-                    >รหัสนักศึกษา :
+                  >รหัสนักศึกษา :
                   </label>
                   <AppTextField
                     id="student_code"
@@ -647,17 +676,21 @@ const repeateAgain = () => {
                     disabled
                   />
                 </VCol>
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="prefix_id"
                     cols="12"
                     md="2"
-                    >คำนำหน้า :
+                  >คำนำหน้า :
                   </label>
                   <AppSelect
-                    :items="selectOptions.prefix_names"
                     v-model="item.prefix_id"
+                    :items="selectOptions.prefix_names"
                     :rules="[requiredValidator]"
                     variant="outlined"
                     placeholder="Prefix"
@@ -665,13 +698,17 @@ const repeateAgain = () => {
                     clearable
                   />
                 </VCol>
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="firstname"
                     cols="12"
                     md="4"
-                    >ชื่อ :
+                  >ชื่อ :
                   </label>
                   <AppTextField
                     id="firstname"
@@ -681,13 +718,17 @@ const repeateAgain = () => {
                     persistent-placeholder
                   />
                 </VCol>
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="surname"
                     cols="12"
                     md="4"
-                    >นามสกุล :
+                  >นามสกุล :
                   </label>
                   <AppTextField
                     id="surname"
@@ -697,13 +738,17 @@ const repeateAgain = () => {
                     persistent-placeholder
                   />
                 </VCol>
-                <VCol cols="12" md="6" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="6"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for=""
                     cols="12"
                     md="4"
-                    >คณะ :
+                  >คณะ :
                   </label>
                   <AppTextField
                     id="faculty_name"
@@ -712,13 +757,17 @@ const repeateAgain = () => {
                     disabled
                   />
                 </VCol>
-                <VCol cols="12" md="6" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="6"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for=""
                     cols="12"
                     md="4"
-                    >สาขาวิชา :
+                  >สาขาวิชา :
                   </label>
                   <AppTextField
                     id="major_name"
@@ -728,17 +777,21 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="2" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="2"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="class_year"
                     cols="12"
                     md="2"
-                    >ชั้นปีที่ :
+                  >ชั้นปีที่ :
                   </label>
                   <AppSelect
-                    :items="selectOptions.class_years"
                     v-model="item.class_year"
+                    :items="selectOptions.class_years"
                     :rules="[requiredValidator]"
                     variant="outlined"
                     placeholder="Class Year"
@@ -747,17 +800,21 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="2" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="2"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="class_room"
                     cols="12"
                     md="2"
-                    >ห้อง :
+                  >ห้อง :
                   </label>
                   <AppSelect
-                    :items="selectOptions.class_rooms"
                     v-model="item.class_room"
+                    :items="selectOptions.class_rooms"
                     :rules="[requiredValidator]"
                     variant="outlined"
                     :disabled="!disabled"
@@ -765,13 +822,17 @@ const repeateAgain = () => {
                     clearable
                   />
                 </VCol>
-                <VCol cols="12" md="6" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="6"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="advisor"
                     cols="12"
                     md="2"
-                    >อาจารย์ที่ปรึกษา :
+                  >อาจารย์ที่ปรึกษา :
                   </label>
                   <AppAutocomplete
                     v-model="item.advisor_id"
@@ -782,7 +843,8 @@ const repeateAgain = () => {
                     clearable
                   />
 
-                  <!-- <AppSelect
+                  <!--
+                    <AppSelect
                     :items="selectOptions.teachers"
                     v-model="item.advisor_id"
                     :rules="[requiredValidator]"
@@ -790,16 +852,21 @@ const repeateAgain = () => {
                     :disabled="!disabled"
                     placeholder="Advisor"
                     clearable
-                  /> -->
+                    /> 
+                  -->
                 </VCol>
 
-                <VCol cols="12" md="2" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="2"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="GPA"
                     cols="12"
                     md="2"
-                    >เกรดเฉลี่ย
+                  >เกรดเฉลี่ย
                   </label>
                   <AppTextField
                     id="GPA"
@@ -811,20 +878,34 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VDivider class="mt-4 mb-4"></VDivider>
+                <VDivider class="mt-4 mb-4" />
 
-                <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-map-pin" style="opacity: 1" />
-                  <h4 class="pt-1 pl-3 pb-2">ที่อยู่</h4>
+                <VCol
+                  cols="12"
+                  md="12"
+                  class="d-flex"
+                >
+                  <VIcon
+                    size="22"
+                    icon="tabler-map-pin"
+                    style="opacity: 1;"
+                  />
+                  <h4 class="pt-1 pl-3 pb-2">
+                    ที่อยู่
+                  </h4>
                 </VCol>
 
-                <VCol cols="12" md="12" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="12"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="GPA"
                     cols="12"
                     md="2"
-                    >ที่อยู่ปัจจุบัน
+                  >ที่อยู่ปัจจุบัน
                   </label>
                   <AppTextarea
                     id="address"
@@ -835,17 +916,21 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="4" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="4"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="province_id"
                     cols="12"
                     md="4"
-                    >จังหวัด :
+                  >จังหวัด :
                   </label>
                   <AppSelect
-                    :items="selectOptions.provinces"
                     v-model="item.province_id"
+                    :items="selectOptions.provinces"
                     :rules="[requiredValidator]"
                     variant="outlined"
                     :disabled="!disabled"
@@ -854,17 +939,21 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="4" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="4"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="amphur_id"
                     cols="12"
                     md="4"
-                    >อำเภอ/เขต :
+                  >อำเภอ/เขต :
                   </label>
                   <AppSelect
-                    :items="selectOptions.amphurs"
                     v-model="item.amphur_id"
+                    :items="selectOptions.amphurs"
                     :disabled="!disabled"
                     :rules="[requiredValidator]"
                     variant="outlined"
@@ -873,13 +962,19 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="4" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="tumbol_id"
-                    >ตำบล/แขวง :
+                <VCol
+                  cols="12"
+                  md="4"
+                  class="align-items-center"
+                >
+                  <label
+                    class="v-label font-weight-bold"
+                    for="tumbol_id"
+                  >ตำบล/แขวง :
                   </label>
                   <AppSelect
-                    :items="selectOptions.tumbols"
                     v-model="item.tumbol_id"
+                    :items="selectOptions.tumbols"
                     :rules="[requiredValidator]"
                     variant="outlined"
                     :disabled="!disabled"
@@ -888,13 +983,17 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="6" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="6"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="tel"
                     cols="12"
                     md="2"
-                    >เบอร์โทรศัพท์
+                  >เบอร์โทรศัพท์
                   </label>
                   <AppTextField
                     id="tel"
@@ -904,13 +1003,17 @@ const repeateAgain = () => {
                     persistent-placeholder
                   />
                 </VCol>
-                <VCol cols="12" md="6" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="6"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="Email"
                     cols="12"
                     md="2"
-                    >เมล(@kmutnb.ac.th เท่านั้น)
+                  >เมล(@kmutnb.ac.th เท่านั้น)
                   </label>
                   <AppTextField
                     id="email"
@@ -921,20 +1024,34 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VDivider class="mt-4 mb-4"></VDivider>
+                <VDivider class="mt-4 mb-4" />
 
-                <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-users" style="opacity: 1" />
-                  <h4 class="pt-1 pl-3 pb-2">ผู้ที่ติดต่อได้</h4>
+                <VCol
+                  cols="12"
+                  md="12"
+                  class="d-flex"
+                >
+                  <VIcon
+                    size="22"
+                    icon="tabler-users"
+                    style="opacity: 1;"
+                  />
+                  <h4 class="pt-1 pl-3 pb-2">
+                    ผู้ที่ติดต่อได้
+                  </h4>
                 </VCol>
 
-                <VCol cols="12" md="6" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="6"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="contact1_name"
                     cols="12"
                     md="4"
-                    >บุคคลที่ติตต่อได้ 1
+                  >บุคคลที่ติตต่อได้ 1
                   </label>
                   <AppTextField
                     id="contact1_name"
@@ -945,13 +1062,17 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="contact1_relation"
                     cols="12"
                     md="4"
-                    >ความสัมพันธ์
+                  >ความสัมพันธ์
                   </label>
                   <AppTextField
                     id="contact1_relation"
@@ -962,13 +1083,17 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="contact1_tel"
                     cols="12"
                     md="4"
-                    >เบอร์โทรศัพท์
+                  >เบอร์โทรศัพท์
                   </label>
                   <AppTextField
                     id="contact1_tel"
@@ -979,50 +1104,62 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="6" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="6"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="contact2_name"
                     cols="12"
                     md="4"
-                    >บุคคลที่ติตต่อได้ 2
+                  >บุคคลที่ติตต่อได้ 2
                   </label>
                   <AppTextField
                     id="contact2_name"
-                    :disabled="!disabled"
                     v-model="item.contact2_name"
+                    :disabled="!disabled"
                     persistent-placeholder
                   />
                 </VCol>
 
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="contact2_relation"
                     cols="12"
                     md="4"
-                    >ความสัมพันธ์
+                  >ความสัมพันธ์
                   </label>
                   <AppTextField
                     id="contact2_relation"
-                    :disabled="!disabled"
                     v-model="item.contact2_relation"
+                    :disabled="!disabled"
                     persistent-placeholder
                   />
                 </VCol>
 
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="contact2_tel"
                     cols="12"
                     md="4"
-                    >เบอร์โทรศัพท์
+                  >เบอร์โทรศัพท์
                   </label>
                   <AppTextField
                     id="contact2_tel"
-                    :disabled="!disabled"
                     v-model="item.contact2_tel"
+                    :disabled="!disabled"
                     persistent-placeholder
                   />
                 </VCol>
@@ -1033,114 +1170,148 @@ const repeateAgain = () => {
             <!-- ข้อมูลสุขภาพ -->
             <VWindowItem>
               <VRow>
-                <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-heart" style="opacity: 1" />
-                  <h4 class="pt-1 pl-1">ข้อมูลสุขภาพ</h4>
+                <VCol
+                  cols="12"
+                  md="12"
+                  class="d-flex"
+                >
+                  <VIcon
+                    size="22"
+                    icon="tabler-heart"
+                    style="opacity: 1;"
+                  />
+                  <h4 class="pt-1 pl-1">
+                    ข้อมูลสุขภาพ
+                  </h4>
                 </VCol>
-                <VCol style="margin-top: -1.5em">
+                <VCol style="margin-top: -1.5em;">
                   <small> หมายเหตุ : โปรดระบุข้อมูลให้ครบถ้วน </small>
                 </VCol>
               </VRow>
 
               <VRow>
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="blood_group"
                     cols="12"
                     md="2"
-                    >กลุ่มเลือด :
+                  >กลุ่มเลือด :
                   </label>
                   <AppSelect
+                    v-model="item.blood_group"
                     :items="selectOptions.blood_groups"
                     :disabled="!disabled"
-                    v-model="item.blood_group"
                     :rules="[requiredValidator]"
                     variant="outlined"
                     placeholder="Blood Group"
                     clearable
                   />
                 </VCol>
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="height"
                     cols="12"
                     md="4"
-                    >ส่วนสูง(ซม.) :
+                  >ส่วนสูง(ซม.) :
                   </label>
                   <AppTextField
                     id="height"
-                    :disabled="!disabled"
                     v-model="item.height"
+                    :disabled="!disabled"
                     :rules="[requiredValidator]"
                     persistent-placeholder
                     type="number"
                   />
                 </VCol>
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="weight"
                     cols="12"
                     md="4"
-                    >น้ำหนัก(กก.) :
+                  >น้ำหนัก(กก.) :
                   </label>
                   <AppTextField
                     id="weight"
-                    :disabled="!disabled"
                     v-model="item.weight"
+                    :disabled="!disabled"
                     :rules="[requiredValidator]"
                     persistent-placeholder
                     type="number"
                   />
                 </VCol>
 
-                <VCol cols="12" md="3" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="emergency_tel"
                     cols="12"
                     md="4"
-                    >เบอร์โทรฉุกเฉิน :
+                  >เบอร์โทรฉุกเฉิน :
                   </label>
                   <AppTextField
                     id="emergency_tel"
-                    :disabled="!disabled"
                     v-model="item.emergency_tel"
+                    :disabled="!disabled"
                     :rules="[requiredValidator]"
                     persistent-placeholder
                   />
                 </VCol>
 
-                <VCol cols="12" md="12" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="12"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="congenital_disease"
                     cols="12"
                     md="2"
-                    >โรคประจำตัว
+                  >โรคประจำตัว
                   </label>
                   <AppTextarea
                     id="congenital_disease"
-                    :disabled="!disabled"
                     v-model="item.congenital_disease"
+                    :disabled="!disabled"
                     persistent-placeholder
                   />
                 </VCol>
 
-                <VCol cols="12" md="12" class="align-items-center">
+                <VCol
+                  cols="12"
+                  md="12"
+                  class="align-items-center"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="drug_allergy"
                     cols="12"
                     md="2"
-                    >ประวัติการแพ้ยา
+                  >ประวัติการแพ้ยา
                   </label>
                   <AppTextarea
                     id="drug_allergy"
-                    :disabled="!disabled"
                     v-model="item.drug_allergy"
+                    :disabled="!disabled"
                     persistent-placeholder
                   />
                 </VCol>
@@ -1151,41 +1322,59 @@ const repeateAgain = () => {
             <VWindowItem>
               <!-- ใบประกาศ -->
               <VRow>
-                <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-books" style="opacity: 1" />
-                  <h4 class="pt-1 pl-1">ใบประกาศนียบัตร</h4>
+                <VCol
+                  cols="12"
+                  md="12"
+                  class="d-flex"
+                >
+                  <VIcon
+                    size="22"
+                    icon="tabler-books"
+                    style="opacity: 1;"
+                  />
+                  <h4 class="pt-1 pl-1">
+                    ใบประกาศนียบัตร
+                  </h4>
                 </VCol>
-                <!-- <VCol style="margin-top: -1.5em">
+                <!--
+                  <VCol style="margin-top: -1.5em">
                   <small> หมายเหตุ : โปรดระบุข้อมูลให้ครบถ้วน </small>
-                </VCol> -->
+                  </VCol> 
+                -->
               </VRow>
               <VRow
                 v-for="(certItem, index) in documents_certificate"
                 :key="'cert' + index"
               >
-                <VCol cols="12" md="5">
+                <VCol
+                  cols="12"
+                  md="5"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="weight"
                     cols="12"
                     md="5"
-                    >ชื่อใบประกาศ :
+                  >ชื่อใบประกาศ :
                   </label>
                   <AppTextField
+                    :id="'certificate_name_' + index"
                     v-model="certItem.document_name"
                     :disabled="!disabled"
                     persistent-placeholder
-                    :id="'certificate_name_' + index"
                   />
                 </VCol>
 
-                <VCol cols="12" md="5">
+                <VCol
+                  cols="12"
+                  md="5"
+                >
                   <label
                     class="v-label font-weight-bold"
                     for="weight"
                     cols="12"
                     md="5"
-                    >ไฟล์ใบประกาศ :
+                  >ไฟล์ใบประกาศ :
                   </label>
                   <VFileInput
                     :id="'cert-file-' + index"
@@ -1196,9 +1385,13 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="1" class="pl-2 align-self-end">
+                <VCol
+                  cols="12"
+                  md="1"
+                  class="pl-2 align-self-end"
+                >
                   <VBtn
-                    style="width: 100%"
+                    style="width: 100%;"
                     :color="
                       certItem.document_file_old == null
                         ? 'secondary'
@@ -1216,12 +1409,16 @@ const repeateAgain = () => {
                   </VBtn>
                 </VCol>
 
-                <VCol cols="12" md="1" class="pl-2 align-self-end">
+                <VCol
+                  cols="12"
+                  md="1"
+                  class="pl-2 align-self-end"
+                >
                   <VBtn
-                    style="width: 100%"
+                    style="width: 100%;"
                     color="error"
-                    @click="removeCertificateItem(index)"
                     :disabled="!disabled"
+                    @click="removeCertificateItem(index)"
                   >
                     Del
                   </VBtn>
@@ -1229,35 +1426,60 @@ const repeateAgain = () => {
               </VRow>
 
               <VRow>
-                <VCol cols="12" md="1" class="pl-2 align-self-end">
+                <VCol
+                  cols="12"
+                  md="1"
+                  class="pl-2 align-self-end"
+                >
                   <VBtn
-                    style="width: 100%"
+                    style="width: 100%;"
                     color="info"
-                    @click="repeateAgain()"
                     :disabled="!disabled"
+                    @click="repeateAgain"
                   >
                     Add New
                   </VBtn>
                 </VCol>
               </VRow>
 
-              <VDivider class="mt-2 mb-4"></VDivider>
+              <VDivider class="mt-2 mb-4" />
               <!-- ใบอื่นๆ -->
               <VRow>
-                <VCol cols="12" md="12" class="d-flex align-self-center">
-                  <VIcon size="22" icon="tabler-books" style="opacity: 1" />
-                  <h4 class="pt-1 pl-1">เอกสาร</h4>
+                <VCol
+                  cols="12"
+                  md="12"
+                  class="d-flex align-self-center"
+                >
+                  <VIcon
+                    size="22"
+                    icon="tabler-books"
+                    style="opacity: 1;"
+                  />
+                  <h4 class="pt-1 pl-1">
+                    เอกสาร
+                  </h4>
                 </VCol>
               </VRow>
 
-              <VRow v-for="d in item.documents" :key="d.document_type_id">
-                <VCol cols="12" md="2">
-                  <label class="v-label font-weight-bold" for="document_name"
-                    >{{ d.document_name }}
+              <VRow
+                v-for="d in item.documents"
+                :key="d.document_type_id"
+              >
+                <VCol
+                  cols="12"
+                  md="2"
+                >
+                  <label
+                    class="v-label font-weight-bold"
+                    for="document_name"
+                  >{{ d.document_name }}
                   </label>
                 </VCol>
 
-                <VCol cols="12" md="8">
+                <VCol
+                  cols="12"
+                  md="8"
+                >
                   <VFileInput
                     v-model="d.document_file"
                     label="Upload File"
@@ -1266,9 +1488,13 @@ const repeateAgain = () => {
                   />
                 </VCol>
 
-                <VCol cols="12" md="2" class="pl-2 align-self-end">
+                <VCol
+                  cols="12"
+                  md="2"
+                  class="pl-2 align-self-end"
+                >
                   <VBtn
-                    style="width: 100%"
+                    style="width: 100%;"
                     :color="
                       d.document_file_old == null ? 'secondary' : 'primary'
                     "
@@ -1294,23 +1520,34 @@ const repeateAgain = () => {
               :disabled="currentStep === 0"
               @click="currentStep--"
             >
-              <VIcon icon="tabler-chevron-left" start class="flip-in-rtl" />
+              <VIcon
+                icon="tabler-chevron-left"
+                start
+                class="flip-in-rtl"
+              />
               Previous
             </VBtn>
 
             <VBtn
+              v-if="studentSteps.length - 1 === currentStep"
               color="success"
               append-icon="tabler-check"
-              @click="onSubmit"
-              v-if="studentSteps.length - 1 === currentStep"
               :disabled="!disabled"
+              @click="onSubmit"
             >
               submit
             </VBtn>
 
-            <VBtn v-else @click="currentStep++">
+            <VBtn
+              v-else
+              @click="currentStep++"
+            >
               Next
-              <VIcon icon="tabler-chevron-right" end class="flip-in-rtl" />
+              <VIcon
+                icon="tabler-chevron-right"
+                end
+                class="flip-in-rtl"
+              />
             </VBtn>
           </div>
         </VForm>
@@ -1324,7 +1561,12 @@ const repeateAgain = () => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
@@ -1338,6 +1580,16 @@ const repeateAgain = () => {
     </VOverlay>
   </div>
 </template>
+
+<style lang="scss">
+.checkout-stepper {
+  .stepper-icon-step {
+    .step-wrapper + svg {
+      margin-inline: 3.5rem !important;
+    }
+  }
+}
+</style>
 
 <route lang="yaml">
 meta:
