@@ -245,6 +245,7 @@ const fetchForm = () => {
     .then((response) => {
       if (response.status === 200) {
         item.value = response.data.data;
+        console.log(item.value + "FREEDOM")
 
         item.value.namecard_file_old = null;
         if (item.value.namecard_file != null) {
@@ -386,6 +387,10 @@ const onStaffSubmit = () => {
       cwieDataStore
         .editForm({
           ...item.value,
+          status_id:
+            item.value.reject_status_id != 5
+              ? item.value.reject_status_id + 1
+              : 7,
           namecard_file:
             item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
@@ -447,52 +452,30 @@ const format = (date) => {
   <div>
     <VCard title="แบบฟอร์มสมัครโครงการสหกิจศึกษา">
       <VCardItem>
-        <VForm
-          ref="refForm"
-          v-model="isFormValid"
-          @submit.prevent="onValidate()"
-        >
+        <VForm ref="refForm" v-model="isFormValid" @submit.prevent="onValidate()">
           <!-- <VRow> </VRow> -->
 
           <VRow class="mb-1">
             <VCol cols="12" md="12" class="d-flex">
-              <VIcon size="22" icon="tabler-user" style="opacity: 1" />
+              <VIcon size="22" icon="tabler-user" style="opacity: 1;" />
               <h4 class="pt-1 pl-1">ข้อมูลสหกิจศึกษา</h4>
             </VCol>
-            <VCol style="margin-top: -1.5em">
+            <VCol style="margin-top: -1.5em;">
               <small> หมายเหตุ : โปรดระบุข้อมูลให้ครบถ้วน </small>
             </VCol>
 
             <VCol cols="12" md="12">
-              <label class="font-weight-bold"
-                >ปีการศึกษา/รอบที่ออกสหกิจ :
+              <label class="font-weight-bold">ปีการศึกษา/รอบที่ออกสหกิจ :
               </label>
-              <AppSelect
-                :items="selectOptions.semesters"
-                v-model="item.semester_id"
-                variant="outlined"
-                placeholder="Semester"
-                :rules="[requiredValidator]"
-                clearable
-              />
+              <AppSelect :items="selectOptions.semesters" v-model="item.semester_id" variant="outlined"
+                placeholder="Semester" :rules="[requiredValidator]" clearable />
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label
-                class="v-label font-weight-bold"
-                for="start_date"
-                cols="12"
-                md="4"
-                >วันที่เริ่มออกสหกิจศึกษา :
+              <label class="v-label font-weight-bold" for="start_date" cols="12" md="4">วันที่เริ่มออกสหกิจศึกษา :
               </label>
-              <VueDatePicker
-                v-model="item.start_date"
-                :enable-time-picker="false"
-                locale="th"
-                auto-apply
-                :format="format"
-                :rules="[requiredValidator]"
-              >
+              <VueDatePicker v-model="item.start_date" :enable-time-picker="false" locale="th" auto-apply :format="format"
+                :rules="[requiredValidator]">
                 <template #year-overlay-value="{ text }">
                   {{ parseInt(text) + 543 }}
                 </template>
@@ -503,21 +486,10 @@ const format = (date) => {
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label
-                class="v-label font-weight-bold"
-                for="end_date"
-                cols="12"
-                md="4"
-                >วันที่สิ้นสุดการปฏิบัติสหกิจ :
+              <label class="v-label font-weight-bold" for="end_date" cols="12" md="4">วันที่สิ้นสุดการปฏิบัติสหกิจ :
               </label>
-              <VueDatePicker
-                v-model="item.end_date"
-                :enable-time-picker="false"
-                locale="th"
-                auto-apply
-                :format="format"
-                :rules="[requiredValidator]"
-              >
+              <VueDatePicker v-model="item.end_date" :enable-time-picker="false" locale="th" auto-apply :format="format"
+                :rules="[requiredValidator]">
                 <template #year-overlay-value="{ text }">
                   {{ parseInt(text) + 543 }}
                 </template>
@@ -530,7 +502,7 @@ const format = (date) => {
             <VDivider class="mt-4 mb-4"></VDivider>
 
             <VCol cols="12" md="12" class="d-flex">
-              <VIcon size="22" icon="tabler-map-pin" style="opacity: 1" />
+              <VIcon size="22" icon="tabler-map-pin" style="opacity: 1;" />
               <h4 class="pt-1 pl-1">ข้อมูลสถานประกอบการ</h4>
             </VCol>
             <!-- <VCol style="margin-top: -1.5em" cols="12" md="12">
@@ -538,26 +510,13 @@ const format = (date) => {
             </VCol> -->
 
             <VCol cols="12" md="12" class="align-items-center">
-              <label
-                class="v-label font-weight-bold"
-                for="company_id"
-                cols="12"
-                md="4"
-                >เลือก สถานประกอบการ :
+              <label class="v-label font-weight-bold" for="company_id" cols="12" md="4">เลือก สถานประกอบการ :
               </label>
               <!-- <AppSelect variant="outlined" placeholder="Province" clearable /> -->
-              <AppAutocomplete
-                v-model="item.company_id"
-                :items="selectOptions.companies"
-                :rules="[requiredValidator]"
-                placeholder="ค้นหาชื่อสถานประกอบการ"
-                clearable
-              />
-              <span
-                style="margin-top: 20px; cursor: pointer; float: inline-end"
-                @click="isDialogAddCompanyVisible = true"
-                >ไม่พบชื่อสถานประกอบการ ?</span
-              >
+              <AppAutocomplete v-model="item.company_id" :items="selectOptions.companies" :rules="[requiredValidator]"
+                placeholder="ค้นหาชื่อสถานประกอบการ" clearable />
+              <span style="padding-top: 20px; cursor: pointer; float: inline-end;"
+                @click="isDialogAddCompanyVisible = true">ไม่พบชื่อสถานประกอบการ ?</span>
             </VCol>
             <!-- <VCol cols="12" md="5">
               <VBtn
@@ -570,89 +529,42 @@ const format = (date) => {
             </VCol> -->
 
             <VCol cols="12" md="8">
-              <label
-                class="v-label font-weight-bold"
-                for="company_id"
-                cols="12"
-                md="12"
-              >
+              <label class="v-label font-weight-bold" for="company_id" cols="12" md="12">
                 ที่อยู่ :
               </label>
-              <AppTextField
-                id="address"
-                disabled
-                v-model="companyItem.address"
-                placeholder="Address"
-                persistent-placeholder
-              />
+              <AppTextField id="address" disabled v-model="companyItem.address" placeholder="Address"
+                persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="4" class="align-items-center">
-              <label
-                class="v-label font-weight-bold"
-                for="province_id"
-                cols="12"
-                md="4"
-                >จังหวัด :
+              <label class="v-label font-weight-bold" for="province_id" cols="12" md="4">จังหวัด :
               </label>
-              <AppSelect
-                :items="selectOptions.provinces"
-                v-model="companyItem.province_id"
-                disabled
-                variant="outlined"
-                placeholder="Province"
-                clearable
-              />
+              <AppSelect :items="selectOptions.provinces" v-model="companyItem.province_id" disabled variant="outlined"
+                placeholder="Province" clearable />
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="tel"
-                >โทรศัพท์ :
+              <label class="v-label font-weight-bold" for="tel">โทรศัพท์ :
               </label>
-              <AppTextField
-                id="tel"
-                v-model="companyItem.tel"
-                placeholder="Phone"
-                disabled
-                persistent-placeholder
-              />
+              <AppTextField id="tel" v-model="companyItem.tel" placeholder="Phone" disabled persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
               <label class="v-label font-weight-bold" for="fax">แฟกซ์ : </label>
-              <AppTextField
-                id="fax"
-                v-model="companyItem.fax"
-                placeholder="Fax"
-                disabled
-                persistent-placeholder
-              />
+              <AppTextField id="fax" v-model="companyItem.fax" placeholder="Fax" disabled persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="mail"
-                >เมล(@kmutnb.ac.th เท่านั้น) :
+              <label class="v-label font-weight-bold" for="mail">เมล(@kmutnb.ac.th เท่านั้น) :
               </label>
-              <AppTextField
-                id="email"
-                v-model="companyItem.email"
-                disabled
-                placeholder="Email"
-                persistent-placeholder
-              />
+              <AppTextField id="email" v-model="companyItem.email" disabled placeholder="Email" persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="website"
-                >เว็บไซต์ :
+              <label class="v-label font-weight-bold" for="website">เว็บไซต์ :
               </label>
-              <AppTextField
-                id="website"
-                v-model="companyItem.website"
-                placeholder="Website"
-                persistent-placeholder
-                disabled
-              />
+              <AppTextField id="website" v-model="companyItem.website" placeholder="Website" persistent-placeholder
+                disabled />
             </VCol>
 
             <!-- <VCol cols="12" md="12" class="align-items-center">
@@ -670,51 +582,27 @@ const format = (date) => {
             <VDivider class="mt-4 mb-4"></VDivider>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="co_name"
-                >ชื่อ-สกุล ผู้ประสานงาน :
+              <label class="v-label font-weight-bold" for="co_name">ชื่อ-สกุล ผู้ประสานงาน :
               </label>
-              <AppTextField
-                id="co_name"
-                v-model="item.co_name"
-                placeholder="Name"
-                persistent-placeholder
-              />
+              <AppTextField id="co_name" v-model="item.co_name" placeholder="Name" persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="co_position"
-                >ตำแหน่ง ผู้ประสานงาน :
+              <label class="v-label font-weight-bold" for="co_position">ตำแหน่ง ผู้ประสานงาน :
               </label>
-              <AppTextField
-                id="co_position"
-                v-model="item.co_position"
-                placeholder="Position"
-                persistent-placeholder
-              />
+              <AppTextField id="co_position" v-model="item.co_position" placeholder="Position" persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="co_tel"
-                >เบอร์โทรศัพท์ ผู้ประสานงาน :
+              <label class="v-label font-weight-bold" for="co_tel">เบอร์โทรศัพท์ ผู้ประสานงาน :
               </label>
-              <AppTextField
-                id="co_tel"
-                v-model="item.co_tel"
-                placeholder="Tel"
-                persistent-placeholder
-              />
+              <AppTextField id="co_tel" v-model="item.co_tel" placeholder="Tel" persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="co_email"
-                >เมล ผู้ประสานงาน :
+              <label class="v-label font-weight-bold" for="co_email">เมล ผู้ประสานงาน :
               </label>
-              <AppTextField
-                id="co_email"
-                v-model="item.co_email"
-                placeholder="Email"
-                persistent-placeholder
-              />
+              <AppTextField id="co_email" v-model="item.co_email" placeholder="Email" persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="2">
@@ -722,58 +610,38 @@ const format = (date) => {
             </VCol>
 
             <VCol cols="12" md="8">
-              <VFileInput
-                label="Upload Namecard"
-                id="namecard_file"
-                v-model="item.namecard_file"
-                persistent-placeholder
-              />
+              <VFileInput label="Upload Namecard" id="namecard_file" v-model="item.namecard_file"
+                persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="2" class="pl-2">
-              <a
-                :href="
-                  item.namecard_file_old != null ? item.namecard_file_old : '/'
-                "
-                target="_blank"
-              >
-                <VBtn style="width: 100%"> View File </VBtn></a
-              >
+              <a :href="item.namecard_file_old != null ? item.namecard_file_old : '/'
+                " target="_blank">
+                <VBtn style="width: 100%;"> View File </VBtn>
+              </a>
             </VCol>
 
             <VDivider class="mt-4 mb-4"></VDivider>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="request_name"
-                >ชื่อ-สกุล ผู้เรียนถึง (โปรดระบุคำนำหน้า ชื่อ นามสกุล) :
+              <label class="v-label font-weight-bold" for="request_name">ชื่อ-สกุล ผู้เรียนถึง (โปรดระบุคำนำหน้า ชื่อ
+                นามสกุล) :
               </label>
-              <AppTextField
-                id="request_name"
-                v-model="item.request_name"
-                placeholder="Name"
-                persistent-placeholder
-              />
+              <AppTextField id="request_name" v-model="item.request_name" placeholder="Name" persistent-placeholder />
             </VCol>
 
             <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="request_position"
-                >ตำแหน่ง ผู้เรียนถึง (หนังสือ) :
+              <label class="v-label font-weight-bold" for="request_position">ตำแหน่ง ผู้เรียนถึง (หนังสือ) :
               </label>
-              <AppTextField
-                id="request_position"
-                v-model="item.request_position"
-                placeholder="Position"
-                persistent-placeholder
-              />
+              <AppTextField id="request_position" v-model="item.request_position" placeholder="Position"
+                persistent-placeholder />
             </VCol>
 
             <!-- 👉 submit and reset button -->
             <VCol cols="12" md="9" class="d-flex gap-4">
               <VBtn type="submit" color="success"> ส่งข้อมูล</VBtn>
-              <span class="text-error"
-                >**ตรวจสอบข้อมูลให้ถูกต้องก่อนส่งข้อมูล
-                (ไม่สามารถแก้ไขข้อมูลได้ภายหลัง)</span
-              >
+              <span class="text-error">**ตรวจสอบข้อมูลให้ถูกต้องก่อนส่งข้อมูล
+                (ไม่สามารถแก้ไขข้อมูลได้ภายหลัง)</span>
               <!-- <VBtn color="secondary" variant="tonal" type="reset">
                       Reset
                     </VBtn> -->
@@ -784,54 +652,34 @@ const format = (date) => {
       </VCardItem>
     </VCard>
 
-    <VOverlay
-      v-model="isOverlay"
-      contained
-      persistent
-      class="align-center justify-center"
-    >
+    <VOverlay v-model="isOverlay" contained persistent class="align-center justify-center">
       <VProgressCircular indeterminate />
     </VOverlay>
 
     <!-- Edit Form Dialog -->
     <VDialog v-model="isDialogAddCompanyVisible" persistent class="v-dialog-lg">
       <!-- Dialog close btn -->
-      <DialogCloseBtn
-        @click="isDialogAddCompanyVisible = !isDialogAddCompanyVisible"
-        absolute
-      />
-      <CompanyAdd
-        :isDialogAddCompanyVisible="isDialogAddCompanyVisible"
-        @toggle:isDialogAddCompanyVisible="
-          (newValue) => (isDialogAddCompanyVisible = newValue)
-        "
-        @update:companyItem="
-          (newValue) => {
-            fetchCompanies();
-            companyItem = newValue;
-            item.company_id = newValue.id;
-            companyItem.province_id = parseInt(newValue.province_id);
-          }
-        "
-      />
+      <DialogCloseBtn @click="isDialogAddCompanyVisible = !isDialogAddCompanyVisible" absolute />
+      <CompanyAdd :isDialogAddCompanyVisible="isDialogAddCompanyVisible" @toggle:isDialogAddCompanyVisible="(newValue) => (isDialogAddCompanyVisible = newValue)
+        " @update:companyItem="(newValue) => {
+    fetchCompanies();
+    companyItem = newValue;
+    item.company_id = newValue.id;
+    companyItem.province_id = parseInt(newValue.province_id);
+  }
+    " />
     </VDialog>
 
     <VDialog v-model="isDialogConfirmVisible" persistent class="v-dialog-sm">
       <!-- Dialog close btn -->
-      <DialogCloseBtn
-        @click="isDialogConfirmVisible = !isDialogConfirmVisible"
-      />
+      <DialogCloseBtn @click="isDialogConfirmVisible = !isDialogConfirmVisible" />
 
       <!-- Dialog Content -->
       <VCard title="ยืนยันการส่งข้อมูล">
         <VCardText> โปรดตรวจสอบข้อมูลให้ถูกต้องก่อนกดยืนยัน! </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn
-            color="secondary"
-            variant="tonal"
-            @click="isDialogConfirmVisible = false"
-          >
+          <VBtn color="secondary" variant="tonal" @click="isDialogConfirmVisible = false">
             Cancel
           </VBtn>
           <VBtn @click="onCheckSubmit()" color="error"> ส่งข้อมูล </VBtn>

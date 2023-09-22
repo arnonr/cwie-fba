@@ -179,234 +179,104 @@ const confirmCancel = (it) => {
 <template>
   <div>
     <div v-if="props.user_type == 'teacher'">
-      <VCol
-        cols="12"
-        md="12"
-        class="text-right"
-        v-if="props.formActive != null"
-      >
-        <VBtn
-          color="error"
-          :disabled="props.formActive.status_id != 2"
-          @click="
-            () => {
-              rejectLog.form_id = props.formActive.id;
-              isDialogRejectVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-edit"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+      <VCol cols="12" md="12" class="text-right" v-if="props.formActive != null">
+        <VBtn color="error" :disabled="props.formActive.status_id != 2" @click="() => {
+          rejectLog.form_id = props.formActive.id;
+          isDialogRejectVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-edit" style="opacity: 1;" class="mr-1"></VIcon>
           ส่งกลับให้แก้ไข
         </VBtn>
 
-        <VBtn
-          class="ml-2"
-          color="success"
-          :disabled="props.formActive.status_id != 2 || props.isCheck == false"
-          @click="
-            () => {
-              isDialogVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-file-description"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+        <VBtn class="ml-2" color="success" :disabled="props.formActive.status_id != 2 || props.isCheck == false" @click="() => {
+          isDialogVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-file-description" style="opacity: 1;" class="mr-1"></VIcon>
           อนุมัติ
         </VBtn>
       </VCol>
     </div>
 
     <div v-if="props.user_type == 'major-head'">
-      <VCol
-        cols="12"
-        md="12"
-        class="text-right"
-        v-if="props.formActive != null"
-      >
-        <VBtn
-          color="error"
-          :disabled="props.formActive.status_id != 3"
-          @click="
-            () => {
-              rejectLog.form_id = props.formActive.id;
-              isDialogRejectVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-edit"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+      <VCol cols="12" md="12" class="text-right" v-if="props.formActive != null">
+        <VBtn color="error" :disabled="props.formActive.status_id != 3" @click="() => {
+          rejectLog.form_id = props.formActive.id;
+          isDialogRejectVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-edit" style="opacity: 1;" class="mr-1"></VIcon>
           ส่งกลับให้แก้ไข
         </VBtn>
 
-        <VBtn
-          class="ml-2"
-          color="success"
-          :disabled="props.formActive.status_id != 3"
-          @click="
-            () => {
-              isDialogVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-file-description"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+        <VBtn class="ml-2" color="success" :disabled="props.formActive.status_id != 3" @click="() => {
+          isDialogVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-file-description" style="opacity: 1;" class="mr-1"></VIcon>
           อนุมัติ
         </VBtn>
       </VCol>
     </div>
 
     <div v-if="props.user_type == 'supervisor'">
-      <VCol
-        cols="12"
-        md="12"
-        class="text-right"
-        v-if="props.formActive != null"
-      >
-        <VBtn
-          color="error"
-          :disabled="props.formActive.status_id != 12"
-          @click="
-            () => {
-              rejectLog.form_id = props.formActive.id;
-              isDialogRejectVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-edit"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+      <VCol cols="12" md="12" class="text-right" v-if="props.formActive != null">
+        <VBtn color="error" :disabled="props.formActive.status_id != 12" @click="() => {
+          rejectLog.form_id = props.formActive.id;
+          isDialogRejectVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-edit" style="opacity: 1;" class="mr-1"></VIcon>
           ส่งกลับให้แก้ไข
         </VBtn>
 
-        <VBtn
-          class="ml-2"
-          color="success"
-          :disabled="props.formActive.status_id != 12"
-          @click="
-            () => {
-              isDialogVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-file-description"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+        <VBtn class="ml-2" color="success" :disabled="props.formActive.status_id != 12" @click="() => {
+          isDialogVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-file-description" style="opacity: 1;" class="mr-1"></VIcon>
           อนุมัติ
         </VBtn>
       </VCol>
     </div>
 
     <div v-if="props.user_type == 'staff'">
-      <VCol
-        cols="12"
-        md="12"
-        class="text-right"
-        v-if="props.formActive != null"
-      >
-        <VBtn
-          color="error"
-          :disabled="props.formActive.status_id != 4"
-          @click="
-            () => {
-              rejectLog.form_id = props.formActive.id;
-              isDialogRejectVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-edit"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+      <VCol cols="12" md="12" class="text-right" v-if="props.formActive != null">
+        <VBtn color="error" :disabled="props.formActive.status_id != 4" @click="() => {
+          rejectLog.form_id = props.formActive.id;
+          isDialogRejectVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-edit" style="opacity: 1;" class="mr-1"></VIcon>
           ส่งกลับให้แก้ไข
         </VBtn>
 
-        <VBtn
-          class="ml-2"
-          color="success"
-          :disabled="props.formActive.status_id != 4"
-          @click="
-            () => {
-              isDialogVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-file-description"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+        <VBtn class="ml-2" color="success" :disabled="props.formActive.status_id != 4" @click="() => {
+          isDialogVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-file-description" style="opacity: 1;" class="mr-1"></VIcon>
           อนุมัติใบสมัคร
         </VBtn>
       </VCol>
 
       <!-- รับทราบผลการตอบรับ -->
-      <VCol
-        cols="12"
-        md="12"
-        class="text-right"
-        v-if="props.formActive != null"
-      >
-        <VBtn
-          color="error"
-          :disabled="props.formActive.status_id != 7"
-          @click="
-            () => {
-              rejectLog.form_id = props.formActive.id;
-              isDialogRejectVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-edit"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+      <VCol cols="12" md="12" class="text-right" v-if="props.formActive != null">
+        <VBtn color="error" :disabled="props.formActive.status_id != 7" @click="() => {
+          rejectLog.form_id = props.formActive.id;
+          isDialogRejectVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-edit" style="opacity: 1;" class="mr-1"></VIcon>
           ส่งกลับให้แก้ไข
         </VBtn>
 
-        <VBtn
-          class="ml-2"
-          color="success"
-          :disabled="props.formActive.status_id != 7"
-          @click="
-            () => {
-              isDialogVisible = true;
-            }
-          "
-        >
-          <VIcon
-            size="16"
-            icon="tabler-file-description"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+        <VBtn class="ml-2" color="success" :disabled="props.formActive.status_id != 7" @click="() => {
+          isDialogVisible = true;
+        }
+          ">
+          <VIcon size="16" icon="tabler-file-description" style="opacity: 1;" class="mr-1"></VIcon>
           รับทราบผลการตอบรับ
         </VBtn>
       </VCol>
@@ -415,70 +285,38 @@ const confirmCancel = (it) => {
         <!-- @click=" router.push({ path: '/student/cwie-data/edit/' + formActive.id,
         query: { student_id: props.student_id, }, }) " -->
 
-        <VBtn
-          color="success"
-          class="ml-2"
-          :to="{
-            path: '/student/cwie-data/edit/' + formActive.id,
-            query: {
-              student_id: student_id,
-            },
-          }"
-          target="_blank"
-        >
-          แก้ไขข้อมูลใบสมัคร</VBtn
-        >
+        <VBtn color="success" class="ml-2" :to="{
+          path: '/student/cwie-data/edit/' + formActive.id,
+          query: {
+            student_id: student_id,
+          },
+        }" target="_blank">
+          แก้ไขข้อมูลใบสมัคร</VBtn>
 
-        <VBtn
-          color="warning"
-          class="ml-2"
-          :to="{
-            path: '/student/personal-data/' + props.student_id,
-          }"
-          target="_blank"
-        >
-          แก้ไขข้อมูลทั่วไป</VBtn
-        >
+        <VBtn color="warning" class="ml-2" :to="{
+          path: '/student/personal-data/' + props.student_id,
+        }" target="_blank">
+          แก้ไขข้อมูลทั่วไป</VBtn>
 
-        <VBtn
-          color="primary"
-          class="ml-2"
-          :to="{
-            name: 'cwie-settings-company-edit-id',
-            params: { id: formActive.company_id },
-          }"
-          target="_blank"
-        >
+        <VBtn color="primary" class="ml-2" :to="{
+          name: 'cwie-settings-company-edit-id',
+          params: { id: formActive.company_id },
+        }" target="_blank">
           แก้ไขข้อมูลสถานประกอบการ
         </VBtn>
 
         <VBtn color="success" class="ml-2" @click="reload()">
-          <VIcon
-            size="16"
-            icon="tabler-refresh"
-            style="opacity: 1"
-            class="mr-1"
-          ></VIcon>
+          <VIcon size="16" icon="tabler-refresh" style="opacity: 1;" class="mr-1"></VIcon>
         </VBtn>
 
-        <VBtn
-          color="error"
-          class="ml-2"
-          v-if="formActive"
-          @click="confirmCancel(formActive)"
-        >
+        <VBtn color="error" class="ml-2" v-if="formActive" @click="confirmCancel(formActive)">
           ยกเลิกการสมัคร
         </VBtn>
       </VCol>
     </div>
 
     <!-- Dialog -->
-    <VDialog
-      v-model="isDialogVisible"
-      persistent
-      class="v-dialog-sm"
-      style="z-index: 20001 !important"
-    >
+    <VDialog v-model="isDialogVisible" persistent class="v-dialog-sm" style="z-index: 20001 !important;">
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" />
 
@@ -494,12 +332,7 @@ const confirmCancel = (it) => {
       </VCard>
     </VDialog>
 
-    <VDialog
-      v-model="isDialogRejectVisible"
-      persistent
-      class="v-dialog-sm"
-      style="z-index: 20001 !important"
-    >
+    <VDialog v-model="isDialogRejectVisible" persistent class="v-dialog-sm" style="z-index: 20001 !important;">
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogRejectVisible = !isDialogRejectVisible" />
 
@@ -507,23 +340,14 @@ const confirmCancel = (it) => {
       <VCard title="แบบฟอร์มส่งข้อมูลกลับให้แก้ไข">
         <VCardText>
           <VCol cols="12" md="12" class="align-items-center">
-            <label class="v-label font-weight-bold" for="comment"
-              >ระบุเหตุผล :
+            <label class="v-label font-weight-bold" for="comment">ระบุเหตุผล :
             </label>
-            <AppTextarea
-              id="comment"
-              v-model="rejectLog.comment"
-              rows="5"
-              persistent-placeholder
-            />
+            <AppTextarea id="comment" v-model="rejectLog.comment" rows="5" persistent-placeholder />
           </VCol>
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn
-            @click="isDialogRejectVisible = !isDialogRejectVisible"
-            color="error"
-          >
+          <VBtn @click="isDialogRejectVisible = !isDialogRejectVisible" color="error">
             Cancel
           </VBtn>
           <VBtn @click="onRejectSubmit()" color="success"> Reject </VBtn>
