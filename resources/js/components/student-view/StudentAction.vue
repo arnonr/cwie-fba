@@ -1099,6 +1099,11 @@ const onPlanSubmit = () => {
           อัพโหลดแผนการปฏิบัติงาน
         </VBtn>
       </VCol>
+      <VCol cols="12" md="12" v-if="props.formActive">
+        <h3 class="text-red" v-if="props.formActive.status_id == 1">ผู้อนุมัติส่งข้อมูลกลับให้แก้ไข
+          <br>โปรดแก้ไขข้อมูลส่วนตัวหรือข้อมูลใบสมัคร
+        </h3>
+      </VCol>
     </div>
 
     <!-- Dialog -->
