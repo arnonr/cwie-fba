@@ -6,6 +6,7 @@ import buddhistEra from "dayjs/plugin/buddhistEra";
 import { useRoute, useRouter } from "vue-router";
 import CompanyAdd from "../../cwie-settings/company/add.vue";
 import { useCwieDataStore } from "./useCwieDataStore";
+import Swal from "sweetalert2";
 
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -58,6 +59,7 @@ const item = ref({
 });
 const companyItem = ref({});
 const isNewCompany = ref(true);
+const isDialogCheckFalseVisible = ref(false);
 
 const isOverlay = ref(false);
 const isFormValid = ref(false);
@@ -210,9 +212,37 @@ const fetchStudent = () => {
     .then((response) => {
       if (response.data.message == "success") {
         const { data } = response.data;
-        // student.value = { ...data[0] };
-
         item.value.student_id = data[0].id;
+
+        if (
+          data[0].id &&
+          data[0].prefix_id &&
+          data[0].firstname &&
+          // item.value.surname &&
+          data[0].citizen_id &&
+          data[0].address &&
+          data[0].province_id &&
+          data[0].amphur_id &&
+          data[0].tumbol_id &&
+          data[0].tel &&
+          data[0].email &&
+          data[0].faculty_id &&
+          data[0].class_year &&
+          data[0].class_room &&
+          data[0].advisor_id &&
+          data[0].gpa &&
+          data[0].contact1_name &&
+          data[0].contact1_relation &&
+          data[0].contact1_tel &&
+          data[0].blood_group &&
+          data[0].emergency_tel &&
+          data[0].height &&
+          data[0].weight
+        ) {
+          isDialogCheckFalseVisible.value = false;
+        } else {
+          isDialogCheckFalseVisible.value = true;
+        }
       } else {
         console.log("error");
       }
@@ -480,7 +510,7 @@ const format = (date) => {
                 clearable
               />
               <span
-                style="margin-top: 20px; cursor: pointer; float: right"
+                style="margin-top: 20px; cursor: pointer; float: inline-end"
                 @click="isDialogAddCompanyVisible = true"
                 >ไม่พบชื่อสถานประกอบการ ?</span
               >
@@ -749,6 +779,23 @@ const format = (date) => {
             Cancel
           </VBtn>
           <VBtn @click="onSubmit()" color="error"> ส่งข้อมูล </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+
+    <VDialog v-model="isDialogCheckFalseVisible" class="v-dialog-sm" persistent>
+      <VCard title="กรอกข้อมูลส่วนตัวไม่ครบถ้วน">
+        <VCardText>โปรดระบุข้อมูลส่วนตัวให้ครบถ้วน</VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            :to="{
+              name: 'student-personal-data',
+            }"
+            color="error"
+          >
+            Ok</VBtn
+          >
         </VCardText>
       </VCard>
     </VDialog>
