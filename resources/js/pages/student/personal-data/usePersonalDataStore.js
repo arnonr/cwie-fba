@@ -156,5 +156,15 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         validateStatus: () => true,
       });
     },
+
+    async fetchForms(params) {
+      return axios.get(
+        `/form`,
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
   },
 });

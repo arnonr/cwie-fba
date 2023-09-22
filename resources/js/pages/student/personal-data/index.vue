@@ -481,9 +481,30 @@ const onStudentDocumentSubmit = async () => {
       confirmButton:
         "v-btn v-btn--elevated v-theme--light bg-primary v-btn--density-default v-btn--size-default v-btn--variant-elevated",
     },
-  }).then(() => {
+  }).then(async () => {
     isOverlay.value = false;
-    router.push({ name: "student-cwie-data" });
+    // router.push({ name: "student-cwie-data" });
+    console.log(item.value.id);
+    await personalDataStore
+      .fetchForms({ student_id: item.value.id })
+      .then((response) => {
+        if (response.status == 200) {
+          if (response.data.data.length == 0) {
+            router.push({ name: "student-cwie-data-add" });
+          } else {
+            console.log(response.data.data);
+            router.push({
+              name: "student-cwie-data-edit-id",
+              params: { id: response.data.data[0].id },
+            });
+          }
+        } else {
+          console.log("error");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   });
 };
 
@@ -572,8 +593,12 @@ const repeateAgain = () => {
     <VCard title="ข้อมูลส่วนตัว">
       <VCardText>
         <!-- 👉 Stepper -->
-        <AppStepper v-model:current-step="currentStep" class="checkout-stepper" :items="studentSteps"
-          :direction="$vuetify.display.smAndUp ? 'horizontal' : 'vertical'" />
+        <AppStepper
+          v-model:current-step="currentStep"
+          class="checkout-stepper"
+          :items="studentSteps"
+          :direction="$vuetify.display.smAndUp ? 'horizontal' : 'vertical'"
+        />
       </VCardText>
 
       <VDivider />
@@ -586,7 +611,7 @@ const repeateAgain = () => {
             <VWindowItem>
               <VRow>
                 <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-user" style="opacity: 1;" />
+                  <VIcon size="22" icon="tabler-user" style="opacity: 1" />
                   <h4 class="pt-1">ข้อมูลทั่วไป</h4>
                 </VCol>
                 <VCol class="note">
@@ -597,74 +622,183 @@ const repeateAgain = () => {
               <VRow>
                 <!--  -->
                 <VCol cols="12" md="10">
-                  <label class="v-label font-weight-bold" for="document_name">รูปภาพนักศึกษา (1x1.5 นิ้ว ไฟล์รูปภาพ PNG,
-                    JPG)
+                  <label class="v-label font-weight-bold" for="document_name"
+                    >รูปภาพนักศึกษา (1x1.5 นิ้ว ไฟล์รูปภาพ PNG, JPG)
                   </label>
-                  <VFileInput v-model="item.photo_file" label="Upload File" persistent-placeholder
-                    :disabled="!disabled" />
+                  <VFileInput
+                    v-model="item.photo_file"
+                    label="Upload File"
+                    persistent-placeholder
+                    :disabled="!disabled"
+                  />
                 </VCol>
 
                 <VCol cols="12" md="2" class="pl-2 align-self-end">
-                  <VBtn style="width: 100%;" :color="item.photo_file_old == null ? 'secondary' : 'primary'
-                    " :disabled="item.photo_file_old == null" :href="item.photo_file_old != null ? item.photo_file_old : '/'
-    " target="_blank">
+                  <VBtn
+                    style="width: 100%"
+                    :color="
+                      item.photo_file_old == null ? 'secondary' : 'primary'
+                    "
+                    :disabled="item.photo_file_old == null"
+                    :href="
+                      item.photo_file_old != null ? item.photo_file_old : '/'
+                    "
+                    target="_blank"
+                  >
                     View File
                   </VBtn>
                 </VCol>
                 <!--  -->
 
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="student_code" cols="12" md="4">รหัสนักศึกษา :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="student_code"
+                    cols="12"
+                    md="4"
+                    >รหัสนักศึกษา :
                   </label>
-                  <AppTextField id="student_code" v-model="item.student_code" persistent-placeholder disabled />
+                  <AppTextField
+                    id="student_code"
+                    v-model="item.student_code"
+                    persistent-placeholder
+                    disabled
+                  />
                 </VCol>
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="prefix_id" cols="12" md="2">คำนำหน้า :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="prefix_id"
+                    cols="12"
+                    md="2"
+                    >คำนำหน้า :
                   </label>
-                  <AppSelect v-model="item.prefix_id" :items="selectOptions.prefix_names" :rules="[requiredValidator]"
-                    variant="outlined" placeholder="Prefix" :disabled="!disabled" clearable />
+                  <AppSelect
+                    v-model="item.prefix_id"
+                    :items="selectOptions.prefix_names"
+                    :rules="[requiredValidator]"
+                    variant="outlined"
+                    placeholder="Prefix"
+                    :disabled="!disabled"
+                    clearable
+                  />
                 </VCol>
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="firstname" cols="12" md="4">ชื่อ :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="firstname"
+                    cols="12"
+                    md="4"
+                    >ชื่อ :
                   </label>
-                  <AppTextField id="firstname" v-model="item.firstname" :rules="[requiredValidator]" :disabled="!disabled"
-                    persistent-placeholder />
+                  <AppTextField
+                    id="firstname"
+                    v-model="item.firstname"
+                    :rules="[requiredValidator]"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="surname" cols="12" md="4">นามสกุล :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="surname"
+                    cols="12"
+                    md="4"
+                    >นามสกุล :
                   </label>
-                  <AppTextField id="surname" v-model="item.surname" :rules="[requiredValidator]" :disabled="!disabled"
-                    persistent-placeholder />
+                  <AppTextField
+                    id="surname"
+                    v-model="item.surname"
+                    :rules="[requiredValidator]"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
                 <VCol cols="12" md="6" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="" cols="12" md="4">คณะ :
+                  <label
+                    class="v-label font-weight-bold"
+                    for=""
+                    cols="12"
+                    md="4"
+                    >คณะ :
                   </label>
-                  <AppTextField id="faculty_name" v-model="item.faculty_name" persistent-placeholder disabled />
+                  <AppTextField
+                    id="faculty_name"
+                    v-model="item.faculty_name"
+                    persistent-placeholder
+                    disabled
+                  />
                 </VCol>
                 <VCol cols="12" md="6" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="" cols="12" md="4">สาขาวิชา :
+                  <label
+                    class="v-label font-weight-bold"
+                    for=""
+                    cols="12"
+                    md="4"
+                    >สาขาวิชา :
                   </label>
-                  <AppTextField id="major_name" v-model="item.major_name" persistent-placeholder disabled />
+                  <AppTextField
+                    id="major_name"
+                    v-model="item.major_name"
+                    persistent-placeholder
+                    disabled
+                  />
                 </VCol>
 
                 <VCol cols="12" md="2" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="class_year" cols="12" md="2">ชั้นปีที่ :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="class_year"
+                    cols="12"
+                    md="2"
+                    >ชั้นปีที่ :
                   </label>
-                  <AppSelect v-model="item.class_year" :items="selectOptions.class_years" :rules="[requiredValidator]"
-                    variant="outlined" placeholder="Class Year" :disabled="!disabled" clearable />
+                  <AppSelect
+                    v-model="item.class_year"
+                    :items="selectOptions.class_years"
+                    :rules="[requiredValidator]"
+                    variant="outlined"
+                    placeholder="Class Year"
+                    :disabled="!disabled"
+                    clearable
+                  />
                 </VCol>
 
                 <VCol cols="12" md="2" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="class_room" cols="12" md="2">ห้อง :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="class_room"
+                    cols="12"
+                    md="2"
+                    >ห้อง :
                   </label>
-                  <AppSelect v-model="item.class_room" :items="selectOptions.class_rooms" :rules="[requiredValidator]"
-                    variant="outlined" :disabled="!disabled" placeholder="Class Room" clearable />
+                  <AppSelect
+                    v-model="item.class_room"
+                    :items="selectOptions.class_rooms"
+                    :rules="[requiredValidator]"
+                    variant="outlined"
+                    :disabled="!disabled"
+                    placeholder="Class Room"
+                    clearable
+                  />
                 </VCol>
                 <VCol cols="12" md="6" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="advisor" cols="12" md="2">อาจารย์ที่ปรึกษา :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="advisor"
+                    cols="12"
+                    md="2"
+                    >อาจารย์ที่ปรึกษา :
                   </label>
-                  <AppAutocomplete v-model="item.advisor_id" :items="selectOptions.teachers" :rules="[requiredValidator]"
-                    placeholder="Advisor" :disabled="!disabled" clearable />
+                  <AppAutocomplete
+                    v-model="item.advisor_id"
+                    :items="selectOptions.teachers"
+                    :rules="[requiredValidator]"
+                    placeholder="Advisor"
+                    :disabled="!disabled"
+                    clearable
+                  />
 
                   <!--
                     <AppSelect
@@ -680,107 +814,237 @@ const repeateAgain = () => {
                 </VCol>
 
                 <VCol cols="12" md="2" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="GPA" cols="12" md="2">เกรดเฉลี่ย
+                  <label
+                    class="v-label font-weight-bold"
+                    for="GPA"
+                    cols="12"
+                    md="2"
+                    >เกรดเฉลี่ย
                   </label>
-                  <AppTextField id="GPA" v-model="item.gpa" :rules="[requiredValidator]" persistent-placeholder
-                    :disabled="!disabled" type="number" />
+                  <AppTextField
+                    id="GPA"
+                    v-model="item.gpa"
+                    :rules="[requiredValidator]"
+                    persistent-placeholder
+                    :disabled="!disabled"
+                    type="number"
+                  />
                 </VCol>
 
                 <VDivider class="mt-4 mb-4" />
 
                 <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-map-pin" style="opacity: 1;" />
+                  <VIcon size="22" icon="tabler-map-pin" style="opacity: 1" />
                   <h4 class="pt-1 pl-3 pb-2">ที่อยู่</h4>
                 </VCol>
 
                 <VCol cols="12" md="12" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="GPA" cols="12" md="2">ที่อยู่ปัจจุบัน
+                  <label
+                    class="v-label font-weight-bold"
+                    for="GPA"
+                    cols="12"
+                    md="2"
+                    >ที่อยู่ปัจจุบัน
                   </label>
-                  <AppTextarea id="address" v-model="item.address" :rules="[requiredValidator]" :disabled="!disabled"
-                    persistent-placeholder />
+                  <AppTextarea
+                    id="address"
+                    v-model="item.address"
+                    :rules="[requiredValidator]"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="4" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="province_id" cols="12" md="4">จังหวัด :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="province_id"
+                    cols="12"
+                    md="4"
+                    >จังหวัด :
                   </label>
-                  <AppSelect v-model="item.province_id" :items="selectOptions.provinces" :rules="[requiredValidator]"
-                    variant="outlined" :disabled="!disabled" placeholder="Province" clearable />
+                  <AppSelect
+                    v-model="item.province_id"
+                    :items="selectOptions.provinces"
+                    :rules="[requiredValidator]"
+                    variant="outlined"
+                    :disabled="!disabled"
+                    placeholder="Province"
+                    clearable
+                  />
                 </VCol>
 
                 <VCol cols="12" md="4" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="amphur_id" cols="12" md="4">อำเภอ/เขต :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="amphur_id"
+                    cols="12"
+                    md="4"
+                    >อำเภอ/เขต :
                   </label>
-                  <AppSelect v-model="item.amphur_id" :items="selectOptions.amphurs" :disabled="!disabled"
-                    :rules="[requiredValidator]" variant="outlined" placeholder="Amphur" clearable />
+                  <AppSelect
+                    v-model="item.amphur_id"
+                    :items="selectOptions.amphurs"
+                    :disabled="!disabled"
+                    :rules="[requiredValidator]"
+                    variant="outlined"
+                    placeholder="Amphur"
+                    clearable
+                  />
                 </VCol>
 
                 <VCol cols="12" md="4" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="tumbol_id">ตำบล/แขวง :
+                  <label class="v-label font-weight-bold" for="tumbol_id"
+                    >ตำบล/แขวง :
                   </label>
-                  <AppSelect v-model="item.tumbol_id" :items="selectOptions.tumbols" :rules="[requiredValidator]"
-                    variant="outlined" :disabled="!disabled" placeholder="Tumbol" clearable />
+                  <AppSelect
+                    v-model="item.tumbol_id"
+                    :items="selectOptions.tumbols"
+                    :rules="[requiredValidator]"
+                    variant="outlined"
+                    :disabled="!disabled"
+                    placeholder="Tumbol"
+                    clearable
+                  />
                 </VCol>
 
                 <VCol cols="12" md="6" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="tel" cols="12" md="2">เบอร์โทรศัพท์
+                  <label
+                    class="v-label font-weight-bold"
+                    for="tel"
+                    cols="12"
+                    md="2"
+                    >เบอร์โทรศัพท์
                   </label>
-                  <AppTextField id="tel" v-model="item.tel" :disabled="!disabled" :rules="[requiredValidator]"
-                    persistent-placeholder />
+                  <AppTextField
+                    id="tel"
+                    v-model="item.tel"
+                    :disabled="!disabled"
+                    :rules="[requiredValidator]"
+                    persistent-placeholder
+                  />
                 </VCol>
                 <VCol cols="12" md="6" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="Email" cols="12" md="2">เมล(@kmutnb.ac.th เท่านั้น)
+                  <label
+                    class="v-label font-weight-bold"
+                    for="Email"
+                    cols="12"
+                    md="2"
+                    >เมล(@kmutnb.ac.th เท่านั้น)
                   </label>
-                  <AppTextField id="email" v-model="item.email" :disabled="!disabled" :rules="[requiredValidator]"
-                    persistent-placeholder />
+                  <AppTextField
+                    id="email"
+                    v-model="item.email"
+                    :disabled="!disabled"
+                    :rules="[requiredValidator]"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VDivider class="mt-4 mb-4" />
 
                 <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-users" style="opacity: 1;" />
+                  <VIcon size="22" icon="tabler-users" style="opacity: 1" />
                   <h4 class="pt-1 pl-3 pb-2">ผู้ที่ติดต่อได้</h4>
                 </VCol>
 
                 <VCol cols="12" md="6" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="contact1_name" cols="12" md="4">บุคคลที่ติตต่อได้ 1
+                  <label
+                    class="v-label font-weight-bold"
+                    for="contact1_name"
+                    cols="12"
+                    md="4"
+                    >บุคคลที่ติตต่อได้ 1
                   </label>
-                  <AppTextField id="contact1_name" v-model="item.contact1_name" :disabled="!disabled"
-                    :rules="[requiredValidator]" persistent-placeholder />
+                  <AppTextField
+                    id="contact1_name"
+                    v-model="item.contact1_name"
+                    :disabled="!disabled"
+                    :rules="[requiredValidator]"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="contact1_relation" cols="12" md="4">ความสัมพันธ์
+                  <label
+                    class="v-label font-weight-bold"
+                    for="contact1_relation"
+                    cols="12"
+                    md="4"
+                    >ความสัมพันธ์
                   </label>
-                  <AppTextField id="contact1_relation" v-model="item.contact1_relation" :disabled="!disabled"
-                    :rules="[requiredValidator]" persistent-placeholder />
+                  <AppTextField
+                    id="contact1_relation"
+                    v-model="item.contact1_relation"
+                    :disabled="!disabled"
+                    :rules="[requiredValidator]"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="contact1_tel" cols="12" md="4">เบอร์โทรศัพท์
+                  <label
+                    class="v-label font-weight-bold"
+                    for="contact1_tel"
+                    cols="12"
+                    md="4"
+                    >เบอร์โทรศัพท์
                   </label>
-                  <AppTextField id="contact1_tel" v-model="item.contact1_tel" :rules="[requiredValidator]"
-                    :disabled="!disabled" persistent-placeholder />
+                  <AppTextField
+                    id="contact1_tel"
+                    v-model="item.contact1_tel"
+                    :rules="[requiredValidator]"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="6" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="contact2_name" cols="12" md="4">บุคคลที่ติตต่อได้ 2
+                  <label
+                    class="v-label font-weight-bold"
+                    for="contact2_name"
+                    cols="12"
+                    md="4"
+                    >บุคคลที่ติตต่อได้ 2
                   </label>
-                  <AppTextField id="contact2_name" v-model="item.contact2_name" :disabled="!disabled"
-                    persistent-placeholder />
+                  <AppTextField
+                    id="contact2_name"
+                    v-model="item.contact2_name"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="contact2_relation" cols="12" md="4">ความสัมพันธ์
+                  <label
+                    class="v-label font-weight-bold"
+                    for="contact2_relation"
+                    cols="12"
+                    md="4"
+                    >ความสัมพันธ์
                   </label>
-                  <AppTextField id="contact2_relation" v-model="item.contact2_relation" :disabled="!disabled"
-                    persistent-placeholder />
+                  <AppTextField
+                    id="contact2_relation"
+                    v-model="item.contact2_relation"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="contact2_tel" cols="12" md="4">เบอร์โทรศัพท์
+                  <label
+                    class="v-label font-weight-bold"
+                    for="contact2_tel"
+                    cols="12"
+                    md="4"
+                    >เบอร์โทรศัพท์
                   </label>
-                  <AppTextField id="contact2_tel" v-model="item.contact2_tel" :disabled="!disabled"
-                    persistent-placeholder />
+                  <AppTextField
+                    id="contact2_tel"
+                    v-model="item.contact2_tel"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
               </VRow>
               <!--  -->
@@ -790,55 +1054,115 @@ const repeateAgain = () => {
             <VWindowItem>
               <VRow>
                 <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-heart" style="opacity: 1;" />
+                  <VIcon size="22" icon="tabler-heart" style="opacity: 1" />
                   <h4 class="pt-1 pl-1">ข้อมูลสุขภาพ</h4>
                 </VCol>
-                <VCol style="margin-top: -1.5em;">
+                <VCol style="margin-top: -1.5em">
                   <small> หมายเหตุ : โปรดระบุข้อมูลให้ครบถ้วน </small>
                 </VCol>
               </VRow>
 
               <VRow>
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="blood_group" cols="12" md="2">กลุ่มเลือด :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="blood_group"
+                    cols="12"
+                    md="2"
+                    >กลุ่มเลือด :
                   </label>
-                  <AppSelect v-model="item.blood_group" :items="selectOptions.blood_groups" :disabled="!disabled"
-                    :rules="[requiredValidator]" variant="outlined" placeholder="Blood Group" clearable />
+                  <AppSelect
+                    v-model="item.blood_group"
+                    :items="selectOptions.blood_groups"
+                    :disabled="!disabled"
+                    :rules="[requiredValidator]"
+                    variant="outlined"
+                    placeholder="Blood Group"
+                    clearable
+                  />
                 </VCol>
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="height" cols="12" md="4">ส่วนสูง(ซม.) :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="height"
+                    cols="12"
+                    md="4"
+                    >ส่วนสูง(ซม.) :
                   </label>
-                  <AppTextField id="height" v-model="item.height" :disabled="!disabled" :rules="[requiredValidator]"
-                    persistent-placeholder type="number" />
+                  <AppTextField
+                    id="height"
+                    v-model="item.height"
+                    :disabled="!disabled"
+                    :rules="[requiredValidator]"
+                    persistent-placeholder
+                    type="number"
+                  />
                 </VCol>
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="weight" cols="12" md="4">น้ำหนัก(กก.) :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="weight"
+                    cols="12"
+                    md="4"
+                    >น้ำหนัก(กก.) :
                   </label>
-                  <AppTextField id="weight" v-model="item.weight" :disabled="!disabled" :rules="[requiredValidator]"
-                    persistent-placeholder type="number" />
+                  <AppTextField
+                    id="weight"
+                    v-model="item.weight"
+                    :disabled="!disabled"
+                    :rules="[requiredValidator]"
+                    persistent-placeholder
+                    type="number"
+                  />
                 </VCol>
 
                 <VCol cols="12" md="3" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="emergency_tel" cols="12" md="4">เบอร์โทรฉุกเฉิน :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="emergency_tel"
+                    cols="12"
+                    md="4"
+                    >เบอร์โทรฉุกเฉิน :
                   </label>
-                  <AppTextField id="emergency_tel" v-model="item.emergency_tel" :disabled="!disabled"
-                    :rules="[requiredValidator]" persistent-placeholder />
+                  <AppTextField
+                    id="emergency_tel"
+                    v-model="item.emergency_tel"
+                    :disabled="!disabled"
+                    :rules="[requiredValidator]"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="12" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="congenital_disease" cols="12" md="2">โรคประจำตัว
-                    (กรณีไม่มีข้อมูลให้ทำการใช้เครื่องหมาย "-")
+                  <label
+                    class="v-label font-weight-bold"
+                    for="congenital_disease"
+                    cols="12"
+                    md="2"
+                    >โรคประจำตัว (กรณีไม่มีข้อมูลให้ทำการใช้เครื่องหมาย "-")
                   </label>
-                  <AppTextarea id="congenital_disease" v-model="item.congenital_disease" :disabled="!disabled"
-                    persistent-placeholder />
+                  <AppTextarea
+                    id="congenital_disease"
+                    v-model="item.congenital_disease"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="12" class="align-items-center">
-                  <label class="v-label font-weight-bold" for="drug_allergy" cols="12" md="2">ประวัติการแพ้ยา
-                    (กรณีไม่มีข้อมูลให้ทำการใช้เครื่องหมาย "-")
+                  <label
+                    class="v-label font-weight-bold"
+                    for="drug_allergy"
+                    cols="12"
+                    md="2"
+                    >ประวัติการแพ้ยา (กรณีไม่มีข้อมูลให้ทำการใช้เครื่องหมาย "-")
                   </label>
-                  <AppTextarea id="drug_allergy" v-model="item.drug_allergy" :disabled="!disabled"
-                    persistent-placeholder />
+                  <AppTextarea
+                    id="drug_allergy"
+                    v-model="item.drug_allergy"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
               </VRow>
             </VWindowItem>
@@ -848,7 +1172,7 @@ const repeateAgain = () => {
               <!-- ใบประกาศ -->
               <VRow>
                 <VCol cols="12" md="12" class="d-flex">
-                  <VIcon size="22" icon="tabler-books" style="opacity: 1;" />
+                  <VIcon size="22" icon="tabler-books" style="opacity: 1" />
                   <h4 class="pt-1 pl-1">ใบประกาศนียบัตร</h4>
                 </VCol>
                 <!--
@@ -857,35 +1181,70 @@ const repeateAgain = () => {
                   </VCol> 
                 -->
               </VRow>
-              <VRow v-for="(certItem, index) in documents_certificate" :key="'cert' + index">
+              <VRow
+                v-for="(certItem, index) in documents_certificate"
+                :key="'cert' + index"
+              >
                 <VCol cols="12" md="5">
-                  <label class="v-label font-weight-bold" for="weight" cols="12" md="5">ชื่อใบประกาศ :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="weight"
+                    cols="12"
+                    md="5"
+                    >ชื่อใบประกาศ :
                   </label>
-                  <AppTextField :id="'certificate_name_' + index" v-model="certItem.document_name" :disabled="!disabled"
-                    persistent-placeholder />
+                  <AppTextField
+                    :id="'certificate_name_' + index"
+                    v-model="certItem.document_name"
+                    :disabled="!disabled"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="5">
-                  <label class="v-label font-weight-bold" for="weight" cols="12" md="5">ไฟล์ใบประกาศ :
+                  <label
+                    class="v-label font-weight-bold"
+                    for="weight"
+                    cols="12"
+                    md="5"
+                    >ไฟล์ใบประกาศ :
                   </label>
-                  <VFileInput :id="'cert-file-' + index" v-model="certItem.document_file" :disabled="!disabled"
-                    label="Upload Certificate" persistent-placeholder />
+                  <VFileInput
+                    :id="'cert-file-' + index"
+                    v-model="certItem.document_file"
+                    :disabled="!disabled"
+                    label="Upload Certificate"
+                    persistent-placeholder
+                  />
                 </VCol>
 
                 <VCol cols="12" md="1" class="pl-2 align-self-end">
-                  <VBtn style="width: 100%;" :color="certItem.document_file_old == null
-                    ? 'secondary'
-                    : 'primary'
-                    " :disabled="certItem.document_file_old == null" :href="certItem.document_file_old != null
-    ? certItem.document_file_old
-    : '/'
-    " target="_blank">
+                  <VBtn
+                    style="width: 100%"
+                    :color="
+                      certItem.document_file_old == null
+                        ? 'secondary'
+                        : 'primary'
+                    "
+                    :disabled="certItem.document_file_old == null"
+                    :href="
+                      certItem.document_file_old != null
+                        ? certItem.document_file_old
+                        : '/'
+                    "
+                    target="_blank"
+                  >
                     View File
                   </VBtn>
                 </VCol>
 
                 <VCol cols="12" md="1" class="pl-2 align-self-end">
-                  <VBtn style="width: 100%;" color="error" :disabled="!disabled" @click="removeCertificateItem(index)">
+                  <VBtn
+                    style="width: 100%"
+                    color="error"
+                    :disabled="!disabled"
+                    @click="removeCertificateItem(index)"
+                  >
                     Del
                   </VBtn>
                 </VCol>
@@ -893,7 +1252,12 @@ const repeateAgain = () => {
 
               <VRow>
                 <VCol cols="12" md="1" class="pl-2 align-self-end">
-                  <VBtn style="width: 100%;" color="info" :disabled="!disabled" @click="repeateAgain">
+                  <VBtn
+                    style="width: 100%"
+                    color="info"
+                    :disabled="!disabled"
+                    @click="repeateAgain"
+                  >
                     Add New
                   </VBtn>
                 </VCol>
@@ -903,26 +1267,39 @@ const repeateAgain = () => {
               <!-- ใบอื่นๆ -->
               <VRow>
                 <VCol cols="12" md="12" class="d-flex align-self-center">
-                  <VIcon size="22" icon="tabler-books" style="opacity: 1;" />
+                  <VIcon size="22" icon="tabler-books" style="opacity: 1" />
                   <h4 class="pt-1 pl-1">เอกสาร</h4>
                 </VCol>
               </VRow>
 
               <VRow v-for="d in item.documents" :key="d.document_type_id">
                 <VCol cols="12" md="2">
-                  <label class="v-label font-weight-bold" for="document_name">{{ d.document_name }}
+                  <label class="v-label font-weight-bold" for="document_name"
+                    >{{ d.document_name }}
                   </label>
                 </VCol>
 
                 <VCol cols="12" md="8">
-                  <VFileInput v-model="d.document_file" label="Upload File" persistent-placeholder
-                    :disabled="!disabled" />
+                  <VFileInput
+                    v-model="d.document_file"
+                    label="Upload File"
+                    persistent-placeholder
+                    :disabled="!disabled"
+                  />
                 </VCol>
 
                 <VCol cols="12" md="2" class="pl-2 align-self-end">
-                  <VBtn style="width: 100%;" :color="d.document_file_old == null ? 'secondary' : 'primary'
-                    " :disabled="d.document_file_old == null" :href="d.document_file_old != null ? d.document_file_old : '/'
-    " target="_blank">
+                  <VBtn
+                    style="width: 100%"
+                    :color="
+                      d.document_file_old == null ? 'secondary' : 'primary'
+                    "
+                    :disabled="d.document_file_old == null"
+                    :href="
+                      d.document_file_old != null ? d.document_file_old : '/'
+                    "
+                    target="_blank"
+                  >
                     View File
                   </VBtn>
                 </VCol>
@@ -933,13 +1310,23 @@ const repeateAgain = () => {
           </VWindow>
 
           <div class="d-flex justify-space-between mt-8">
-            <VBtn color="secondary" variant="tonal" :disabled="currentStep === 0" @click="currentStep--">
+            <VBtn
+              color="secondary"
+              variant="tonal"
+              :disabled="currentStep === 0"
+              @click="currentStep--"
+            >
               <VIcon icon="tabler-chevron-left" start class="flip-in-rtl" />
               Previous
             </VBtn>
 
-            <VBtn v-if="studentSteps.length - 1 === currentStep" color="success" append-icon="tabler-check"
-              :disabled="!disabled" @click="onSubmit">
+            <VBtn
+              v-if="studentSteps.length - 1 === currentStep"
+              color="success"
+              append-icon="tabler-check"
+              :disabled="!disabled"
+              @click="onSubmit"
+            >
               submit
             </VBtn>
 
@@ -952,14 +1339,23 @@ const repeateAgain = () => {
       </VCardText>
     </VCard>
 
-    <VSnackbar v-model="isSnackbarVisible" location="top end" :color="snackbarColor">
+    <VSnackbar
+      v-model="isSnackbarVisible"
+      location="top end"
+      :color="snackbarColor"
+    >
       {{ snackbarText }}
       <template #actions>
         <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
       </template>
     </VSnackbar>
 
-    <VOverlay v-model="isOverlay" contained persistent class="align-center justify-center">
+    <VOverlay
+      v-model="isOverlay"
+      contained
+      persistent
+      class="align-center justify-center"
+    >
       <VProgressCircular indeterminate />
     </VOverlay>
   </div>
@@ -968,7 +1364,7 @@ const repeateAgain = () => {
 <style lang="scss">
 .checkout-stepper {
   .stepper-icon-step {
-    .step-wrapper+svg {
+    .step-wrapper + svg {
       margin-inline: 3.5rem !important;
     }
   }
