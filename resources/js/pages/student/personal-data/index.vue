@@ -362,8 +362,6 @@ const onSubmit = () => {
         })
         .catch((error) => {
           console.error(error);
-
-          //   isOverlay.value = false;
         });
     } else {
       snackbarText.value = "ข้อมูลไม่ครบถ้วน";
@@ -627,6 +625,7 @@ const repeateAgain = () => {
                   </label>
                   <VFileInput
                     v-model="item.photo_file"
+                    accept="image/png, image/jpeg, image/bmp"
                     label="Upload File"
                     persistent-placeholder
                     :disabled="!disabled"

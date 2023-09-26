@@ -281,7 +281,6 @@ const fetchStudent = () => {
         if (data[0].photo_file != null) {
           item.value.photo_file_old = data[0].photo_file;
         }
-        console.log(data[0].photo_file);
         item.value.photo_file = [];
 
         item.value.documents = selectOptions.value.document_types.map((d) => {
@@ -608,6 +607,7 @@ const repeateAgain = () => {
                   <VFileInput
                     v-model="item.photo_file"
                     label="Upload File"
+                    accept="image/png, image/jpeg, image/bmp"
                     persistent-placeholder
                     :disabled="!disabled"
                   />
