@@ -16,6 +16,22 @@ dayjs.extend(buddhistEra);
 const route = useRoute();
 const router = useRouter();
 
+const props = defineProps({
+  fromStudentPage: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  form_id: {
+    type: Number,
+    required: false,
+  },
+  student_id: {
+    type: Number,
+    required: false,
+  },
+});
+
 const item = ref({
   id: null,
   semester_id: null,
@@ -64,6 +80,9 @@ const isFormValid = ref(false);
 const refForm = ref();
 const isDialogAddCompanyVisible = ref(false);
 const isDialogConfirmVisible = ref(false);
+const isSnackbarVisible = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("success");
 
 const setIsDialogAddCompanyVisible = (value) => {
   isDialogAddCompanyVisible.value = value;
@@ -205,7 +224,8 @@ const fetchStudent = () => {
 
   if (userData.role == "admin" || userData.role == "staff") {
     searh = {
-      id: route.query.student_id,
+      // id: route.query.student_id,
+      id: props.student_id,
     };
   } else {
     searh = {
@@ -241,7 +261,9 @@ fetchStudent();
 
 const fetchForm = () => {
   cwieDataStore
-    .fetchForm({ id: route.params.id })
+    .fetchForm({
+      id: props.fromStudentPage == true ? props.form_id : route.params.id,
+    })
     .then((response) => {
       if (response.status === 200) {
         item.value = response.data.data;
@@ -332,10 +354,9 @@ watch(
 
 const onCheckSubmit = () => {
   if (userData.role == "admin" || userData.role == "staff") {
-    // console.log(item.value);
     onStaffSubmit();
   } else {
-    console.log("FREEDOM1");
+    console.log("DSD1");
     onSubmit();
   }
 };
@@ -396,9 +417,15 @@ const onStaffSubmit = () => {
           if (response.data.message == "success") {
             localStorage.setItem("updated", 1);
             nextTick(() => {
-              router.push({
-                path: "/staff/students/view/" + route.query.student_id,
-              });
+              isOverlay.value = false;
+              isDialogConfirmVisible.value = false;
+              snackbarText.value = "Updated Student";
+              snackbarColor.value = "success";
+              isSnackbarVisible.value = true;
+
+              // router.push({
+              //   path: "/staff/students/view/" + route.query.student_id,
+              // });
             });
           } else {
             isOverlay.value = false;
@@ -427,6 +454,7 @@ const onValidate = () => {
     }
   });
 };
+
 onMounted(() => {
   window.scrollTo(0, 0);
 });
@@ -817,7 +845,12 @@ const format = (date) => {
       />
     </VDialog>
 
-    <VDialog v-model="isDialogConfirmVisible" persistent class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogConfirmVisible"
+      persistent
+      class="v-dialog-sm"
+      style="z-index: 20003 !important"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn
         @click="isDialogConfirmVisible = !isDialogConfirmVisible"
@@ -839,6 +872,18 @@ const format = (date) => {
         </VCardText>
       </VCard>
     </VDialog>
+
+    <VSnackbar
+      v-model="isSnackbarVisible"
+      location="top end"
+      :color="snackbarColor"
+      style="z-index: 20004 !important"
+    >
+      {{ snackbarText }}
+      <template #actions>
+        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+      </template>
+    </VSnackbar>
   </div>
 </template>
 

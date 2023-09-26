@@ -7,6 +7,18 @@ const route = useRoute();
 const router = useRouter();
 const companyStore = useCompanyStore();
 
+const props = defineProps({
+  fromStudentPage: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  company_id: {
+    type: Number,
+    required: false,
+  },
+});
+
 const item = ref({
   id: null,
   name_th: "",
@@ -31,6 +43,9 @@ const item = ref({
 const isOverlay = ref(false);
 const isFormValid = ref(false);
 const refForm = ref();
+const isSnackbarVisible = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("success");
 
 const selectOptions = ref({
   provinces: [],
@@ -110,7 +125,7 @@ const fetchTumbols = () => {
 
 companyStore
   .fetchCompany({
-    id: route.params.id,
+    id: props.fromStudentPage == true ? props.company_id : route.params.id,
   })
   .then((response) => {
     if (response.data.message == "success") {
@@ -184,9 +199,15 @@ const onSubmit = () => {
           if (response.data.message == "success") {
             localStorage.setItem("updated", 1);
             nextTick(() => {
-              router.push({
-                path: "/cwie-settings/company/view/" + response.data.data.id,
-              });
+              if (props.fromStudentPage == true) {
+                snackbarText.value = "Updated Company";
+                snackbarColor.value = "success";
+                isSnackbarVisible.value = true;
+              } else {
+                router.push({
+                  path: "/cwie-settings/company/view/" + response.data.data.id,
+                });
+              }
             });
           } else {
             isOverlay.value = false;
@@ -426,6 +447,18 @@ onMounted(() => {
         </VForm>
       </VCardItem>
     </VCard>
+
+    <VSnackbar
+      v-model="isSnackbarVisible"
+      location="top end"
+      :color="snackbarColor"
+      style="z-index: 20002 !important"
+    >
+      {{ snackbarText }}
+      <template #actions>
+        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+      </template>
+    </VSnackbar>
 
     <VOverlay
       v-model="isOverlay"

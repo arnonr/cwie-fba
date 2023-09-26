@@ -2,6 +2,7 @@
 import { useStudentViewStore } from "./useStudentViewStore";
 import { form_statuses, statusShow } from "@/data-constant/data";
 import VuePdfEmbed from "vue-pdf-embed";
+import { watch } from "vue";
 
 const props = defineProps(["student_id", "status_id"]);
 
@@ -196,10 +197,14 @@ const fetchStudent = () => {
     });
 };
 
+watch(props, () => {
+  if (props.student_id) {
+    fetchDocumentTypes();
+  }
+});
+
 onMounted(() => {
   window.scrollTo(0, 0);
-  // fetchDocumentTypes();
-  console.log(props.student_id);
   if (props.student_id) {
     fetchDocumentTypes();
   }

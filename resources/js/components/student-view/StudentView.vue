@@ -247,6 +247,9 @@ onMounted(() => {
 });
 
 const refreshData = () => {
+  let status_id_cache = status_id.value;
+  status_id.value = 1;
+  // status_id.value = status_id_cache;
   fetchForms();
   emit("refresh-data");
   if (isClose.value == false) {

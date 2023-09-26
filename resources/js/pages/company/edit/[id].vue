@@ -7,6 +7,18 @@ const route = useRoute();
 const router = useRouter();
 const companyStore = useCompanyStore();
 
+const props = defineProps({
+  fromStudentPage: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  company_id: {
+    type: Number,
+    required: false,
+  },
+});
+
 const item = ref({
   id: null,
   name_th: "",
@@ -110,7 +122,7 @@ const fetchTumbols = () => {
 
 companyStore
   .fetchCompany({
-    id: route.params.id,
+    id: props.fromStudentPage == true ? props.company_id : route.params.id,
   })
   .then((response) => {
     if (response.data.message == "success") {

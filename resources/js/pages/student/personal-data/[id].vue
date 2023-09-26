@@ -19,6 +19,18 @@ const route = useRoute();
 const router = useRouter();
 const personalDataStore = usePersonalDataStore();
 
+const props = defineProps({
+  fromStudentPage: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  student_id: {
+    type: Number,
+    required: false,
+  },
+});
+
 const item = ref({});
 
 const documents_certificate = ref([
@@ -257,7 +269,7 @@ const fetchStudent = () => {
   personalDataStore
     .fetchStudents({
       // id: route.params.id,
-      id: route.params.id,
+      id: props.fromStudentPage == true ? props.student_id : route.params.id,
       includeAll: true,
 
       // get id self
@@ -481,9 +493,15 @@ const onStudentDocumentSubmit = async () => {
   }).then(() => {
     isOverlay.value = false;
 
-    router.push({
-      path: "/staff/students/view/" + route.params.id,
-    });
+    if (props.fromStudentPage == true) {
+      snackbarText.value = "Updated Student";
+      snackbarColor.value = "success";
+      isSnackbarVisible.value = true;
+    } else {
+      router.push({
+        path: "/staff/students/view/" + route.params.id,
+      });
+    }
   });
 };
 
@@ -1323,6 +1341,7 @@ const repeateAgain = () => {
       v-model="isSnackbarVisible"
       location="top end"
       :color="snackbarColor"
+      style="z-index: 20004 !important"
     >
       {{ snackbarText }}
       <template #actions>
