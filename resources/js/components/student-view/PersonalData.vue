@@ -1,6 +1,7 @@
 <script setup>
 import { useStudentViewStore } from "./useStudentViewStore";
 import { form_statuses, statusShow } from "@/data-constant/data";
+import VuePdfEmbed from "vue-pdf-embed";
 
 const props = defineProps(["student_id", "status_id"]);
 
@@ -216,10 +217,22 @@ onMounted(() => {
         <VCard title="" class="pa-3">
           <VCardText>
             <VImg
+              v-if="
+                student.photo_file &&
+                (student.photo_file.includes('jpg') ||
+                  student.photo_file.includes('jpeg') ||
+                  student.photo_file.includes('png'))
+              "
               :src="student.photo_file"
               width="100"
               height="120"
               class="mx-auto"
+            />
+            <vue-pdf-embed
+              class="mx-auto"
+              :source="student.photo_file"
+              v-if="student.photo_file && student.photo_file.includes('pdf')"
+              style="width: 100px"
             />
           </VCardText>
           <VCardText>
