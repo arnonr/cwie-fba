@@ -332,8 +332,10 @@ watch(
 
 const onCheckSubmit = () => {
   if (userData.role == "admin" || userData.role == "staff") {
+    // console.log(item.value);
     onStaffSubmit();
   } else {
+    console.log("FREEDOM1");
     onSubmit();
   }
 };
@@ -385,10 +387,6 @@ const onStaffSubmit = () => {
       cwieDataStore
         .editForm({
           ...item.value,
-          status_id:
-            item.value.reject_status_id != 5
-              ? item.value.reject_status_id + 1
-              : 7,
           namecard_file:
             item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
