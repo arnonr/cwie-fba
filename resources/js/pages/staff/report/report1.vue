@@ -268,6 +268,7 @@ const fetchItems = () => {
           // ถ้าสถานะ > 10
 
           let i = 0;
+          json_data.value = [];
           items.value = response.data.data.map((e) => {
             e.level =
               currentPage != 1
