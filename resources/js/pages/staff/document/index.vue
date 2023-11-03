@@ -14,7 +14,7 @@ const order = ref("asc");
 
 const advancedSearch = reactive({
   name_th: "",
-  active: 1,
+  // active: 1,
 });
 
 const selectOptions = ref({
