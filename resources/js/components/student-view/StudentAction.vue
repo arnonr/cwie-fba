@@ -280,9 +280,9 @@ const generateRegisPDF = async () => {
 
   existingPage.drawText(
     props.student.prefix_name +
-    props.student.firstname +
-    " " +
-    props.student.surname,
+      props.student.firstname +
+      " " +
+      props.student.surname,
     {
       x: 220,
       y: 658,
@@ -489,7 +489,7 @@ const generateRegisPDF = async () => {
       ...defaultSize,
     }
   );
-
+  console.log(props.formActive);
   existingPage2.drawText(props.formActive.major_head_name, {
     x: 250,
     y: 304,
@@ -691,10 +691,10 @@ const generatePDF = async () => {
 
   existingPage.drawText(
     chairman.value.prefix +
-    " " +
-    chairman.value.firstname +
-    " " +
-    chairman.value.surname,
+      " " +
+      chairman.value.firstname +
+      " " +
+      chairman.value.surname,
     {
       x: 300,
       y: 117,
@@ -871,10 +871,10 @@ const generateSendPDF = async () => {
 
   existingPage.drawText(
     chairman.value.prefix +
-    " " +
-    chairman.value.firstname +
-    " " +
-    chairman.value.surname,
+      " " +
+      chairman.value.firstname +
+      " " +
+      chairman.value.surname,
     {
       x: 300,
       y: 145,
@@ -1045,63 +1045,133 @@ const onPlanSubmit = () => {
   <div>
     <div>
       <VCol cols="12" md="12">
-        <VBtn color="success" :disabled="isDisabledAdd" @click="onAddClick" id="btnAddForm">
-          <VIcon size="16" icon="tabler-file-description" style="opacity: 1;" class="mr-1"></VIcon>
+        <VBtn
+          color="success"
+          :disabled="isDisabledAdd"
+          @click="onAddClick"
+          id="btnAddForm"
+          v-if="userData.account_type == 1"
+        >
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
           เพิ่มใบสมัคร
         </VBtn>
 
-        <VBtn color="primary" class="ml-2" @click="generateRegisPDF" v-if="props.formActive" :disabled="props.formActive.status_id < 5 ||
-          props.formActive.status_id == 9 ||
-          props.formActive.status_id == 10
-          ">
-          <VIcon size="16" icon="tabler-file-description" style="opacity: 1;" class="mr-1"></VIcon>
+        <VBtn
+          color="primary"
+          class="ml-2"
+          @click="generateRegisPDF"
+          v-if="props.formActive"
+          :disabled="
+            props.formActive.status_id < 5 ||
+            props.formActive.status_id == 9 ||
+            props.formActive.status_id == 10
+          "
+        >
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
           ดาวน์โหลดใบสมัครโครงการ
         </VBtn>
 
-        <VBtn color="primary" class="ml-2" @click="generatePDF" v-if="props.formActive" :disabled="props.formActive.status_id < 6 ||
-          props.formActive.status_id == 9 ||
-          props.formActive.status_id == 10
-          ">
-          <VIcon size="16" icon="tabler-file-description" style="opacity: 1;" class="mr-1"></VIcon>
+        <VBtn
+          color="primary"
+          class="ml-2"
+          @click="generatePDF"
+          v-if="props.formActive"
+          :disabled="
+            props.formActive.status_id < 6 ||
+            props.formActive.status_id == 9 ||
+            props.formActive.status_id == 10
+          "
+        >
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
           หนังสือขอความอนุเคราะห์
         </VBtn>
 
-        <VBtn color="primary" class="ml-2" @click="generateSendPDF" v-if="props.formActive" :disabled="props.formActive.status_id < 11 ||
-          props.formActive.status_id == 9 ||
-          props.formActive.status_id == 10
-          ">
-          <VIcon size="16" icon="tabler-file-description" style="opacity: 1;" class="mr-1"></VIcon>
+        <VBtn
+          color="primary"
+          class="ml-2"
+          @click="generateSendPDF"
+          v-if="props.formActive"
+          :disabled="
+            props.formActive.status_id < 11 ||
+            props.formActive.status_id == 9 ||
+            props.formActive.status_id == 10
+          "
+        >
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
           หนังสือส่งตัว
         </VBtn>
       </VCol>
 
       <VCol cols="12" md="12">
-        <VBtn color="info" v-if="props.formActive" :disabled="props.formActive.status_id != 1" :to="{
-          name: 'student-cwie-data-edit-id',
-          params: { id: props.formActive.id },
-        }">
+        <VBtn
+          color="info"
+          v-if="props.formActive && userData.account_type == 1"
+          :disabled="props.formActive.status_id != 1"
+          :to="{
+            name: 'student-cwie-data-edit-id',
+            params: { id: props.formActive.id },
+          }"
+        >
           แก้ไขใบสมัคร
         </VBtn>
 
-        <VBtn color="error" class="ml-2" v-if="props.formActive" :disabled="props.formActive.status_id > 5"
-          @click="confirmCancel(it)">
+        <VBtn
+          color="error"
+          class="ml-2"
+          v-if="props.formActive && userData.account_type == 1"
+          :disabled="props.formActive.status_id > 5"
+          @click="confirmCancel(it)"
+        >
           ยกเลิกการสมัคร
         </VBtn>
 
-        <VBtn color="info" class="ml-2" v-if="props.formActive" @click="isDialogResponseVisible = true" :disabled="props.formActive.request_document_date == null ||
-          props.formActive.status_id != 6
-          ">
+        <VBtn
+          color="info"
+          class="ml-2"
+          v-if="props.formActive && userData.account_type == 1"
+          @click="isDialogResponseVisible = true"
+          :disabled="
+            props.formActive.request_document_date == null ||
+            props.formActive.status_id != 6
+          "
+        >
           อัพโหลดเอกสารตอบรับ
         </VBtn>
 
-        <VBtn color="info" class="ml-2" v-if="props.formActive" :disabled="props.formActive.status_id != 11"
-          @click="isDialogPlanVisible = true">
+        <VBtn
+          color="info"
+          class="ml-2"
+          v-if="props.formActive && userData.account_type == 1"
+          :disabled="props.formActive.status_id != 11"
+          @click="isDialogPlanVisible = true"
+        >
           อัพโหลดแผนการปฏิบัติงาน
         </VBtn>
       </VCol>
       <VCol cols="12" md="12" v-if="props.formActive">
-        <h3 class="text-red" v-if="props.formActive.status_id == 1">ผู้อนุมัติส่งข้อมูลกลับให้แก้ไข
-          <br>โปรดแก้ไขข้อมูลส่วนตัวหรือข้อมูลใบสมัคร
+        <h3 class="text-red" v-if="props.formActive.status_id == 1">
+          ผู้อนุมัติส่งข้อมูลกลับให้แก้ไข
+          <br />โปรดแก้ไขข้อมูลส่วนตัวหรือข้อมูลใบสมัคร
         </h3>
       </VCol>
     </div>
@@ -1114,35 +1184,58 @@ const onPlanSubmit = () => {
         <VCardText>โปรดระบุข้อมูลส่วนตัวให้ครบถ้วน</VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn :to="{
-            name: 'student-personal-data',
-          }" color="error">
-            Ok</VBtn>
+          <VBtn
+            :to="{
+              name: 'student-personal-data',
+            }"
+            color="error"
+          >
+            Ok</VBtn
+          >
         </VCardText>
       </VCard>
     </VDialog>
 
     <!-- Response Form Dialog -->
-    <VDialog persistent v-if="formActive != null" v-model="isDialogResponseVisible" class="v-dialog-sm">
+    <VDialog
+      persistent
+      v-if="formActive != null"
+      v-model="isDialogResponseVisible"
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
-      <DialogCloseBtn @click="isDialogResponseVisible = !isDialogResponseVisible" absolute />
+      <DialogCloseBtn
+        @click="isDialogResponseVisible = !isDialogResponseVisible"
+        absolute
+      />
       <!-- Dialog Content -->
-      <VCard title="แบบฟอร์มอัพโหลดเอกสารตอบรับ" style="overflow: visible;">
-        <VCardItem style="overflow: visible;">
-          <VForm ref="refResponseForm" v-model="isResponseFormValid" @submit.prevent="onResponseSubmit"
-            style="overflow: visible;">
+      <VCard title="แบบฟอร์มอัพโหลดเอกสารตอบรับ" style="overflow: visible">
+        <VCardItem style="overflow: visible">
+          <VForm
+            ref="refResponseForm"
+            v-model="isResponseFormValid"
+            @submit.prevent="onResponseSubmit"
+            style="overflow: visible"
+          >
             <VRow>
               <VCol cols="12">
                 <!--  -->
                 <label class="v-label" for="status_id">
                   ผลการตอบกลับจากสถานประกอบการ
                 </label>
-                <AppSelect style="overflow: visible;" :items="[
-                  { title: 'ตอบรับ', value: 8 },
-                  { title: 'ปฏิเสธ', value: 9 },
-                  { title: 'สละสิทธิ์', value: 10 },
-                ]" v-model="response_company.result" :rules="[requiredValidator]" variant="outlined"
-                  placeholder="Status" clearable />
+                <AppSelect
+                  style="overflow: visible"
+                  :items="[
+                    { title: 'ตอบรับ', value: 8 },
+                    { title: 'ปฏิเสธ', value: 9 },
+                    { title: 'สละสิทธิ์', value: 10 },
+                  ]"
+                  v-model="response_company.result"
+                  :rules="[requiredValidator]"
+                  variant="outlined"
+                  placeholder="Status"
+                  clearable
+                />
                 <!--  -->
               </VCol>
 
@@ -1151,8 +1244,12 @@ const onPlanSubmit = () => {
                 <label class="v-label" for="response_document_file">
                   ไฟล์หนังสือตอบกลับ
                 </label>
-                <VFileInput v-model="response_company.response_document_file" :rules="[requiredValidator]"
-                  label="Upload File" persistent-placeholder />
+                <VFileInput
+                  v-model="response_company.response_document_file"
+                  :rules="[requiredValidator]"
+                  label="Upload File"
+                  persistent-placeholder
+                />
                 <!--  -->
               </VCol>
 
@@ -1160,15 +1257,24 @@ const onPlanSubmit = () => {
                 <label class="v-label" for="response_province_id">
                   จังหวัดที่ไปปฏิบัติงาน
                 </label>
-                <AppSelect :items="selectOptions.provinces" v-model="response_company.province_id" variant="outlined"
-                  placeholder="Province" clearable />
+                <AppSelect
+                  :items="selectOptions.provinces"
+                  v-model="response_company.province_id"
+                  variant="outlined"
+                  placeholder="Province"
+                  clearable
+                />
               </VCol>
             </VRow>
           </VForm>
         </VCardItem>
 
         <VCardText class="d-flex justify-end flex-wrap gap-3">
-          <VBtn variant="tonal" color="secondary" @click="isDialogResponseVisible = false">
+          <VBtn
+            variant="tonal"
+            color="secondary"
+            @click="isDialogResponseVisible = false"
+          >
             Cancel
           </VBtn>
           <VBtn type="submit" @click="onResponseSubmit" id="btn-submit">
@@ -1179,58 +1285,94 @@ const onPlanSubmit = () => {
     </VDialog>
 
     <!--  Plan Form Dialog -->
-    <VDialog v-model="isDialogPlanVisible" class="v-dialog-sm" v-if="formActive != null">
+    <VDialog
+      v-model="isDialogPlanVisible"
+      class="v-dialog-sm"
+      v-if="formActive != null"
+    >
       <!-- Dialog close btn -->
-      <DialogCloseBtn @click="isDialogPlanVisible = !isDialogPlanVisible" absolute />
+      <DialogCloseBtn
+        @click="isDialogPlanVisible = !isDialogPlanVisible"
+        absolute
+      />
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์มอัพโหลดแผนการปฏิบัติงาน">
         <VCardItem>
-          <VForm ref="refPlanForm" v-model="isPlanFormValid" @submit.prevent="onPlanSubmit">
+          <VForm
+            ref="refPlanForm"
+            v-model="isPlanFormValid"
+            @submit.prevent="onPlanSubmit"
+          >
             <VRow>
               <VCol cols="12">
                 <!--  -->
                 <label class="v-label" for="plan_document_file">
                   ไฟล์แผนการปฏิบัติงาน
                 </label>
-                <VFileInput v-model="plan.plan_document_file" :rules="[requiredValidator]" label="Upload File"
-                  persistent-placeholder />
+                <VFileInput
+                  v-model="plan.plan_document_file"
+                  :rules="[requiredValidator]"
+                  label="Upload File"
+                  persistent-placeholder
+                />
                 <!--  -->
               </VCol>
 
               <VCol cols="12">
                 <label class="v-label" for="workplace_address"> Address </label>
-                <AppTextField id="workplace_address" v-model="plan.workplace_address" />
+                <AppTextField
+                  id="workplace_address"
+                  v-model="plan.workplace_address"
+                />
               </VCol>
 
               <VCol cols="12">
                 <label class="v-label" for="workplace_province_id">
                   จังหวัดที่ไปปฏิบัติงาน
                 </label>
-                <AppSelect :items="selectOptions.plan_provinces" v-model="plan.workplace_province_id" variant="outlined"
-                  placeholder="Province" clearable />
+                <AppSelect
+                  :items="selectOptions.plan_provinces"
+                  v-model="plan.workplace_province_id"
+                  variant="outlined"
+                  placeholder="Province"
+                  clearable
+                />
               </VCol>
 
               <VCol cols="12">
                 <label class="v-label" for="workplace_amphur_id">
                   อำเภอ/เขต
                 </label>
-                <AppSelect :items="selectOptions.plan_amphurs" v-model="plan.workplace_amphur_id" variant="outlined"
-                  placeholder="Amphur" clearable />
+                <AppSelect
+                  :items="selectOptions.plan_amphurs"
+                  v-model="plan.workplace_amphur_id"
+                  variant="outlined"
+                  placeholder="Amphur"
+                  clearable
+                />
               </VCol>
 
               <VCol cols="12">
                 <label class="v-label" for="workplace_tumbol_id">
                   ตำบล/แขวง
                 </label>
-                <AppSelect :items="selectOptions.plan_tumbols" v-model="plan.workplace_tumbol_id" variant="outlined"
-                  placeholder="Tumbol" clearable />
+                <AppSelect
+                  :items="selectOptions.plan_tumbols"
+                  v-model="plan.workplace_tumbol_id"
+                  variant="outlined"
+                  placeholder="Tumbol"
+                  clearable
+                />
               </VCol>
 
               <VCol cols="12">
                 <label class="v-label" for="workplace_googlemap_url">
                   Google Map Url
                 </label>
-                <AppTextField id="workplace_googlemap_url" v-model="plan.workplace_googlemap_url" />
+                <AppTextField
+                  id="workplace_googlemap_url"
+                  v-model="plan.workplace_googlemap_url"
+                />
               </VCol>
 
               <!-- <VCol cols="12">
@@ -1248,7 +1390,11 @@ const onPlanSubmit = () => {
         </VCardItem>
 
         <VCardText class="d-flex justify-end flex-wrap gap-3">
-          <VBtn variant="tonal" color="secondary" @click="isDialogPlanVisible = false">
+          <VBtn
+            variant="tonal"
+            color="secondary"
+            @click="isDialogPlanVisible = false"
+          >
             Cancel
           </VBtn>
           <VBtn type="submit" @click="onPlanSubmit" id="btn-submit">

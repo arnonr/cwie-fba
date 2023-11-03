@@ -2,6 +2,7 @@
 import CompanyEdit from "@/pages/cwie-settings/company/edit/[id].vue";
 import CwieDataEdit from "@/pages/student/cwie-data/edit/[id].vue";
 import StudentDataEdit from "@/pages/student/personal-data/[id].vue";
+import StudentAction from "@/components/student-view/StudentAction.vue";
 
 import { useStudentApproveStore } from "./useStudentApproveStore";
 import dayjs from "dayjs";
@@ -11,6 +12,8 @@ import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Swal from "sweetalert2";
 import "sweetalert2/src/sweetalert2.scss";
+import { PDFDocument, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
 
 const studentApproveStore = useStudentApproveStore();
 const props = defineProps(["user_type", "student_id", "formActive", "isCheck"]);
@@ -22,9 +25,12 @@ const isDialogCompanyVisible = ref(false);
 const isDialogCwieDataVisible = ref(false);
 const isDialogStudentDataVisible = ref(false);
 const router = useRouter();
+const isOverlay = ref(false);
 
 let userData = JSON.parse(localStorage.getItem("userData"));
 
+const student = ref({});
+const formActive = ref({});
 const new_status_id = ref(null);
 const date = ref({});
 const rejectLog = ref({
@@ -34,11 +40,10 @@ const rejectLog = ref({
   user_id: userData.user_id,
 });
 
-// if (props.formActive != null) {
-
-// }
-
 watch(props, () => {
+  if (props.student_id) {
+    fetchStudent();
+  }
   if (props.formActive != null) {
     if (props.user_type == "teacher") {
       rejectLog.value.reject_status_id = 1;
@@ -65,12 +70,80 @@ watch(props, () => {
         new_status_id.value = props.formActive.response_result;
       } else {
       }
+      formActive.value = props.formActive;
     } else {
     }
   }
 });
 
 // Function
+const fetchStudent = () => {
+  studentApproveStore
+    .fetchStudents({
+      id: props.student_id,
+      includeAll: true,
+    })
+    .then((response) => {
+      if (response.data.message == "success") {
+        const { data } = response.data;
+        student.value = { ...data[0] };
+
+        student.value.faculty_name = student.value.faculty_name.replace(
+          "คณะ",
+          ""
+        );
+
+        student.value.major_name = student.value.major_name
+          ? student.value.major_name.replace("สาขาวิชา", "")
+          : "";
+
+        if (
+          student.value.id &&
+          student.value.prefix_id &&
+          student.value.firstname &&
+          student.value.surname &&
+          student.value.citizen_id &&
+          student.value.address &&
+          student.value.province_id &&
+          student.value.amphur_id &&
+          student.value.tumbol_id &&
+          student.value.tel &&
+          student.value.email &&
+          student.value.faculty_id &&
+          student.value.class_year &&
+          student.value.class_room &&
+          student.value.advisor_id &&
+          student.value.gpa &&
+          student.value.contact1_name &&
+          student.value.contact1_relation &&
+          student.value.contact1_tel &&
+          student.value.blood_group &&
+          student.value.emergency_tel &&
+          student.value.height &&
+          student.value.weight
+        ) {
+        }
+
+        studentApproveStore
+          .fetchMajorHeads({
+            semester_id: props.formActive.semester_id,
+            major_id: student.value.major_id,
+            active: 1,
+            includeAll: true,
+          })
+          .then((res) => {
+            formActive.value.major_head_name = res.data.data[0].teacher_name;
+          });
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+};
+
 const onRejectSubmit = () => {
   if (rejectLog.comment != "") {
     studentApproveStore
@@ -420,7 +493,7 @@ const confirmCancel = (it) => {
 
       <VCol cols="12" md="12" class="text-left" v-if="props.formActive != null">
         <!-- @click=" router.push({ path: '/student/cwie-data/edit/' + formActive.id,
-        query: { student_id: props.student_id, }, }) " -->
+        query: { student_id: student.value_id, }, }) " -->
 
         <VBtn
           color="success"
@@ -444,7 +517,7 @@ const confirmCancel = (it) => {
           @click="isDialogStudentDataVisible = true"
         >
           <!-- :to="{
-            path: '/student/personal-data/' + props.student_id,
+            path: '/student/personal-data/' + student.value_id,
           }" -->
           แก้ไขข้อมูลทั่วไป</VBtn
         >
@@ -479,6 +552,16 @@ const confirmCancel = (it) => {
         >
           ยกเลิกการสมัคร
         </VBtn>
+      </VCol>
+
+      <VCol cols="12" md="12" class="text-left" v-if="props.formActive != null">
+        <!-- Action -->
+        <StudentAction
+          v-if="props.student_id"
+          :student_id="props.student_id"
+          :student="student"
+          :formActive="formActive"
+        />
       </VCol>
     </div>
 

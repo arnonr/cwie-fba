@@ -3,6 +3,32 @@ import { defineStore } from "pinia";
 
 export const useStudentApproveStore = defineStore("StudentApproveStore", {
   actions: {
+    fetchStudents(params) {
+      return axios.get(
+        `/student`,
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
+    fetchStudent({ id }) {
+      return axios.get(`/student/${id}`, {
+        validateStatus: () => true,
+      });
+    },
+
+    fetchMajorHeads(params) {
+      return axios.get(
+        "/major-head",
+        { params },
+        {
+          validateStatus: () => true,
+        }
+      );
+    },
+
     async addRejectLog(dataSend) {
       return await axios.post(`/reject-log`, dataSend, {
         validateStatus: () => true,
