@@ -412,6 +412,7 @@ const onStaffSubmit = () => {
             item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
               : null,
+          start_date: dayjs(item.value.start_date).format("YYYY-MM-DD"),
         })
         .then((response) => {
           if (response.data.message == "success") {
