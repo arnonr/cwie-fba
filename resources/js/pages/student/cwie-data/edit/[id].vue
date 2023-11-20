@@ -337,20 +337,20 @@ watch(
   }
 );
 
-watch(
-  () => item.value.semester_id,
-  (value, oldValue) => {
-    if (value != null) {
-      let semester = selectOptions.value.semesters.find((x) => {
-        return value === x.value;
-      });
-      item.value.start_date = semester.start_date;
-      item.value.end_date = semester.end_date;
-    }
-    // oldValue
-    // Value
-  }
-);
+// watch(
+//   () => item.value.semester_id,
+//   (value, oldValue) => {
+//     if (value != null) {
+//       let semester = selectOptions.value.semesters.find((x) => {
+//         return value === x.value;
+//       });
+//       item.value.start_date = semester.start_date;
+//       item.value.end_date = semester.end_date;
+//     }
+//     // oldValue
+//     // Value
+//   }
+// );
 
 const onCheckSubmit = () => {
   if (userData.role == "admin" || userData.role == "staff") {
