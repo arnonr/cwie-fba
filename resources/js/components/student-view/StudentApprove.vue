@@ -570,7 +570,7 @@ const confirmCancel = (it) => {
       v-model="isDialogVisible"
       persistent
       class="v-dialog-sm"
-      style="z-index: 20001 !important"
+      style="z-index: 1900 !important"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" />
@@ -591,7 +591,7 @@ const confirmCancel = (it) => {
       v-model="isDialogRejectVisible"
       persistent
       class="v-dialog-sm"
-      style="z-index: 20001 !important"
+      style="z-index: 1900 !important"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogRejectVisible = !isDialogRejectVisible" />
@@ -629,7 +629,7 @@ const confirmCancel = (it) => {
       v-model="isDialogCompanyVisible"
       persistent
       class="v-dialog-lg"
-      style="z-index: 20001 !important"
+      style="z-index: 1900 !important"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn
@@ -648,7 +648,7 @@ const confirmCancel = (it) => {
       v-model="isDialogCwieDataVisible"
       persistent
       class="v-dialog-lg"
-      style="z-index: 20001 !important; overflow: scroll"
+      style="z-index: 1900 !important; overflow: scroll"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn
@@ -669,7 +669,7 @@ const confirmCancel = (it) => {
       v-model="isDialogStudentDataVisible"
       persistent
       class="v-dialog-lg"
-      style="z-index: 20001 !important; overflow: scroll"
+      style="z-index: 1900 !important; overflow: scroll"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn

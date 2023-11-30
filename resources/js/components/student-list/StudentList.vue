@@ -603,7 +603,7 @@ const refreshData = () => {
       v-model="isDialogViewStudent"
       persistent
       class="v-dialog-lg"
-      style="z-index: 20001"
+      style="z-index: 1900"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogViewStudent = !isDialogViewStudent" />
