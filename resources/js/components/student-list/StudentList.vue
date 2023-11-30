@@ -1,4 +1,5 @@
 <script setup>
+// ห
 import StudentView from "@/components/student-view/StudentView.vue";
 import {
   class_rooms,
