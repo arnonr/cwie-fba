@@ -27,6 +27,7 @@ const isResponseFormValid = ref(false);
 const provinces = ref([]);
 const amphurs = ref([]);
 const tumbols = ref([]);
+const plan = ref({});
 
 const refResponseForm = ref();
 
