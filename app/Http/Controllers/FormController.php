@@ -66,7 +66,12 @@ class FormController extends Controller
                     $this->uploadUrl .
                     "',form.workplace_googlemap_file) END) AS workplace_googlemap_file"
             ),
-            "form.plan_document_file as plan_document_file",
+            DB::raw(
+                "(CASE WHEN form.plan_document_file = NULL THEN ''
+            ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',form.plan_document_file) END) AS plan_document_file"
+            ),
             "form.plan_send_at as plan_send_at",
             "form.plan_accept_at as plan_accept_at",
             "form.reject_status_id as reject_status_id",
@@ -448,7 +453,12 @@ class FormController extends Controller
                     $this->uploadUrl .
                     "',form.workplace_googlemap_file) END) AS workplace_googlemap_file"
             ),
-            "form.plan_document_file as plan_document_file",
+            DB::raw(
+                "(CASE WHEN form.plan_document_file = NULL THEN ''
+            ELSE CONCAT('" .
+                    $this->uploadUrl .
+                    "',form.plan_document_file) END) AS plan_document_file"
+            ),
             "form.plan_send_at as plan_send_at",
             "form.plan_accept_at as plan_accept_at",
             "form.reject_status_id as reject_status_id",

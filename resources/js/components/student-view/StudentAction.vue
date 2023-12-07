@@ -28,6 +28,7 @@ const provinces = ref([]);
 const amphurs = ref([]);
 const tumbols = ref([]);
 const plan = ref({});
+const isPlanFormValid = ref(false);
 
 const refResponseForm = ref();
 
@@ -154,6 +155,31 @@ watch(props, async () => {
   checkFormActive();
 });
 
+watch(
+  () => plan.value.workplace_province_id,
+  (value, oldValue) => {
+    if (value != null) {
+      fetchPlanAmphur();
+      if (oldValue != "") {
+        plan.value.workplace_amphur_id = null;
+        plan.value.workplace_tumbol_id = null;
+      }
+    }
+  }
+);
+
+watch(
+  () => plan.value.workplace_amphur_id,
+  (value, oldValue) => {
+    if (value != null) {
+      fetchPlanTumbol();
+      if (oldValue != "") {
+        plan.value.workplace_tumbol_id = null;
+      }
+    }
+  }
+);
+
 onMounted(async () => {
   checkFormActive();
 });
@@ -168,6 +194,10 @@ const fetchProvince = async () => {
   selectOptions.value.provinces = res.data.data.map((r) => {
     return { title: r.name_th, value: r.province_id };
   });
+
+  selectOptions.value.plan_provinces = res.data.data.map((r) => {
+    return { title: r.name_th, value: r.province_id };
+  });
 };
 fetchProvince();
 
@@ -180,8 +210,31 @@ const fetchAmphur = async () => {
   selectOptions.value.amphurs = res.data.data.map((r) => {
     return { title: r.name_th, value: r.amphur_id };
   });
+
+  selectOptions.value.plan_amphurs = res.data.data.map((r) => {
+    return { title: r.name_th, value: r.amphur_id };
+  });
 };
 fetchAmphur();
+
+const fetchPlanAmphur = async () => {
+  let res = await axios.get(
+    "/amphur",
+    {
+      params: {
+        province_id: plan.value.workplace_province_id,
+      },
+    },
+    {
+      validateStatus: () => true,
+    }
+  );
+  amphurs.value = res.data.data;
+
+  selectOptions.value.plan_amphurs = res.data.data.map((r) => {
+    return { title: r.name_th, value: r.amphur_id };
+  });
+};
 
 const fetchTumbol = async () => {
   let res = await axios.get(
@@ -196,8 +249,32 @@ const fetchTumbol = async () => {
   selectOptions.value.tumbols = res.data.data.map((r) => {
     return { title: r.name_th, value: r.tumbol_id };
   });
+
+  selectOptions.value.plan_tumbols = res.data.data.map((r) => {
+    return { title: r.name_th, value: r.amphur_id };
+  });
 };
 fetchTumbol();
+
+const fetchPlanTumbol = async () => {
+  let res = await axios.get(
+    "/tumbol",
+    {
+      params: {
+        amphur_id: plan.value.workplace_amphur_id,
+        perPage: 20000,
+      },
+    },
+    {
+      validateStatus: () => true,
+    }
+  );
+  tumbols.value = res.data.data;
+
+  selectOptions.value.plan_tumbols = res.data.data.map((r) => {
+    return { title: r.name_th, value: r.amphur_id };
+  });
+};
 
 // Function
 
@@ -1009,10 +1086,10 @@ const onPlanSubmit = () => {
         plan.value.plan_document_file.length !== 0
           ? plan.value.plan_document_file[0]
           : null,
-      workplace_googlemap_file:
-        plan.value.workplace_googlemap_file.length !== 0
-          ? plan.value.workplace_googlemap_file[0]
-          : null,
+      // workplace_googlemap_file:
+      //   plan.value.workplace_googlemap_file.length !== 0
+      //     ? plan.value.workplace_googlemap_file[0]
+      //     : null,
       plan_send_at: dayjs().format("YYYY-MM-DD"),
     })
     .then((response) => {
