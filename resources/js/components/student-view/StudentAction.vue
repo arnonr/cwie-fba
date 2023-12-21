@@ -251,7 +251,7 @@ const fetchTumbol = async () => {
   });
 
   selectOptions.value.plan_tumbols = res.data.data.map((r) => {
-    return { title: r.name_th, value: r.amphur_id };
+    return { title: r.name_th, value: r.tumbol_id };
   });
 };
 fetchTumbol();
@@ -272,7 +272,7 @@ const fetchPlanTumbol = async () => {
   tumbols.value = res.data.data;
 
   selectOptions.value.plan_tumbols = res.data.data.map((r) => {
-    return { title: r.name_th, value: r.amphur_id };
+    return { title: r.name_th, value: r.tumbol_id };
   });
 };
 
