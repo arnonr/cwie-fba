@@ -100,6 +100,8 @@ const formActive = ref(null);
 const items = ref([]);
 const status_id = ref(null);
 const provinces = ref([]);
+const amphurs = ref([]);
+const tumbols = ref([]);
 
 const selectOptions = ref({
   //   amphurs: [],
@@ -115,6 +117,26 @@ const fetchProvince = async () => {
   provinces.value = res.data.data;
 };
 fetchProvince();
+
+const fetchAmphur = async () => {
+  let res = await axios.get("/amphur", {
+    validateStatus: () => true,
+  });
+  amphurs.value = res.data.data;
+};
+fetchAmphur();
+
+const fetchTumbol = async () => {
+  let res = await axios.get(
+    "/tumbol",
+    { perPage: 20000 },
+    {
+      validateStatus: () => true,
+    }
+  );
+  tumbols.value = res.data.data;
+};
+fetchTumbol();
 
 const fetchForms = () => {
   studentViewStore
@@ -211,6 +233,22 @@ const getProvince = (province_id) => {
   if (province_id == null) return "";
   let res = provinces.value.find((e) => {
     return e.province_id == province_id;
+  });
+  return res.name_th;
+};
+
+const getAmphur = (id) => {
+  if (id == null || amphurs.value.length == 0) return "";
+  let res = amphurs.value.find((e) => {
+    return e.amphur_id == id;
+  });
+  return res.name_th;
+};
+
+const getTumbol = (id) => {
+  if (id == null || tumbols.value.length == 0) return "";
+  let res = tumbols.value.find((e) => {
+    return e.tumbol_id == id;
   });
   return res.name_th;
 };
@@ -685,6 +723,132 @@ const refreshData = () => {
                       :key="index"
                     >
                       <VCol cols="12" md="4" v-if="rl.reject_status_id > 3">
+                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
+                        <span>
+                          {{
+                            dayjs(rl.created_at)
+                              .locale("th")
+                              .format("DD MMM BB")
+                          }}</span
+                        >
+                      </VCol>
+                      <VCol cols="12" md="12" v-if="rl.reject_status_id > 3">
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          รายละเอียด :
+                        </h4>
+                        <span> {{ rl.comment }}</span>
+                      </VCol>
+
+                      <VCol cols="12" md="12" v-if="rl.reject_status_id > 3">
+                        <hr style="border: solid #eee 1px" />
+                      </VCol>
+                    </VRow>
+                  </VCol>
+
+                  <VCol cols="12" md="12" class="text-center"> </VCol>
+                </VRow>
+              </VWindowItem>
+
+              <VWindowItem>
+                <VRow>
+                  <VCol cols="12" md="6">
+                    <span>ไฟล์แผนการปฏิบัติงาน1 : </span>
+                    <a
+                      v-if="formActive.plan_document_file"
+                      :href="formActive.plan_document_file"
+                      target="_blank"
+                      ><span>
+                        <VIcon
+                          size="16"
+                          icon="tabler-file"
+                          style="opacity: 1"
+                          class="mr-1"
+                        />เอกสาร</span
+                      >
+                    </a>
+                    <span v-else>-</span>
+                  </VCol>
+                  <VCol cols="12" md="6">
+                    <span>วันที่ส่งแผน : </span>
+                    <span>{{
+                      formActive.plan_send_at == null
+                        ? "-"
+                        : dayjs(formActive.plan_send_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>วันที่อนุมัติแผน : </span>
+                    <span>{{
+                      formActive.plan_accept_at == null
+                        ? "-"
+                        : dayjs(formActive.plan_accept_at)
+                            .locale("th")
+                            .format("DD MMMM BBBB")
+                    }}</span>
+                  </VCol>
+                  <VCol cols="12" md="12">
+                    <hr />
+                  </VCol>
+
+                  <VCol cols="12" md="12">
+                    <span>ที่อยู่ที่ปฏิบัติงาน : </span>
+                    <span>{{ formActive.workplace_address }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>จังหวัด : </span>
+                    <span>{{
+                      getProvince(formActive.workplace_province_id)
+                    }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>อำเภอ/เขต : </span>
+                    <span>{{ getAmphur(formActive.workplace_amphur_id) }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ตำบล/แขวง : </span>
+                    <span>{{ getTumbol(formActive.workplace_tumbol_id) }}</span>
+                  </VCol>
+
+                  <VCol cols="12" md="6">
+                    <span>ลิงค์แผนที่ : </span>
+                    <a
+                      v-if="formActive.workplace_googlemap_url"
+                      :href="formActive.workplace_googlemap_url"
+                      target="_blank"
+                    >
+                      <span>
+                        <VIcon
+                          size="16"
+                          icon="tabler-map-pin"
+                          style="opacity: 1"
+                          class="mr-1"
+                        />Map</span
+                      >
+                    </a>
+                    <span v-else>-</span>
+                  </VCol>
+
+                  <VDivider></VDivider>
+
+                  <VDivider></VDivider>
+
+                  <VCol cols="12" md="6" class="text-error">
+                    <VRow>
+                      <VCol cols="12" md="12">
+                        <h4>Remark</h4>
+                      </VCol>
+                    </VRow>
+                    <VRow
+                      v-for="(rl, index) in formActive.reject_log"
+                      :key="index"
+                    >
+                      <VCol cols="12" md="4" v-if="rl.reject_status_id > 4">
                         <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
                         <span>
                           {{
