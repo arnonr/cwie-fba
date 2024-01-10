@@ -299,3 +299,8 @@ Route::group(["prefix" => "froala"], function () {
 Route::group(["prefix" => "mail"], function () {
     Route::get("/send/{receiver}", [MailController::class, "send"]);
 });
+
+Route::group(["prefix" => "config"], function () {
+    Route::get("/{id}", [ConfigController::class, "get"]);
+    Route::put("/{id}", [ConfigController::class, "edit"]);
+});

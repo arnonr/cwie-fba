@@ -21,4 +21,11 @@ export default [
     action: "manage",
     subject: "AdminUser",
   },
+  {
+    title: "ตั้งค่าระบบ",
+    icon: { icon: "tabler-settings-filled" },
+    to: { name: "cwie-settings-config-edit-id", params: { id: 1 } },
+    action: "manage",
+    subject: "AdminUser",
+  },
 ];
