@@ -422,7 +422,7 @@ const onSubmit = () => {
   cwieDataStore
     .approve({
       id: item.value.id,
-      status_id: 12,
+      status_id: 13,
       plan_accept_at: dayjs().format("YYYY-MM-DD"),
     })
     .then((response) => {

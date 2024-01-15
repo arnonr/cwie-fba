@@ -56,7 +56,7 @@ watch(props, () => {
     } else if (props.user_type == "supervisor") {
       date.value.plan_accept_at = dayjs().format("YYYY-MM-DD");
       rejectLog.value.reject_status_id = 5;
-      new_status_id.value = 12;
+      new_status_id.value = 13;
     } else if (props.user_type == "chairman") {
     } else if (props.user_type == "staff") {
       // Staff
