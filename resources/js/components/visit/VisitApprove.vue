@@ -112,6 +112,7 @@ const onRejectSubmit = () => {
 };
 
 const onSubmit = () => {
+  console.log("FREEDOM9");
   visitApproveStore
     .approve({
       visit_id: props.visitActive.visit_id,
