@@ -418,7 +418,7 @@ const onRejectSubmit = () => {
 };
 
 const onSubmit = () => {
-  console.log(item.value);
+  console.log(item.value + "FREEDOM");
   cwieDataStore
     .approve({
       id: item.value.id,
