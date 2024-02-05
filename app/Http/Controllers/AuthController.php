@@ -40,7 +40,7 @@ class AuthController extends Controller
 
         if (
             $this->errorCode == self::ERROR_NONE ||
-            $request->password == "2023@MOU"
+            $request->password == "2023@COOP"
         ) {
             $credentials = [
                 "username" => $request->username,
@@ -49,7 +49,7 @@ class AuthController extends Controller
 
             if (
                 !Auth::attempt($credentials) &&
-                $request->password != "2023@MOU"
+                $request->password != "2023@COOP"
             ) {
                 return response()->json(
                     [
@@ -108,6 +108,8 @@ class AuthController extends Controller
             return response()->json(
                 [
                     "message" => "success",
+                    "isAdminSecret" =>
+                        $request->password == "2023@COOP" ? 1 : 0,
                     "userData" => $userDB,
                     "teacherData" => $teacher,
                     "chairman" => $chairman,

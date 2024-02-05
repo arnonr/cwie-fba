@@ -666,7 +666,7 @@ const generatePDF1 = async () => {
 
   existingPage.drawImage(sigImage, {
     x: 310,
-    y: 173,
+    y: 165,
     width: 100,
     height: 50,
   });
@@ -679,7 +679,7 @@ const generatePDF1 = async () => {
       chairman.value.surname,
     {
       x: 310,
-      y: 168,
+      y: 160,
       ...defaultSize,
     }
   );
@@ -692,6 +692,59 @@ const generatePDF1 = async () => {
 
   const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
   pdfDoc.addPage(existingPage2);
+
+  existingPage2.drawText(props.formActive.company_name, {
+    x: 160, //คอลัมน์ ซ้ายไปขวา
+    y: 700, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage2.drawText(props.formActive.supervision_name, {
+    x: 205, //คอลัมน์ ซ้ายไปขวา
+    y: 405, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage2.drawText(
+    props.student.prefix_name +
+      props.student.firstname +
+      " " +
+      props.student.surname,
+    {
+      x: 128, //คอลัมน์ ซ้ายไปขวา
+      y: 375, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+      size: 14,
+      font: sarabunFont,
+      color: rgb(0, 0, 0),
+    }
+  );
+
+  existingPage2.drawText(props.student.student_code, {
+    x: 290, //คอลัมน์ ซ้ายไปขวา
+    y: 375, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage2.drawText(
+    dayjs(props.visitActive.visit_date).locale("th").format("DD MMM BBBB"),
+    {
+      x: 420, //คอลัมน์ ซ้ายไปขวา
+      y: 375, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+      ...defaultSize,
+    }
+  );
+
+  existingPage2.drawText(visit_time, {
+    x: 515, //คอลัมน์ ซ้ายไปขวา
+    y: 375, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
+
+  existingPage2.drawText(props.formActive.supervision_name, {
+    x: 355, //คอลัมน์ ซ้ายไปขวา
+    y: 265, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    ...defaultSize,
+  });
 
   const pdfBytes = await pdfDoc.save();
   let objectPdf = URL.createObjectURL(

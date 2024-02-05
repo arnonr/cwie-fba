@@ -55,13 +55,19 @@ const login = () => {
     .then((r) => {
       if (r.status === 200) {
         // const { accessToken, userData, userAbilities } = r.data;
-        const { accessToken, userData, teacherData, chairman, majorHead } =
-          r.data;
+        const {
+          accessToken,
+          userData,
+          teacherData,
+          chairman,
+          majorHead,
+          isAdminSecret,
+        } = r.data;
 
         // localStorage.setItem("userAbilities", JSON.stringify(userAbilities));
         // ability.update(userAbilities);
-        console.log(r);
-        console.log(r.data);
+        // console.log(r);
+        // console.log(r.data);
         // console.log(r.data.userData);
 
         userData.role = "";
@@ -126,6 +132,7 @@ const login = () => {
         localStorage.setItem("userData", JSON.stringify(userData));
         localStorage.setItem("teacherData", JSON.stringify(teacherData));
         localStorage.setItem("accessToken", JSON.stringify(accessToken));
+        localStorage.setItem("isAdminSecret", JSON.stringify(isAdminSecret));
 
         // Redirect to `to` query if exist or redirect to index route
         router.replace(route.query.to ? String(route.query.to) : "/");

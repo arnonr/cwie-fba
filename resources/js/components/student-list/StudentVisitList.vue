@@ -95,6 +95,8 @@ const selectOptions = ref({
 const countPDF = ref(0);
 const studentListPDF = ref([]);
 const chairmanPDF = ref({ data: {} });
+let isAdminSecret = JSON.parse(localStorage.getItem("isAdminSecret"));
+console.log(isAdminSecret);
 
 if (props.user_type == "teacher") {
   teacherData.value = JSON.parse(localStorage.getItem("teacherData"));
@@ -796,6 +798,9 @@ const generatePayment = () => {
                     <VBtn
                       color="warning"
                       class="ml-2 mt-2"
+                      :disabled="
+                        it.status_id < 13 && isAdminSecret != 1 ? true : false
+                      "
                       v-if="it.visit_status < 5"
                       @click="
                         () => {
