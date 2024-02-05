@@ -384,10 +384,14 @@ export const form_statuses = [
   "warning", // 3
   "warning", // 4
   "warning", // 5
-  "error", // 6
-  "success", // 7
-  "error", // 8
-  "primary", // 9
+  "Secondary", // 6
+  "secondary", // 7
+  "primary", // 8
+  "error", // 9
+  "error", // 10
+  "primary", // 11
+  "warning", // 12
+  "success", // 13
 ];
 
 export const text_statuses = [

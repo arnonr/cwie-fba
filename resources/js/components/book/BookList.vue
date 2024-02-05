@@ -15,6 +15,13 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
+import { useConfigDefaultStore } from "../../store/configDefault";
+const configDefaultStore = useConfigDefaultStore();
+if (configDefaultStore.config == undefined) {
+  configDefaultStore.fetchConfig().then(() => {
+    fetchSemesters();
+  });
+}
 
 dayjs.extend(buddhistEra);
 
@@ -115,8 +122,13 @@ const fetchSemesters = () => {
     .then((response) => {
       if (response.status === 200) {
         selectOptions.value.semesters = response.data.data.map((r) => {
-          if (r.is_current == 1) {
-            advancedSearch.semester_id = r.id;
+          if (configDefaultStore.config) {
+            advancedSearch.semester_id =
+              configDefaultStore.config.staff_year_default;
+          } else {
+            if (r.is_current == 1) {
+              advancedSearch.semester_id = r.id;
+            }
           }
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
@@ -135,7 +147,7 @@ const fetchSemesters = () => {
       isOverlay.value = false;
     });
 };
-fetchSemesters();
+// fetchSemesters();
 
 // เฉพาะเมนูของคณะและประธานบริหาร
 const fetchTeachers = () => {

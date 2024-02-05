@@ -1,6 +1,6 @@
 export default [
   {
-    heading: "ประธานบริหารโครงหารสหกิจ",
+    heading: "ประธานบริหารโครงการสหกิจ",
     subject: "ChairmanUser",
     action: "manage",
   },

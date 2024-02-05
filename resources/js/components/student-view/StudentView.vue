@@ -752,7 +752,7 @@ const refreshData = () => {
               <VWindowItem>
                 <VRow>
                   <VCol cols="12" md="6">
-                    <span>ไฟล์แผนการปฏิบัติงาน1 : </span>
+                    <span>ไฟล์แผนการปฏิบัติงาน : </span>
                     <a
                       v-if="formActive.plan_document_file"
                       :href="formActive.plan_document_file"

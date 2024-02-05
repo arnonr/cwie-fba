@@ -792,6 +792,7 @@ const generatePayment = () => {
                       ดูข้อมูล
                     </VBtn>
 
+                    <!-- :disabled="it.status_id < 13 ? true : false" -->
                     <VBtn
                       color="warning"
                       class="ml-2 mt-2"
@@ -923,8 +924,8 @@ const generatePayment = () => {
           style="
             margin-top: 50px;
             margin-right: 50px;
-            margin-left: 50px;
             margin-bottom: 50px;
+            margin-left: 50px;
           "
           class="payment-pdf"
         >
@@ -936,12 +937,12 @@ const generatePayment = () => {
             ใบสำคัญรับเงิน
           </div>
 
-          <div class="" style="margin-left: 400px; margin-top: 20px">
+          <div class="" style="margin-top: 20px; margin-left: 400px">
             วันที่
             ......................................................................
           </div>
 
-          <div class="" style="margin-left: 120px; margin-top: 20px">
+          <div class="" style="margin-top: 20px; margin-left: 120px">
             ข้าพเจ้า
             ...............................................................
             อยู่บ้านเลขที่.......................................................
@@ -965,10 +966,10 @@ const generatePayment = () => {
                 <td
                   class=""
                   style="
-                    padding-left: 10px;
+                    height: 300px;
                     padding-top: 10px;
                     padding-bottom: 10px;
-                    height: 300px;
+                    padding-left: 10px;
                     vertical-align: top;
                   "
                 >
@@ -982,11 +983,11 @@ const generatePayment = () => {
                 <td
                   class="text-right"
                   style="
-                    padding-left: 10px;
-                    padding-right: 10px;
-                    padding-top: 10px;
-                    padding-bottom: 10px;
                     height: 300px;
+                    padding-top: 10px;
+                    padding-right: 10px;
+                    padding-bottom: 10px;
+                    padding-left: 10px;
                     vertical-align: top;
                   "
                 ></td>
@@ -995,10 +996,10 @@ const generatePayment = () => {
                 <td
                   class="text-right"
                   style="
-                    padding-left: 10px;
                     padding-top: 10px;
                     padding-right: 10px;
                     padding-bottom: 10px;
+                    padding-left: 10px;
                     vertical-align: top;
                   "
                 >
@@ -1007,10 +1008,10 @@ const generatePayment = () => {
                 <td
                   class="text-right"
                   style="
-                    padding-left: 10px;
-                    padding-right: 10px;
                     padding-top: 10px;
+                    padding-right: 10px;
                     padding-bottom: 10px;
+                    padding-left: 10px;
                     vertical-align: top;
                   "
                 ></td>
@@ -1118,8 +1119,8 @@ const generatePayment = () => {
           style="
             margin-top: 50px;
             margin-right: 50px;
-            margin-left: 50px;
             margin-bottom: 50px;
+            margin-left: 50px;
           "
           class="payment-pdf"
         >
@@ -1145,9 +1146,9 @@ const generatePayment = () => {
                 <td
                   class="text-center"
                   style="
-                    padding-left: 10px;
                     padding-top: 10px;
                     padding-bottom: 10px;
+                    padding-left: 10px;
                   "
                 >
                   <span>
@@ -1156,10 +1157,10 @@ const generatePayment = () => {
                 </td>
                 <td
                   style="
-                    padding-left: 10px;
-                    padding-right: 10px;
                     padding-top: 10px;
+                    padding-right: 10px;
                     padding-bottom: 10px;
+                    padding-left: 10px;
                   "
                   class="text-center"
                 >
@@ -1167,20 +1168,20 @@ const generatePayment = () => {
                 </td>
                 <td
                   style="
-                    padding-left: 10px;
-                    padding-right: 10px;
                     padding-top: 10px;
+                    padding-right: 10px;
                     padding-bottom: 10px;
+                    padding-left: 10px;
                   "
                 >
                   {{ it.prefix_name + it.firstname + " " + it.surname }}
                 </td>
                 <td
                   style="
-                    padding-left: 10px;
-                    padding-right: 10px;
                     padding-top: 10px;
+                    padding-right: 10px;
                     padding-bottom: 10px;
+                    padding-left: 10px;
                   "
                 >
                   {{ it.company_name }}
@@ -1188,10 +1189,10 @@ const generatePayment = () => {
                 <td
                   class="text-center"
                   style="
-                    padding-left: 10px;
                     padding-top: 10px;
                     padding-right: 10px;
                     padding-bottom: 10px;
+                    padding-left: 10px;
                   "
                 >
                   <span> {{ getProvince(it.visit_province_id) }} </span>
@@ -1247,8 +1248,8 @@ const generatePayment = () => {
           style="
             margin-top: 50px;
             margin-right: 50px;
-            margin-left: 50px;
             margin-bottom: 50px;
+            margin-left: 50px;
           "
           class="payment-pdf"
         >
@@ -1273,9 +1274,9 @@ const generatePayment = () => {
                   <td
                     class="text-center"
                     style="
-                      padding-left: 10px;
                       padding-top: 10px;
                       padding-bottom: 10px;
+                      padding-left: 10px;
                     "
                   >
                     <span>
@@ -1284,10 +1285,10 @@ const generatePayment = () => {
                   </td>
                   <td
                     style="
-                      padding-left: 10px;
-                      padding-right: 10px;
                       padding-top: 10px;
+                      padding-right: 10px;
                       padding-bottom: 10px;
+                      padding-left: 10px;
                     "
                   >
                     ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา<br />
@@ -1296,10 +1297,10 @@ const generatePayment = () => {
                   </td>
                   <td
                     style="
-                      padding-left: 10px;
-                      padding-right: 10px;
                       padding-top: 10px;
+                      padding-right: 10px;
                       padding-bottom: 10px;
+                      padding-left: 10px;
                     "
                     class="text-right"
                   >
@@ -1308,10 +1309,10 @@ const generatePayment = () => {
                   <td
                     class="text-center"
                     style="
-                      padding-left: 10px;
                       padding-top: 10px;
                       padding-right: 10px;
                       padding-bottom: 10px;
+                      padding-left: 10px;
                     "
                   >
                     <span> </span>
@@ -1379,9 +1380,10 @@ const generatePayment = () => {
 </template>
 
 <style lang="scss">
-@import url("https://fonts.googleapis.com/css2?family=Sarabun&display=swap");
+@import "https://fonts.googleapis.com/css2?family=Sarabun&display=swap";
+
 .payment-pdf {
-  font-family: "Sarabun", sans-serif;
+  font-family: Sarabun, sans-serif;
 }
 
 .table-payment,

@@ -13,7 +13,13 @@ import axios from "@axios";
 import { useConfigDefaultStore } from "../../store/configDefault";
 const configDefaultStore = useConfigDefaultStore();
 if (configDefaultStore.config == undefined) {
-  configDefaultStore.fetchConfig().then(() => {});
+  configDefaultStore.fetchConfig().then(() => {
+    if (props.user_type != "major-head") {
+      fetchSemesters();
+    } else {
+      fetchMajorHeads();
+    }
+  });
 }
 
 const studentListStore = useStudentListStore();
@@ -120,7 +126,7 @@ if (props.user_type == "teacher") {
         isOverlay.value = false;
       });
   };
-  fetchMajorHeads();
+  // fetchMajorHeads();
 } else if (props.user_type == "supervisor") {
   selectOptions.value.approve_statuses = [];
   //
@@ -173,9 +179,9 @@ const fetchSemesters = () => {
     });
 };
 
-if (props.user_type != "major-head") {
-  fetchSemesters();
-}
+// if (props.user_type != "major-head") {
+//   fetchSemesters();
+// }
 
 // เฉพาะเมนูของคณะและประธานบริหาร
 const fetchTeachers = () => {

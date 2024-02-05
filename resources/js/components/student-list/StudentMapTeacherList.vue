@@ -2,7 +2,7 @@
 import StudentView from "@/components/student-view/StudentView.vue";
 import { requiredValidator } from "@validators";
 import {
-  class_rooms,
+  class_rooms,  
   class_years,
   statuses,
   form_statuses,
@@ -12,6 +12,11 @@ import { useStudentListStore } from "./useStudentListStore";
 import axios from "@axios";
 import JsonExcel from "vue-json-excel3";
 import XLSX from "xlsx";
+import { useConfigDefaultStore } from "../../store/configDefault";
+const configDefaultStore = useConfigDefaultStore();
+if (configDefaultStore.config == undefined) {
+  configDefaultStore.fetchConfig().then(() => {});
+}
 
 const studentListStore = useStudentListStore();
 
@@ -151,8 +156,13 @@ const fetchSemesters = () => {
     .then((response) => {
       if (response.status === 200) {
         selectOptions.value.semesters = response.data.data.map((r) => {
-          if (r.is_current == 1) {
-            advancedSearch.semester_id = r.id;
+          if (configDefaultStore.config) {
+            advancedSearch.semester_id =
+              configDefaultStore.config.staff_year_default;
+          } else {
+            if (r.is_current == 1) {
+              advancedSearch.semester_id = r.id;
+            }
           }
 
           return {
@@ -682,7 +692,7 @@ const onImportSubmit = () => {
               </thead>
               <!-- 👉 table body -->
               <tbody>
-                <tr v-for="it in items" :key="it.id" style="height: 3.75rem;">
+                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
                   <td class="text-center">
                     {{ it.firstname + " " + it.surname }}
                   </td>
@@ -702,7 +712,7 @@ const onImportSubmit = () => {
                     {{ it.supervision_name }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px;">
+                  <td class="text-center" style="min-width: 100px">
                     <VChip label :color="form_statuses[it.status_id]">{{
                       statusShow(
                         it.status_id,
@@ -713,7 +723,7 @@ const onImportSubmit = () => {
                   </td>
 
                   <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px;">
+                  <td class="text-center" style="min-width: 80px">
                     <VBtn
                       color="info"
                       target="_blank"
@@ -731,7 +741,7 @@ const onImportSubmit = () => {
                       View</VBtn
                     >
                   </td>
-                  <td class="text-center" style="min-width: 80px;">
+                  <td class="text-center" style="min-width: 80px">
                     <VBtn
                       color="info"
                       target="_blank"
@@ -795,7 +805,7 @@ const onImportSubmit = () => {
       v-model="isDialogViewStudent"
       persistent
       class="v-dialog-lg"
-      style="z-index: 20001;"
+      style="z-index: 20001"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogViewStudent = !isDialogViewStudent" />
@@ -816,7 +826,7 @@ const onImportSubmit = () => {
       v-model="isDialogEditSupervisor"
       persistent
       class="v-dialog-lg"
-      style="z-index: 2000;"
+      style="z-index: 2000"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn
@@ -850,7 +860,7 @@ const onImportSubmit = () => {
       contained
       persistent
       class="v-dialog-lg"
-      style="z-index: 2000;"
+      style="z-index: 2000"
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn

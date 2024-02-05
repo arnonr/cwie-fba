@@ -684,11 +684,11 @@ const generatePDF1 = async () => {
     }
   );
 
-  existingPage.drawText(chairman.value.executive_position, {
-    x: 275,
-    y: 135,
-    ...defaultSize,
-  });
+  // existingPage.drawText(chairman.value.executive_position, {
+  //   x: 275,
+  //   y: 135,
+  //   ...defaultSize,
+  // });
 
   const [existingPage2] = await pdfDoc.copyPages(pdfTemplate, [1]);
   pdfDoc.addPage(existingPage2);
