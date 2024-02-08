@@ -140,8 +140,14 @@ if (props.user_type == "major-head") {
   ];
 
   selectOptions.value.visit_statuses = [
+    // { title: "รอออกหนังสือขอเข้านิเทศ", value: 31 },
+
+    { title: "อยู่ระหว่างประธานนิเทศอนุมัติ", value: 11 },
+    { title: "อยู่ระหว่างผู้บริหารอนุมัติ", value: 21 },
     { title: "รอออกหนังสือขอเข้านิเทศ", value: 31 },
     { title: "ออกหนังสือขอเข้านิเทศแล้ว", value: 4 },
+    { title: "อยู่ระหว่างตรวจสอบรายงานผล", value: 51 },
+    { title: "สำเร็จ", value: 61 },
   ];
 }
 

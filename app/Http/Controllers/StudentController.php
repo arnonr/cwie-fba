@@ -334,6 +334,34 @@ class StudentController extends Controller
                                     ->where("visit.active", 1)
                                     ->where("visit.visit_status", "=", 4);
                             });
+                        } elseif ($request->visit_status == 5) {
+                            $items->join("visit", function ($join) {
+                                $join
+                                    ->on("form.id", "=", "visit.form_id")
+                                    ->where("visit.active", 1)
+                                    ->where("visit.visit_status", ">", 4);
+                            });
+                        } elseif ($request->visit_status == 51) {
+                            $items->join("visit", function ($join) {
+                                $join
+                                    ->on("form.id", "=", "visit.form_id")
+                                    ->where("visit.active", 1)
+                                    ->where("visit.visit_status", "=", 5);
+                            });
+                        } elseif ($request->visit_status == 6) {
+                            $items->join("visit", function ($join) {
+                                $join
+                                    ->on("form.id", "=", "visit.form_id")
+                                    ->where("visit.active", 1)
+                                    ->where("visit.visit_status", ">", 5);
+                            });
+                        } elseif ($request->visit_status == 61) {
+                            $items->join("visit", function ($join) {
+                                $join
+                                    ->on("form.id", "=", "visit.form_id")
+                                    ->where("visit.active", 1)
+                                    ->where("visit.visit_status", "=", 6);
+                            });
                         } else {
                             // status = 0
                             $items
