@@ -94,38 +94,6 @@ if (props.user_type == "teacher") {
     { title: "รอประธานอาจารย์นิเทศอนุมัติ", value: 3 },
     { title: "ประธานอาจารย์นิเทศอนุมัติเรียบร้อย", value: 4 },
   ];
-
-  const fetchMajorHeads = () => {
-    studentListStore
-      .fetchMajorHeads({
-        teacher_id: teacherData.id,
-        perPage: 100,
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          let semester = response.data.data.map((r) => {
-            console.log(r.semester_id);
-            return r.semester_id;
-          });
-
-          major.value = response.data.data.map((r) => {
-            return r.major_id;
-          });
-
-          if (semester.length == 0) {
-            checkSemester.value = false;
-          }
-          fetchSemesters();
-          fetchItems();
-        } else {
-          console.log("error");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        isOverlay.value = false;
-      });
-  };
   // fetchMajorHeads();
 } else if (props.user_type == "supervisor") {
   selectOptions.value.approve_statuses = [];
@@ -169,6 +137,38 @@ const fetchSemesters = () => {
           };
         });
         isOverlay.value = false;
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      isOverlay.value = false;
+    });
+};
+
+const fetchMajorHeads = () => {
+  studentListStore
+    .fetchMajorHeads({
+      teacher_id: teacherData.id,
+      perPage: 100,
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        let semester = response.data.data.map((r) => {
+          console.log(r.semester_id);
+          return r.semester_id;
+        });
+
+        major.value = response.data.data.map((r) => {
+          return r.major_id;
+        });
+
+        if (semester.length == 0) {
+          checkSemester.value = false;
+        }
+        fetchSemesters();
+        fetchItems();
       } else {
         console.log("error");
       }
