@@ -80,7 +80,7 @@ const selectOptions = ref({
   ],
 });
 
-const teacherData = null;
+let teacherData = null;
 
 if (props.user_type == "teacher") {
   teacherData = JSON.parse(localStorage.getItem("teacherData"));
