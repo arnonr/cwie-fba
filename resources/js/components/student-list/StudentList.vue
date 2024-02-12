@@ -80,8 +80,10 @@ const selectOptions = ref({
   ],
 });
 
+const teacherData = null;
+
 if (props.user_type == "teacher") {
-  const teacherData = JSON.parse(localStorage.getItem("teacherData"));
+  teacherData = JSON.parse(localStorage.getItem("teacherData"));
   advancedSearch.advisor_id = teacherData.id;
 
   selectOptions.value.approve_statuses = [
@@ -89,7 +91,7 @@ if (props.user_type == "teacher") {
     { title: "ที่ปรึกษาอนุมัติเรียบร้อย", value: 2 },
   ];
 } else if (props.user_type == "major-head") {
-  const teacherData = JSON.parse(localStorage.getItem("teacherData"));
+  teacherData = JSON.parse(localStorage.getItem("teacherData"));
   selectOptions.value.approve_statuses = [
     { title: "รอประธานอาจารย์นิเทศอนุมัติ", value: 3 },
     { title: "ประธานอาจารย์นิเทศอนุมัติเรียบร้อย", value: 4 },
