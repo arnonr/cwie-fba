@@ -1,14 +1,11 @@
 <script setup>
 import VisitApprove from "@/components/visit/VisitApprove.vue";
 import VisitDownload from "@/components/visit/VisitDownload.vue";
-import { requiredValidator } from "@validators";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import { useRoute, useRouter } from "vue-router";
 import { useVisitViewStore } from "./useVisitViewStore";
-
-import VueDatePicker from "@vuepic/vue-datepicker";
 
 import "@vuepic/vue-datepicker/dist/main.css";
 
@@ -267,7 +264,11 @@ const refreshData = () => {
       />
 
       <VisitDownload
-        v-if="props.user_type == 'supervisor'"
+        v-if="
+          props.user_type == 'supervisor' ||
+          props.user_type == 'staff' ||
+          props.user_type == 'chairman'
+        "
         :student_id="props.student_id"
         :formActive="formActive"
         :visitAll="items"

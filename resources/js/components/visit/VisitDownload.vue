@@ -987,7 +987,13 @@ const generatePDF2 = async () => {
 
 <template>
   <div>
-    <div v-if="props.user_type == 'supervisor'">
+    <div
+      v-if="
+        props.user_type == 'supervisor' ||
+        props.user_type == 'staff' ||
+        props.user_type == 'chairman'
+      "
+    >
       <VCol
         cols="12"
         md="12"
@@ -1059,6 +1065,7 @@ const generatePDF2 = async () => {
               isDialogVisible = true;
             }
           "
+          v-if="props.user_type == 'supervisor'"
         >
           <VIcon
             size="16"
