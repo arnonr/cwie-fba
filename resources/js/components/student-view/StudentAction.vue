@@ -1,16 +1,15 @@
 <script setup>
-import { useStudentActionStore } from "./useStudentActionStore";
+import axios from "@axios";
+import fontkit from "@pdf-lib/fontkit";
 import { requiredValidator } from "@validators";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
-import buddhistEra from "dayjs/plugin/buddhistEra";
-import { onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
 import { PDFDocument, rgb } from "pdf-lib";
-import fontkit from "@pdf-lib/fontkit";
 import Swal from "sweetalert2";
 import "sweetalert2/src/sweetalert2.scss";
-import axios from "@axios";
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useStudentActionStore } from "./useStudentActionStore";
 
 const studentActionStore = useStudentActionStore();
 const props = defineProps(["student_id", "formActive", "student"]);

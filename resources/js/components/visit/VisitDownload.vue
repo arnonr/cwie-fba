@@ -1,13 +1,12 @@
 <script setup>
-import { useVisitDownloadStore } from "./useVisitDownloadStore";
+import fontkit from "@pdf-lib/fontkit";
 import { requiredValidator } from "@validators";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
-import buddhistEra from "dayjs/plugin/buddhistEra";
-import { onMounted } from "vue";
 import { PDFDocument, rgb } from "pdf-lib";
-import fontkit from "@pdf-lib/fontkit";
+import { onMounted } from "vue";
 import "vue3-pdf-app/dist/icons/main.css";
+import { useVisitDownloadStore } from "./useVisitDownloadStore";
 
 const visitDownloadStore = useVisitDownloadStore();
 const props = defineProps([
@@ -319,7 +318,7 @@ const generatePDF = async () => {
   existingPage.drawText(
     props.visitActive.address != null ? props.visitActive.address : "",
     {
-      x: 100,
+      x: 80,
       y: 622,
       ...defaultSize,
     }
@@ -345,19 +344,19 @@ const generatePDF = async () => {
 
   existingPage.drawText(props.visitActive.co_name, {
     x: 130,
-    y: 573,
+    y: 574,
     ...defaultSize,
   });
 
   existingPage.drawText(props.visitActive.co_position, {
-    x: 320,
-    y: 574,
+    x: 90,
+    y: 550,
     ...defaultSize,
   });
 
   existingPage.drawText(props.visitActive.co_phone, {
-    x: 475,
-    y: 574,
+    x: 450,
+    y: 550,
     ...defaultSize,
   });
 
@@ -368,22 +367,22 @@ const generatePDF = async () => {
       props.student.surname,
     {
       x: 135,
-      y: 550,
+      y: 526,
       ...defaultSize,
     }
   );
 
   existingPage.drawText(props.student.student_code, {
-    x: 370,
-    y: 550,
+    x: 410,
+    y: 526,
     ...defaultSize,
   });
 
   existingPage.drawText(
     dayjs(props.visitActive.visit_date).locale("th").format("DD MMMM BBBB"),
     {
-      x: 72,
-      y: 525,
+      x: 74,
+      y: 502,
       ...defaultSize,
     }
   );
@@ -393,11 +392,11 @@ const generatePDF = async () => {
     let visit_time_arr = props.visitActive.visit_time.split(":");
     visit_time = visit_time_arr[0] + ":" + visit_time_arr[1];
   }
-  existingPage.drawText(visit_time, { x: 187, y: 525, ...defaultSize });
+  existingPage.drawText(visit_time, { x: 222, y: 502, ...defaultSize });
 
   existingPage.drawText(props.formActive.supervision_name, {
     x: 420, //คอลัมน์ ซ้ายไปขวา
-    y: 338, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    y: 316, //แถว ยิ่งมากยิ่งอยู่ด้านบน
     ...defaultSize,
   });
 
@@ -405,14 +404,14 @@ const generatePDF = async () => {
     dayjs(props.visitActive.created_at).locale("th").format("DD MMMM BBBB"),
     {
       x: 420, //คอลัมน์ ซ้ายไปขวา
-      y: 296, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+      y: 274, //แถว ยิ่งมากยิ่งอยู่ด้านบน
       ...defaultSize,
     }
   );
 
   existingPage.drawText(major_head_name.value, {
     x: 110, //คอลัมน์ ซ้ายไปขวา
-    y: 267, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+    y: 244, //แถว ยิ่งมากยิ่งอยู่ด้านบน
     ...defaultSize,
   });
 
@@ -420,7 +419,7 @@ const generatePDF = async () => {
     dayjs(props.visitActive.created_at).locale("th").format("DD MMMM BBBB"),
     {
       x: 110, //คอลัมน์ ซ้ายไปขวา
-      y: 247, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+      y: 223, //แถว ยิ่งมากยิ่งอยู่ด้านบน
       ...defaultSize,
     }
   );
@@ -450,7 +449,7 @@ const generatePDF = async () => {
       chairman.value.surname,
     {
       x: 110,
-      y: 115,
+      y: 93,
       ...defaultSize,
     }
   );
@@ -459,7 +458,7 @@ const generatePDF = async () => {
     dayjs(props.visitActive.created_at).locale("th").format("DD MMMM BBBB"),
     {
       x: 110, //คอลัมน์ ซ้ายไปขวา
-      y: 94, //แถว ยิ่งมากยิ่งอยู่ด้านบน
+      y: 72, //แถว ยิ่งมากยิ่งอยู่ด้านบน
       ...defaultSize,
     }
   );
