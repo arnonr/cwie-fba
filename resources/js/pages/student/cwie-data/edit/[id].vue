@@ -375,6 +375,8 @@ const onSubmit = () => {
             item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
               : null,
+          response_document_file: undefined,
+          plan_document_file: undefined,
         })
         .then((response) => {
           if (response.data.message == "success") {
