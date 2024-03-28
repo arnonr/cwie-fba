@@ -375,8 +375,6 @@ const onSubmit = () => {
             item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
               : null,
-          response_document_file: undefined,
-          plan_document_file: undefined,
         })
         .then((response) => {
           if (response.data.message == "success") {
@@ -415,6 +413,8 @@ const onStaffSubmit = () => {
               ? item.value.namecard_file[0]
               : null,
           start_date: dayjs(item.value.start_date).format("YYYY-MM-DD"),
+          response_document_file: undefined,
+          plan_document_file: undefined,
         })
         .then((response) => {
           if (response.data.message == "success") {
