@@ -409,10 +409,10 @@ class TeacherController extends Controller
 
         $item->signature_file = $pathSignature;
         $item->address = $request->address ? $request->address : $item->address;
-        $item->province_id = $request->hprovince_id
+        $item->province_id = $request->province_id
             ? $request->province_id
             : $item->province_id;
-        $item->amphur_id = $request->hamphur_id
+        $item->amphur_id = $request->amphur_id
             ? $request->amphur_id
             : $item->amphur_id;
         $item->tumbol_id = $request->tumbol_id
