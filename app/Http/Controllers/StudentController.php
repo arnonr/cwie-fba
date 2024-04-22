@@ -930,15 +930,15 @@ class StudentController extends Controller
             $req = new Request();
             $req->student_code = $json_data["STU_CODE"];
 
-            if ($json_data["STU_PRE_NAME"] == "นางสาว") {
+            if ($json_data["PRE_NAME_THAI"] == "นางสาว") {
                 $req->prefix_id = "03";
             }
 
-            if ($json_data["STU_PRE_NAME"] == "นาง") {
+            if ($json_data["PRE_NAME_THAI"] == "นาง") {
                 $req->prefix_id = "02";
             }
 
-            if ($json_data["STU_PRE_NAME"] == "นาย") {
+            if ($json_data["PRE_NAME_THAI"] == "นาย") {
                 $req->prefix_id = "01";
             }
 
