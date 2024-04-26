@@ -271,6 +271,10 @@ Route::group(["prefix" => "visit-reject-log"], function () {
 });
 
 Route::group(["prefix" => "visit"], function () {
+    Route::get("/update-travel-express", [
+        VisitController::class,
+        "updateTravelExpress",
+    ]);
     Route::get("/{id}", [VisitController::class, "get"]);
     Route::get("/", [VisitController::class, "getAll"]);
     Route::put("/approve/{id}", [VisitController::class, "approve"]);

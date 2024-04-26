@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Visit;
+use App\Models\Province;
 use Carbon\Carbon;
 use Validator;
 use Illuminate\Support\Facades\Storage;
@@ -358,6 +359,8 @@ class VisitController extends Controller
             }
         }
 
+        // $request->travel_expense
+
         $item = new Visit();
         $item->supervision_id = $request->supervision_id;
         $item->form_id = $request->form_id;
@@ -493,6 +496,26 @@ class VisitController extends Controller
         } else {
             $pathMap = $item->cancel_file;
         }
+        $pv = null;
+        if ($request->province_id) {
+            $pv = Province::select(
+                "province.province_id as province_id",
+                "province.province_code as province_code",
+                "province.name_th as name_th",
+                "province.name_en as name_en",
+                "province.visit_expense as visit_expense",
+                "province.travel_expense as travel_expense",
+                "province.active as active"
+            )
+                ->where("province.province_id", $request->province_id)
+                ->first();
+        }
+
+        // travel_expense
+
+        // $item->news_title = $request->has("news_title")
+        //     ? $request->news_title
+        //     : $item->news_title;
 
         // $item->news_title = $request->has("news_title")
         //     ? $request->news_title
@@ -579,9 +602,10 @@ class VisitController extends Controller
         $item->visit_expense = $request->has("visit_expense")
             ? $request->visit_expense
             : $item->visit_expense;
-        $item->travel_expense = $request->has("travel_expense")
-            ? $request->travel_expense
-            : $item->travel_expense;
+        $item->travel_expense = $pv != null ? $pv->travel_expense : null;
+        // $item->travel_expense = $request->has("travel_expense")
+        //     ? $request->travel_expense
+        //     : $item->travel_expense;
         $item->active = $request->has("active")
             ? $request->active
             : $item->active;
@@ -803,6 +827,36 @@ class VisitController extends Controller
         $responseData = [
             "message" => "success",
             "data" => $item,
+        ];
+
+        return response()->json($responseData, 200);
+    }
+
+    public function updateTravelExpress()
+    {
+        $vs = Visit::all();
+
+        $vsLength = count($vs);
+
+        for ($i = 0; $i < $vsLength; $i++) {
+            $pv = Province::where("province_id", $vs[$i]->province_id)->first();
+
+            if ($vs[$i]->travel_expense == null) {
+                if ($pv) {
+                    $vs[$i]->travel_expense = $pv->travel_expense;
+                }
+            }
+            if ($vs[$i]->visit_expense == null) {
+                if ($pv) {
+                    $vs[$i]->visit_expense = $pv->visit_expense;
+                }
+            }
+            $vs[$i]->save();
+        }
+
+        $responseData = [
+            "message" => "success",
+            "data" => [],
         ];
 
         return response()->json($responseData, 200);
