@@ -68,6 +68,7 @@ const advancedSearch = reactive({
   visit_status: "",
 });
 const teacherData = ref({});
+const total_travel = ref(0);
 const selectOptions = ref({
   perPage: [
     { title: "20", value: 20 },
@@ -488,8 +489,12 @@ const onPayment = () => {
               });
             }
           });
+
           travel_array.value = ta;
-          console.log(travel_array.value);
+
+          travel_array.value.forEach((el) => {
+            total_travel.value = total_travel.value + el.price.expense;
+          });
           studentListPDF.value = students;
           generatePayment();
         }
@@ -1087,11 +1092,15 @@ const generatePayment = () => {
         </span>
 
         <span style="position: absolute; top: 370px; left: 680px"
-          >{{ countPDF * semesterPDF.semester_visit_expense }}.00
+          >{{
+            (countPDF * semesterPDF.semester_visit_expense).toLocaleString()
+          }}.00
         </span>
 
         <span style="position: absolute; top: 670px; left: 680px"
-          >{{ countPDF * semesterPDF.semester_visit_expense }}.00
+          >{{
+            (countPDF * semesterPDF.semester_visit_expense).toLocaleString()
+          }}.00
         </span>
 
         <span style="position: absolute; top: 720px; left: 200px"
@@ -1215,7 +1224,11 @@ const generatePayment = () => {
             <span style="padding-left: 15 px"
               >ค่าตอบแทนการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษาจํานวน
               {{ countPDF }} คนรวมเป็นเงิน
-              {{ semesterPDF.semester_visit_expense * countPDF }}.00 บาท</span
+              {{
+                (
+                  semesterPDF.semester_visit_expense * countPDF
+                ).toLocaleString()
+              }}.00 บาท</span
             >
           </div>
 
@@ -1232,7 +1245,7 @@ const generatePayment = () => {
                     {{ getProvince(cp.province_id) }}
                     {{
                       it.price.id == cp.id
-                        ? `เหมาจ่าย ${it.price.expense}.00 บาท`
+                        ? `เหมาจ่าย ${it.price.expense.toLocaleString()}.00 บาท`
                         : ""
                     }}
                   </td>
@@ -1309,7 +1322,11 @@ const generatePayment = () => {
                     "
                     class="text-right"
                   >
-                    {{ cp.id == it.price.id ? `${it.price.expense}.00` : "" }}
+                    {{
+                      cp.id == it.price.id
+                        ? `${it.price.expense.toLocaleString()}.00`
+                        : ""
+                    }}
                   </td>
                   <td
                     class="text-center"
@@ -1328,12 +1345,7 @@ const generatePayment = () => {
           </div>
 
           <div class="" style="margin-top: 20px">
-            <span
-              >รวมทั้งสิ้น (ตัวอักษร)
-              {{
-                bahttext(countPDF * semesterPDF.semester_visit_expense)
-              }}</span
-            >
+            <span>รวมทั้งสิ้น (ตัวอักษร) {{ bahttext(total_travel) }}</span>
           </div>
           <div class="" style="margin-top: 20px; margin-left: 40px">
             ข้าพเจ้า
@@ -1373,9 +1385,17 @@ const generatePayment = () => {
             <span style="padding-left: 50px">ตำแหน่งอาจารย์</span>
             <br />
             <span style="padding-left: 50px"
-              >วันที่..........................................</span
+              >วันที่
+              {{
+                dayjs(studentListPDF[studentListPDF.length - 1]?.visit_date)
+                  .locale("th")
+                  .format("DD MMMM BBBB")
+              }}</span
             >
           </div>
+
+          <!-- {{
+            studentListPDF[studentListPDF.length - 1].visit_date  }}-->
         </div>
       </template>
     </vue3-html2pdf>
