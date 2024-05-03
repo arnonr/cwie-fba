@@ -1087,8 +1087,8 @@ const generatePayment = () => {
           >{{ countPDF }}
         </span>
 
-        <span style="position: absolute; top: 435px; left: 220px"
-          >{{ semesterPDF.semester_visit_expense }}
+        <span style="position: absolute; top: 435px; left: 219px"
+          >{{ semesterPDF.semester_visit_expense }}.00
         </span>
 
         <span style="position: absolute; top: 370px; left: 680px"
