@@ -454,13 +454,21 @@ const onPayment = () => {
                   name: e.company_name,
                   province_id: e.visit_province_id,
                 });
-              }
 
-              findDate.companies2.push({
-                id: e.company_id,
-                name: e.company_name,
-                province_id: e.visit_province_id,
-              });
+                findDate.companies2.push({
+                  id: e.company_id,
+                  name: e.company_name,
+                  province_id: e.visit_province_id,
+                  show_price: true,
+                });
+              } else {
+                findDate.companies2.push({
+                  id: e.company_id,
+                  name: e.company_name,
+                  province_id: e.visit_province_id,
+                  show_price: false,
+                });
+              }
 
               if (findDate.price.expense < e.visit_travel_expense) {
                 findDate.price = {
@@ -483,6 +491,7 @@ const onPayment = () => {
                     id: e.company_id,
                     name: e.company_name,
                     province_id: e.visit_province_id,
+                    show_price: true,
                   },
                 ],
                 price: { id: e.company_id, expense: e.visit_travel_expense },
@@ -1323,9 +1332,9 @@ const generatePayment = () => {
                     class="text-right"
                   >
                     {{
-                      cp.id == it.price.id
+                      cp.show_price == true
                         ? `${it.price.expense.toLocaleString()}.00`
-                        : ""
+                        : "-"
                     }}
                   </td>
                   <td
@@ -1341,12 +1350,27 @@ const generatePayment = () => {
                   </td>
                 </tr>
               </tbody>
+              <tr>
+                <td colspan="2" class="text-right pa-2">
+                  <span class="fw-bold"> รวมทั้งสิ้น </span>
+                </td>
+                <td class="pa-2 text-right">
+                  {{ total_travel.toLocaleString() }}.00
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td colspan="4" class="pa-2">
+                  <span>รวมทั้งสิ้น (ตัวอักษร) </span>
+                  <span class="ml-10 ms-10">{{ bahttext(total_travel) }}</span>
+                </td>
+              </tr>
             </table>
           </div>
 
-          <div class="" style="margin-top: 20px">
+          <!-- <div class="" style="margin-top: 20px">
             <span>รวมทั้งสิ้น (ตัวอักษร) {{ bahttext(total_travel) }}</span>
-          </div>
+          </div> -->
           <div class="" style="margin-top: 20px; margin-left: 40px">
             ข้าพเจ้า
             <span>{{
