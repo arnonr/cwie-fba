@@ -448,7 +448,11 @@ const onPayment = () => {
                 return x.id == e.company_id;
               });
 
-              if (!checkCompany) {
+              let checkProvince = findDate.companies.find((x) => {
+                return x.province_id == e.visit_province_id;
+              });
+
+              if (!checkCompany && !checkProvince) {
                 findDate.companies.push({
                   id: e.company_id,
                   name: e.company_name,
