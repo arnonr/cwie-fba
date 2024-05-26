@@ -69,6 +69,7 @@ const advancedSearch = reactive({
 });
 const teacherData = ref({});
 const total_travel = ref(0);
+const visit_expense_all = ref(0);
 const selectOptions = ref({
   perPage: [
     { title: "20", value: 20 },
@@ -97,8 +98,6 @@ const countPDF = ref(0);
 const studentListPDF = ref([]);
 const chairmanPDF = ref({ data: {} });
 let isAdminSecret = JSON.parse(localStorage.getItem("isAdminSecret"));
-console.log(isAdminSecret);
-
 if (props.user_type == "teacher") {
   teacherData.value = JSON.parse(localStorage.getItem("teacherData"));
   advancedSearch.advisor_id = teacherData.value.id;
@@ -166,7 +165,6 @@ const fetchProvince = async () => {
   });
   provinces.value = res.data.data;
 };
-fetchProvince();
 
 const fetchAmphur = async () => {
   let res = await axios.get("/amphur", {
@@ -174,7 +172,6 @@ const fetchAmphur = async () => {
   });
   amphurs.value = res.data.data;
 };
-fetchAmphur();
 
 const fetchTumbol = async () => {
   let res = await axios.get(
@@ -186,7 +183,6 @@ const fetchTumbol = async () => {
   );
   tumbols.value = res.data.data;
 };
-fetchTumbol();
 
 const fetchSemesters = () => {
   let search = {};
@@ -232,8 +228,8 @@ if (props.user_type != "major-head") {
 }
 
 // เฉพาะเมนูของคณะและประธานบริหาร
-const fetchTeachers = () => {
-  studentListStore
+const fetchTeachers = async () => {
+  await studentListStore
     .fetchTeachers({})
     .then((response) => {
       if (response.status === 200) {
@@ -262,11 +258,9 @@ const fetchTeachers = () => {
       isOverlay.value = false;
     });
 };
-fetchTeachers();
-
 // เฉพาะเมนูของคณะและประธานบริหาร
-const fetchMajors = () => {
-  studentListStore
+const fetchMajors = async () => {
+  await studentListStore
     .fetchMajors({})
     .then((response) => {
       if (response.status === 200) {
@@ -286,8 +280,6 @@ const fetchMajors = () => {
       isOverlay.value = false;
     });
 };
-fetchMajors();
-
 // 👉 Fetching
 
 const fetchItems = () => {
@@ -383,7 +375,14 @@ watch(advancedSearch, (value) => {
   }
 });
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchProvince();
+  await fetchAmphur();
+  await fetchTumbol();
+  await fetchTeachers();
+
+  await fetchMajors();
+
   window.scrollTo(0, 0);
 });
 
@@ -391,6 +390,11 @@ const refreshData = () => {
   isDialogFormVisitStudent.value = false;
   isDialogViewVisitStudent.value = false;
   fetchItems();
+};
+
+const html2Pdf = ref(null);
+const generatePayment = () => {
+  html2Pdf.value.generatePdf();
 };
 
 const onPayment = () => {
@@ -498,7 +502,13 @@ const onPayment = () => {
                     show_price: true,
                   },
                 ],
-                price: { id: e.company_id, expense: e.visit_travel_expense },
+                price: {
+                  id: e.company_id,
+                  expense:
+                    e.visit_travel_expense != null
+                      ? e.visit_travel_expense.toLocaleString()
+                      : null,
+                },
               });
             }
           });
@@ -506,9 +516,13 @@ const onPayment = () => {
           travel_array.value = ta;
 
           travel_array.value.forEach((el) => {
-            total_travel.value = total_travel.value + el.price.expense;
+            total_travel.value = Number(total_travel.value) + Number(el.price.expense);
           });
           studentListPDF.value = students;
+
+          visit_expense_all.value = (
+            semesterPDF.value.semester_visit_expense * countPDF.value
+          ).toLocaleString();
           generatePayment();
         }
       } else {
@@ -523,11 +537,6 @@ const onPayment = () => {
   // if()
   // check ว่าครบทุกคนไหม ถ้าไม่ครบ alert
   // ถ้าครบแล้วกดออกใบได้ที่ function PDF
-};
-
-const html2Pdf = ref(null);
-const generatePayment = () => {
-  html2Pdf.value.generatePdf();
 };
 </script>
 
@@ -1105,15 +1114,11 @@ const generatePayment = () => {
         </span>
 
         <span style="position: absolute; top: 370px; left: 680px"
-          >{{
-            (countPDF * semesterPDF.semester_visit_expense).toLocaleString()
-          }}.00
+          >{{ visit_expense_all }}.00
         </span>
 
         <span style="position: absolute; top: 670px; left: 680px"
-          >{{
-            (countPDF * semesterPDF.semester_visit_expense).toLocaleString()
-          }}.00
+          >{{ visit_expense_all }}.00
         </span>
 
         <span style="position: absolute; top: 720px; left: 200px"
@@ -1234,14 +1239,9 @@ const generatePayment = () => {
               (อัตราค่าตอบแทนเหมาจ่ายไม่เกิน
               {{ semesterPDF.semester_visit_expense }} บาท/นักศึกษา 1 คน)</span
             ><br />
-            <span style="padding-left: 15 px"
+            <span style="padding-left: 15px"
               >ค่าตอบแทนการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษาจํานวน
-              {{ countPDF }} คนรวมเป็นเงิน
-              {{
-                (
-                  semesterPDF.semester_visit_expense * countPDF
-                ).toLocaleString()
-              }}.00 บาท</span
+              {{ countPDF }} คนรวมเป็นเงิน {{ visit_expense_all }}.00 บาท</span
             >
           </div>
 
@@ -1258,7 +1258,7 @@ const generatePayment = () => {
                     {{ getProvince(cp.province_id) }}
                     {{
                       it.price.id == cp.id
-                        ? `เหมาจ่าย ${it.price.expense.toLocaleString()}.00 บาท`
+                        ? `เหมาจ่าย ${it.price.expense}.00 บาท`
                         : ""
                     }}
                   </td>
@@ -1335,11 +1335,7 @@ const generatePayment = () => {
                     "
                     class="text-right"
                   >
-                    {{
-                      cp.show_price == true
-                        ? `${it.price.expense.toLocaleString()}.00`
-                        : "-"
-                    }}
+                    {{ cp.show_price == true ? `${it.price.expense}.00` : "-" }}
                   </td>
                   <td
                     class="text-center"
@@ -1358,9 +1354,7 @@ const generatePayment = () => {
                 <td colspan="2" class="text-right pa-2">
                   <span class="fw-bold"> รวมทั้งสิ้น </span>
                 </td>
-                <td class="pa-2 text-right">
-                  {{ total_travel.toLocaleString() }}.00
-                </td>
+                <td class="pa-2 text-right">{{ total_travel }}.00</td>
                 <td></td>
               </tr>
               <tr>
