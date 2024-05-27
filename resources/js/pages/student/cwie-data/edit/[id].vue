@@ -362,11 +362,14 @@ const onCheckSubmit = () => {
 };
 const onSubmit = () => {
   isOverlay.value = true;
+
+
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
       cwieDataStore
         .editForm({
           ...item.value,
+          end_date: dayjs(item.value.end_date).format("YYYY-MM-DD"),
           status_id:
             item.value.reject_status_id != 5
               ? item.value.reject_status_id + 1
@@ -408,6 +411,7 @@ const onStaffSubmit = () => {
       cwieDataStore
         .editForm({
           ...item.value,
+          end_date: dayjs(item.value.end_date).format("YYYY-MM-DD"),
           namecard_file:
             item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]

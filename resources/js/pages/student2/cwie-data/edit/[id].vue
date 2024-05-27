@@ -345,6 +345,7 @@ const onSubmit = () => {
       cwieDataStore
         .editForm({
           ...item.value,
+          end_date: dayjs(item.value.end_date).format("YYYY-MM-DD"),
           status_id:
             item.value.reject_status_id != 5
               ? item.value.reject_status_id + 1
