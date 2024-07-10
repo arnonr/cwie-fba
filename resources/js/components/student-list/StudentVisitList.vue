@@ -1013,7 +1013,7 @@ const onPayment = () => {
                 >
                   <span>
                     ค่าตอบแทนการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษา<br />
-                    โครงการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษาคณะบริหารธุรกิจ<br />
+                    <!-- โครงการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษาคณะบริหารธุรกิจ<br /> -->
                     ภาคการศึกษาที่ &nbsp; &nbsp; ปีการศึกษา <br />
                     (จำนวน.............คน คนละ.......................บาท)
                   </span>
@@ -1103,19 +1103,19 @@ const onPayment = () => {
           >{{ getProvince(supervisor.province_id) }}
         </span>
 
-        <span style="position: absolute; top: 414px; left: 160px"
+        <span style="position: absolute; top: 392px; left: 160px"
           >{{ semesterPDF.term }}
         </span>
 
-        <span style="position: absolute; top: 414px; left: 245px"
+        <span style="position: absolute; top: 392px; left: 245px"
           >{{ semesterPDF.semester_year }}
         </span>
 
-        <span style="position: absolute; top: 435px; left: 125px"
+        <span style="position: absolute; top: 414px; left: 125px"
           >{{ countPDF }}
         </span>
 
-        <span style="position: absolute; top: 435px; left: 219px"
+        <span style="position: absolute; top: 414px; left: 219px"
           >{{ semesterPDF.semester_visit_expense }}.00
         </span>
 
