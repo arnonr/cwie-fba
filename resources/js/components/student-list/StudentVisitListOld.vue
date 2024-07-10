@@ -482,8 +482,6 @@ const onPayment = () => {
                 findDate.price = {
                   id: e.company_id,
                   expense: e.visit_travel_expense,
-                  expense_num:
-                    e.visit_travel_expense != null ? e.visit_travel_expense : 0,
                 };
               }
             } else {
@@ -510,8 +508,6 @@ const onPayment = () => {
                     e.visit_travel_expense != null
                       ? e.visit_travel_expense.toLocaleString()
                       : null,
-                  expense_num:
-                    e.visit_travel_expense != null ? e.visit_travel_expense : 0,
                 },
               });
             }
@@ -520,9 +516,8 @@ const onPayment = () => {
           travel_array.value = ta;
 
           travel_array.value.forEach((el) => {
-            console.log(el.price);
             total_travel.value =
-              Number(total_travel.value) + Number(el.price.expense_num);
+              Number(total_travel.value) + Number(el.price.expense);
           });
           studentListPDF.value = students;
 
@@ -1360,9 +1355,7 @@ const onPayment = () => {
                 <td colspan="2" class="text-right pa-2">
                   <span class="fw-bold"> รวมทั้งสิ้น </span>
                 </td>
-                <td class="pa-2 text-right">
-                  {{ total_travel.toLocaleString() }}.00
-                </td>
+                <td class="pa-2 text-right">{{ total_travel }}.00</td>
                 <td></td>
               </tr>
               <tr>
