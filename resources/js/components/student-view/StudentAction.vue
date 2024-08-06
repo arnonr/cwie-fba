@@ -33,6 +33,10 @@ const refResponseForm = ref();
 
 let userData = JSON.parse(localStorage.getItem("userData"));
 
+const isSnackbarVisible = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("success");
+
 const isDisabledAdd = ref(false);
 const new_status_id = ref(null);
 const isCheck = ref(false);
@@ -1077,6 +1081,16 @@ const onResponseSubmit = () => {
 };
 
 const onPlanSubmit = () => {
+  console.log(plan.value);
+  if (plan.value.workplace_province_id == null) {
+    isOverlay.value = false;
+
+    snackbarText.value = "ข้อมูลไม่ครบถ้วน";
+    snackbarColor.value = "error";
+    isSnackbarVisible.value = true;
+
+    return;
+  }
   studentActionStore
     .addPlan({
       ...plan.value,
@@ -1253,7 +1267,26 @@ const onPlanSubmit = () => {
       </VCol>
     </div>
 
-    <!-- Dialog -->
+    <!-- Snackbar -->
+    <VSnackbar
+      v-model="isSnackbarVisible"
+      location="top end"
+      :color="snackbarColor"
+    >
+      {{ snackbarText }}
+      <template #actions>
+        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+      </template>
+    </VSnackbar>
+
+    <VOverlay
+      v-model="isOverlay"
+      contained
+      persistent
+      class="align-center justify-center"
+    >
+      <VProgressCircular indeterminate />
+    </VOverlay>
 
     <!-- Dialog isDialogCheckFalseVisible -->
     <VDialog v-model="isDialogCheckFalseVisible" class="v-dialog-sm" persistent>
