@@ -445,36 +445,45 @@ const onPayment = () => {
 
           let ta = [];
 
+          // ตั้งค่า ta = [] เก็บ วันที่ที่มี caompany ด้านใน
+          // วนรอบรายการ ตรวจสอบว่าวันที่ซ้ำหรือยัง ถ้าใหม่ให้ push Data (ชื่อบริษัท จังหวัด ราคา โชว์ราคาหรือไม่ โชว์ไปก่อน)
+          // ถ้าวันที่ซ้ำ ให้ตรวจสอบว่าบริษัทเดียวกันและจังหวัดเดียวกันหรือไม่ ถ้าใช่ซ้ำไม่ต้อง push
+          // ถ้าไม่ซ้ำให้ push Data (ชื่อบริษัท จังหวัด ราคา โชว์ราคาหรือไม่ โชว์ไปก่อน) ตรวจสอบว่า อันไหนแพงกว่าให้ false อันอื่นๆไปให้หมด
+
           students.forEach((e) => {
             let findDate = ta.find((x) => x.date == e.visit_date);
+
             if (findDate) {
+              // ถ้ามีวันที่อยู่แล้วทำเงื่อนไขนี้
               let checkCompany = findDate.companies.find((x) => {
-                return x.id == e.company_id;
+                return (
+                  x.id == e.company_id && x.province_id == e.visit_province_id
+                );
               });
 
-              let checkProvince = findDate.companies.find((x) => {
-                return x.province_id == e.visit_province_id;
-              });
-
-              if (!checkCompany && !checkProvince) {
+              if (!checkCompany) {
                 findDate.companies.push({
                   id: e.company_id,
                   name: e.company_name,
                   province_id: e.visit_province_id,
+                  price:
+                    e.visit_travel_expense != null ? e.visit_travel_expense : 0,
                 });
 
                 findDate.companies2.push({
                   id: e.company_id,
                   name: e.company_name,
                   province_id: e.visit_province_id,
-                  show_price: true,
+                  price:
+                    e.visit_travel_expense != null ? e.visit_travel_expense : 0,
                 });
               } else {
                 findDate.companies2.push({
                   id: e.company_id,
                   name: e.company_name,
                   province_id: e.visit_province_id,
-                  show_price: false,
+                  price:
+                    e.visit_travel_expense != null ? e.visit_travel_expense : 0,
                 });
               }
 
@@ -487,6 +496,7 @@ const onPayment = () => {
                 };
               }
             } else {
+              // ถ้าไม่มีวันที่อยู่
               ta.push({
                 date: e.visit_date,
                 companies: [
@@ -494,6 +504,11 @@ const onPayment = () => {
                     id: e.company_id,
                     name: e.company_name,
                     province_id: e.visit_province_id,
+                    price:
+                      e.visit_travel_expense != null
+                        ? e.visit_travel_expense
+                        : 0,
+                    show_price: true,
                   },
                 ],
                 companies2: [
@@ -501,6 +516,10 @@ const onPayment = () => {
                     id: e.company_id,
                     name: e.company_name,
                     province_id: e.visit_province_id,
+                    price:
+                      e.visit_travel_expense != null
+                        ? e.visit_travel_expense
+                        : 0,
                     show_price: true,
                   },
                 ],
@@ -1341,7 +1360,7 @@ const onPayment = () => {
                     "
                     class="text-right"
                   >
-                    {{ cp.show_price == true ? `${it.price.expense}.00` : "-" }}
+                    {{ it.price.id == cp.id ? `${it.price.expense}.00` : "-" }}
                   </td>
                   <td
                     class="text-center"
