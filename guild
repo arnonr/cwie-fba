@@ -1,0 +1,5 @@
+SELECT student_id, COUNT(*) as count
+FROM form
+WHERE active = 1
+GROUP BY student_id
+HAVING COUNT(*) > 1

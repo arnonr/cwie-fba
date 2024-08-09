@@ -43,6 +43,7 @@ const fetchItems = () => {
       currentPage: currentPage.value,
       orderBy: orderBy.value,
       order: order.value,
+      active: 1,
       //   ...search,
     })
     .then((response) => {
