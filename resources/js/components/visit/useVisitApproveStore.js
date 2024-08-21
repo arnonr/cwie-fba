@@ -21,5 +21,11 @@ export const useVisitApproveStore = defineStore("VisitApproveStore", {
         validateStatus: () => true,
       });
     },
+
+    async editForm(dataSend) {
+      return await axios.put(`/form/${dataSend.id}`, dataSend, {
+        validateStatus: () => true,
+      });
+    },
   },
 });

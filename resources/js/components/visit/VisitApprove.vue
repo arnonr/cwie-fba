@@ -2,6 +2,7 @@
 import { useVisitApproveStore } from "./useVisitApproveStore";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
+import axios from "@axios";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import { onMounted } from "vue";
 
@@ -16,10 +17,13 @@ const emit = defineEmits(["refresh-data"]);
 
 const isDialogVisible = ref(false);
 const isDialogRejectVisible = ref(false);
+const isDialogEditVisitVisible = ref(false);
 
 let userData = JSON.parse(localStorage.getItem("userData"));
 
+const provinces = ref([]);
 const new_visit_status = ref(null);
+const visit_province_id = ref(null);
 const date = ref({});
 const rejectLog = ref({
   comment: "",
@@ -49,6 +53,17 @@ watch(props, () => {
     }
   }
 });
+
+const fetchProvince = async () => {
+  let res = await axios.get("/province", {
+    validateStatus: () => true,
+  });
+
+  provinces.value = res.data.data.map((r) => {
+    return { title: r.name_th, value: r.province_id };
+  });
+};
+fetchProvince();
 
 // Function
 const onRejectSubmit = () => {
@@ -135,7 +150,41 @@ const onSubmit = () => {
     });
 };
 
-console.log(props.visitActive);
+const onSubmitVisitProvince = () => {
+  visitApproveStore
+    .editForm({
+      id: props.formActive.id,
+      workplace_province_id: visit_province_id.value,
+    })
+    .then((response) => {
+      if (response.data.message == "success") {
+        visitApproveStore
+          .editVisit({
+            visit_id: props.visitActive.visit_id,
+            province_id: visit_province_id.value,
+          })
+          .then((response) => {
+            if (response.data.message == "success") {
+              localStorage.setItem("Update Success", 1);
+              nextTick(() => {
+                isDialogEditVisitVisible.value = false;
+                emit("refresh-data");
+              });
+            } else {
+              console.log("error");
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      } else {
+        console.log("error");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
 </script>
 <style scoped>
 /* .swal2-container {
@@ -258,6 +307,23 @@ console.log(props.visitActive);
         v-if="props.visitActive != null"
       >
         <VBtn
+          class="mr-2"
+          color="success"
+          @click="
+            () => {
+              isDialogEditVisitVisible = true;
+            }
+          "
+        >
+          <VIcon
+            size="16"
+            icon="tabler-file-description"
+            style="opacity: 1"
+            class="mr-1"
+          ></VIcon>
+          แก้ไขสถานที่ออกนิเทศ
+        </VBtn>
+        <VBtn
           color="error"
           :disabled="props.visitActive.visit_status != 5"
           @click="
@@ -352,6 +418,72 @@ console.log(props.visitActive);
             Cancel
           </VBtn>
           <VBtn @click="onRejectSubmit()" color="success"> Reject </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+
+    <VDialog
+      v-model="isDialogEditVisitVisible"
+      persistent
+      class="v-dialog-sm"
+      style="z-index: 2000 !important"
+    >
+      <!-- Dialog close btn -->
+      <DialogCloseBtn
+        @click="isDialogEditVisitVisible = !isDialogEditVisitVisible"
+      />
+
+      <!-- Dialog Content -->
+      <VCard title="Are You Sure?">
+        <VCardText> แก้ไขข้อมูลสถานที่ออกนิเทศ </VCardText>
+        <VCardText>
+          <VCol cols="12" md="12" class="align-items-center">
+            <label class="v-label font-weight-bold" for="comment"
+              >จังหวัด :
+            </label>
+
+            <AppSelect
+              :items="provinces"
+              v-model="visit_province_id"
+              variant="outlined"
+              placeholder="จังหวัด"
+            />
+          </VCol>
+        </VCardText>
+        <!-- <VCardText>
+          <VCol cols="12" md="12" class="align-items-center">
+            <label class="v-label font-weight-bold" for="comment"
+              >อำเภอ :
+            </label>
+            <AppTextarea
+              id="comment"
+              v-model="rejectLog.comment"
+              rows="5"
+              persistent-placeholder
+            />
+          </VCol>
+        </VCardText>
+        <VCardText>
+          <VCol cols="12" md="12" class="align-items-center">
+            <label class="v-label font-weight-bold" for="comment"
+              >ตำบล :
+            </label>
+            <AppTextarea
+              id="comment"
+              v-model="rejectLog.comment"
+              rows="5"
+              persistent-placeholder
+            />
+          </VCol>
+        </VCardText> -->
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            @click="isDialogEditVisitVisible = !isDialogEditVisitVisible"
+            color="error"
+          >
+            Cancel
+          </VBtn>
+          <VBtn @click="onSubmitVisitProvince()" color="success"> อัพเดท </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
