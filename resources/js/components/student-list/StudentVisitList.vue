@@ -476,6 +476,7 @@ const onPayment = () => {
                   province_id: e.visit_province_id,
                   price:
                     e.visit_travel_expense != null ? e.visit_travel_expense : 0,
+                  show_price: false,
                 });
               } else {
                 findDate.companies2.push({
@@ -484,6 +485,7 @@ const onPayment = () => {
                   province_id: e.visit_province_id,
                   price:
                     e.visit_travel_expense != null ? e.visit_travel_expense : 0,
+                  show_price: false,
                 });
               }
 
@@ -1360,7 +1362,8 @@ const onPayment = () => {
                     "
                     class="text-right"
                   >
-                    {{ it.price.id == cp.id ? `${it.price.expense}.00` : "-" }}
+                    <!-- {{ it.price.id == cp.id ? `${it.price.expense}.00` : "-" }} -->
+                    {{ cp.show_price ? `${cp.price}.00` : "-" }}
                   </td>
                   <td
                     class="text-center"
