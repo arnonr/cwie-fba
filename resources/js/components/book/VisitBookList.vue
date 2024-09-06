@@ -1,21 +1,21 @@
 <script setup>
 import VisitView from "@/components/visit/VisitView.vue";
-import { requiredValidator } from "@validators";
 import {
   class_rooms,
   class_years,
-  statuses,
   form_statuses,
+  statuses,
   statusShow,
   visit_status,
 } from "@/data-constant/data";
-import { useVisitBookListStore } from "./useVisitBookListStore";
 import axios from "@axios";
+import { requiredValidator } from "@validators";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
+import { useVisitBookListStore } from "./useVisitBookListStore";
 dayjs.extend(buddhistEra);
 
 const visitBookListStore = useVisitBookListStore();
@@ -581,6 +581,9 @@ const onSubmit = () => {
                     จังหวัด
                   </th>
                   <th scope="col" class="text-center font-weight-bold">
+                    อาจารย์นิเทศ
+                  </th>
+                  <th scope="col" class="text-center font-weight-bold">
                     สถานะ
                   </th>
                   <th scope="col" class="text-center font-weight-bold">
@@ -615,6 +618,10 @@ const onSubmit = () => {
 
                   <td class="text-center" style="min-width: 100px">
                     {{ getProvince(it.workplace_province_id) }}
+                  </td>
+
+                  <td class="text-center" style="min-width: 100px">
+                    {{ it.supervision_name }}
                   </td>
 
                   <td class="text-center" style="min-width: 100px">

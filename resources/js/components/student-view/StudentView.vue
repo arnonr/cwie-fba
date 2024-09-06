@@ -1,13 +1,13 @@
 <script setup>
 import PersonalData from "@/components/student-view/PersonalData.vue";
 import StudentApprove from "@/components/student-view/StudentApprove.vue";
+import { form_statuses, statusShow } from "@/data-constant/data";
 import axios from "@axios";
-import { useRoute, useRouter } from "vue-router";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
+import { useRoute, useRouter } from "vue-router";
 import { useStudentViewStore } from "./useStudentViewStore";
-import { form_statuses, statusShow } from "@/data-constant/data";
 dayjs.extend(buddhistEra);
 const studentViewStore = useStudentViewStore();
 const route = useRoute();
@@ -147,6 +147,7 @@ const fetchForms = () => {
       orderBy: "id",
       order: "desc",
       includeAll: true,
+      //   includeCompany: true,
     })
     .then(async (response) => {
       if (response.data.message == "success") {
@@ -408,6 +409,15 @@ const refreshData = () => {
                     <span>สถานประกอบการ : </span>
                     <span>
                       {{ formActive.company_name }}
+                    </span>
+                  </VCol>
+
+                  <VCol cols="12" md="12">
+                    <span>ที่ตั้งสถานประกอบการ : </span>
+                    <span>
+                      {{ getProvince(formActive.company_province_id) }} >
+                      {{ getAmphur(formActive.company_amphur_id) }} >
+                      {{ getTumbol(formActive.company_tumbol_id) }}
                     </span>
                   </VCol>
 

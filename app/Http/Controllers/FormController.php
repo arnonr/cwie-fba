@@ -115,6 +115,9 @@ class FormController extends Controller
                     "concat(student.firstname, ' ', student.surname) as student_fullname"
                 ),
                 "company.name_th as company_name",
+                "company.province_id as company_province_id",
+                "company.amphur_id as company_amphur_id",
+                "company.tumbol_id as company_tumbol_id",
                 "form_status.name_th as form_status_name",
                 "response_province.name_th as response_province_name",
                 "province.name_th as province_name",
