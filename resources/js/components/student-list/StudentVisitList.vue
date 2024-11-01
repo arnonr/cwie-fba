@@ -1010,18 +1010,18 @@ const onPayment = () => {
 
           <div class="" style="margin-top: 20px; margin-left: 400px">
             วันที่
-            ......................................................................
+            ................................................................................
           </div>
 
           <div class="" style="margin-top: 20px; margin-left: 120px">
             ข้าพเจ้า
-            ...............................................................
-            อยู่บ้านเลขที่.......................................................
+            ...................................................................
+            อยู่บ้านเลขที่........................................................................
           </div>
           <div class="" style="margin-top: 20px">
-            แขวง/ตำบล ..............................................
-            เขต/อำเภอ..........................................
-            จังหวัด.............................................
+            แขวง/ตำบล .....................................................
+            เขต/อำเภอ......................................................
+            จังหวัด....................................................
           </div>
 
           <div class="" style="margin-top: 20px">
@@ -1120,71 +1120,91 @@ const onPayment = () => {
           >{{ dayjs().locale("th").format("DD MMMM BBBB") }}
           </span> 
         -->
-        <span style="position: absolute; top: 202px; left: 220px">{{
-          supervisor.prefix + supervisor.firstname + " " + supervisor.surname
-        }}</span>
-        <span style="position: absolute; top: 202px; left: 520px"
+        <span
+          style="position: absolute; top: 199px; left: 220px; font-size: 13px"
+          >{{
+            supervisor.prefix + supervisor.firstname + " " + supervisor.surname
+          }}</span
+        >
+        <span
+          style="position: absolute; top: 199px; left: 510px; font-size: 13px"
           >{{ supervisor.address }}
         </span>
-        <span style="position: absolute; top: 243px; left: 130px"
+        <span
+          style="position: absolute; top: 238px; left: 130px; font-size: 13px"
           >{{ getTumbol(supervisor.tumbol_id) }}
         </span>
 
-        <span style="position: absolute; top: 243px; left: 360px"
+        <span
+          style="position: absolute; top: 238px; left: 360px; font-size: 13px"
           >{{ getAmphur(supervisor.amphur_id) }}
         </span>
 
-        <span style="position: absolute; top: 243px; left: 550px"
+        <span
+          style="position: absolute; top: 238px; left: 580px; font-size: 13px"
           >{{ getProvince(supervisor.province_id) }}
         </span>
 
-        <span style="position: absolute; top: 381px; left: 154px"
+        <span
+          style="position: absolute; top: 368px; left: 147px; font-size: 13px"
           >{{ semesterPDF.term }}
         </span>
 
-        <span style="position: absolute; top: 381px; left: 238px"
+        <span
+          style="position: absolute; top: 368px; left: 228px; font-size: 13px"
           >{{ semesterPDF.semester_year }}
         </span>
 
-        <span style="position: absolute; top: 400px; left: 125px"
+        <span
+          style="position: absolute; top: 389px; left: 120px; font-size: 13px"
           >{{ countPDF }}
         </span>
 
-        <span style="position: absolute; top: 400px; left: 219px"
+        <span
+          style="position: absolute; top: 389px; left: 210px; font-size: 13px"
           >{{ semesterPDF.semester_visit_expense }}.00
         </span>
 
-        <span style="position: absolute; top: 360px; left: 680px"
+        <span
+          style="position: absolute; top: 350px; left: 680px; font-size: 13px"
           >{{ visit_expense_all }}.00
         </span>
 
-        <span style="position: absolute; top: 660px; left: 680px"
+        <span
+          style="position: absolute; top: 650px; left: 680px; font-size: 13px"
           >{{ visit_expense_all }}.00
         </span>
 
-        <span style="position: absolute; top: 710px; left: 200px"
+        <span
+          style="position: absolute; top: 699px; left: 200px; font-size: 13px"
           >{{ bahttext(countPDF * semesterPDF.semester_visit_expense) }}
         </span>
 
         <!-- bahttext() -->
 
-        <span style="position: absolute; top: 840px; left: 400px">{{
-          "( " +
-          supervisor.prefix +
-          supervisor.firstname +
-          " " +
-          supervisor.surname +
-          " )"
-        }}</span>
+        <span
+          style="position: absolute; top: 828px; left: 400px; font-size: 13px"
+          >{{
+            "( " +
+            supervisor.prefix +
+            supervisor.firstname +
+            " " +
+            supervisor.surname +
+            " )"
+          }}</span
+        >
 
-        <span style="position: absolute; top: 975px; left: 400px">{{
-          "( " +
-          chairmanPDF.data.prefix +
-          chairmanPDF.data.firstname +
-          " " +
-          chairmanPDF.data.surname +
-          " )"
-        }}</span>
+        <span
+          style="position: absolute; top: 945px; left: 400px; font-size: 13px"
+          >{{
+            "( " +
+            chairmanPDF.data.prefix +
+            chairmanPDF.data.firstname +
+            " " +
+            chairmanPDF.data.surname +
+            " )"
+          }}</span
+        >
 
         <div class="html2pdf__page-break" />
         <!-- Page2 -->
@@ -1310,9 +1330,15 @@ const onPayment = () => {
           </div>
 
           <!-- Absolute Page2 -->
-          <span style="position: absolute; top: 1240px; left: 50px">{{
-            supervisor.prefix + supervisor.firstname + " " + supervisor.surname
-          }}</span>
+          <span
+            style="position: absolute; top: 1240px; left: 50px; font-size: 13px"
+            >{{
+              supervisor.prefix +
+              supervisor.firstname +
+              " " +
+              supervisor.surname
+            }}</span
+          >
         </div>
         <div class="html2pdf__page-break" />
         <!-- Page3 -->
@@ -1344,8 +1370,8 @@ const onPayment = () => {
                     <td
                       class="text-center"
                       style="
-                        padding-top: 10px;
-                        padding-bottom: 10px;
+                        padding-top: 5px;
+                        padding-bottom: 5px;
                         padding-left: 10px;
                       "
                     >
@@ -1355,38 +1381,41 @@ const onPayment = () => {
                     </td>
                     <td
                       style="
-                        padding-top: 10px;
+                        padding-top: 5px;
                         padding-right: 10px;
-                        padding-bottom: 10px;
+                        padding-bottom: 5px;
                         padding-left: 10px;
                       "
                     >
-                      ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา <br />
-                      เริ่มต้นที่ มจพ.วิทยาเขตระยอง ถีง {{ cp.name }}<br />
-                      จังหวัด{{ getProvince(cp.province_id) }} เหมาจ่าย
+                      ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา เริ่มต้นที่
+                      มจพ.วิทยาเขตระยอง <br />ถีง {{ cp.name }} จังหวัด{{
+                        getProvince(cp.province_id)
+                      }}
                     </td>
                     <td
                       style="
-                        padding-top: 10px;
+                        padding-top: 5px;
                         padding-right: 10px;
-                        padding-bottom: 10px;
+                        padding-bottom: 5px;
                         padding-left: 10px;
                       "
                       class="text-right"
                     >
                       <!-- {{ it.price.id == cp.id ? `${it.price.expense}.00` : "-" }} -->
-                      {{ cp.show_price ? `${cp.price}.00` : "-" }}
+                      {{
+                        cp.show_price ? `${cp.price.toLocaleString()}.00` : "-"
+                      }}
                     </td>
                     <td
                       class="text-center"
                       style="
-                        padding-top: 10px;
+                        padding-top: 5px;
                         padding-right: 10px;
-                        padding-bottom: 10px;
+                        padding-bottom: 5px;
                         padding-left: 10px;
                       "
                     >
-                      <span />
+                      <span>เหมาจ่าย</span>
                     </td>
                   </tr>
                 </tbody>
@@ -1439,7 +1468,7 @@ const onPayment = () => {
                 >ลงชื่อ...............................................................................</span
               >
               <br />
-              <span style="padding-left: 50px"
+              <span style="padding-left: 50px; font-size: 13px"
                 >(
                 {{
                   supervisor.prefix +
@@ -1480,7 +1509,7 @@ const onPayment = () => {
 
 .payment-pdf {
   font-family: Sarabun, sans-serif;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .table-payment,
