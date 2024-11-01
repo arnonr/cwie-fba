@@ -1,30 +1,30 @@
 <script setup>
-import StudentView from "@/components/student-view/StudentView.vue";
 import VisitForm from "@/components/visit/VisitForm.vue";
 import VisitView from "@/components/visit/VisitView.vue";
 import Vue3Html2pdf from "vue3-html2pdf";
+
 // import "@/font/Sarabun-normal";
-import Swal from "sweetalert2";
 import {
   class_rooms,
   class_years,
-  statuses,
   form_statuses,
+  statuses,
   statusShow,
   visit_status,
 } from "@/data-constant/data";
-import { useStudentListStore } from "./useStudentListStore";
-import { jsPDF } from "jspdf";
 import axios from "@axios";
+import { bahttext } from "bahttext";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
-import { bahttext } from "bahttext";
 import buddhistEra from "dayjs/plugin/buddhistEra";
+import Swal from "sweetalert2";
+import { useStudentListStore } from "./useStudentListStore";
+
+const props = defineProps(["user_type"]);
+
 dayjs.extend(buddhistEra);
 
 const studentListStore = useStudentListStore();
-
-const props = defineProps(["user_type"]);
 
 const rowPerPage = ref(20);
 const currentPage = ref(1);
@@ -50,6 +50,7 @@ const supervisor = ref({});
 const view_student_id = ref(null);
 const major = ref([]); // สำหรับประธานอาจารย์นิเทศ
 let travel_array = ref([]);
+
 const advancedSearch = reactive({
   semester_id: "",
   status_id: "",
@@ -67,9 +68,11 @@ const advancedSearch = reactive({
   plan_status: "",
   visit_status: "",
 });
+
 const teacherData = ref({});
 const total_travel = ref(0);
 const visit_expense_all = ref(0);
+
 const selectOptions = ref({
   perPage: [
     { title: "20", value: 20 },
@@ -143,11 +146,13 @@ if (props.user_type == "teacher") {
         isOverlay.value = false;
       });
   };
+
   fetchMajorHeads();
 } else if (props.user_type == "supervisor") {
   teacherData.value = JSON.parse(localStorage.getItem("teacherData"));
   supervisor_id.value = teacherData.value.id;
   selectOptions.value.approve_statuses = [];
+
   //
 } else if (props.user_type == "chairman") {
   selectOptions.value.approve_statuses = [];
@@ -201,6 +206,7 @@ const fetchSemesters = () => {
           if (r.is_current == 1) {
             advancedSearch.semester_id = r.id;
           }
+
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
             value: r.id,
@@ -258,6 +264,7 @@ const fetchTeachers = async () => {
       isOverlay.value = false;
     });
 };
+
 // เฉพาะเมนูของคณะและประธานบริหาร
 const fetchMajors = async () => {
   await studentListStore
@@ -280,6 +287,7 @@ const fetchMajors = async () => {
       isOverlay.value = false;
     });
 };
+
 // 👉 Fetching
 
 const fetchItems = () => {
@@ -341,6 +349,7 @@ const getProvince = (province_id) => {
   let res = provinces.value.find((e) => {
     return e.province_id == province_id;
   });
+
   return res.name_th;
 };
 
@@ -349,6 +358,7 @@ const getAmphur = (id) => {
   let res = amphurs.value.find((e) => {
     return e.amphur_id == id;
   });
+
   return res.name_th;
 };
 
@@ -357,6 +367,7 @@ const getTumbol = (id) => {
   let res = tumbols.value.find((e) => {
     return e.tumbol_id == id;
   });
+
   return res.name_th;
 };
 
@@ -367,6 +378,7 @@ watchEffect(() => {
 });
 
 const semesterPDF = ref({});
+
 watch(advancedSearch, (value) => {
   if (advancedSearch.semester_id != null) {
     semesterPDF.value = selectOptions.value.semesters.find((e) => {
@@ -393,6 +405,7 @@ const refreshData = () => {
 };
 
 const html2Pdf = ref(null);
+
 const generatePayment = () => {
   html2Pdf.value.generatePdf();
 };
@@ -541,7 +554,6 @@ const onPayment = () => {
           travel_array.value = ta;
 
           travel_array.value.forEach((el) => {
-            console.log(el.price);
             total_travel.value =
               Number(total_travel.value) + Number(el.price.expense_num);
           });
@@ -576,8 +588,8 @@ const onPayment = () => {
           <!-- Search -->
           <VCol cols="12" sm="4">
             <VSelect
-              label="จำนวนรายการ/page"
               v-model="rowPerPage"
+              label="จำนวนรายการ/page"
               density="compact"
               variant="outlined"
               :items="selectOptions.perPage"
@@ -586,8 +598,8 @@ const onPayment = () => {
           <VSpacer />
           <VCol cols="12" sm="8">
             <VSelect
-              label="ปีการศึกษา"
               v-model="advancedSearch.semester_id"
+              label="ปีการศึกษา"
               density="compact"
               variant="outlined"
               clearable
@@ -595,10 +607,10 @@ const onPayment = () => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="4" v-if="props.user_type != 'supervisor'">
+          <VCol v-if="props.user_type != 'supervisor'" cols="12" sm="4">
             <VSelect
-              label="สถานะการอนุมัติ"
               v-model="advancedSearch.approve_status"
+              label="สถานะการอนุมัติ"
               density="compact"
               variant="outlined"
               clearable
@@ -607,10 +619,10 @@ const onPayment = () => {
           </VCol>
           <VSpacer />
 
-          <VCol cols="12" sm="4" v-if="props.user_type == 'staff'">
+          <VCol v-if="props.user_type == 'staff'" cols="12" sm="4">
             <VSelect
-              label="สถานะ"
               v-model="advancedSearch.status_id"
+              label="สถานะ"
               density="compact"
               variant="outlined"
               clearable
@@ -620,13 +632,13 @@ const onPayment = () => {
           <VSpacer />
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'supervisor'"
             cols="12"
             sm="4"
-            v-if="props.user_type == 'staff' || props.user_type == 'supervisor'"
           >
             <VSelect
-              label="สถานะแผนการปฏิบัติงาน"
               v-model="advancedSearch.plan_status"
+              label="สถานะแผนการปฏิบัติงาน"
               density="compact"
               variant="outlined"
               clearable
@@ -636,8 +648,8 @@ const onPayment = () => {
 
           <VCol cols="12" sm="4">
             <VSelect
-              label="สถานะการขอออกนิเทศ"
               v-model="advancedSearch.visit_status"
+              label="สถานะการขอออกนิเทศ"
               density="compact"
               variant="outlined"
               clearable
@@ -666,13 +678,13 @@ const onPayment = () => {
             />
           </VCol>
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="4"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <VSelect
-              label="สาขาวิชา"
               v-model="advancedSearch.major_id"
+              label="สาขาวิชา"
               density="compact"
               variant="outlined"
               clearable
@@ -681,9 +693,9 @@ const onPayment = () => {
           </VCol>
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="6"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <AppAutocomplete
               v-model="advancedSearch.advisor_id"
@@ -697,9 +709,9 @@ const onPayment = () => {
           </VCol>
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="6"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <AppAutocomplete
               v-model="advancedSearch.supervision_id"
@@ -714,8 +726,8 @@ const onPayment = () => {
 
           <VCol cols="12" sm="4">
             <VTextField
-              label="สถานประกอบการ"
               v-model="advancedSearch.company_name"
+              label="สถานประกอบการ"
               density="compact"
             />
           </VCol>
@@ -741,11 +753,11 @@ const onPayment = () => {
 
           <VCol cols="12" sm="12">
             <VTable
-              class=""
               v-if="
                 selectOptions.semesters.length != 0 ||
                 props.user_type == 'staff'
               "
+              class=""
             >
               <!-- 👉 table head -->
               <thead>
@@ -789,32 +801,34 @@ const onPayment = () => {
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
-                    <VChip label :color="form_statuses[it.status_id]">{{
-                      statusShow(
-                        it.status_id,
-                        it.request_document_date,
-                        it.confirm_response_at
-                      )
-                    }}</VChip>
+                    <VChip label :color="form_statuses[it.status_id]">
+                      {{
+                        statusShow(
+                          it.status_id,
+                          it.request_document_date,
+                          it.confirm_response_at
+                        )
+                      }}
+                    </VChip>
                   </td>
 
                   <td class="text-center" style="min-width: 100px">
                     <span v-if="it.visit_status">
                       <VChip
-                        label
                         v-if="it.visit_reject_status_id == null"
+                        label
                         :color="visit_status[it.visit_status].color"
                         >{{ visit_status[it.visit_status].title }}</VChip
                       >
-                      <VChip label v-else color="error">รอแก้ไขข้อมูล</VChip>
+                      <VChip v-else label color="error">รอแก้ไขข้อมูล</VChip>
 
                       <VChip
-                        label
-                        color="error"
-                        class="mt-2"
                         v-if="
                           it.visit_status == 4 && it.visit_report_status_id == 3
                         "
+                        label
+                        color="error"
+                        class="mt-2"
                         >รอแก้ไขรายงาน</VChip
                       >
                     </span>
@@ -850,12 +864,12 @@ const onPayment = () => {
 
                     <!-- :disabled="it.status_id < 13 ? true : false" -->
                     <VBtn
+                      v-if="it.visit_status < 5"
                       color="warning"
                       class="ml-2 mt-2"
                       :disabled="
                         it.status_id < 13 && isAdminSecret != 1 ? true : false
                       "
-                      v-if="it.visit_status < 5"
                       @click="
                         () => {
                           view_student_id = it.id;
@@ -877,7 +891,7 @@ const onPayment = () => {
                   <td colspan="7" class="text-center">No data available</td>
                 </tr>
               </tfoot>
-              <tfoot v-show="items.length"></tfoot>
+              <tfoot v-show="items.length" />
             </VTable>
           </VCol>
 
@@ -931,7 +945,8 @@ const onPayment = () => {
             :student_id="view_student_id"
             @refresh-data="refreshData"
             @close="isDialogViewVisitStudent = false"
-        /></VCardText>
+          />
+        </VCardText>
       </VCard>
     </VDialog>
 
@@ -954,12 +969,14 @@ const onPayment = () => {
             :student_id="view_student_id"
             @refresh-data="refreshData"
             @close="isDialogFormVisitStudent = false"
-        /></VCardText>
+          />
+        </VCardText>
       </VCard>
     </VDialog>
 
     <!--  -->
-    <vue3-html2pdf
+    <Vue3Html2pdf
+      ref="html2Pdf"
       :show-layout="false"
       :float-layout="true"
       :enable-download="true"
@@ -971,27 +988,22 @@ const onPayment = () => {
       pdf-format="a4"
       pdf-orientation="portrait"
       pdf-content-width="800px"
-      ref="html2Pdf"
     >
-      <!-- @progress="onProgress($event)"
-      @hasStartedGeneration="hasStartedGeneration()"
-      @hasGenerated="hasGenerated($event)" -->
+      <!--
+        @progress="onProgress($event)"
+        @hasStartedGeneration="hasStartedGeneration()"
+        @hasGenerated="hasGenerated($event)" 
+      -->
 
-      <template v-slot:pdf-content>
+      <template #pdf-content>
         <!-- PDF Content Here -->
         <div
-          style="
-            margin-top: 50px;
-            margin-right: 50px;
-            margin-bottom: 50px;
-            margin-left: 50px;
-          "
+          style="margin-right: 50px; margin-bottom: 50px; margin-left: 50px"
           class="payment-pdf"
         >
-          <div class="text-right">
+          <div class="text-right" style="margin-top: 50px">
             ที่คณะบริหารธุรกิจมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
           </div>
-
           <div class="text-center font-weight-bold" style="margin-top: 50px">
             ใบสำคัญรับเงิน
           </div>
@@ -1049,7 +1061,7 @@ const onPayment = () => {
                     padding-left: 10px;
                     vertical-align: top;
                   "
-                ></td>
+                />
               </tr>
               <tr>
                 <td
@@ -1073,7 +1085,7 @@ const onPayment = () => {
                     padding-left: 10px;
                     vertical-align: top;
                   "
-                ></td>
+                />
               </tr>
             </table>
           </div>
@@ -1090,7 +1102,7 @@ const onPayment = () => {
               >...............................................................................</span
             >
             <span>ผู้รับเงิน</span><br />
-            <span style="padding-left: 40px"></span>
+            <span style="padding-left: 40px" />
           </div>
 
           <div style="margin-top: 80px; margin-left: 300px">
@@ -1098,63 +1110,65 @@ const onPayment = () => {
               >...............................................................................</span
             >
             <span>ผู้จ่ายเงิน</span><br />
-            <span style="padding-left: 40px"></span>
+            <span style="padding-left: 40px" />
           </div>
         </div>
 
         <!-- Absolute Page1 -->
-        <!-- <span style="position: absolute; top: 162px; left: 500px"
+        <!--
+          <span style="position: absolute; top: 162px; left: 500px"
           >{{ dayjs().locale("th").format("DD MMMM BBBB") }}
-        </span> -->
-        <span style="position: absolute; top: 205px; left: 230px">{{
+          </span> 
+        -->
+        <span style="position: absolute; top: 202px; left: 220px">{{
           supervisor.prefix + supervisor.firstname + " " + supervisor.surname
         }}</span>
-        <span style="position: absolute; top: 205px; left: 550px"
+        <span style="position: absolute; top: 202px; left: 520px"
           >{{ supervisor.address }}
         </span>
-        <span style="position: absolute; top: 248px; left: 140px"
+        <span style="position: absolute; top: 243px; left: 130px"
           >{{ getTumbol(supervisor.tumbol_id) }}
         </span>
 
-        <span style="position: absolute; top: 248px; left: 380px"
+        <span style="position: absolute; top: 243px; left: 360px"
           >{{ getAmphur(supervisor.amphur_id) }}
         </span>
 
-        <span style="position: absolute; top: 248px; left: 580px"
+        <span style="position: absolute; top: 243px; left: 550px"
           >{{ getProvince(supervisor.province_id) }}
         </span>
 
-        <span style="position: absolute; top: 392px; left: 160px"
+        <span style="position: absolute; top: 381px; left: 154px"
           >{{ semesterPDF.term }}
         </span>
 
-        <span style="position: absolute; top: 392px; left: 245px"
+        <span style="position: absolute; top: 381px; left: 238px"
           >{{ semesterPDF.semester_year }}
         </span>
 
-        <span style="position: absolute; top: 414px; left: 125px"
+        <span style="position: absolute; top: 400px; left: 125px"
           >{{ countPDF }}
         </span>
 
-        <span style="position: absolute; top: 414px; left: 219px"
+        <span style="position: absolute; top: 400px; left: 219px"
           >{{ semesterPDF.semester_visit_expense }}.00
         </span>
 
-        <span style="position: absolute; top: 370px; left: 680px"
+        <span style="position: absolute; top: 360px; left: 680px"
           >{{ visit_expense_all }}.00
         </span>
 
-        <span style="position: absolute; top: 670px; left: 680px"
+        <span style="position: absolute; top: 660px; left: 680px"
           >{{ visit_expense_all }}.00
         </span>
 
-        <span style="position: absolute; top: 720px; left: 200px"
+        <span style="position: absolute; top: 710px; left: 200px"
           >{{ bahttext(countPDF * semesterPDF.semester_visit_expense) }}
         </span>
 
         <!-- bahttext() -->
 
-        <span style="position: absolute; top: 850px; left: 400px">{{
+        <span style="position: absolute; top: 840px; left: 400px">{{
           "( " +
           supervisor.prefix +
           supervisor.firstname +
@@ -1175,160 +1189,29 @@ const onPayment = () => {
         <div class="html2pdf__page-break" />
         <!-- Page2 -->
         <div
-          style="
-            margin-top: 50px;
-            margin-right: 50px;
-            margin-bottom: 50px;
-            margin-left: 50px;
-          "
+          style="margin-right: 50px; margin-bottom: 50px; margin-left: 50px"
           class="payment-pdf"
         >
-          <div class="text-center font-weight-bold">
-            ตารางสรุปค่าตอบแทนการนิเทศและค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา<br />
-            ของอาจารย์นิเทศคณะบริหารธุรกิจ
-          </div>
+          <div class="pdf-page">
+            <div class="text-center font-weight-bold" style="margin-top: 49px">
+              ตารางสรุปค่าตอบแทนการนิเทศและค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา<br />
+              ของอาจารย์นิเทศคณะบริหารธุรกิจ
+            </div>
 
-          <div class="" style="margin-top: 20px">
-            <span></span>
-          </div>
+            <div class="" style="margin-top: 20px">
+              <span />
+            </div>
 
-          <div class="" style="margin-top: 60px">
-            <table class="table-payment">
-              <tr>
-                <th class="text-center" style="width: 150px">ว-ด-ป</th>
-                <th class="text-center" style="width: 150px">รหัสนักศึกษา</th>
-                <th class="text-center" style="width: 300px">ชื่อ-สกุล</th>
-                <th class="text-center" style="width: 300px">บริษัท</th>
-                <th class="text-center" style="width: 150px">จังหวัด</th>
-              </tr>
-              <tr v-for="(it, index) in studentListPDF" :key="index">
-                <td
-                  class="text-center"
-                  style="
-                    padding-top: 10px;
-                    padding-bottom: 10px;
-                    padding-left: 10px;
-                  "
-                >
-                  <span>
-                    {{ dayjs(it.visit_date).locale("th").format("DD MMM BB") }}
-                  </span>
-                </td>
-                <td
-                  style="
-                    padding-top: 10px;
-                    padding-right: 10px;
-                    padding-bottom: 10px;
-                    padding-left: 10px;
-                  "
-                  class="text-center"
-                >
-                  {{ it.student_code }}
-                </td>
-                <td
-                  style="
-                    padding-top: 10px;
-                    padding-right: 10px;
-                    padding-bottom: 10px;
-                    padding-left: 10px;
-                  "
-                >
-                  {{ it.prefix_name + it.firstname + " " + it.surname }}
-                </td>
-                <td
-                  style="
-                    padding-top: 10px;
-                    padding-right: 10px;
-                    padding-bottom: 10px;
-                    padding-left: 10px;
-                  "
-                >
-                  {{ it.company_name }}
-                </td>
-                <td
-                  class="text-center"
-                  style="
-                    padding-top: 10px;
-                    padding-right: 10px;
-                    padding-bottom: 10px;
-                    padding-left: 10px;
-                  "
-                >
-                  <span> {{ getProvince(it.visit_province_id) }} </span>
-                </td>
-              </tr>
-            </table>
-          </div>
-
-          <div style="margin-top: 20px">
-            <span
-              >1. ค่าตอบแทนการนิเทศนักศึกษาสหกิจศึกษา
-              (อัตราค่าตอบแทนเหมาจ่ายไม่เกิน
-              {{ semesterPDF.semester_visit_expense }} บาท/นักศึกษา 1 คน)</span
-            ><br />
-            <span style="padding-left: 15px"
-              >ค่าตอบแทนการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษาจํานวน
-              {{ countPDF }} คนรวมเป็นเงิน {{ visit_expense_all }}.00 บาท</span
-            >
-          </div>
-
-          <div style="margin-top: 40px">
-            <span>2. ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา</span><br />
-            <table v-if="travel_array.length != 0">
-              <tbody v-for="(it, index) in travel_array" :key="index">
-                <tr v-for="(cp, idx) in it.companies" :key="idx">
-                  <td style="width: 400px; padding-left: 30px">
-                    {{ cp.name }}
-                  </td>
-                  <td>
-                    จังหวัด
-                    {{ getProvince(cp.province_id) }}
-                    {{
-                      it.price.id == cp.id
-                        ? `เหมาจ่าย ${it.price.expense}.00 บาท`
-                        : ""
-                    }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Absolute Page2 -->
-        <span style="position: absolute; top: 1240px; left: 50px">{{
-          supervisor.prefix + supervisor.firstname + " " + supervisor.surname
-        }}</span>
-
-        <div class="html2pdf__page-break" />
-        <!-- Page3 -->
-        <div
-          style="
-            margin-top: 50px;
-            margin-right: 50px;
-            margin-bottom: 50px;
-            margin-left: 50px;
-          "
-          class="payment-pdf"
-        >
-          <div class="text-center font-weight-bold">
-            มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ<br />ใบรับรองการจ่ายเงิน
-          </div>
-
-          <div class="" style="margin-top: 20px">
-            <table class="table-payment">
-              <thead>
+            <div class="" style="margin-top: 60px; font-size: 10px">
+              <table class="table-payment">
                 <tr>
-                  <th class="text-center" style="width: 110px">วัน เดือน ปี</th>
-                  <th class="text-center" style="width: 450px">
-                    รายละเอียดรายจ่าย
-                  </th>
-                  <th class="text-center" style="width: 80px">จำนวนเงิน</th>
-                  <th class="text-center" style="width: 150px">หมายเหตุ</th>
+                  <th class="text-center" style="width: 150px">ว-ด-ป</th>
+                  <th class="text-center" style="width: 150px">รหัสนักศึกษา</th>
+                  <th class="text-center" style="width: 300px">ชื่อ-สกุล</th>
+                  <th class="text-center" style="width: 300px">บริษัท</th>
+                  <th class="text-center" style="width: 150px">จังหวัด</th>
                 </tr>
-              </thead>
-              <tbody v-for="(it, index) in travel_array" :key="index">
-                <tr v-for="(cp, idx) in it.companies2" :key="idx">
+                <tr v-for="(it, index) in studentListPDF" :key="index">
                   <td
                     class="text-center"
                     style="
@@ -1338,7 +1221,9 @@ const onPayment = () => {
                     "
                   >
                     <span>
-                      {{ dayjs(it.date).locale("th").format("DD MMM BBBB") }}
+                      {{
+                        dayjs(it.visit_date).locale("th").format("DD MMM BB")
+                      }}
                     </span>
                   </td>
                   <td
@@ -1348,10 +1233,9 @@ const onPayment = () => {
                       padding-bottom: 10px;
                       padding-left: 10px;
                     "
+                    class="text-center"
                   >
-                    ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา<br />
-                    เริ่มต้นที่ มจพ.วิทยาเขตระยอง ถีง {{ cp.name }}<br />
-                    จังหวัด{{ getProvince(cp.province_id) }} เหมาจ่าย
+                    {{ it.student_code }}
                   </td>
                   <td
                     style="
@@ -1360,10 +1244,18 @@ const onPayment = () => {
                       padding-bottom: 10px;
                       padding-left: 10px;
                     "
-                    class="text-right"
                   >
-                    <!-- {{ it.price.id == cp.id ? `${it.price.expense}.00` : "-" }} -->
-                    {{ cp.show_price ? `${cp.price}.00` : "-" }}
+                    {{ it.prefix_name + it.firstname + " " + it.surname }}
+                  </td>
+                  <td
+                    style="
+                      padding-top: 10px;
+                      padding-right: 10px;
+                      padding-bottom: 10px;
+                      padding-left: 10px;
+                    "
+                  >
+                    {{ it.company_name }}
                   </td>
                   <td
                     class="text-center"
@@ -1374,83 +1266,210 @@ const onPayment = () => {
                       padding-left: 10px;
                     "
                   >
-                    <span> </span>
+                    <span> {{ getProvince(it.visit_province_id) }} </span>
                   </td>
                 </tr>
-              </tbody>
-              <tr>
-                <td colspan="2" class="text-right pa-2">
-                  <span class="fw-bold"> รวมทั้งสิ้น </span>
-                </td>
-                <td class="pa-2 text-right">
-                  {{ total_travel.toLocaleString() }}.00
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td colspan="4" class="pa-2">
-                  <span>รวมทั้งสิ้น (ตัวอักษร) </span>
-                  <span class="ml-10 ms-10">{{ bahttext(total_travel) }}</span>
-                </td>
-              </tr>
-            </table>
+              </table>
+            </div>
+
+            <div style="margin-top: 20px">
+              <span
+                >1. ค่าตอบแทนการนิเทศนักศึกษาสหกิจศึกษา
+                (อัตราค่าตอบแทนเหมาจ่ายไม่เกิน
+                {{ semesterPDF.semester_visit_expense }} บาท/นักศึกษา 1
+                คน)</span
+              ><br />
+              <span style="padding-left: 15px"
+                >ค่าตอบแทนการนิเทศนักศึกษาปฏิบัติงานสหกิจศึกษาจํานวน
+                {{ countPDF }} คนรวมเป็นเงิน {{ visit_expense_all }}.00
+                บาท</span
+              >
+            </div>
+
+            <div style="margin-top: 40px">
+              <span>2. ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา</span><br />
+              <table v-if="travel_array.length != 0">
+                <tbody v-for="(it, index) in travel_array" :key="index">
+                  <tr v-for="(cp, idx) in it.companies" :key="idx">
+                    <td style="width: 400px; padding-left: 30px">
+                      {{ cp.name }}
+                    </td>
+                    <td>
+                      จังหวัด
+                      {{ getProvince(cp.province_id) }}
+                      {{
+                        it.price.id == cp.id
+                          ? `เหมาจ่าย ${it.price.expense}.00 บาท`
+                          : ""
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          <!-- <div class="" style="margin-top: 20px">
-            <span>รวมทั้งสิ้น (ตัวอักษร) {{ bahttext(total_travel) }}</span>
-          </div> -->
-          <div class="" style="margin-top: 20px; margin-left: 40px">
-            ข้าพเจ้า
-            <span>{{
-              supervisor.prefix +
-              supervisor.firstname +
-              " " +
-              supervisor.surname
-            }}</span>
-            ตำแหน่ง อาจารย์
-          </div>
-          <div class="">
-            <span>หน่วยงาน คณะบริหารธุรกิจ</span><br />
-            <span
-              >ขอรับรองว่ารายจ่ายข้างต้นไม่อาจเรียกใบเสร็จรับเงินจากผู้รับได้และข้าพเจ้าได้จ่ายเงินไปในงานของมหาวิทยาลัยจริง</span
-            >
-          </div>
+          <!-- Absolute Page2 -->
+          <span style="position: absolute; top: 1240px; left: 50px">{{
+            supervisor.prefix + supervisor.firstname + " " + supervisor.surname
+          }}</span>
+        </div>
+        <div class="html2pdf__page-break" />
+        <!-- Page3 -->
+        <div
+          style="margin-right: 50px; margin-bottom: 50px; margin-left: 50px"
+          class="payment-pdf"
+        >
+          <div class="pdf-page">
+            <div class="text-center font-weight-bold" style="margin-top: 49px">
+              มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ<br />ใบรับรองการจ่ายเงิน
+            </div>
 
-          <!--  -->
+            <div class="" style="margin-top: 20px; font-size: 10px">
+              <table class="table-payment">
+                <thead>
+                  <tr>
+                    <th class="text-center" style="width: 110px">
+                      วัน เดือน ปี
+                    </th>
+                    <th class="text-center" style="width: 450px">
+                      รายละเอียดรายจ่าย
+                    </th>
+                    <th class="text-center" style="width: 80px">จำนวนเงิน</th>
+                    <th class="text-center" style="width: 150px">หมายเหตุ</th>
+                  </tr>
+                </thead>
+                <tbody v-for="(it, index) in travel_array" :key="index">
+                  <tr v-for="(cp, idx) in it.companies2" :key="idx">
+                    <td
+                      class="text-center"
+                      style="
+                        padding-top: 10px;
+                        padding-bottom: 10px;
+                        padding-left: 10px;
+                      "
+                    >
+                      <span>
+                        {{ dayjs(it.date).locale("th").format("DD MMM BBBB") }}
+                      </span>
+                    </td>
+                    <td
+                      style="
+                        padding-top: 10px;
+                        padding-right: 10px;
+                        padding-bottom: 10px;
+                        padding-left: 10px;
+                      "
+                    >
+                      ค่าเดินทางในการนิเทศนักศึกษาสหกิจศึกษา <br />
+                      เริ่มต้นที่ มจพ.วิทยาเขตระยอง ถีง {{ cp.name }}<br />
+                      จังหวัด{{ getProvince(cp.province_id) }} เหมาจ่าย
+                    </td>
+                    <td
+                      style="
+                        padding-top: 10px;
+                        padding-right: 10px;
+                        padding-bottom: 10px;
+                        padding-left: 10px;
+                      "
+                      class="text-right"
+                    >
+                      <!-- {{ it.price.id == cp.id ? `${it.price.expense}.00` : "-" }} -->
+                      {{ cp.show_price ? `${cp.price}.00` : "-" }}
+                    </td>
+                    <td
+                      class="text-center"
+                      style="
+                        padding-top: 10px;
+                        padding-right: 10px;
+                        padding-bottom: 10px;
+                        padding-left: 10px;
+                      "
+                    >
+                      <span />
+                    </td>
+                  </tr>
+                </tbody>
+                <tr>
+                  <td colspan="2" class="text-right pa-2">
+                    <span class="fw-bold"> รวมทั้งสิ้น </span>
+                  </td>
+                  <td class="pa-2 text-right">
+                    {{ total_travel.toLocaleString() }}.00
+                  </td>
+                  <td />
+                </tr>
+                <tr>
+                  <td colspan="4" class="pa-2">
+                    <span>รวมทั้งสิ้น (ตัวอักษร) </span>
+                    <span class="ml-10 ms-10">{{
+                      bahttext(total_travel)
+                    }}</span>
+                  </td>
+                </tr>
+              </table>
+            </div>
 
-          <div style="margin-top: 80px; margin-left: 300px">
-            <span
-              >ลงชื่อ...............................................................................</span
-            >
-            <br />
-            <span style="padding-left: 50px"
-              >(
-              {{
+            <!--
+              <div class="" style="margin-top: 20px">
+              <span>รวมทั้งสิ้น (ตัวอักษร) {{ bahttext(total_travel) }}</span>
+              </div> 
+            -->
+            <div class="" style="margin-top: 20px; margin-left: 40px">
+              ข้าพเจ้า
+              <span>{{
                 supervisor.prefix +
                 supervisor.firstname +
                 " " +
                 supervisor.surname
-              }}
-              )</span
-            >
-            <br />
-            <span style="padding-left: 50px">ตำแหน่งอาจารย์</span>
-            <br />
-            <span style="padding-left: 50px"
-              >วันที่
-              {{
-                dayjs(studentListPDF[studentListPDF.length - 1]?.visit_date)
-                  .locale("th")
-                  .format("DD MMMM BBBB")
-              }}</span
-            >
+              }}</span>
+              ตำแหน่ง อาจารย์
+            </div>
+            <div class="">
+              <span>หน่วยงาน คณะบริหารธุรกิจ</span><br />
+              <span
+                >ขอรับรองว่ารายจ่ายข้างต้นไม่อาจเรียกใบเสร็จรับเงินจากผู้รับได้และข้าพเจ้าได้จ่ายเงินไปในงานของมหาวิทยาลัยจริง</span
+              >
+            </div>
+
+            <!--  -->
+
+            <div style="margin-top: 20px; margin-left: 300px">
+              <span
+                >ลงชื่อ...............................................................................</span
+              >
+              <br />
+              <span style="padding-left: 50px"
+                >(
+                {{
+                  supervisor.prefix +
+                  supervisor.firstname +
+                  " " +
+                  supervisor.surname
+                }}
+                )</span
+              >
+              <br />
+              <span style="padding-left: 50px">ตำแหน่งอาจารย์</span>
+              <br />
+              <span style="padding-left: 50px"
+                >วันที่
+                {{
+                  dayjs(studentListPDF[studentListPDF.length - 1]?.visit_date)
+                    .locale("th")
+                    .format("DD MMMM BBBB")
+                }}</span
+              >
+            </div>
           </div>
 
-          <!-- {{
-            studentListPDF[studentListPDF.length - 1].visit_date  }}-->
+          <!--
+            {{
+            studentListPDF[studentListPDF.length - 1].visit_date  }}
+          -->
         </div>
       </template>
-    </vue3-html2pdf>
+    </Vue3Html2pdf>
 
     <!--  -->
   </div>
@@ -1461,13 +1480,27 @@ const onPayment = () => {
 
 .payment-pdf {
   font-family: Sarabun, sans-serif;
+  font-size: 14px;
 }
 
 .table-payment,
 .table-payment th,
 .table-payment td {
-  border: 1px solid black;
+  border: 0.1px solid black;
   border-collapse: collapse;
+}
+
+.page-break {
+  page-break-before: always;
+}
+
+.pdf-page {
+  // padding-bottom: 20px;
+  background: white;
+  // border: 1px solid #ddd;
+  // margin-bottom: 20px; /* กำหนดระยะขอบล่างของทุกหน้าให้เป็น 20px */
+  // height: 297mm; /* สมมติว่าใช้ขนาด A4 ที่สูง 297 มิลลิเมตร */
+  // box-sizing: border-box;
 }
 </style>
 
