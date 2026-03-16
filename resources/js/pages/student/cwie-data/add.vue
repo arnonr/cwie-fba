@@ -354,6 +354,10 @@ const onSubmit = () => {
                 name: "student-cwie-data",
               });
             });
+          } else if (response.data.message == "duplicate") {
+            isOverlay.value = false;
+            isDialogConfirmVisible.value = false;
+            alert("ไม่สามารถส่งใบสมัครได้: มีใบสมัครในภาคการศึกษานี้แล้ว");
           } else {
             isOverlay.value = false;
             isDialogConfirmVisible.value = false;
@@ -362,7 +366,7 @@ const onSubmit = () => {
         })
         .catch((error) => {
           console.error(error);
-          //   isOverlay.value = false;
+          isOverlay.value = false;
         });
     } else {
       isOverlay.value = false;
@@ -776,7 +780,7 @@ const format = (date) => {
           >
             Cancel
           </VBtn>
-          <VBtn @click="onSubmit()" color="error"> ส่งข้อมูล </VBtn>
+          <VBtn @click="onSubmit()" color="error" :disabled="isOverlay" :loading="isOverlay"> ส่งข้อมูล </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
