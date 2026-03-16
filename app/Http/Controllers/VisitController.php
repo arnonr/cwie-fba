@@ -602,10 +602,9 @@ class VisitController extends Controller
         $item->visit_expense = $request->has("visit_expense")
             ? $request->visit_expense
             : $item->visit_expense;
-        $item->travel_expense = $pv != null ? $pv->travel_expense : null;
-        // $item->travel_expense = $request->has("travel_expense")
-        //     ? $request->travel_expense
-        //     : $item->travel_expense;
+        $item->travel_expense = $request->has("travel_expense")
+            ? $request->travel_expense
+            : $item->travel_expense;
         $item->active = $request->has("active")
             ? $request->active
             : $item->active;
