@@ -352,6 +352,7 @@ declare module '@vue/runtime-core' {
     StudentMapTeacherList: typeof import('./resources/js/components/student-list/StudentMapTeacherList.vue')['default']
     StudentView: typeof import('./resources/js/components/student-view/StudentView.vue')['default']
     StudentVisitList: typeof import('./resources/js/components/student-list/StudentVisitList.vue')['default']
+    StudentVisitListOld: typeof import('./resources/js/components/student-list/StudentVisitListOld.vue')['default']
     TeacherVisitList: typeof import('./resources/js/components/student-list/TeacherVisitList.vue')['default']
     TheCustomizer: typeof import('./resources/js/@core/components/TheCustomizer.vue')['default']
     ThemeSwitcher: typeof import('./resources/js/@core/components/ThemeSwitcher.vue')['default']

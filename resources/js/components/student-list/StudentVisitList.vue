@@ -992,7 +992,7 @@ const onPayment = () => {
       <!--
         @progress="onProgress($event)"
         @hasStartedGeneration="hasStartedGeneration()"
-        @hasGenerated="hasGenerated($event)" 
+        @hasGenerated="hasGenerated($event)"
       -->
 
       <template #pdf-content>
@@ -1118,7 +1118,7 @@ const onPayment = () => {
         <!--
           <span style="position: absolute; top: 162px; left: 500px"
           >{{ dayjs().locale("th").format("DD MMMM BBBB") }}
-          </span> 
+          </span>
         -->
         <span
           style="position: absolute; top: 199px; left: 220px; font-size: 13px"
@@ -1442,7 +1442,7 @@ const onPayment = () => {
             <!--
               <div class="" style="margin-top: 20px">
               <span>รวมทั้งสิ้น (ตัวอักษร) {{ bahttext(total_travel) }}</span>
-              </div> 
+              </div>
             -->
             <div class="" style="margin-top: 20px; margin-left: 40px">
               ข้าพเจ้า
