@@ -10,6 +10,7 @@ use Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
 
 class StudentDocumentController extends Controller
@@ -159,7 +160,7 @@ class StudentDocumentController extends Controller
         ) {
             $fileDocument =
                 "document-" .
-                rand(10, 100) .
+                Str::uuid() .
                 "-" .
                 $request->file("document_file")->getClientOriginalName();
             $pathDocument = "/student/document/" . $fileDocument;
@@ -168,7 +169,6 @@ class StudentDocumentController extends Controller
                 file_get_contents($request->document_file)
             );
         }
-        var_dump($pathDocument);
         $item = new StudentDocument();
         $item->document_name = $request->document_name;
         $item->document_type_id = $request->document_type_id;
@@ -200,7 +200,7 @@ class StudentDocumentController extends Controller
         ) {
             $fileDocument =
                 "document-" .
-                rand(10, 100) .
+                Str::uuid() .
                 "-" .
                 $request->file("document_file")->getClientOriginalName();
             $pathDocument = "/student/document/" . $fileDocument;
