@@ -511,6 +511,8 @@ const onPayment = () => {
                 };
               }
             } else {
+              console.log(e);
+
               // ถ้าไม่มีวันที่อยู่
               ta.push({
                 date: e.visit_date,
@@ -552,7 +554,7 @@ const onPayment = () => {
           });
 
           travel_array.value = ta;
-
+          total_travel.value = 0;
           travel_array.value.forEach((el) => {
             total_travel.value =
               Number(total_travel.value) + Number(el.price.expense_num);
@@ -1526,6 +1528,7 @@ const onPayment = () => {
 .pdf-page {
   // padding-bottom: 20px;
   background: white;
+
   // border: 1px solid #ddd;
   // margin-bottom: 20px; /* กำหนดระยะขอบล่างของทุกหน้าให้เป็น 20px */
   // height: 297mm; /* สมมติว่าใช้ขนาด A4 ที่สูง 297 มิลลิเมตร */

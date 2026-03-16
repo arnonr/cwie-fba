@@ -2,7 +2,7 @@
 import StudentView from "@/components/student-view/StudentView.vue";
 import { requiredValidator } from "@validators";
 import {
-  class_rooms,  
+  class_rooms,
   class_years,
   statuses,
   form_statuses,
@@ -396,9 +396,12 @@ const onImportSubmit = () => {
 
               s_surname = s_surname.trim();
             }
+
+            console.log(el[1]);
+
             data.push({
               level: el[0],
-              student_code: el[1].replace("'", ""),
+              student_code: el[1].toString().replace("'", ""),
               student_fullname: el[2],
               supervision_fullname: el[12],
               firstname: s_firstname,
