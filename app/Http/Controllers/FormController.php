@@ -547,6 +547,21 @@ class FormController extends Controller
     {
         $request->validate(["semester_id as required"]);
 
+        $duplicate = Form::where("student_id", $request->student_id)
+            ->where("semester_id", $request->semester_id)
+            ->where("active", 1)
+            ->first();
+
+        if ($duplicate) {
+            return response()->json(
+                [
+                    "message" => "duplicate",
+                    "error" => "นักศึกษานี้มีใบสมัครในภาคการศึกษานี้แล้ว",
+                ],
+                409
+            );
+        }
+
         $pathNamecard = null;
         if (
             $request->namecard_file != "" &&
