@@ -212,6 +212,10 @@ const fetchStudent = () => {
     .then((response) => {
       if (response.data.message == "success") {
         const { data } = response.data;
+        if (!data || data.length === 0) {
+          console.error("ไม่พบข้อมูลนักศึกษาในระบบ");
+          return;
+        }
         item.value.student_id = data[0].id;
 
         if (
@@ -780,7 +784,7 @@ const format = (date) => {
           >
             Cancel
           </VBtn>
-          <VBtn @click="onSubmit()" color="error" :disabled="isOverlay" :loading="isOverlay"> ส่งข้อมูล </VBtn>
+          <VBtn @click="onSubmit()" color="error" :disabled="isOverlay || !item.student_id" :loading="isOverlay"> ส่งข้อมูล </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

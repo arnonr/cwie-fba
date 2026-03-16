@@ -547,6 +547,13 @@ class FormController extends Controller
     {
         $request->validate(["semester_id as required"]);
 
+        if (!$request->student_id) {
+            return response()->json(
+                ["message" => "error", "error" => "student_id is required"],
+                422
+            );
+        }
+
         $duplicate = Form::where("student_id", $request->student_id)
             ->where("semester_id", $request->semester_id)
             ->where("active", 1)
@@ -683,8 +690,10 @@ class FormController extends Controller
         $item->save();
 
         $student = Student::where("id", $item->student_id)->first();
-        $student->status_id = $item->status_id;
-        $student->save();
+        if ($student) {
+            $student->status_id = $item->status_id;
+            $student->save();
+        }
 
         // $student = Student::where("id", $item->student_id)->first();
         // $student->status_id = $item->status_id;
