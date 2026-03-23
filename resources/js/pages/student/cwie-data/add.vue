@@ -346,7 +346,7 @@ const onSubmit = () => {
               : null,
 
           namecard_file:
-            item.value.namecard_file.length !== 0
+            item.value.namecard_file && item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
               : null,
         })

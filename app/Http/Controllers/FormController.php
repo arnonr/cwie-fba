@@ -12,6 +12,7 @@ use Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use PHPMailer\PHPMailer\PHPMailer;
 const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
 
@@ -572,56 +573,37 @@ class FormController extends Controller
         }
 
         $pathNamecard = null;
-        if (
-            $request->namecard_file != "" &&
-            $request->namecard_file != "null" &&
-            $request->namecard_file != "undefined"
-        ) {
-            $fileNamecard =
-                "namecard-" .
-                rand(10, 100) .
-                "-" .
-                $request->file("namecard_file")->getClientOriginalName();
+        if ($request->hasFile("namecard_file")) {
+            $namecardExt = $request->file("namecard_file")->extension();
+            $fileNamecard = "namecard-" . Str::uuid() . "." . $namecardExt;
             $pathNamecard = "/form/namecard/" . $fileNamecard;
             Storage::disk("public")->put(
                 $pathNamecard,
-                file_get_contents($request->namecard_file)
+                file_get_contents($request->file("namecard_file")->getRealPath())
             );
         }
 
         $pathPPT = null;
-        if (
-            $request->ppt_report_file != "" &&
-            $request->ppt_report_file != "null" &&
-            $request->ppt_report_file != "undefined"
-        ) {
-            $filePPT =
-                "ppt_report-" .
-                rand(10, 100) .
-                "-" .
-                $request->file("ppt_report_file")->getClientOriginalName();
+        if ($request->hasFile("ppt_report_file")) {
+            $pptExt = $request->file("ppt_report_file")->extension();
+            $filePPT = "ppt_report-" . Str::uuid() . "." . $pptExt;
             $pathPPT = "/form/ppt/" . $filePPT;
             Storage::disk("public")->put(
                 $pathPPT,
-                file_get_contents($request->ppt_report_file)
+                file_get_contents($request->file("ppt_report_file")->getRealPath())
             );
         }
 
         $pathPoster = null;
-        if (
-            $request->poster_report_file != "" &&
-            $request->poster_report_file != "null" &&
-            $request->poster_report_file != "undefined"
-        ) {
-            $filePoster =
-                "poster_report-" .
-                rand(10, 100) .
-                "-" .
-                $request->file("poster_report_file")->getClientOriginalName();
+        if ($request->hasFile("poster_report_file")) {
+            $posterExt = $request->file("poster_report_file")->extension();
+            $filePoster = "poster_report-" . Str::uuid() . "." . $posterExt;
             $pathPoster = "/form/ppt/" . $filePoster;
             Storage::disk("public")->put(
                 $pathPoster,
-                file_get_contents($request->poster_report_file)
+                file_get_contents(
+                    $request->file("poster_report_file")->getRealPath()
+                )
             );
         }
 
@@ -717,20 +699,13 @@ class FormController extends Controller
         $item = Form::where("id", $request->id)->first();
 
         $pathNamecard = null;
-        if (
-            $request->namecard_file != "" &&
-            $request->namecard_file != "null" &&
-            $request->namecard_file != "undefined"
-        ) {
-            $fileNamecard =
-                "namecard-" .
-                rand(10, 100) .
-                "-" .
-                $request->file("namecard_file")->getClientOriginalName();
+        if ($request->hasFile("namecard_file")) {
+            $namecardExt = $request->file("namecard_file")->extension();
+            $fileNamecard = "namecard-" . Str::uuid() . "." . $namecardExt;
             $pathNamecard = "/form/namecard/" . $fileNamecard;
             Storage::disk("public")->put(
                 $pathNamecard,
-                file_get_contents($request->namecard_file)
+                file_get_contents($request->file("namecard_file")->getRealPath())
             );
             $request->namecard_file = $pathNamecard;
         } else {
@@ -738,39 +713,31 @@ class FormController extends Controller
         }
 
         $pathPPT = null;
-        if (
-            $request->ppt_report_file != "" &&
-            $request->ppt_report_file != "null" &&
-            $request->ppt_report_file != "undefined"
-        ) {
-            $filePPT =
-                "ppt_report-" .
-                rand(10, 100) .
-                "-" .
-                $request->file("ppt_report_file")->getClientOriginalName();
+        if ($request->hasFile("ppt_report_file")) {
+            $pptExt = $request->file("ppt_report_file")->extension();
+            $filePPT = "ppt_report-" . Str::uuid() . "." . $pptExt;
             $pathPPT = "/form/ppt/" . $filePPT;
             Storage::disk("public")->put(
                 $pathPPT,
-                file_get_contents($request->ppt_report_file)
+                file_get_contents($request->file("ppt_report_file")->getRealPath())
             );
+        } else {
+            $pathPPT = $item->ppt_report_file;
         }
 
         $pathPoster = null;
-        if (
-            $request->poster_report_file != "" &&
-            $request->poster_report_file != "null" &&
-            $request->poster_report_file != "undefined"
-        ) {
-            $filePoster =
-                "poster_report-" .
-                rand(10, 100) .
-                "-" .
-                $request->file("poster_report_file")->getClientOriginalName();
+        if ($request->hasFile("poster_report_file")) {
+            $posterExt = $request->file("poster_report_file")->extension();
+            $filePoster = "poster_report-" . Str::uuid() . "." . $posterExt;
             $pathPoster = "/form/ppt/" . $filePoster;
             Storage::disk("public")->put(
                 $pathPoster,
-                file_get_contents($request->poster_report_file)
+                file_get_contents(
+                    $request->file("poster_report_file")->getRealPath()
+                )
             );
+        } else {
+            $pathPoster = $item->poster_report_file;
         }
 
         $data = $request->all();

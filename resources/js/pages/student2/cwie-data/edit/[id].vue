@@ -351,7 +351,7 @@ const onSubmit = () => {
               ? item.value.reject_status_id + 1
               : 7,
           namecard_file:
-            item.value.namecard_file.length !== 0
+            item.value.namecard_file && item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
               : null,
         })
@@ -371,7 +371,8 @@ const onSubmit = () => {
         })
         .catch((error) => {
           console.error(error);
-          //   isOverlay.value = false;
+          isOverlay.value = false;
+          isDialogConfirmVisible.value = false;
         });
     } else {
       isOverlay.value = false;
@@ -388,7 +389,7 @@ const onStaffSubmit = () => {
         .editForm({
           ...item.value,
           namecard_file:
-            item.value.namecard_file.length !== 0
+            item.value.namecard_file && item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
               : null,
         })
@@ -408,7 +409,8 @@ const onStaffSubmit = () => {
         })
         .catch((error) => {
           console.error(error);
-          //   isOverlay.value = false;
+          isOverlay.value = false;
+          isDialogConfirmVisible.value = false;
         });
     } else {
       isOverlay.value = false;

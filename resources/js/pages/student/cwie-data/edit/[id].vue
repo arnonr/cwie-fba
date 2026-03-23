@@ -374,7 +374,7 @@ const onSubmit = () => {
               ? item.value.reject_status_id + 1
               : 7,
           namecard_file:
-            item.value.namecard_file.length !== 0
+            item.value.namecard_file && item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
               : null,
         })
@@ -394,7 +394,8 @@ const onSubmit = () => {
         })
         .catch((error) => {
           console.error(error);
-          //   isOverlay.value = false;
+          isOverlay.value = false;
+          isDialogConfirmVisible.value = false;
         });
     } else {
       isOverlay.value = false;
@@ -412,7 +413,7 @@ const onStaffSubmit = () => {
           ...item.value,
           end_date: dayjs(item.value.end_date).format("YYYY-MM-DD"),
           namecard_file:
-            item.value.namecard_file.length !== 0
+            item.value.namecard_file && item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
               : null,
           start_date: dayjs(item.value.start_date).format("YYYY-MM-DD"),
@@ -441,7 +442,8 @@ const onStaffSubmit = () => {
         })
         .catch((error) => {
           console.error(error);
-          //   isOverlay.value = false;
+          isOverlay.value = false;
+          isDialogConfirmVisible.value = false;
         });
     } else {
       isOverlay.value = false;
