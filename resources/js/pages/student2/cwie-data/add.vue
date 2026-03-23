@@ -324,6 +324,10 @@ const onSubmit = () => {
                 name: "student-cwie-data",
               });
             });
+          } else if (response.data.message == "duplicate") {
+            isOverlay.value = false;
+            isDialogConfirmVisible.value = false;
+            alert("ไม่สามารถส่งใบสมัครได้: มีใบสมัครในภาคการศึกษานี้แล้ว");
           } else {
             isOverlay.value = false;
             isDialogConfirmVisible.value = false;

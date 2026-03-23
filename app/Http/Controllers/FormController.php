@@ -331,7 +331,7 @@ class FormController extends Controller
             $items->where("form.tumbol_id", $request->tumbol_id);
         }
 
-        if ($request->active) {
+        if ($request->has("active")) {
             $items->where("form.active", $request->active);
         }
 
@@ -545,7 +545,7 @@ class FormController extends Controller
 
     public function add(Request $request)
     {
-        $request->validate(["semester_id as required"]);
+        $request->validate(["semester_id" => "required"]);
 
         if (!$request->student_id) {
             return response()->json(
@@ -556,7 +556,9 @@ class FormController extends Controller
 
         $duplicate = Form::where("student_id", $request->student_id)
             ->where("semester_id", $request->semester_id)
+            ->where("deleted_at", null)
             ->where("active", 1)
+            ->where("status_id", "!=", 10)
             ->first();
 
         if ($duplicate) {
@@ -938,6 +940,11 @@ class FormController extends Controller
             ? $request->send_at
             : $item->send_at;
 
+        // Keep cancellation state consistent even if some clients omit active.
+        if ((int) $item->status_id === 10) {
+            $item->active = 0;
+        }
+
         $item->updated_by = "arnonr";
         $item->save();
 
@@ -989,6 +996,11 @@ class FormController extends Controller
         $item->active = $request->has("active")
             ? $request->active
             : $item->active;
+
+        // Keep cancellation state consistent even if some clients omit active.
+        if ((int) $item->status_id === 10) {
+            $item->active = 0;
+        }
         $item->updated_by = "arnonr";
         $item->save();
 
