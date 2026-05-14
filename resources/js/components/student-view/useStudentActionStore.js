@@ -74,13 +74,12 @@ export const useStudentActionStore = defineStore("StudentActionStore", {
       var form_data = new FormData();
 
       for (var key in dataSend) {
-        if (dataSend[key] == null) {
-          dataSend[key] = "";
+        if (dataSend[key] !== null && dataSend[key] !== undefined) {
+          form_data.append(key, dataSend[key]);
         }
-        form_data.append(key, dataSend[key]);
       }
       return await axios.post(`/form/add-plan`, form_data, {
-        validateStatus: () => true,
+        validateStatus: (status) => status < 500,
       });
     },
   },

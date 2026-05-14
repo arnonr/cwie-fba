@@ -1142,77 +1142,99 @@ class FormController extends Controller
 
     public function addPlan(Request $request)
     {
-        $request->validate(["id as required"]);
+        $request->validate([
+            "id" => "required",
+            "workplace_province_id" => "required",
+        ]);
 
         $item = Form::where("id", $request->id)->first();
 
-        $pathPlanFile = null;
-        if (
-            $request->plan_document_file != "" &&
-            $request->plan_document_file != "null" &&
-            $request->plan_document_file != "undefined"
-        ) {
-            $fileResponse =
-                "response-" .
-                rand(10, 100) .
-                "-" .
-                $request->file("plan_document_file")->getClientOriginalName();
-            $pathPlanFile = "/student/plan-document/" . $fileResponse;
-            Storage::disk("public")->put(
-                $pathPlanFile,
-                file_get_contents($request->plan_document_file)
+        if (!$item) {
+            return response()->json(
+                ["message" => "ไม่พบข้อมูลฟอร์ม"],
+                404
             );
-        } else {
+        }
+
+        try {
+            DB::beginTransaction();
+
             $pathPlanFile = $item->plan_document_file;
-        }
+            if ($request->hasFile("plan_document_file")) {
+                $planExt = $request
+                    ->file("plan_document_file")
+                    ->extension();
+                $filePlan =
+                    "plan-" . Str::uuid() . "." . $planExt;
+                $pathPlanFile = "/student/plan-document/" . $filePlan;
+                Storage::disk("public")->put(
+                    $pathPlanFile,
+                    file_get_contents(
+                        $request
+                            ->file("plan_document_file")
+                            ->getRealPath()
+                    )
+                );
+            }
 
-        $pathGooglemapFile = null;
-        if (
-            $request->workplace_googlemap_file != "" &&
-            $request->workplace_googlemap_file != "null" &&
-            $request->workplace_googlemap_file != "undefined"
-        ) {
-            $fileResponse =
-                "response-" .
-                rand(10, 100) .
-                "-" .
-                $request
-                    ->file("workplace_googlemap_file")
-                    ->getClientOriginalName();
-            $pathGooglemapFile = "/student/plan/google-map/" . $fileResponse;
-            Storage::disk("public")->put(
-                $pathGooglemapFile,
-                file_get_contents($request->workplace_googlemap_file)
-            );
-        } else {
             $pathGooglemapFile = $item->workplace_googlemap_file;
+            if ($request->hasFile("workplace_googlemap_file")) {
+                $mapExt = $request
+                    ->file("workplace_googlemap_file")
+                    ->extension();
+                $fileMap =
+                    "googlemap-" . Str::uuid() . "." . $mapExt;
+                $pathGooglemapFile =
+                    "/student/plan/google-map/" . $fileMap;
+                Storage::disk("public")->put(
+                    $pathGooglemapFile,
+                    file_get_contents(
+                        $request
+                            ->file("workplace_googlemap_file")
+                            ->getRealPath()
+                    )
+                );
+            }
+
+            $item->plan_document_file = $pathPlanFile;
+            $item->plan_send_at = $request->plan_send_at;
+            $item->workplace_address = $request->workplace_address;
+            $item->workplace_province_id =
+                $request->workplace_province_id;
+            $item->workplace_amphur_id =
+                $request->workplace_amphur_id ?: null;
+            $item->workplace_tumbol_id =
+                $request->workplace_tumbol_id ?: null;
+            $item->workplace_googlemap_url =
+                $request->workplace_googlemap_url;
+            $item->workplace_googlemap_file = $pathGooglemapFile;
+            $item->status_id = 12;
+            $item->updated_by = "arnonr";
+            $item->save();
+
+            $student = Student::where("id", $item->student_id)->first();
+            if ($student) {
+                $student->status_id = $item->status_id;
+                $student->save();
+            }
+
+            DB::commit();
+
+            return response()->json(
+                ["message" => "success", "data" => $item],
+                200
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error("addPlan error: " . $e->getMessage());
+            return response()->json(
+                [
+                    "message" => "error",
+                    "error" => $e->getMessage(),
+                ],
+                500
+            );
         }
-
-        $item->plan_document_file = $pathPlanFile;
-        $item->plan_send_at = $request->plan_send_at;
-        $item->workplace_address = $request->workplace_address;
-        $item->workplace_province_id = $request->workplace_province_id;
-        $item->workplace_province_id = $request->workplace_province_id;
-        $item->workplace_amphur_id = $request->workplace_amphur_id;
-        $item->workplace_tumbol_id = $request->workplace_tumbol_id;
-        $item->workplace_googlemap_url = $request->workplace_googlemap_url;
-        $item->workplace_googlemap_file = $pathGooglemapFile;
-        $item->status_id = 12;
-        $item->updated_by = "arnonr";
-        $item->save();
-
-        $student = Student::where("id", $item->student_id)->first();
-        $student->status_id = $item->status_id;
-        $student->save();
-
-        // student
-
-        $responseData = [
-            "message" => "success",
-            "data" => $item,
-        ];
-
-        return response()->json($responseData, 200);
     }
 
     public function editSupervision(Request $request)

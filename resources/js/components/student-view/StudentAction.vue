@@ -1117,12 +1117,18 @@ const onPlanSubmit = () => {
         });
       } else {
         isOverlay.value = false;
-        console.log("error");
+        snackbarText.value =
+          response.data.error || "เกิดข้อผิดพลาด กรุณาลองใหม่";
+        snackbarColor.value = "error";
+        isSnackbarVisible.value = true;
       }
     })
     .catch((error) => {
       console.error(error);
       isOverlay.value = false;
+      snackbarText.value = "เกิดข้อผิดพลาด กรุณาลองใหม่";
+      snackbarColor.value = "error";
+      isSnackbarVisible.value = true;
     });
   ``;
 };
