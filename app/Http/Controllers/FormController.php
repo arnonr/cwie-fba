@@ -560,6 +560,7 @@ class FormController extends Controller
             ->where("deleted_at", null)
             ->where("active", 1)
             ->where("status_id", "!=", 10)
+            ->where("status_id", "!=", 9)
             ->first();
 
         if ($duplicate) {
