@@ -214,7 +214,7 @@ Route::group(["prefix" => "document-download-type"], function () {
     Route::delete("/{id}", [DocumentDownloadTypeController::class, "delete"]);
 });
 
-Route::group(["prefix" => "student-document"], function () {
+Route::group(["prefix" => "student-document", "middleware" => "auth:api"], function () {
     Route::get("/{id}", [StudentDocumentController::class, "get"]);
     Route::get("/", [StudentDocumentController::class, "getAll"]);
     Route::post("/", [StudentDocumentController::class, "add"]);

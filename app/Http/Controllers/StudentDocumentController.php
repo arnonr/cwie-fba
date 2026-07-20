@@ -61,8 +61,43 @@ class StudentDocumentController extends Controller
             );
         }
 
-        if ($request->student_id) {
-            $items->where("student_document.student_id", $request->student_id);
+        $user = Auth::user();
+        $studentId = null;
+        if ($user && $user->account_type == 1) {
+            $studentCode = substr($user->username, 1);
+            $student = DB::table('student')->where('student_code', $studentCode)->first();
+            if ($student) {
+                $studentId = $student->id;
+            }
+        }
+
+        if ($user && $user->account_type == 1) {
+            if (!$studentId) {
+                return response()->json(
+                    [
+                        "message" => "success",
+                        "data" => [],
+                        "totalPage" => 1,
+                        "totalData" => 0,
+                    ],
+                    200
+                );
+            }
+            $items->where("student_document.student_id", $studentId);
+        } else {
+            if ($request->student_id) {
+                $items->where("student_document.student_id", $request->student_id);
+            } else {
+                return response()->json(
+                    [
+                        "message" => "success",
+                        "data" => [],
+                        "totalPage" => 1,
+                        "totalData" => 0,
+                    ],
+                    200
+                );
+            }
         }
 
         if ($request->document_type_id) {
@@ -117,7 +152,7 @@ class StudentDocumentController extends Controller
             "student_document.document_name as document_name",
             DB::raw(
                 "(CASE WHEN document_file = NULL THEN ''
-             ELSE CONCAT('" .
+              ELSE CONCAT('" .
                     $this->uploadUrl .
                     "',document_file) END) AS document_file"
             ),
@@ -135,6 +170,19 @@ class StudentDocumentController extends Controller
             )
             ->first();
 
+        if (!$item) {
+            return response()->json(["message" => "Document not found"], 404);
+        }
+
+        $user = Auth::user();
+        if ($user && $user->account_type == 1) {
+            $studentCode = substr($user->username, 1);
+            $student = DB::table('student')->where('student_code', $studentCode)->first();
+            if (!$student || $item->student_id != $student->id) {
+                return response()->json(["message" => "Unauthorized"], 403);
+            }
+        }
+
         return response()->json(
             [
                 "message" => "success",
@@ -146,10 +194,27 @@ class StudentDocumentController extends Controller
 
     public function add(Request $request)
     {
+        $user = Auth::user();
+        $studentId = null;
+        if ($user && $user->account_type == 1) {
+            $studentCode = substr($user->username, 1);
+            $student = DB::table('student')->where('student_code', $studentCode)->first();
+            if ($student) {
+                $studentId = $student->id;
+            }
+        }
+
+        if ($user && $user->account_type == 1) {
+            if (!$studentId) {
+                return response()->json(["message" => "Student record not found"], 404);
+            }
+            $request->merge(['student_id' => $studentId]);
+        }
+
         $request->validate([
-            "document_name as required",
-            "document_type_id as required",
-            "student_id as required",
+            "document_name" => "required",
+            "document_type_id" => "required",
+            "student_id" => "required",
         ]);
 
         $pathDocument = null;
@@ -174,7 +239,7 @@ class StudentDocumentController extends Controller
         $item->document_type_id = $request->document_type_id;
         $item->document_file = $pathDocument;
         $item->student_id = $request->student_id;
-        $item->active = $request->active ? active : 1;
+        $item->active = $request->active ?? 1;
         $item->created_by = "arnonr";
         $item->save();
 
@@ -188,9 +253,25 @@ class StudentDocumentController extends Controller
 
     public function edit($id, Request $request)
     {
-        $request->validate(["id as required"]);
+        $request->validate(["id" => "required"]);
 
-        $item = StudentDocument::where("id", $request->id)->first();
+        $documentId = $request->id ?? $id;
+        $item = StudentDocument::where("id", $documentId)->first();
+
+        if (!$item) {
+            return response()->json(["message" => "Document not found"], 404);
+        }
+
+        $user = Auth::user();
+        if ($user && $user->account_type == 1) {
+            $studentCode = substr($user->username, 1);
+            $student = DB::table('student')->where('student_code', $studentCode)->first();
+            if (!$student || $item->student_id != $student->id) {
+                return response()->json(["message" => "Unauthorized"], 403);
+            }
+            // Ensure they can't change the student_id of the document
+            $request->merge(['student_id' => $student->id]);
+        }
 
         $pathDocument = null;
         if (
@@ -239,13 +320,21 @@ class StudentDocumentController extends Controller
 
     public function delete($id)
     {
-        // $item = StudentDocument::where('id', $id)->first();
+        $item = StudentDocument::where("id", $id)->first();
+        if (!$item) {
+            return response()->json(["message" => "Document not found"], 404);
+        }
 
-        // $item->active = 0;
-        // $item->deleted_at = Carbon::now();
-        // $item->save();
+        $user = Auth::user();
+        if ($user && $user->account_type == 1) {
+            $studentCode = substr($user->username, 1);
+            $student = DB::table('student')->where('student_code', $studentCode)->first();
+            if (!$student || $item->student_id != $student->id) {
+                return response()->json(["message" => "Unauthorized"], 403);
+            }
+        }
 
-        $item = StudentDocument::where("id", $id)->delete();
+        $item->delete();
 
         $responseData = [
             "message" => "success",

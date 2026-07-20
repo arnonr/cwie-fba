@@ -14,6 +14,11 @@ class Form extends Model
     protected $table = "form";
     protected $primaryKey = "id";
 
+    protected $casts = [
+        "status_id" => "integer",
+        "reject_status_id" => "integer",
+    ];
+
     protected $fillable = [
         "id",
         "supervision_id",

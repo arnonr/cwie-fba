@@ -370,9 +370,11 @@ const onSubmit = () => {
           ...item.value,
           end_date: dayjs(item.value.end_date).format("YYYY-MM-DD"),
           status_id:
-            item.value.reject_status_id != 5
-              ? item.value.reject_status_id + 1
-              : 7,
+            item.value.reject_status_id != null
+              ? (Number(item.value.reject_status_id) !== 5
+                ? Number(item.value.reject_status_id) + 1
+                : 7)
+              : 2,
           namecard_file:
             item.value.namecard_file && item.value.namecard_file.length !== 0
               ? item.value.namecard_file[0]
