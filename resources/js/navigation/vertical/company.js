@@ -7,4 +7,4 @@ export default [
     action: "manage",
     subject: "Auth",
   },
-];
+]

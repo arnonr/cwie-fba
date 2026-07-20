@@ -6,7 +6,7 @@
 export async function loadFonts() {
   const webFontLoader = await import(
     /* webpackChunkName: "webfontloader" */ "webfontloader"
-  );
+  )
 
   // webFontLoader.load({
   //   google: {
@@ -20,5 +20,5 @@ export async function loadFonts() {
     google: {
       families: ["Noto+Sans+Thai:100,300,400,500,700,900&display=swap"],
     },
-  });
+  })
 }

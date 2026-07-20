@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useTeacherStore = defineStore("TeacherStore", {
   actions: {
@@ -10,43 +10,43 @@ export const useTeacherStore = defineStore("TeacherStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTeacher({ id }) {
-      return axios.get(`/teacher/${id}`);
+      return axios.get(`/teacher/${id}`)
     },
 
     async addTeacher({ teachername }) {
       return await axios.post(`/teacher/import-icit-account/${teachername}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async editTeacher(dataSend) {
-      var form_data = new FormData();
+      var form_data = new FormData()
 
       for (var key in dataSend) {
         if (dataSend[key] == null) {
-          dataSend[key] = "";
+          dataSend[key] = ""
         }
-        form_data.append(key, dataSend[key]);
+        form_data.append(key, dataSend[key])
       }
-      form_data.append("_method", "PUT");
+      form_data.append("_method", "PUT")
 
       return await axios.post(`/teacher/${dataSend.id}`, form_data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         validateStatus: () => true,
-      });
+      })
     },
 
     async deleteTeacher({ id }) {
       return await axios.delete(`/teacher/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     loadTeacher(params) {
@@ -55,8 +55,8 @@ export const useTeacherStore = defineStore("TeacherStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     syncTeacher() {
@@ -65,8 +65,8 @@ export const useTeacherStore = defineStore("TeacherStore", {
         {},
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchProvinces(params) {
@@ -75,8 +75,8 @@ export const useTeacherStore = defineStore("TeacherStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchAmphurs(params) {
@@ -85,8 +85,8 @@ export const useTeacherStore = defineStore("TeacherStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTumbols(params) {
@@ -95,8 +95,8 @@ export const useTeacherStore = defineStore("TeacherStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDepartments(params) {
@@ -105,8 +105,8 @@ export const useTeacherStore = defineStore("TeacherStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
   },
-});
+})

@@ -1,25 +1,25 @@
 <script setup>
-import { class_rooms, class_years, statuses } from "@/data-constant/data";
-import { useStudentStore } from "./useStudentStore";
+import { class_rooms, class_years, statuses, form_statuses, statusShow } from "@/data-constant/data"
+import { useStudentStore } from "./useStudentStore"
 
-import { form_statuses, statusShow } from "@/data-constant/data";
 
-const studentStore = useStudentStore();
+const studentStore = useStudentStore()
 
-const rowPerPage = ref(20);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const items = ref([]);
-const isOverlay = ref(true);
-const orderBy = ref("student.id");
-const order = ref("desc");
-const teacherData = JSON.parse(localStorage.getItem("teacherData"));
-const semester = ref([]);
-const major = ref([]);
+const rowPerPage = ref(20)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const items = ref([])
+const isOverlay = ref(true)
+const orderBy = ref("student.id")
+const order = ref("desc")
+const teacherData = JSON.parse(localStorage.getItem("teacherData"))
+const semester = ref([])
+const major = ref([])
 
 const advancedSearch = reactive({
   semester_id: "",
+
   //   status_id: 3,
   student_code: "",
   firstname: "",
@@ -32,9 +32,10 @@ const advancedSearch = reactive({
   company_name: "",
   province_id: "",
   approve_status: "",
+
   //   major_id: "",
   //   teacherData.id
-});
+})
 
 const selectOptions = ref({
   perPage: [
@@ -66,27 +67,28 @@ const selectOptions = ref({
     { title: "รออการอนุมัติ", value: 3 },
     { title: "อนุมัติเรียบร้อย", value: 4 },
   ],
-});
+})
 
 const fetchProvinces = () => {
   studentStore
     .fetchProvinces({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.provinces = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.province_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.provinces = response.data.data.map(r => {
+          return { title: r.name_th, value: r.province_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchProvinces();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchProvinces()
 
 const fetchMajorHeads = () => {
   studentStore
@@ -94,29 +96,31 @@ const fetchMajorHeads = () => {
       teacher_id: teacherData.id,
       perPage: 100,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        console.log(response.data.data);
-        semester.value = response.data.data.map((r) => {
-          console.log(r.semester_id);
-          return r.semester_id;
-        });
+        console.log(response.data.data)
+        semester.value = response.data.data.map(r => {
+          console.log(r.semester_id)
+          
+          return r.semester_id
+        })
 
-        major.value = response.data.data.map((r) => {
-          return r.major_id;
-        });
+        major.value = response.data.data.map(r => {
+          return r.major_id
+        })
 
-        fetchSemesters(semester.value);
+        fetchSemesters(semester.value)
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchMajorHeads();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchMajorHeads()
 
 const fetchSemesters = () => {
   if (semester.value.length != 0) {
@@ -125,78 +129,81 @@ const fetchSemesters = () => {
         id_array: semester.value,
         perPage: 100,
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
-          selectOptions.value.semesters = response.data.data.map((r) => {
+          selectOptions.value.semesters = response.data.data.map(r => {
             if (r.is_current == 1) {
-              advancedSearch.semester_id = r.id;
+              advancedSearch.semester_id = r.id
             }
+            
             return {
               title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
               value: r.id,
               start_date: r.start_date,
               end_date: r.end_date,
-            };
-          });
+            }
+          })
 
-          console.log(selectOptions.value);
-          isOverlay.value = false;
+          console.log(selectOptions.value)
+          isOverlay.value = false
         } else {
-          console.log("error");
+          console.log("error")
         }
       })
-      .catch((error) => {
-        console.error(error);
-        isOverlay.value = false;
-      });
+      .catch(error => {
+        console.error(error)
+        isOverlay.value = false
+      })
   }
-};
+}
 
 const fetchTeachers = () => {
   studentStore
     .fetchTeachers({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.teachers = response.data.data.map((r) => {
+        selectOptions.value.teachers = response.data.data.map(r => {
           return {
             title: r.prefix + r.firstname + " " + r.surname,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchTeachers();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchTeachers()
 
 const fetchMajors = () => {
   studentStore
     .fetchMajors({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.majors = response.data.data.map((r) => {
+        selectOptions.value.majors = response.data.data.map(r => {
           return {
             title: r.name_th,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchMajors();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchMajors()
 
 // 👉 Fetching
 const fetchItems = () => {
@@ -205,7 +212,7 @@ const fetchItems = () => {
       ...advancedSearch,
       includeAll: true,
       major_id_array: major.value,
-    };
+    }
 
     studentStore
       .fetchListStudents({
@@ -216,74 +223,74 @@ const fetchItems = () => {
         ...search,
         includeForm: true,
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
-          items.value = response.data.data;
-          totalPage.value = response.data.totalPage;
-          totalItems.value = response.data.totalData;
-          isOverlay.value = false;
+          items.value = response.data.data
+          totalPage.value = response.data.totalPage
+          totalItems.value = response.data.totalData
+          isOverlay.value = false
         } else {
-          console.log("error");
+          console.log("error")
         }
       })
-      .catch((error) => {
-        console.error(error);
-        isOverlay.value = false;
-      });
+      .catch(error => {
+        console.error(error)
+        isOverlay.value = false
+      })
   } else {
-    items.value = [];
+    items.value = []
   }
-};
+}
 
-watchEffect(fetchItems);
+watchEffect(fetchItems)
 
 // 👉 watching current page
 watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value
+})
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
 
 const resolveActive = (active, type) => {
-  let data = "";
+  let data = ""
 
-  if (active == 1) data = ["success", "Active"];
+  if (active == 1) data = ["success", "Active"]
 
-  if (active == 0) data = ["secondary", "In Active"];
+  if (active == 0) data = ["secondary", "In Active"]
 
   if (type == "color") {
-    return data[0];
+    return data[0]
   }
 
-  return data[1];
-};
+  return data[1]
+}
 
 const resolveBlacklist = (b, type) => {
-  let data = "";
+  let data = ""
 
-  if (b == 1) data = ["error", "Blacklist"];
+  if (b == 1) data = ["error", "Blacklist"]
 
-  if (b == 0) data = ["secondary", "None"];
+  if (b == 0) data = ["secondary", "None"]
 
   if (type == "color") {
-    return data[0];
+    return data[0]
   }
 
-  return data[1];
-};
+  return data[1]
+}
 
 if (localStorage.getItem("deleted") == 1) {
-  snackbarText.value = "Deleted Company";
-  snackbarColor.value = "success";
-  isSnackbarVisible.value = true;
-  localStorage.removeItem("deleted");
+  snackbarText.value = "Deleted Company"
+  snackbarColor.value = "success"
+  isSnackbarVisible.value = true
+  localStorage.removeItem("deleted")
 }
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 </script>
 
 <template>
@@ -293,30 +300,39 @@ onMounted(() => {
       <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Search -->
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="จำนวนรายการ/page"
               v-model="rowPerPage"
+              label="จำนวนรายการ/page"
               density="compact"
               variant="outlined"
               :items="selectOptions.perPage"
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="8">
+          <VCol
+            cols="12"
+            sm="8"
+          >
             <VSelect
-              label="ปีการศึกษา"
               v-model="advancedSearch.semester_id"
+              label="ปีการศึกษา"
               density="compact"
               variant="outlined"
               :items="selectOptions.semesters"
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="สถานะการอนุมัติ"
               v-model="advancedSearch.approve_status"
+              label="สถานะการอนุมัติ"
               density="compact"
               variant="outlined"
               clearable
@@ -324,18 +340,23 @@ onMounted(() => {
             />
           </VCol>
 
-          <!-- <VCol cols="12" sm="4">
+          <!--
+            <VCol cols="12" sm="4">
             <VSelect
-              label="สถานะ"
-              v-model="advancedSearch.status_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.statuses"
+            label="สถานะ"
+            v-model="advancedSearch.status_id"
+            density="compact"
+            variant="outlined"
+            clearable
+            :items="selectOptions.statuses"
             />
-          </VCol> -->
+            </VCol> 
+          -->
           <VSpacer />
-          <VCol cols="12" sm="2">
+          <VCol
+            cols="12"
+            sm="2"
+          >
             <VTextField
               v-model="advancedSearch.student_code"
               label="รหัสนักศึกษา"
@@ -343,7 +364,10 @@ onMounted(() => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol
+            cols="12"
+            sm="3"
+          >
             <VTextField
               v-model="advancedSearch.firstname"
               label="ชื่อ"
@@ -351,7 +375,10 @@ onMounted(() => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol
+            cols="12"
+            sm="3"
+          >
             <VTextField
               v-model="advancedSearch.surname"
               label="นามสกุล"
@@ -359,10 +386,13 @@ onMounted(() => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="6">
+          <VCol
+            cols="12"
+            sm="6"
+          >
             <VSelect
-              label="สาขาวิชา"
               v-model="advancedSearch.major_id"
+              label="สาขาวิชา"
               density="compact"
               variant="outlined"
               clearable
@@ -371,10 +401,13 @@ onMounted(() => {
           </VCol>
 
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol
+            cols="12"
+            sm="3"
+          >
             <VSelect
-              label="ชั้นปี"
               v-model="advancedSearch.class_year"
+              label="ชั้นปี"
               density="compact"
               variant="outlined"
               clearable
@@ -383,10 +416,13 @@ onMounted(() => {
           </VCol>
 
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol
+            cols="12"
+            sm="3"
+          >
             <VSelect
-              label="ห้อง"
               v-model="advancedSearch.class_room"
+              label="ห้อง"
               density="compact"
               variant="outlined"
               clearable
@@ -394,75 +430,114 @@ onMounted(() => {
             />
           </VCol>
           <!-- 
-          <VCol cols="12" sm="6">
+            <VCol cols="12" sm="6">
             <VSelect
-              label="อาจารย์ที่ปรึกษา"
-              v-model="advancedSearch.advisor_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.teachers"
+            label="อาจารย์ที่ปรึกษา"
+            v-model="advancedSearch.advisor_id"
+            density="compact"
+            variant="outlined"
+            clearable
+            :items="selectOptions.teachers"
             />
-          </VCol> -->
+            </VCol> 
+          -->
 
-          <!-- <VCol cols="12" sm="6">
+          <!--
+            <VCol cols="12" sm="6">
             <VSelect
-              label="อาจารย์นิเทศ"
-              v-model="advancedSearch.supervision_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.teachers"
+            label="อาจารย์นิเทศ"
+            v-model="advancedSearch.supervision_id"
+            density="compact"
+            variant="outlined"
+            clearable
+            :items="selectOptions.teachers"
             />
-          </VCol> -->
+            </VCol> 
+          -->
 
-          <!-- <VCol cols="12" sm="6">
+          <!--
+            <VCol cols="12" sm="6">
             <VTextField
-              label="สถานประกอบการ"
-              v-model="advancedSearch.company_name"
-              density="compact"
+            label="สถานประกอบการ"
+            v-model="advancedSearch.company_name"
+            density="compact"
             />
-          </VCol> -->
+            </VCol> 
+          -->
 
-          <!-- <VCol cols="12" sm="6">
+          <!--
+            <VCol cols="12" sm="6">
             <VSelect
-              label="จังหวัดที่ออกปฏิบัติ"
-              v-model="advancedSearch.province_id"
-              density="compact"
-              variant="outlined"
-              clearable
-              :items="selectOptions.provinces"
+            label="จังหวัดที่ออกปฏิบัติ"
+            v-model="advancedSearch.province_id"
+            density="compact"
+            variant="outlined"
+            clearable
+            :items="selectOptions.provinces"
             />
-          </VCol> -->
+            </VCol> 
+          -->
 
           <!-- Table -->
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <VTable class="text-no-wrap">
               <!-- 👉 table head -->
               <thead>
                 <tr>
-                  <th scope="col" class="font-weight-bold">รหัสนักศึกษา</th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="font-weight-bold"
+                  >
+                    รหัสนักศึกษา
+                  </th>
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ชื่อ-นามสกุล
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สาขาวิชา
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ชั้นปี
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">ห้อง</th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
+                    ห้อง
+                  </th>
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สถานะ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จัดการ
                   </th>
                 </tr>
               </thead>
               <!-- 👉 table body -->
               <tbody>
-                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
+                <tr
+                  v-for="it in items"
+                  :key="it.id"
+                  style="height: 3.75rem"
+                >
                   <!-- 👉 User -->
                   <td>
                     <span>
@@ -476,28 +551,43 @@ onMounted(() => {
                     {{ it.major_name }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
                     {{ it.class_year }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
                     {{ it.class_room }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    <VChip label :color="form_statuses[it.status_id]">
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
+                    <VChip
+                      label
+                      :color="form_statuses[it.status_id]"
+                    >
                       {{
                         statusShow(
                           it.status_id,
                           it.request_document_date,
                           it.confirm_response_at
                         )
-                      }}</VChip
-                    >
+                      }}
+                    </VChip>
                   </td>
 
                   <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px">
+                  <td
+                    class="text-center"
+                    style="min-width: 80px"
+                  >
                     <VBtn
                       color="info"
                       :to="{
@@ -505,8 +595,8 @@ onMounted(() => {
                         params: { id: it.id },
                       }"
                     >
-                      View</VBtn
-                    >
+                      View
+                    </VBtn>
                   </td>
                 </tr>
               </tbody>
@@ -514,14 +604,22 @@ onMounted(() => {
               <!-- 👉 table footer  -->
               <tfoot v-show="!items.length">
                 <tr>
-                  <td colspan="7" class="text-center">โปรดเลือกปีการศึกษา</td>
+                  <td
+                    colspan="7"
+                    class="text-center"
+                  >
+                    โปรดเลือกปีการศึกษา
+                  </td>
                 </tr>
               </tfoot>
-              <tfoot v-show="items.length"></tfoot>
+              <tfoot v-show="items.length" />
             </VTable>
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <span class="text-sm text-disabled">
               Showing {{ currentPage }} to {{ totalPage }} of
               {{ totalItems }} entries
@@ -544,11 +642,20 @@ onMounted(() => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
-    <VOverlay v-model="isOverlay" contained class="align-center justify-center">
+    <VOverlay
+      v-model="isOverlay"
+      contained
+      class="align-center justify-center"
+    >
       <VProgressCircular indeterminate />
     </VOverlay>
   </div>

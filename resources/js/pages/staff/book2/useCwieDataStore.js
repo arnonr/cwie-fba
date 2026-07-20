@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useCwieDataStore = defineStore("CwieDataStore", {
   actions: {
@@ -9,8 +9,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchSemesters(params) {
@@ -19,8 +19,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTeachers(params) {
@@ -29,8 +29,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchListStudents(params) {
@@ -39,8 +39,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajors(params) {
@@ -49,8 +49,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async fetchForms(params) {
@@ -59,8 +59,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudents(params) {
@@ -69,21 +69,21 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudent({ id }) {
       return axios.get(`/student/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async editStudent(dataSend) {
       //
       return await axios.put(`/student/${dataSend.id}`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     fetchTeachers(params) {
@@ -92,8 +92,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchProvinces(params) {
@@ -102,8 +102,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchAmphurs(params) {
@@ -112,8 +112,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTumbols(params) {
@@ -122,8 +122,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDepartments(params) {
@@ -132,8 +132,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDocumentTypes(params) {
@@ -142,8 +142,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudentDocuments(params) {
@@ -152,8 +152,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchSemesters(params) {
@@ -162,8 +162,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchCompanies(params) {
@@ -172,8 +172,8 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajorHeads(params) {
@@ -182,27 +182,28 @@ export const useCwieDataStore = defineStore("CwieDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async addRejectLog(dataSend) {
       return await axios.post(`/reject-log`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async approve(dataSend) {
-      console.log(dataSend);
+      console.log(dataSend)
+      
       return await axios.put(`/form/approve/${dataSend.id}`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async addSendBook(dataSend) {
       return await axios.post(`/form/add-send-book`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
   },
-});
+})

@@ -1,27 +1,27 @@
 <script setup>
-import { useProvinceStore } from "./useProvinceStore";
+import { useProvinceStore } from "./useProvinceStore"
 
-const provinceStore = useProvinceStore();
+const provinceStore = useProvinceStore()
 
-const rowPerPage = ref(20);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const items = ref([]);
-const item = ref({});
-const isOverlay = ref(true);
-const orderBy = ref("name_th");
-const order = ref("asc");
+const rowPerPage = ref(20)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const items = ref([])
+const item = ref({})
+const isOverlay = ref(true)
+const orderBy = ref("name_th")
+const order = ref("asc")
 
-const refForm = ref();
-const isFormValid = ref(false);
-const isSubmit = ref(false);
+const refForm = ref()
+const isFormValid = ref(false)
+const isSubmit = ref(false)
 
-const isDialogEditVisible = ref(false);
+const isDialogEditVisible = ref(false)
 
 const advancedSearch = reactive({
   name_th: "",
-});
+})
 
 const selectOptions = ref({
   perPage: [
@@ -34,13 +34,13 @@ const selectOptions = ref({
     { title: "น้อย -> มาก", value: "asc" },
     { title: "มาก -> น้อย", value: "desc" },
   ],
-});
+})
 
 // 👉 Fetching
 const fetchItems = () => {
   let search = {
     ...advancedSearch,
-  };
+  }
 
   provinceStore
     .fetchProvinces({
@@ -50,39 +50,39 @@ const fetchItems = () => {
       order: order.value,
       ...search,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        items.value = response.data.data;
-        totalPage.value = response.data.totalPage;
-        totalItems.value = response.data.totalData;
-        isOverlay.value = false;
+        items.value = response.data.data
+        totalPage.value = response.data.totalPage
+        totalItems.value = response.data.totalData
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
-watchEffect(fetchItems);
+watchEffect(fetchItems)
 
 // 👉 watching current page
 watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value
+})
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
 const onSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
 
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
@@ -90,26 +90,26 @@ const onSubmit = () => {
         .editProvince({
           ...item.value,
         })
-        .then((response) => {
+        .then(response => {
           if (response.status === 200) {
-            isDialogEditVisible.value = false;
-            snackbarText.value = "Updated Province";
-            snackbarColor.value = "success";
-            isSnackbarVisible.value = true;
+            isDialogEditVisible.value = false
+            snackbarText.value = "Updated Province"
+            snackbarColor.value = "success"
+            isSnackbarVisible.value = true
 
-            fetchItems();
+            fetchItems()
           } else {
-            isOverlay.value = false;
-            console.log("error");
+            isOverlay.value = false
+            console.log("error")
           }
         })
-        .catch((error) => {
-          console.error(error);
-        });
+        .catch(error => {
+          console.error(error)
+        })
     }
-    isOverlay.value = false;
-  });
-};
+    isOverlay.value = false
+  })
+}
 </script>
 
 <template>
@@ -118,17 +118,23 @@ const onSubmit = () => {
     <VCard title="จัดการค่านิเทศ/ค่าเดินทาง">
       <VCardItem>
         <VRow class="mt-1 mb-1">
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="จำนวนรายการ/page"
               v-model="rowPerPage"
+              label="จำนวนรายการ/page"
               density="compact"
               variant="outlined"
               :items="selectOptions.perPage"
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.name_th"
               label="ชื่อจังหวัด/Name"
@@ -136,19 +142,36 @@ const onSubmit = () => {
             />
           </VCol>
           <!-- Table -->
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <VTable class="text-no-wrap">
               <!-- 👉 table head -->
               <thead>
                 <tr>
-                  <th scope="col" class="font-weight-bold">จังหวัด</th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="font-weight-bold"
+                  >
+                    จังหวัด
+                  </th>
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ค่านิเทศ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ค่าเดินทาง
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จัดการ
                   </th>
                 </tr>
@@ -166,25 +189,36 @@ const onSubmit = () => {
                       {{ it.name_th }}
                     </span>
                   </td>
-                  <td class="text-center" style="min-width: 110px">
+                  <td
+                    class="text-center"
+                    style="min-width: 110px"
+                  >
                     {{ it.visit_expense }}
                   </td>
-                  <td class="text-center" style="min-width: 100px">
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
                     {{ it.travel_expense }}
                   </td>
                   <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px">
-                    <!-- <VBtn
-                    color="primary"
-                    @click="
-                      () => {
-                        isDialogViewVisible = true;
-                        item = it;
-                      }
-                    "
+                  <td
+                    class="text-center"
+                    style="min-width: 80px"
                   >
-                    View</VBtn
-                  > -->
+                    <!--
+                      <VBtn
+                      color="primary"
+                      @click="
+                      () => {
+                      isDialogViewVisible = true;
+                      item = it;
+                      }
+                      "
+                      >
+                      View</VBtn
+                      > 
+                    -->
                     <VBtn
                       color="success"
                       class="ml-1"
@@ -195,20 +229,22 @@ const onSubmit = () => {
                         }
                       "
                     >
-                      Edit</VBtn
-                    >
-                    <!-- <VBtn
+                      Edit
+                    </VBtn>
+                    <!--
+                      <VBtn
                       icon
                       size="x-small"
                       color="success"
                       class="ml-1"
                       :to="{
-                        name: 'province-edit-id',
-                        params: { id: it.province_id },
+                      name: 'province-edit-id',
+                      params: { id: it.province_id },
                       }"
-                    >
+                      >
                       <VIcon size="22" icon="tabler-edit" />
-                    </VBtn> -->
+                      </VBtn> 
+                    -->
                   </td>
                 </tr>
               </tbody>
@@ -216,14 +252,22 @@ const onSubmit = () => {
               <!-- 👉 table footer  -->
               <tfoot v-show="!items.length">
                 <tr>
-                  <td colspan="7" class="text-center">No data available</td>
+                  <td
+                    colspan="7"
+                    class="text-center"
+                  >
+                    No data available
+                  </td>
                 </tr>
               </tfoot>
-              <tfoot v-show="items.length"></tfoot>
+              <tfoot v-show="items.length" />
             </VTable>
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <span class="text-sm text-disabled">
               Showing {{ currentPage }} to {{ totalPage }} of
               {{ totalItems }} entries
@@ -246,7 +290,12 @@ const onSubmit = () => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
@@ -261,47 +310,57 @@ const onSubmit = () => {
     <!-- </section> -->
 
     <!-- View Dialog -->
-    <!-- <VDialog v-model="isDialogViewVisible" persistent class="v-dialog-sm">
-    <DialogCloseBtn @click="isDialogViewVisible = !isDialogViewVisible" />
-    <VCard title="ข้อมูลค่านิเทศ/ค่าเดินทาง">
+    <!--
+      <VDialog v-model="isDialogViewVisible" persistent class="v-dialog-sm">
+      <DialogCloseBtn @click="isDialogViewVisible = !isDialogViewVisible" />
+      <VCard title="ข้อมูลค่านิเทศ/ค่าเดินทาง">
       <VCardText class="d-flex justify-end gap-3 flex-wrap">
-        <VRow>
-          <VCol cols="4" class="font-weight-bold">ชื่อจังหวัด : </VCol>
-          <VCol cols="8">{{ item.name_th }}</VCol>
-          <VCol cols="12">
-            <hr style="border-top: none; border-bottom: 0.5px dotted #ddd" />
-          </VCol>
-          <VCol cols="4" class="font-weight-bold">ค่านิเทศ (บาท) : </VCol>
-          <VCol cols="8">{{ item.visit_expense }}</VCol>
-          <VCol cols="12">
-            <hr style="border-top: none; border-bottom: 0.5px dotted #ddd" />
-          </VCol>
-          <VCol cols="4" class="font-weight-bold">ค่าเดินทาง (บาท) : </VCol>
-          <VCol cols="8">{{ item.travel_expense }}</VCol>
-        </VRow>
+      <VRow>
+      <VCol cols="4" class="font-weight-bold">ชื่อจังหวัด : </VCol>
+      <VCol cols="8">{{ item.name_th }}</VCol>
+      <VCol cols="12">
+      <hr style="border-top: none; border-bottom: 0.5px dotted #ddd" />
+      </VCol>
+      <VCol cols="4" class="font-weight-bold">ค่านิเทศ (บาท) : </VCol>
+      <VCol cols="8">{{ item.visit_expense }}</VCol>
+      <VCol cols="12">
+      <hr style="border-top: none; border-bottom: 0.5px dotted #ddd" />
+      </VCol>
+      <VCol cols="4" class="font-weight-bold">ค่าเดินทาง (บาท) : </VCol>
+      <VCol cols="8">{{ item.travel_expense }}</VCol>
+      </VRow>
       </VCardText>
 
       <VCardText class="d-flex justify-end gap-3 flex-wrap">
-        <VBtn
-          color="secondary"
-          variant="tonal"
-          @click="isDialogViewVisible = false"
-        >
-          Cancel
-        </VBtn>
+      <VBtn
+      color="secondary"
+      variant="tonal"
+      @click="isDialogViewVisible = false"
+      >
+      Cancel
+      </VBtn>
       </VCardText>
-    </VCard>
-  </VDialog> -->
+      </VCard>
+      </VDialog> 
+    -->
 
     <!-- Form Dialog -->
-    <VDialog v-model="isDialogEditVisible" persistent class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogEditVisible"
+      persistent
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogEditVisible = !isDialogEditVisible" />
 
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์ม ค่านิเทศ/ค่าเดินทาง">
         <VCardItem>
-          <VForm ref="refForm" v-model="isFormValid" @submit.prevent="onSubmit">
+          <VForm
+            ref="refForm"
+            v-model="isFormValid"
+            @submit.prevent="onSubmit"
+          >
             <VRow>
               <VCol cols="12">
                 <AppTextField
@@ -343,7 +402,12 @@ const onSubmit = () => {
           >
             Close
           </VBtn>
-          <VBtn type="submit" @click="onSubmit"> Save </VBtn>
+          <VBtn
+            type="submit"
+            @click="onSubmit"
+          >
+            Save
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

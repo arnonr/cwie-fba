@@ -7,7 +7,7 @@ export const class_years = [
   { value: 6, title: "ชั้นปีที่ 6" },
   { value: 7, title: "ชั้นปีที่ 7" },
   { value: 8, title: "ชั้นปีที่ 8" },
-];
+]
 
 export const class_rooms = [
   { value: "A", title: "ห้อง A" },
@@ -21,14 +21,14 @@ export const class_rooms = [
   { value: "I", title: "ห้อง I" },
   { value: "J", title: "ห้อง J" },
   { value: "K", title: "ห้อง K" },
-];
+]
 
 export const blood_groups = [
   { value: "A", title: "A" },
   { value: "B", title: "B" },
   { value: "AB", title: "AB" },
   { value: "O", title: "O" },
-];
+]
 
 export const prefix_names = [
   {
@@ -375,7 +375,7 @@ export const prefix_names = [
     title: "MISS",
     value: "99",
   },
-];
+]
 
 export const form_statuses = [
   "", // 0
@@ -392,7 +392,7 @@ export const form_statuses = [
   "primary", // 11
   "warning", // 12
   "success", // 13
-];
+]
 
 export const text_statuses = [
   "",
@@ -405,7 +405,7 @@ export const text_statuses = [
   "สถานประกอบการปฏิเสธ",
   "นักศึกษาสละสิทธิ์",
   "อนุมัติแผนการปฏิบัติงาน",
-];
+]
 
 export const statuses = [
   { value: 1, title: "ร่าง" },
@@ -419,54 +419,56 @@ export const statuses = [
   { value: 9, title: "สถานประกอบการปฏิเสธ" },
   { value: 10, title: "นักศึกษาสละสิทธิ์" },
   { value: 11, title: "ออกหนังสือส่งตัว" },
+
   //   { value: 12, title: "ส่งแผนการปฏิบัติงาน" },
   //   { value: 13, title: "อนุมัติแผนการปฏิบัติงาน" },
-];
+]
 
 export const statusShow = (
   status,
   request_document_date = null,
-  confirm_response_at = null
+  confirm_response_at = null,
 ) => {
-  let text = "";
+  let text = ""
   if (status == 1) {
-    text = "ร่าง";
+    text = "ร่าง"
   } else if (status == 2) {
-    text = "ส่งใบสมัคร";
+    text = "ส่งใบสมัคร"
   } else if (status == 3) {
-    text = "อาจารย์ที่ปรึกษาอนุมัติ";
+    text = "อาจารย์ที่ปรึกษาอนุมัติ"
   } else if (status == 4) {
-    text = "ประธานอาจารย์นิเทศอนุมัติ";
+    text = "ประธานอาจารย์นิเทศอนุมัติ"
   } else if (status == 5) {
-    text = "คณะยืนยันข้อมูล";
+    text = "คณะยืนยันข้อมูล"
   } else if (status == 6) {
-    text = "ออกหนังสือขอความอนุเคราะห์";
+    text = "ออกหนังสือขอความอนุเคราะห์"
   } else if (status == 7) {
-    text = "ส่งเอกสารตอบรับ";
+    text = "ส่งเอกสารตอบรับ"
   } else if (status == 8) {
-    text = "สถานประกอบการตอบรับ";
+    text = "สถานประกอบการตอบรับ"
   } else if (status == 9) {
-    text = "สถานประกอบการปฏิเสธ";
+    text = "สถานประกอบการปฏิเสธ"
   } else if (status == 10) {
-    text = "นักศึกษาสละสิทธิ์";
+    text = "นักศึกษาสละสิทธิ์"
   } else if (status == 11) {
-    text = "ออกหนังสือส่งตัว";
+    text = "ออกหนังสือส่งตัว"
   } else if (status == 12) {
-    text = "ส่งแผนการปฏิบัติงาน";
+    text = "ส่งแผนการปฏิบัติงาน"
   } else if (status == 13) {
-    text = "อนุมัติแผนการปฏิบัติงาน";
+    text = "อนุมัติแผนการปฏิบัติงาน"
   } else {
-    text = "ร่าง";
+    text = "ร่าง"
   }
-  return text;
-};
+  
+  return text
+}
 
 export const book_statuses = [
   { value: 1, title: "รอออกหนังสือขอความอนุเคราะห์" },
   { value: 2, title: "ออกหนังสือขอความอนุเคราะห์แล้ว" },
   { value: 3, title: "รอออกหนังสือส่งตัว" },
   { value: 4, title: "ออกหนังสือส่งตัวแล้ว" },
-];
+]
 
 export const visit_status = [
   { value: 0, title: "ส่งใบขอออกนิเทศ", color: "warning" },
@@ -476,4 +478,4 @@ export const visit_status = [
   { value: 4, title: "ออกหนังสือสำเร็จ", color: "success" },
   { value: 5, title: "อยู่ระหว่างตรวจสอบรายงานผล", color: "primary" },
   { value: 6, title: "สำเร็จ", color: "success" },
-];
+]

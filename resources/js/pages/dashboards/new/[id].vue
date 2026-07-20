@@ -1,12 +1,12 @@
 <script setup>
-import { useDashboardStore } from "../useDashboardStore";
-import { useRoute, useRouter } from "vue-router";
+import { useDashboardStore } from "../useDashboardStore"
+import { useRoute, useRouter } from "vue-router"
 
-const dashboardStore = useDashboardStore();
-const route = useRoute();
-const router = useRouter();
+const dashboardStore = useDashboardStore()
+const route = useRoute()
+const router = useRouter()
 
-const item = ref({});
+const item = ref({})
 
 // 👉 Fetching
 const fetchItem = () => {
@@ -14,21 +14,22 @@ const fetchItem = () => {
     .fetchNew({
       id: route.params.id,
       includeAll: true,
+
       //   ...search,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        item.value = response.data.data;
+        item.value = response.data.data
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+    .catch(error => {
+      console.error(error)
+    })
+}
 
-fetchItem();
+fetchItem()
 </script>
 
 <template>
@@ -36,17 +37,25 @@ fetchItem();
     <VRow class="match-height">
       <!--     -->
 
-      <VCol cols="12" class="mt-5">
+      <VCol
+        cols="12"
+        class="mt-5"
+      >
         <VCard class="pa-5">
           <h2>{{ item.news_title }}</h2>
-          <hr />
+          <hr>
           <div class="mt-5">
-            <VImg :src="item.news_file" cover width="500" class="mx-auto" />
+            <VImg
+              :src="item.news_file"
+              cover
+              width="500"
+              class="mx-auto"
+            />
             <div
               class="ml-5 mr-5"
               style="margin-top: 3em"
               v-html="item.news_detail"
-            ></div>
+            />
           </div>
         </VCard>
       </VCol>

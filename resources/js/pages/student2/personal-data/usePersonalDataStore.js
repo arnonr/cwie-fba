@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const usePersonalDataStore = defineStore("PersonalDataStore", {
   actions: {
@@ -9,39 +9,39 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudent({ id }) {
       return axios.get(`/student/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async editStudent(dataSend) {
-      var form_data = new FormData();
+      var form_data = new FormData()
 
       for (var key in dataSend) {
         if (dataSend[key] == null) {
-          dataSend[key] = "";
+          dataSend[key] = ""
         }
-        form_data.append(key, dataSend[key]);
+        form_data.append(key, dataSend[key])
       }
-      form_data.append("_method", "PUT");
+      form_data.append("_method", "PUT")
 
       return await axios.post(`/student/${dataSend.id}`, form_data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         validateStatus: () => true,
-      });
+      })
     },
 
     async deleteStudent({ id }) {
       return await axios.delete(`/student/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     fetchTeachers(params) {
@@ -50,8 +50,8 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchProvinces(params) {
@@ -60,8 +60,8 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchAmphurs(params) {
@@ -70,8 +70,8 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTumbols(params) {
@@ -80,8 +80,8 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDepartments(params) {
@@ -90,8 +90,8 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDocumentTypes(params) {
@@ -100,8 +100,8 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudentDocuments(params) {
@@ -110,24 +110,24 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async deleteStudentDocument({ id }) {
       return await axios.delete(`/student-document/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async addStudentDocument(dataSend) {
-      var form_data = new FormData();
+      var form_data = new FormData()
 
       for (var key in dataSend) {
         if (dataSend[key] == null) {
-          dataSend[key] = "";
+          dataSend[key] = ""
         }
-        form_data.append(key, dataSend[key]);
+        form_data.append(key, dataSend[key])
       }
 
       return await axios.post(`/student-document`, form_data, {
@@ -135,26 +135,26 @@ export const usePersonalDataStore = defineStore("PersonalDataStore", {
           "Content-Type": "multipart/form-data",
         },
         validateStatus: () => true,
-      });
+      })
     },
 
     async editStudentDocument(dataSend) {
-      var form_data = new FormData();
+      var form_data = new FormData()
 
       for (var key in dataSend) {
         if (dataSend[key] == null) {
-          dataSend[key] = "";
+          dataSend[key] = ""
         }
-        form_data.append(key, dataSend[key]);
+        form_data.append(key, dataSend[key])
       }
-      form_data.append("_method", "PUT");
+      form_data.append("_method", "PUT")
 
       return await axios.post(`/student-document/${dataSend.id}`, form_data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         validateStatus: () => true,
-      });
+      })
     },
   },
-});
+})

@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useDashboardStore = defineStore("DashboardStore", {
   actions: {
@@ -9,14 +9,14 @@ export const useDashboardStore = defineStore("DashboardStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchNew({ id }) {
       return axios.get(`/news/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async fetchDocumentDownloads(params) {
@@ -25,8 +25,8 @@ export const useDashboardStore = defineStore("DashboardStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
   },
-});
+})

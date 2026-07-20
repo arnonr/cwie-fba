@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useCompanyStore = defineStore("CompanyStore", {
   actions: {
@@ -10,21 +10,21 @@ export const useCompanyStore = defineStore("CompanyStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchCompany({ id }) {
-      return axios.get(`/company/${id}`);
+      return axios.get(`/company/${id}`)
     },
 
     async addCompany(dataSend) {
-      var form_data = new FormData();
+      var form_data = new FormData()
 
       for (var key in dataSend) {
-        form_data.append(key, dataSend[key]);
+        form_data.append(key, dataSend[key])
         if (dataSend[key] == null) {
-          dataSend[key] = "";
+          dataSend[key] = ""
         }
       }
 
@@ -33,33 +33,33 @@ export const useCompanyStore = defineStore("CompanyStore", {
           "Content-Type": "multipart/form-data",
         },
         validateStatus: () => true,
-      });
+      })
     },
 
     async editCompany(dataSend) {
-      var form_data = new FormData();
+      var form_data = new FormData()
 
       for (var key in dataSend) {
         if (dataSend[key] == null) {
-          dataSend[key] = "";
+          dataSend[key] = ""
         }
-        form_data.append(key, dataSend[key]);
+        form_data.append(key, dataSend[key])
       }
 
-      form_data.append("_method", "PUT");
+      form_data.append("_method", "PUT")
 
       return await axios.post(`/company/${dataSend.id}`, form_data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         validateStatus: () => true,
-      });
+      })
     },
 
     async deleteCompany({ id }) {
       return await axios.delete(`/company/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     fetchProvinces(params) {
@@ -68,8 +68,8 @@ export const useCompanyStore = defineStore("CompanyStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchAmphurs(params) {
@@ -78,8 +78,8 @@ export const useCompanyStore = defineStore("CompanyStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTumbols(params) {
@@ -88,8 +88,8 @@ export const useCompanyStore = defineStore("CompanyStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
   },
-});
+})

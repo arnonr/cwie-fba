@@ -1,69 +1,72 @@
 <script setup>
-import { useVisitApproveStore } from "./useVisitApproveStore";
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import axios from "@axios";
-import buddhistEra from "dayjs/plugin/buddhistEra";
-import { onMounted } from "vue";
+import { useVisitApproveStore } from "./useVisitApproveStore"
+import dayjs from "dayjs"
+import "dayjs/locale/th"
+import axios from "@axios"
+import buddhistEra from "dayjs/plugin/buddhistEra"
+import { onMounted } from "vue"
 
-const visitApproveStore = useVisitApproveStore();
 const props = defineProps([
   "user_type",
   "student_id",
   "formActive",
   "visitActive",
-]);
-const emit = defineEmits(["refresh-data"]);
+])
 
-const isDialogVisible = ref(false);
-const isDialogRejectVisible = ref(false);
-const isDialogEditVisitVisible = ref(false);
+const emit = defineEmits(["refresh-data"])
+const visitApproveStore = useVisitApproveStore()
+const isDialogVisible = ref(false)
+const isDialogRejectVisible = ref(false)
+const isDialogEditVisitVisible = ref(false)
 
-let userData = JSON.parse(localStorage.getItem("userData"));
+let userData = JSON.parse(localStorage.getItem("userData"))
 
-const provinces = ref([]);
-const new_visit_status = ref(null);
-const visit_province_id = ref(null);
-const date = ref({});
+const provinces = ref([])
+const new_visit_status = ref(null)
+const visit_province_id = ref(null)
+const date = ref({})
+
 const rejectLog = ref({
   comment: "",
   reject_status_id: "",
   visit_id: "",
   user_id: userData.user_id,
-});
+})
 
 watch(props, () => {
   if (props.visitActive != null) {
     if (props.user_type == "major-head") {
-      rejectLog.value.reject_status_id = 1;
-      new_visit_status.value = 2;
-      date.value.major_head_approve_at = dayjs().format("YYYY-MM-DD");
+      rejectLog.value.reject_status_id = 1
+      new_visit_status.value = 2
+      date.value.major_head_approve_at = dayjs().format("YYYY-MM-DD")
     } else if (props.user_type == "chairman") {
-      rejectLog.value.reject_status_id = 2;
-      new_visit_status.value = 3;
-      date.value.chairman_approved_at = dayjs().format("YYYY-MM-DD");
+      rejectLog.value.reject_status_id = 2
+      new_visit_status.value = 3
+      date.value.chairman_approved_at = dayjs().format("YYYY-MM-DD")
     } else if (props.user_type == "staff") {
-      rejectLog.value.reject_status_id = 2;
+      rejectLog.value.reject_status_id = 2
+
       //   reject_report_comment
       //   report_status_id
       //   report_status_id.value;
-      new_visit_status.value = 6;
-      date.value.confirm_report_at = dayjs().format("YYYY-MM-DD");
+      new_visit_status.value = 6
+      date.value.confirm_report_at = dayjs().format("YYYY-MM-DD")
     } else {
     }
   }
-});
+})
 
 const fetchProvince = async () => {
   let res = await axios.get("/province", {
     validateStatus: () => true,
-  });
+  })
 
-  provinces.value = res.data.data.map((r) => {
-    return { title: r.name_th, value: r.province_id };
-  });
-};
-fetchProvince();
+  provinces.value = res.data.data.map(r => {
+    return { title: r.name_th, value: r.province_id }
+  })
+}
+
+fetchProvince()
 
 // Function
 const onRejectSubmit = () => {
@@ -74,7 +77,7 @@ const onRejectSubmit = () => {
           ...rejectLog.value,
           active: 1,
         })
-        .then((response) => {
+        .then(response => {
           if (response.data.message == "success") {
             visitApproveStore
               .editVisit({
@@ -82,25 +85,25 @@ const onRejectSubmit = () => {
                 visit_reject_status_id: rejectLog.value.reject_status_id,
                 active: 1,
               })
-              .then((response) => {
+              .then(response => {
                 if (response.data.message == "success") {
-                  isDialogRejectVisible.value = false;
-                  emit("refresh-data");
+                  isDialogRejectVisible.value = false
+                  emit("refresh-data")
                 }
-              });
-            localStorage.setItem("Rejected", 1);
-            nextTick(() => {});
+              })
+            localStorage.setItem("Rejected", 1)
+            nextTick(() => {})
           } else {
-            isOverlay.value = false;
-            console.log("error");
+            isOverlay.value = false
+            console.log("error")
           }
         })
-        .catch((error) => {
-          console.error(error);
-        });
+        .catch(error => {
+          console.error(error)
+        })
     } else {
       // Staff คือรับทราบรายงานผลการนิเทศ
-      console.log(rejectLog.value);
+      console.log(rejectLog.value)
       visitApproveStore
         .editVisit({
           visit_id: rejectLog.value.visit_id,
@@ -108,23 +111,23 @@ const onRejectSubmit = () => {
           report_status_id: 3,
           visit_status: 4,
         })
-        .then((response) => {
+        .then(response => {
           if (response.data.message == "success") {
-            isDialogRejectVisible.value = false;
-            emit("refresh-data");
+            isDialogRejectVisible.value = false
+            emit("refresh-data")
           }
         })
-        .catch((error) => {
-          console.error(error);
-        });
+        .catch(error => {
+          console.error(error)
+        })
     }
   } else {
-    snackbarText.value = "โปรดระบุเหตุผล";
-    snackbarColor.value = "error";
-    isSnackbarVisible.value = true;
-    isOverlay.value = false;
+    snackbarText.value = "โปรดระบุเหตุผล"
+    snackbarColor.value = "error"
+    isSnackbarVisible.value = true
+    isOverlay.value = false
   }
-};
+}
 
 const onSubmit = () => {
   visitApproveStore
@@ -134,21 +137,21 @@ const onSubmit = () => {
       ...date.value,
       report_status_id: props.user_type == "staff" ? 2 : undefined,
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        localStorage.setItem("Approved", 1);
+        localStorage.setItem("Approved", 1)
         nextTick(() => {
-          isDialogVisible.value = false;
-          emit("refresh-data");
-        });
+          isDialogVisible.value = false
+          emit("refresh-data")
+        })
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+    .catch(error => {
+      console.error(error)
+    })
+}
 
 const onSubmitVisitProvince = () => {
   visitApproveStore
@@ -156,55 +159,51 @@ const onSubmitVisitProvince = () => {
       id: props.formActive.id,
       workplace_province_id: visit_province_id.value,
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
         visitApproveStore
           .editVisit({
             visit_id: props.visitActive.visit_id,
             province_id: visit_province_id.value,
           })
-          .then((response) => {
+          .then(response => {
             if (response.data.message == "success") {
-              localStorage.setItem("Update Success", 1);
+              localStorage.setItem("Update Success", 1)
               nextTick(() => {
-                isDialogEditVisitVisible.value = false;
-                emit("refresh-data");
-              });
+                isDialogEditVisitVisible.value = false
+                emit("refresh-data")
+              })
             } else {
-              console.log("error");
+              console.log("error")
             }
           })
-          .catch((error) => {
-            console.error(error);
-          });
+          .catch(error => {
+            console.error(error)
+          })
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+    .catch(error => {
+      console.error(error)
+    })
+}
 </script>
-<style scoped>
-/* .swal2-container {
-  z-index: 20001 !important;
-} */
-</style>
+
 <template>
   <div>
     <div v-if="props.user_type == 'major-head'">
       <VCol
+        v-if="props.visitActive != null"
         cols="12"
         md="12"
         class="text-right"
-        v-if="props.visitActive != null"
       >
         <VBtn
           color="error"
           :disabled="
             props.visitActive.visit_status != 1 ||
-            props.visitActive.visit_reject_status_id != null
+              props.visitActive.visit_reject_status_id != null
           "
           @click="
             () => {
@@ -218,7 +217,7 @@ const onSubmitVisitProvince = () => {
             icon="tabler-edit"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           ส่งกลับให้แก้ไข
         </VBtn>
 
@@ -227,7 +226,7 @@ const onSubmitVisitProvince = () => {
           color="success"
           :disabled="
             props.visitActive.visit_status != 1 ||
-            props.visitActive.visit_reject_status_id != null
+              props.visitActive.visit_reject_status_id != null
           "
           @click="
             () => {
@@ -240,7 +239,7 @@ const onSubmitVisitProvince = () => {
             icon="tabler-file-description"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           อนุมัติ
         </VBtn>
       </VCol>
@@ -248,16 +247,16 @@ const onSubmitVisitProvince = () => {
 
     <div v-if="props.user_type == 'chairman'">
       <VCol
+        v-if="props.visitActive != null"
         cols="12"
         md="12"
         class="text-right"
-        v-if="props.visitActive != null"
       >
         <VBtn
           color="error"
           :disabled="
             props.visitActive.visit_status != 2 ||
-            props.visitActive.visit_reject_status_id != null
+              props.visitActive.visit_reject_status_id != null
           "
           @click="
             () => {
@@ -271,7 +270,7 @@ const onSubmitVisitProvince = () => {
             icon="tabler-edit"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           ส่งกลับให้แก้ไข
         </VBtn>
 
@@ -280,7 +279,7 @@ const onSubmitVisitProvince = () => {
           color="success"
           :disabled="
             props.visitActive.visit_status != 2 ||
-            props.visitActive.visit_reject_status_id != null
+              props.visitActive.visit_reject_status_id != null
           "
           @click="
             () => {
@@ -293,7 +292,7 @@ const onSubmitVisitProvince = () => {
             icon="tabler-file-description"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           อนุมัติ
         </VBtn>
       </VCol>
@@ -301,10 +300,10 @@ const onSubmitVisitProvince = () => {
 
     <div v-if="props.user_type == 'staff'">
       <VCol
+        v-if="props.visitActive != null"
         cols="12"
         md="12"
         class="text-right"
-        v-if="props.visitActive != null"
       >
         <VBtn
           class="mr-2"
@@ -320,7 +319,7 @@ const onSubmitVisitProvince = () => {
             icon="tabler-file-description"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           แก้ไขสถานที่ออกนิเทศ
         </VBtn>
         <VBtn
@@ -338,7 +337,7 @@ const onSubmitVisitProvince = () => {
             icon="tabler-edit"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           ส่งกลับให้แก้ไข
         </VBtn>
 
@@ -357,7 +356,7 @@ const onSubmitVisitProvince = () => {
             icon="tabler-file-description"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           รับทราบผลรายงาน
         </VBtn>
       </VCol>
@@ -377,10 +376,18 @@ const onSubmitVisitProvince = () => {
       <VCard title="Are You Sure?">
         <VCardText> ยืนยันการอนุมัติ </VCardText>
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn @click="isDialogVisible = !isDialogVisible" color="error">
+          <VBtn
+            color="error"
+            @click="isDialogVisible = !isDialogVisible"
+          >
             Cancel
           </VBtn>
-          <VBtn @click="onSubmit()" color="success"> Approve </VBtn>
+          <VBtn
+            color="success"
+            @click="onSubmit"
+          >
+            Approve
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -397,9 +404,15 @@ const onSubmitVisitProvince = () => {
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์มส่งข้อมูลกลับให้แก้ไข">
         <VCardText>
-          <VCol cols="12" md="12" class="align-items-center">
-            <label class="v-label font-weight-bold" for="comment"
-              >ระบุเหตุผล :
+          <VCol
+            cols="12"
+            md="12"
+            class="align-items-center"
+          >
+            <label
+              class="v-label font-weight-bold"
+              for="comment"
+            >ระบุเหตุผล :
             </label>
             <AppTextarea
               id="comment"
@@ -412,12 +425,17 @@ const onSubmitVisitProvince = () => {
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
           <VBtn
-            @click="isDialogRejectVisible = !isDialogRejectVisible"
             color="error"
+            @click="isDialogRejectVisible = !isDialogRejectVisible"
           >
             Cancel
           </VBtn>
-          <VBtn @click="onRejectSubmit()" color="success"> Reject </VBtn>
+          <VBtn
+            color="success"
+            @click="onRejectSubmit"
+          >
+            Reject
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -429,63 +447,80 @@ const onSubmitVisitProvince = () => {
       style="z-index: 2000 !important"
     >
       <!-- Dialog close btn -->
-      <DialogCloseBtn
-        @click="isDialogEditVisitVisible = !isDialogEditVisitVisible"
-      />
+      <DialogCloseBtn @click="isDialogEditVisitVisible = !isDialogEditVisitVisible" />
 
       <!-- Dialog Content -->
       <VCard title="Are You Sure?">
         <VCardText> แก้ไขข้อมูลสถานที่ออกนิเทศ </VCardText>
         <VCardText>
-          <VCol cols="12" md="12" class="align-items-center">
-            <label class="v-label font-weight-bold" for="comment"
-              >จังหวัด :
+          <VCol
+            cols="12"
+            md="12"
+            class="align-items-center"
+          >
+            <label
+              class="v-label font-weight-bold"
+              for="comment"
+            >จังหวัด :
             </label>
 
             <AppSelect
-              :items="provinces"
               v-model="visit_province_id"
+              :items="provinces"
               variant="outlined"
               placeholder="จังหวัด"
             />
           </VCol>
         </VCardText>
-        <!-- <VCardText>
+        <!--
+          <VCardText>
           <VCol cols="12" md="12" class="align-items-center">
-            <label class="v-label font-weight-bold" for="comment"
-              >อำเภอ :
-            </label>
-            <AppTextarea
-              id="comment"
-              v-model="rejectLog.comment"
-              rows="5"
-              persistent-placeholder
-            />
+          <label class="v-label font-weight-bold" for="comment"
+          >อำเภอ :
+          </label>
+          <AppTextarea
+          id="comment"
+          v-model="rejectLog.comment"
+          rows="5"
+          persistent-placeholder
+          />
           </VCol>
-        </VCardText>
-        <VCardText>
+          </VCardText>
+          <VCardText>
           <VCol cols="12" md="12" class="align-items-center">
-            <label class="v-label font-weight-bold" for="comment"
-              >ตำบล :
-            </label>
-            <AppTextarea
-              id="comment"
-              v-model="rejectLog.comment"
-              rows="5"
-              persistent-placeholder
-            />
+          <label class="v-label font-weight-bold" for="comment"
+          >ตำบล :
+          </label>
+          <AppTextarea
+          id="comment"
+          v-model="rejectLog.comment"
+          rows="5"
+          persistent-placeholder
+          />
           </VCol>
-        </VCardText> -->
+          </VCardText> 
+        -->
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
           <VBtn
-            @click="isDialogEditVisitVisible = !isDialogEditVisitVisible"
             color="error"
+            @click="isDialogEditVisitVisible = !isDialogEditVisitVisible"
           >
             Cancel
           </VBtn>
-          <VBtn @click="onSubmitVisitProvince()" color="success"> อัพเดท </VBtn>
+          <VBtn
+            color="success"
+            @click="onSubmitVisitProvince"
+          >
+            อัพเดท
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
   </div>
 </template>
+
+<style scoped>
+/* .swal2-container {
+  z-index: 20001 !important;
+} */
+</style>

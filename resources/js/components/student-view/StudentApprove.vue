@@ -1,80 +1,80 @@
 <script setup>
-import CompanyEdit from "@/pages/cwie-settings/company/edit/[id].vue";
-import CwieDataEdit from "@/pages/student/cwie-data/edit/[id].vue";
-import StudentDataEdit from "@/pages/student/personal-data/[id].vue";
-import StudentAction from "@/components/student-view/StudentAction.vue";
+import CompanyEdit from "@/pages/cwie-settings/company/edit/[id].vue"
+import CwieDataEdit from "@/pages/student/cwie-data/edit/[id].vue"
+import StudentDataEdit from "@/pages/student/personal-data/[id].vue"
+import StudentAction from "@/components/student-view/StudentAction.vue"
 
-import { useStudentApproveStore } from "./useStudentApproveStore";
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import buddhistEra from "dayjs/plugin/buddhistEra";
-import { onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import Swal from "sweetalert2";
-import "sweetalert2/src/sweetalert2.scss";
-import { PDFDocument, rgb } from "pdf-lib";
-import fontkit from "@pdf-lib/fontkit";
+import { useStudentApproveStore } from "./useStudentApproveStore"
+import dayjs from "dayjs"
+import "dayjs/locale/th"
+import buddhistEra from "dayjs/plugin/buddhistEra"
+import { onMounted } from "vue"
+import { useRoute, useRouter } from "vue-router"
+import Swal from "sweetalert2"
+import "sweetalert2/src/sweetalert2.scss"
+import { PDFDocument, rgb } from "pdf-lib"
+import fontkit from "@pdf-lib/fontkit"
 
-const studentApproveStore = useStudentApproveStore();
-const props = defineProps(["user_type", "student_id", "formActive", "isCheck"]);
-const emit = defineEmits(["refresh-data", "change-close", "change-close1"]);
+const props = defineProps(["user_type", "student_id", "formActive", "isCheck"])
+const emit = defineEmits(["refresh-data", "change-close", "change-close1"])
+const studentApproveStore = useStudentApproveStore()
+const isDialogVisible = ref(false)
+const isDialogRejectVisible = ref(false)
+const isDialogCompanyVisible = ref(false)
+const isDialogCwieDataVisible = ref(false)
+const isDialogStudentDataVisible = ref(false)
+const router = useRouter()
+const isOverlay = ref(false)
 
-const isDialogVisible = ref(false);
-const isDialogRejectVisible = ref(false);
-const isDialogCompanyVisible = ref(false);
-const isDialogCwieDataVisible = ref(false);
-const isDialogStudentDataVisible = ref(false);
-const router = useRouter();
-const isOverlay = ref(false);
+let userData = JSON.parse(localStorage.getItem("userData"))
 
-let userData = JSON.parse(localStorage.getItem("userData"));
+const student = ref({})
+const formActive = ref({})
+const new_status_id = ref(null)
+const date = ref({})
 
-const student = ref({});
-const formActive = ref({});
-const new_status_id = ref(null);
-const date = ref({});
 const rejectLog = ref({
   comment: "",
   reject_status_id: "",
   form_id: "",
   user_id: userData.user_id,
-});
+})
 
 watch(props, () => {
   if (props.student_id) {
-    fetchStudent();
+    fetchStudent()
   }
   if (props.formActive != null) {
     if (props.user_type == "teacher") {
-      rejectLog.value.reject_status_id = 1;
-      new_status_id.value = 3;
-      date.value.advisor_verified_at = dayjs().format("YYYY-MM-DD");
+      rejectLog.value.reject_status_id = 1
+      new_status_id.value = 3
+      date.value.advisor_verified_at = dayjs().format("YYYY-MM-DD")
     } else if (props.user_type == "major-head") {
-      rejectLog.value.reject_status_id = 2;
-      new_status_id.value = 4;
-      date.value.chairman_approved_at = dayjs().format("YYYY-MM-DD");
+      rejectLog.value.reject_status_id = 2
+      new_status_id.value = 4
+      date.value.chairman_approved_at = dayjs().format("YYYY-MM-DD")
     } else if (props.user_type == "supervisor") {
-      date.value.plan_accept_at = dayjs().format("YYYY-MM-DD");
-      rejectLog.value.reject_status_id = 5;
-      new_status_id.value = 13;
+      date.value.plan_accept_at = dayjs().format("YYYY-MM-DD")
+      rejectLog.value.reject_status_id = 5
+      new_status_id.value = 13
     } else if (props.user_type == "chairman") {
     } else if (props.user_type == "staff") {
       // Staff
       if (props.formActive.status_id == 4) {
-        date.value.faculty_confirmed_at = dayjs().format("YYYY-MM-DD");
-        rejectLog.value.reject_status_id = 3;
-        new_status_id.value = 5;
+        date.value.faculty_confirmed_at = dayjs().format("YYYY-MM-DD")
+        rejectLog.value.reject_status_id = 3
+        new_status_id.value = 5
       } else if (props.formActive.status_id == 7) {
-        date.value.confirm_response_at = dayjs().format("YYYY-MM-DD");
-        rejectLog.value.reject_status_id = 4;
-        new_status_id.value = props.formActive.response_result;
+        date.value.confirm_response_at = dayjs().format("YYYY-MM-DD")
+        rejectLog.value.reject_status_id = 4
+        new_status_id.value = props.formActive.response_result
       } else {
       }
-      formActive.value = props.formActive;
+      formActive.value = props.formActive
     } else {
     }
   }
-});
+})
 
 // Function
 const fetchStudent = () => {
@@ -83,19 +83,20 @@ const fetchStudent = () => {
       id: props.student_id,
       includeAll: true,
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        const { data } = response.data;
-        student.value = { ...data[0] };
+        const { data } = response.data
+
+        student.value = { ...data[0] }
 
         student.value.faculty_name = student.value.faculty_name.replace(
           "คณะ",
-          ""
-        );
+          "",
+        )
 
         student.value.major_name = student.value.major_name
           ? student.value.major_name.replace("สาขาวิชา", "")
-          : "";
+          : ""
 
         if (
           student.value.id &&
@@ -131,18 +132,18 @@ const fetchStudent = () => {
             active: 1,
             includeAll: true,
           })
-          .then((res) => {
-            formActive.value.major_head_name = res.data.data[0].teacher_name;
-          });
+          .then(res => {
+            formActive.value.major_head_name = res.data.data[0].teacher_name
+          })
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const onRejectSubmit = () => {
   if (rejectLog.comment != "") {
@@ -151,28 +152,28 @@ const onRejectSubmit = () => {
         ...rejectLog.value,
         active: 1,
       })
-      .then((response) => {
+      .then(response => {
         if (response.data.message == "success") {
-          localStorage.setItem("Rejected", 1);
+          localStorage.setItem("Rejected", 1)
           nextTick(() => {
-            isDialogRejectVisible.value = false;
-            emit("refresh-data");
-          });
+            isDialogRejectVisible.value = false
+            emit("refresh-data")
+          })
         } else {
-          isOverlay.value = false;
-          console.log("error");
+          isOverlay.value = false
+          console.log("error")
         }
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch(error => {
+        console.error(error)
+      })
   } else {
-    snackbarText.value = "โปรดระบุเหตุผล";
-    snackbarColor.value = "error";
-    isSnackbarVisible.value = true;
-    isOverlay.value = false;
+    snackbarText.value = "โปรดระบุเหตุผล"
+    snackbarColor.value = "error"
+    isSnackbarVisible.value = true
+    isOverlay.value = false
   }
-};
+}
 
 const onSubmit = () => {
   studentApproveStore
@@ -181,29 +182,29 @@ const onSubmit = () => {
       status_id: new_status_id.value,
       ...date.value,
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        localStorage.setItem("Approved", 1);
+        localStorage.setItem("Approved", 1)
         nextTick(() => {
-          isDialogVisible.value = false;
-          emit("refresh-data");
-        });
+          isDialogVisible.value = false
+          emit("refresh-data")
+        })
       } else {
-        isOverlay.value = false;
-        console.log("error");
+        isOverlay.value = false
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+    .catch(error => {
+      console.error(error)
+    })
+}
 
 const reload = () => {
-  emit("change-close");
-  emit("refresh-data");
-};
+  emit("change-close")
+  emit("refresh-data")
+}
 
-const confirmCancel = (it) => {
+const confirmCancel = it => {
   Swal.fire({
     title: "Are you sure?",
     text: "เมื่อยกเลิกการสมัครแล้วจะไม่สามารถแก้ไขข้อมูลได้",
@@ -217,20 +218,21 @@ const confirmCancel = (it) => {
         "v-btn v-btn--elevated v-theme--light bg-error v-btn--density-default v-btn--size-default v-btn--variant-elevated ml-1",
     },
     buttonsStyling: false,
-  }).then((result) => {
+  }).then(result => {
     if (result.isConfirmed) {
       studentApproveStore
         .editForm({
           id: it.id,
           active: 0,
           status_id: 10,
+
           //
         })
-        .then(async (response) => {
+        .then(async response => {
           if (response.status == 200) {
             //
-            emit("change-close1");
-            emit("refresh-data");
+            emit("change-close1")
+            emit("refresh-data")
             Swal.fire({
               icon: "success",
               title: "Cancel!",
@@ -239,31 +241,27 @@ const confirmCancel = (it) => {
                 confirmButton:
                   "v-btn v-btn--elevated v-theme--light bg-success v-btn--density-default v-btn--size-default v-btn--variant-elevated",
               },
-            });
+            })
           } else {
-            console.log("error");
+            console.log("error")
           }
         })
-        .catch((error) => {
-          console.error(error);
-        });
+        .catch(error => {
+          console.error(error)
+        })
     }
-  });
-};
+  })
+}
 </script>
-<style scoped>
-/* .swal2-container {
-  z-index: 20001 !important;
-} */
-</style>
+
 <template>
   <div>
     <div v-if="props.user_type == 'teacher'">
       <VCol
+        v-if="props.formActive != null"
         cols="12"
         md="12"
         class="text-right"
-        v-if="props.formActive != null"
       >
         <VBtn
           color="error"
@@ -280,7 +278,7 @@ const confirmCancel = (it) => {
             icon="tabler-edit"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           ส่งกลับให้แก้ไข
         </VBtn>
 
@@ -299,7 +297,7 @@ const confirmCancel = (it) => {
             icon="tabler-file-description"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           อนุมัติ
         </VBtn>
       </VCol>
@@ -307,10 +305,10 @@ const confirmCancel = (it) => {
 
     <div v-if="props.user_type == 'major-head'">
       <VCol
+        v-if="props.formActive != null"
         cols="12"
         md="12"
         class="text-right"
-        v-if="props.formActive != null"
       >
         <VBtn
           color="error"
@@ -327,7 +325,7 @@ const confirmCancel = (it) => {
             icon="tabler-edit"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           ส่งกลับให้แก้ไข
         </VBtn>
 
@@ -346,7 +344,7 @@ const confirmCancel = (it) => {
             icon="tabler-file-description"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           อนุมัติ
         </VBtn>
       </VCol>
@@ -354,10 +352,10 @@ const confirmCancel = (it) => {
 
     <div v-if="props.user_type == 'supervisor'">
       <VCol
+        v-if="props.formActive != null"
         cols="12"
         md="12"
         class="text-right"
-        v-if="props.formActive != null"
       >
         <VBtn
           color="error"
@@ -374,7 +372,7 @@ const confirmCancel = (it) => {
             icon="tabler-edit"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           ส่งกลับให้แก้ไข
         </VBtn>
 
@@ -393,7 +391,7 @@ const confirmCancel = (it) => {
             icon="tabler-file-description"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           อนุมัติ
         </VBtn>
       </VCol>
@@ -401,10 +399,10 @@ const confirmCancel = (it) => {
 
     <div v-if="props.user_type == 'staff'">
       <VCol
+        v-if="props.formActive != null"
         cols="12"
         md="12"
         class="text-right"
-        v-if="props.formActive != null"
       >
         <VBtn
           color="error"
@@ -421,7 +419,7 @@ const confirmCancel = (it) => {
             icon="tabler-edit"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           ส่งกลับให้แก้ไข
         </VBtn>
 
@@ -440,17 +438,17 @@ const confirmCancel = (it) => {
             icon="tabler-file-description"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           อนุมัติใบสมัคร
         </VBtn>
       </VCol>
 
       <!-- รับทราบผลการตอบรับ -->
       <VCol
+        v-if="props.formActive != null"
         cols="12"
         md="12"
         class="text-right"
-        v-if="props.formActive != null"
       >
         <VBtn
           color="error"
@@ -467,7 +465,7 @@ const confirmCancel = (it) => {
             icon="tabler-edit"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           ส่งกลับให้แก้ไข
         </VBtn>
 
@@ -486,29 +484,38 @@ const confirmCancel = (it) => {
             icon="tabler-file-description"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
           รับทราบผลการตอบรับ
         </VBtn>
       </VCol>
 
-      <VCol cols="12" md="12" class="text-left" v-if="props.formActive != null">
-        <!-- @click=" router.push({ path: '/student/cwie-data/edit/' + formActive.id,
-        query: { student_id: student.value_id, }, }) " -->
+      <VCol
+        v-if="props.formActive != null"
+        cols="12"
+        md="12"
+        class="text-left"
+      >
+        <!--
+          @click=" router.push({ path: '/student/cwie-data/edit/' + formActive.id,
+          query: { student_id: student.value_id, }, }) " 
+        -->
 
         <VBtn
           color="success"
           class="ml-2"
           @click="isDialogCwieDataVisible = true"
         >
-          <!-- :to="{
+          <!--
+            :to="{
             path: '/student/cwie-data/edit/' + formActive.id,
             query: {
-              student_id: student_id,
+            student_id: student_id,
             },
-          }"
-          target="_blank" -->
-          แก้ไขข้อมูลใบสมัคร</VBtn
-        >
+            }"
+            target="_blank" 
+          -->
+          แก้ไขข้อมูลใบสมัคร
+        </VBtn>
 
         <VBtn
           color="warning"
@@ -516,51 +523,64 @@ const confirmCancel = (it) => {
           target="_blank"
           @click="isDialogStudentDataVisible = true"
         >
-          <!-- :to="{
+          <!--
+            :to="{
             path: '/student/personal-data/' + student.value_id,
-          }" -->
-          แก้ไขข้อมูลทั่วไป</VBtn
-        >
+            }" 
+          -->
+          แก้ไขข้อมูลทั่วไป
+        </VBtn>
 
         <VBtn
           color="primary"
           class="ml-2"
           @click="isDialogCompanyVisible = true"
         >
-          <!-- :to="{
+          <!--
+            :to="{
             name: 'cwie-settings-company-edit-id',
             params: { id: formActive.company_id },
-          }"
-          target="_blank" -->
+            }"
+            target="_blank" 
+          -->
           แก้ไขข้อมูลสถานประกอบการ
         </VBtn>
 
-        <VBtn color="success" class="ml-2" @click="reload()">
+        <VBtn
+          color="success"
+          class="ml-2"
+          @click="reload"
+        >
           <VIcon
             size="16"
             icon="tabler-refresh"
             style="opacity: 1"
             class="mr-1"
-          ></VIcon>
+          />
         </VBtn>
 
         <VBtn
+          v-if="formActive"
           color="error"
           class="ml-2"
-          v-if="formActive"
           @click="confirmCancel(formActive)"
         >
           ยกเลิกการสมัคร
         </VBtn>
       </VCol>
 
-      <VCol cols="12" md="12" class="text-left" v-if="props.formActive != null">
+      <VCol
+        v-if="props.formActive != null"
+        cols="12"
+        md="12"
+        class="text-left"
+      >
         <!-- Action -->
         <StudentAction
           v-if="props.student_id"
           :student_id="props.student_id"
           :student="student"
-          :formActive="formActive"
+          :form-active="formActive"
         />
       </VCol>
     </div>
@@ -579,10 +599,18 @@ const confirmCancel = (it) => {
       <VCard title="Are You Sure?">
         <VCardText> ยืนยันการอนุมัติ </VCardText>
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn @click="isDialogVisible = !isDialogVisible" color="error">
+          <VBtn
+            color="error"
+            @click="isDialogVisible = !isDialogVisible"
+          >
             Cancel
           </VBtn>
-          <VBtn @click="onSubmit()" color="success"> Approve </VBtn>
+          <VBtn
+            color="success"
+            @click="onSubmit"
+          >
+            Approve
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -599,9 +627,15 @@ const confirmCancel = (it) => {
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์มส่งข้อมูลกลับให้แก้ไข">
         <VCardText>
-          <VCol cols="12" md="12" class="align-items-center">
-            <label class="v-label font-weight-bold" for="comment"
-              >ระบุเหตุผล :
+          <VCol
+            cols="12"
+            md="12"
+            class="align-items-center"
+          >
+            <label
+              class="v-label font-weight-bold"
+              for="comment"
+            >ระบุเหตุผล :
             </label>
             <AppTextarea
               id="comment"
@@ -614,12 +648,17 @@ const confirmCancel = (it) => {
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
           <VBtn
-            @click="isDialogRejectVisible = !isDialogRejectVisible"
             color="error"
+            @click="isDialogRejectVisible = !isDialogRejectVisible"
           >
             Cancel
           </VBtn>
-          <VBtn @click="onRejectSubmit()" color="success"> Reject </VBtn>
+          <VBtn
+            color="success"
+            @click="onRejectSubmit"
+          >
+            Reject
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -632,15 +671,13 @@ const confirmCancel = (it) => {
       style="z-index: 1900 !important"
     >
       <!-- Dialog close btn -->
-      <DialogCloseBtn
-        @click="isDialogCompanyVisible = !isDialogCompanyVisible"
-      />
+      <DialogCloseBtn @click="isDialogCompanyVisible = !isDialogCompanyVisible" />
 
       <!-- Dialog Content -->
       <CompanyEdit
-        :fromStudentPage="true"
+        :from-student-page="true"
         :company_id="formActive.company_id"
-      ></CompanyEdit>
+      />
     </VDialog>
 
     <!-- Edit Cwie Data -->
@@ -651,20 +688,18 @@ const confirmCancel = (it) => {
       style="z-index: 1900 !important; overflow: scroll"
     >
       <!-- Dialog close btn -->
-      <DialogCloseBtn
-        @click="isDialogCwieDataVisible = !isDialogCwieDataVisible"
-      />
+      <DialogCloseBtn @click="isDialogCwieDataVisible = !isDialogCwieDataVisible" />
 
       <!-- Dialog Content -->
       <CwieDataEdit
         style="overflow: scroll"
-        :fromStudentPage="true"
+        :from-student-page="true"
         :form_id="formActive.id"
         :student_id="formActive.student_id"
-      ></CwieDataEdit>
+      />
     </VDialog>
 
-    <!-- Edit Student Data-->
+    <!-- Edit Student Data -->
     <VDialog
       v-model="isDialogStudentDataVisible"
       persistent
@@ -672,16 +707,20 @@ const confirmCancel = (it) => {
       style="z-index: 1900 !important; overflow: scroll"
     >
       <!-- Dialog close btn -->
-      <DialogCloseBtn
-        @click="isDialogStudentDataVisible = !isDialogStudentDataVisible"
-      />
+      <DialogCloseBtn @click="isDialogStudentDataVisible = !isDialogStudentDataVisible" />
 
       <!-- Dialog Content -->
       <StudentDataEdit
         style="overflow: scroll"
-        :fromStudentPage="true"
+        :from-student-page="true"
         :student_id="formActive.student_id"
-      ></StudentDataEdit>
+      />
     </VDialog>
   </div>
 </template>
+
+<style scoped>
+/* .swal2-container {
+  z-index: 20001 !important;
+} */
+</style>

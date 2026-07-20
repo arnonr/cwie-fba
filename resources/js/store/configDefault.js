@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useConfigDefaultStore = defineStore("ConfigDefaultStore", {
   state: () => {
@@ -9,13 +9,14 @@ export const useConfigDefaultStore = defineStore("ConfigDefaultStore", {
   actions: {
     // 👉 Fetch all Slide
     async fetchConfig() {
-      await axios.get(`/config/1`).then((res) => {
+      await axios.get(`/config/1`).then(res => {
         // console.log(res.data.data);
-        this.config = res.data.data;
-        return true;
-      });
+        this.config = res.data.data
+        
+        return true
+      })
 
       //   console.log(this.config);
     },
   },
-});
+})

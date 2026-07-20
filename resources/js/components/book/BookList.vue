@@ -1,60 +1,59 @@
 <script setup>
-import StudentView from "@/components/student-view/StudentView.vue";
-import { requiredValidator } from "@validators";
+import StudentView from "@/components/student-view/StudentView.vue"
+import { requiredValidator } from "@validators"
 import {
   class_rooms,
   class_years,
   statuses,
   form_statuses,
   statusShow,
-} from "@/data-constant/data";
-import { useBookListStore } from "./useBookListStore";
-import axios from "@axios";
-import VueDatePicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import buddhistEra from "dayjs/plugin/buddhistEra";
-import { useConfigDefaultStore } from "../../store/configDefault";
-const configDefaultStore = useConfigDefaultStore();
-if (configDefaultStore.config == undefined) {
-  configDefaultStore.fetchConfig().then(() => {
-    fetchSemesters();
-  });
-}
+} from "@/data-constant/data"
+import { useBookListStore } from "./useBookListStore"
+import axios from "@axios"
+import VueDatePicker from "@vuepic/vue-datepicker"
+import "@vuepic/vue-datepicker/dist/main.css"
+import dayjs from "dayjs"
+import "dayjs/locale/th"
+import buddhistEra from "dayjs/plugin/buddhistEra"
+import { useConfigDefaultStore } from "../../store/configDefault"
 
-dayjs.extend(buddhistEra);
+const props = defineProps(["user_type", "book_type"])
 
-const bookListStore = useBookListStore();
 
-const props = defineProps(["user_type", "book_type"]);
+const configDefaultStore = useConfigDefaultStore()
 
-const rowPerPage = ref(20);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const isOverlay = ref(true);
-const orderBy = ref("student.id");
-const order = ref("desc");
-const isDialogViewStudent = ref(false);
-const isDialogBook = ref(false);
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
+dayjs.extend(buddhistEra)
 
-const items = ref([]);
-const provinces = ref([]);
-const view_student_id = ref(null);
-const selectedItem = ref([]);
-const refAddBook = ref();
-const isAddBookValid = ref(false);
+const bookListStore = useBookListStore()
+
+const rowPerPage = ref(20)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const isOverlay = ref(true)
+const orderBy = ref("student.id")
+const order = ref("desc")
+const isDialogViewStudent = ref(false)
+const isDialogBook = ref(false)
+
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
+
+const items = ref([])
+const provinces = ref([])
+const view_student_id = ref(null)
+const selectedItem = ref([])
+const refAddBook = ref()
+const isAddBookValid = ref(false)
+
 const document = ref({
   request_document_number: "อว 7125/",
   send_document_number: "อว 7125/",
-});
+})
 
-const status_check = ref(4);
+const status_check = ref(4)
 
 const advancedSearch = reactive({
   semester_id: "",
@@ -72,7 +71,7 @@ const advancedSearch = reactive({
   approve_status: "",
   plan_status: "",
   book_status: "",
-});
+})
 
 const selectOptions = ref({
   perPage: [
@@ -95,121 +94,126 @@ const selectOptions = ref({
     { title: "รอออกหนังสือขอความอนุเคราะห์", value: 1 },
     { title: "ออกหนังสือขอความอนุเคราะห์แล้ว", value: 2 },
   ],
-});
+})
 
 selectOptions.value.approve_statuses = [
   { title: "รอคณะอนุมัติ", value: 5 },
   { title: "คณะอนุมัติเรียบร้อย", value: 6 },
-];
+]
 
 if (props.book_type == "book-send") {
   selectOptions.value.book_statuses = [
     { title: "รอออกหนังสือส่งตัว", value: 3 },
     { title: "ออกหนังสือส่งตัวแล้ว", value: 4 },
-  ];
+  ]
   selectOptions.value.approve_statuses = [
     { title: "รอตรวจสอบเอกสารตอบรับ", value: 7 },
     { title: "สถานประกอบการตอบรับแล้ว", value: 8 },
-  ];
+  ]
 
-  status_check.value = 6;
+  status_check.value = 6
 }
 
 const fetchSemesters = () => {
-  let search = {};
+  let search = {}
   bookListStore
     .fetchSemesters(search)
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.semesters = response.data.data.map((r) => {
+        selectOptions.value.semesters = response.data.data.map(r => {
           if (configDefaultStore.config) {
             advancedSearch.semester_id =
-              configDefaultStore.config.staff_year_default;
+              configDefaultStore.config.staff_year_default
           } else {
             if (r.is_current == 1) {
-              advancedSearch.semester_id = r.id;
+              advancedSearch.semester_id = r.id
             }
           }
+          
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
             value: r.id,
             start_date: r.start_date,
             end_date: r.end_date,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
 // fetchSemesters();
 
 // เฉพาะเมนูของคณะและประธานบริหาร
 const fetchTeachers = () => {
   bookListStore
     .fetchTeachers({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.teachers = response.data.data.map((r) => {
+        selectOptions.value.teachers = response.data.data.map(r => {
           return {
             title: r.prefix + r.firstname + " " + r.surname,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchTeachers();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchTeachers()
 
 // เฉพาะเมนูของคณะและประธานบริหาร
 const fetchMajors = () => {
   bookListStore
     .fetchMajors({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.majors = response.data.data.map((r) => {
+        selectOptions.value.majors = response.data.data.map(r => {
           return {
             title: r.name_th,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchMajors();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchMajors()
 
 // 👉 Fetching
 const fetchProvince = async () => {
   let res = await axios.get("/province", {
     validateStatus: () => true,
-  });
-  provinces.value = res.data.data;
-};
-fetchProvince();
+  })
+  provinces.value = res.data.data
+}
+
+fetchProvince()
 
 const fetchItems = () => {
   let search = {
     ...advancedSearch,
-  };
+  }
 
   bookListStore
     .fetchListStudents({
@@ -221,86 +225,88 @@ const fetchItems = () => {
       includeAll: true,
       includeForm: true,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        items.value = response.data.data;
-        totalPage.value = response.data.totalPage;
-        totalItems.value = response.data.totalData;
-        isOverlay.value = false;
+        items.value = response.data.data
+        totalPage.value = response.data.totalPage
+        totalItems.value = response.data.totalData
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
-const getProvince = (province_id) => {
-  if (province_id == null) return "";
-  let res = provinces.value.find((e) => {
-    return e.province_id == province_id;
-  });
-  return res.name_th;
-};
+const getProvince = province_id => {
+  if (province_id == null) return ""
+  let res = provinces.value.find(e => {
+    return e.province_id == province_id
+  })
+  
+  return res.name_th
+}
 
-watchEffect(fetchItems);
+watchEffect(fetchItems)
 
 watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value
+})
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
 const refreshData = () => {
-  fetchItems();
-};
+  fetchItems()
+}
 
-const format = (date) => {
-  const day = dayjs(date).locale("th").format("DD");
-  const month = dayjs(date).locale("th").format("MMM");
-  const year = date.getFullYear() + 543;
+const format = date => {
+  const day = dayjs(date).locale("th").format("DD")
+  const month = dayjs(date).locale("th").format("MMM")
+  const year = date.getFullYear() + 543
 
-  return `${day} ${month} ${year}`;
-};
+  return `${day} ${month} ${year}`
+}
 
 // selectItem
 const onSelectItemAll = () => {
-  selectedItem.value = [];
-  let check = items.value.filter((d) => {
-    return d.status_id > status_check.value;
-  });
-  selectedItem.value = check.map((d) => {
-    return d.form_id;
-  });
+  selectedItem.value = []
+  let check = items.value.filter(d => {
+    return d.status_id > status_check.value
+  })
+  selectedItem.value = check.map(d => {
+    return d.form_id
+  })
+
   //   chkItem
-  console.log(selectedItem.value);
-};
+  console.log(selectedItem.value)
+}
 
 const onDisSelectItemAll = () => {
-  selectedItem.value = [];
-  console.log(selectedItem.value);
-};
+  selectedItem.value = []
+  console.log(selectedItem.value)
+}
 
 const onAddBook = () => {
   if (selectedItem.value.length != 0) {
     if (advancedSearch.semester_id != "") {
-      isDialogBook.value = true;
-      console.log(document.value.request_document_number);
+      isDialogBook.value = true
+      console.log(document.value.request_document_number)
     }
   } else {
-    snackbarText.value = "โปรดเลือกนักศึกษา";
-    snackbarColor.value = "error";
-    isSnackbarVisible.value = true;
-    isDialogBook.value = false;
+    snackbarText.value = "โปรดเลือกนักศึกษา"
+    snackbarColor.value = "error"
+    isSnackbarVisible.value = true
+    isDialogBook.value = false
   }
-};
+}
 
 const onSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
   refAddBook.value?.validate().then(({ valid }) => {
     //
     if (valid) {
@@ -313,33 +319,34 @@ const onSubmit = () => {
               document.value.request_document_date &&
               document.value.request_document_date != null
                 ? dayjs(document.value.request_document_date).format(
-                    "YYYY-MM-DD"
-                  )
+                  "YYYY-MM-DD",
+                )
                 : null,
             max_response_date:
               document.value.max_response_date &&
               document.value.max_response_date != null
                 ? dayjs(document.value.max_response_date).format("YYYY-MM-DD")
                 : null,
+
             // send_mail: 1,
           })
-          .then((response) => {
+          .then(response => {
             if (response.status === 200) {
               //
-              fetchItems();
-              isDialogBook.value = false;
-              isOverlay.value = false;
-              snackbarText.value = "ออกหนังสือสำเร็จ";
-              snackbarColor.value = "success";
-              isSnackbarVisible.value = true;
+              fetchItems()
+              isDialogBook.value = false
+              isOverlay.value = false
+              snackbarText.value = "ออกหนังสือสำเร็จ"
+              snackbarColor.value = "success"
+              isSnackbarVisible.value = true
             } else {
-              console.log("error");
+              console.log("error")
             }
           })
-          .catch((error) => {
-            console.error(error);
-            isOverlay.value = false;
-          });
+          .catch(error => {
+            console.error(error)
+            isOverlay.value = false
+          })
       } else {
         bookListStore
           .addSendBook({
@@ -351,29 +358,38 @@ const onSubmit = () => {
                 ? dayjs(document.value.send_document_date).format("YYYY-MM-DD")
                 : null,
           })
-          .then((response) => {
+          .then(response => {
             if (response.status === 200) {
               //
-              fetchItems();
-              isDialogBook.value = false;
-              isOverlay.value = false;
-              snackbarText.value = "ออกหนังสือสำเร็จ";
-              snackbarColor.value = "success";
-              isSnackbarVisible.value = true;
+              fetchItems()
+              isDialogBook.value = false
+              isOverlay.value = false
+              snackbarText.value = "ออกหนังสือสำเร็จ"
+              snackbarColor.value = "success"
+              isSnackbarVisible.value = true
             } else {
-              console.log("error");
+              console.log("error")
             }
           })
-          .catch((error) => {
-            console.error(error);
-            isOverlay.value = false;
-          });
+          .catch(error => {
+            console.error(error)
+            isOverlay.value = false
+          })
       }
     }
-    isOverlay.value = false;
-  });
+    isOverlay.value = false
+  })
+
   //
-};
+}
+
+if (configDefaultStore.config == undefined) {
+  configDefaultStore.fetchConfig().then(() => {
+    fetchSemesters()
+  })
+} else {
+  fetchSemesters()
+}
 </script>
 
 <template>
@@ -389,20 +405,26 @@ const onSubmit = () => {
       <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Search -->
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="จำนวนรายการ/page"
               v-model="rowPerPage"
+              label="จำนวนรายการ/page"
               density="compact"
               variant="outlined"
               :items="selectOptions.perPage"
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="8">
+          <VCol
+            cols="12"
+            sm="8"
+          >
             <VSelect
-              label="ปีการศึกษา"
               v-model="advancedSearch.semester_id"
+              label="ปีการศึกษา"
               density="compact"
               variant="outlined"
               clearable
@@ -410,10 +432,14 @@ const onSubmit = () => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="4" v-if="props.user_type != 'supervisor'">
+          <VCol
+            v-if="props.user_type != 'supervisor'"
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="สถานะการอนุมัติ"
               v-model="advancedSearch.approve_status"
+              label="สถานะการอนุมัติ"
               density="compact"
               variant="outlined"
               clearable
@@ -422,10 +448,14 @@ const onSubmit = () => {
           </VCol>
           <VSpacer />
 
-          <VCol cols="12" sm="4" v-if="props.user_type == 'staff'">
+          <VCol
+            v-if="props.user_type == 'staff'"
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="สถานะ"
               v-model="advancedSearch.status_id"
+              label="สถานะ"
               density="compact"
               variant="outlined"
               clearable
@@ -435,34 +465,43 @@ const onSubmit = () => {
           <VSpacer />
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'supervisor'"
             cols="12"
             sm="4"
-            v-if="props.user_type == 'staff' || props.user_type == 'supervisor'"
           >
             <VSelect
-              label="สถานะแผนการปฏิบัติงาน"
               v-model="advancedSearch.plan_status"
+              label="สถานะแผนการปฏิบัติงาน"
               density="compact"
               variant="outlined"
               clearable
               :items="selectOptions.plan_statuses"
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.student_code"
               label="รหัสนักศึกษา"
               density="compact"
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.firstname"
               label="ชื่อ"
               density="compact"
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.surname"
               label="นามสกุล"
@@ -470,13 +509,13 @@ const onSubmit = () => {
             />
           </VCol>
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="4"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <VSelect
-              label="สาขาวิชา"
               v-model="advancedSearch.major_id"
+              label="สาขาวิชา"
               density="compact"
               variant="outlined"
               clearable
@@ -484,10 +523,13 @@ const onSubmit = () => {
             />
           </VCol>
 
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="ชั้นปี"
               v-model="advancedSearch.class_year"
+              label="ชั้นปี"
               density="compact"
               variant="outlined"
               clearable
@@ -495,10 +537,14 @@ const onSubmit = () => {
             />
           </VCol>
 
-          <VCol cols="12" sm="4" v-if="props.user_type != 'chairman'">
+          <VCol
+            v-if="props.user_type != 'chairman'"
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="ห้อง"
               v-model="advancedSearch.class_room"
+              label="ห้อง"
               density="compact"
               variant="outlined"
               clearable
@@ -507,9 +553,9 @@ const onSubmit = () => {
           </VCol>
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="6"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <AppAutocomplete
               v-model="advancedSearch.advisor_id"
@@ -523,9 +569,9 @@ const onSubmit = () => {
           </VCol>
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="6"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <AppAutocomplete
               v-model="advancedSearch.supervision_id"
@@ -538,18 +584,24 @@ const onSubmit = () => {
             />
           </VCol>
 
-          <VCol cols="12" sm="6">
+          <VCol
+            cols="12"
+            sm="6"
+          >
             <VTextField
-              label="สถานประกอบการ"
               v-model="advancedSearch.company_name"
+              label="สถานประกอบการ"
               density="compact"
             />
           </VCol>
 
-          <VCol cols="12" sm="6">
+          <VCol
+            cols="12"
+            sm="6"
+          >
             <VSelect
-              label="สถานะออกหนังสือ"
               v-model="advancedSearch.book_status"
+              label="สถานะออกหนังสือ"
               density="compact"
               variant="outlined"
               clearable
@@ -558,11 +610,23 @@ const onSubmit = () => {
           </VCol>
 
           <!-- Action -->
-          <VCol cols="12" class="mb-2 d-flex">
-            <VBtn color="primary" @click="onSelectItemAll"> เลือกทั้งหมด</VBtn>
-            <VBtn color="error" @click="onDisSelectItemAll" class="ml-2">
-              ยกเลิก</VBtn
+          <VCol
+            cols="12"
+            class="mb-2 d-flex"
+          >
+            <VBtn
+              color="primary"
+              @click="onSelectItemAll"
             >
+              เลือกทั้งหมด
+            </VBtn>
+            <VBtn
+              color="error"
+              class="ml-2"
+              @click="onDisSelectItemAll"
+            >
+              ยกเลิก
+            </VBtn>
             <VSpacer />
             <VBtn
               color="success"
@@ -576,63 +640,109 @@ const onSubmit = () => {
                 }
               "
             >
-              ออกหนังสือ</VBtn
-            >
+              ออกหนังสือ
+            </VBtn>
           </VCol>
         </VRow>
       </VCardItem>
       <VCardItem class="list-table">
         <VRow>
           <!-- Table -->
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <VTable
-              class="table"
               v-if="
                 advancedSearch.semester_id != null || props.user_type == 'staff'
               "
+              class="table"
             >
               <!-- 👉 table head -->
               <thead>
                 <tr>
-                  <th scope="col" class="font-weight-bold">เลือก</th>
-                  <th scope="col" class="font-weight-bold">รหัสนักศึกษา</th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="font-weight-bold"
+                  >
+                    เลือก
+                  </th>
+                  <th
+                    scope="col"
+                    class="font-weight-bold"
+                  >
+                    รหัสนักศึกษา
+                  </th>
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ชื่อ-นามสกุล
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สาขาวิชา
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ชั้นปี
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">ห้อง</th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
+                    ห้อง
+                  </th>
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สถานประกอบการ
                   </th>
 
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จังหวัด
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สถานะ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     เลขที่หนังสือ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จัดการ
                   </th>
                 </tr>
               </thead>
               <!-- 👉 table body -->
               <tbody>
-                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
+                <tr
+                  v-for="it in items"
+                  :key="it.id"
+                  style="height: 3.75rem"
+                >
                   <td>
                     <VCheckbox
+                      v-if="it.status_id > status_check"
                       v-model="selectedItem"
                       class="chkItem"
                       :value="it.form_id"
-                      v-if="it.status_id > status_check"
                     />
                     <!-- @click="onSelectItem(it.id)" -->
                   </td>
@@ -648,11 +758,17 @@ const onSubmit = () => {
                     {{ it.major_name }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
                     {{ it.class_year }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
                     {{ it.class_room }}
                   </td>
 
@@ -664,14 +780,22 @@ const onSubmit = () => {
                     {{ getProvince(it.response_province_id) }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    <VChip label :color="form_statuses[it.status_id]">{{
-                      statusShow(
-                        it.status_id,
-                        it.request_document_date,
-                        it.confirm_response_at
-                      )
-                    }}</VChip>
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
+                    <VChip
+                      label
+                      :color="form_statuses[it.status_id]"
+                    >
+                      {{
+                        statusShow(
+                          it.status_id,
+                          it.request_document_date,
+                          it.confirm_response_at
+                        )
+                      }}
+                    </VChip>
                   </td>
 
                   <td class="text-center">
@@ -683,7 +807,10 @@ const onSubmit = () => {
                   </td>
 
                   <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px">
+                  <td
+                    class="text-center"
+                    style="min-width: 80px"
+                  >
                     <VBtn
                       color="info"
                       target="_blank"
@@ -694,12 +821,14 @@ const onSubmit = () => {
                         }
                       "
                     >
-                      <!-- :to="{
+                      <!--
+                        :to="{
                         name: 'staff-students-view-id',
                         params: { id: it.id },
-                      }" -->
-                      View</VBtn
-                    >
+                        }" 
+                      -->
+                      View
+                    </VBtn>
                   </td>
                 </tr>
               </tbody>
@@ -707,14 +836,22 @@ const onSubmit = () => {
               <!-- 👉 table footer  -->
               <tfoot v-show="!items.length">
                 <tr>
-                  <td colspan="7" class="text-center">No data available</td>
+                  <td
+                    colspan="7"
+                    class="text-center"
+                  >
+                    No data available
+                  </td>
                 </tr>
               </tfoot>
-              <tfoot v-show="items.length"></tfoot>
+              <tfoot v-show="items.length" />
             </VTable>
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <span class="text-sm text-disabled">
               Showing {{ currentPage }} to {{ totalPage }} of
               {{ totalItems }} entries
@@ -737,11 +874,20 @@ const onSubmit = () => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
-    <VOverlay v-model="isOverlay" contained class="align-center justify-center">
+    <VOverlay
+      v-model="isOverlay"
+      contained
+      class="align-center justify-center"
+    >
       <VProgressCircular indeterminate />
     </VOverlay>
 
@@ -762,37 +908,56 @@ const onSubmit = () => {
             :student_id="view_student_id"
             @refresh-data="refreshData"
             @close="isDialogViewStudent = false"
-        /></VCardText>
+          />
+        </VCardText>
       </VCard>
     </VDialog>
 
     <!-- Add Form Dialog -->
-    <VDialog v-model="isDialogBook" contained persistent class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogBook"
+      contained
+      persistent
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
-      <DialogCloseBtn @click="isDialogBook = !isDialogBook" absolute />
+      <DialogCloseBtn
+        absolute
+        @click="isDialogBook = !isDialogBook"
+      />
 
       <!-- Dialog Content -->
-      <VCard title="แบบฟอร์มออกหนังสือ" class="card-modal">
+      <VCard
+        title="แบบฟอร์มออกหนังสือ"
+        class="card-modal"
+      >
         <VCardItem class="card-item-modal">
-          <VForm ref="refAddBook" v-model="isAddBookValid">
+          <VForm
+            ref="refAddBook"
+            v-model="isAddBookValid"
+          >
             <!-- @submit.prevent="onAddSubmit" -->
             <VRow v-if="props.book_type == 'book_request'">
               <VCol cols="12">
                 <AppTextField
                   id="request_document_number"
-                  label="เลขที่หนังสือ"
                   v-model="document.request_document_number"
+                  label="เลขที่หนังสือ"
                   :rules="[requiredValidator]"
                 />
               </VCol>
 
-              <VCol cols="12" md="12" class="align-items-center">
+              <VCol
+                cols="12"
+                md="12"
+                class="align-items-center"
+              >
                 <label
                   class="v-label font-weight-bold"
                   for="request_document_date"
                   cols="12"
                   md="4"
-                  >วันที่หนังสือ :
+                >วันที่หนังสือ :
                 </label>
                 <VueDatePicker
                   v-model="document.request_document_date"
@@ -810,13 +975,17 @@ const onSubmit = () => {
                 </VueDatePicker>
               </VCol>
 
-              <VCol cols="12" md="12" class="align-items-center">
+              <VCol
+                cols="12"
+                md="12"
+                class="align-items-center"
+              >
                 <label
                   class="v-label font-weight-bold"
                   for="request_document_date"
                   cols="12"
                   md="4"
-                  >วันที่ต้องตอบรับ :
+                >วันที่ต้องตอบรับ :
                 </label>
                 <VueDatePicker
                   v-model="document.max_response_date"
@@ -839,19 +1008,23 @@ const onSubmit = () => {
               <VCol cols="12">
                 <AppTextField
                   id="send_document_number"
-                  label="เลขที่หนังสือ"
                   v-model="document.send_document_number"
+                  label="เลขที่หนังสือ"
                   :rules="[requiredValidator]"
                 />
               </VCol>
 
-              <VCol cols="12" md="12" class="align-items-center">
+              <VCol
+                cols="12"
+                md="12"
+                class="align-items-center"
+              >
                 <label
                   class="v-label font-weight-bold"
                   for="request_document_date"
                   cols="12"
                   md="4"
-                  >วันที่หนังสือ :
+                >วันที่หนังสือ :
                 </label>
                 <VueDatePicker
                   v-model="document.send_document_date"
@@ -873,12 +1046,20 @@ const onSubmit = () => {
         </VCardItem>
 
         <VCardText class="d-flex justify-end flex-wrap gap-3">
-          <VBtn variant="tonal" color="secondary" @click="isDialogBook = false">
+          <VBtn
+            variant="tonal"
+            color="secondary"
+            @click="isDialogBook = false"
+          >
             Cancel
           </VBtn>
-          <VBtn type="submit" id="btn-submit" @click="onSubmit">
-            <span>Save</span></VBtn
+          <VBtn
+            id="btn-submit"
+            type="submit"
+            @click="onSubmit"
           >
+            <span>Save</span>
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

@@ -14,4 +14,4 @@ export default [
     action: "manage",
     subject: "AdminUser",
   },
-];
+]

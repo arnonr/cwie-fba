@@ -18,4 +18,4 @@ export default [
     subject: "ChairmanUser",
     action: "manage",
   },
-];
+]

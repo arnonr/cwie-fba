@@ -29,4 +29,4 @@ export default [
     subject: "TeacherUser",
     action: "manage",
   },
-];
+]

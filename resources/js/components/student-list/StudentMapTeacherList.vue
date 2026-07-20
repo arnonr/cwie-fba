@@ -1,53 +1,52 @@
 <script setup>
-import StudentView from "@/components/student-view/StudentView.vue";
-import { requiredValidator } from "@validators";
+import StudentView from "@/components/student-view/StudentView.vue"
+import { requiredValidator } from "@validators"
 import {
   class_rooms,
   class_years,
   statuses,
   form_statuses,
   statusShow,
-} from "@/data-constant/data";
-import { useStudentListStore } from "./useStudentListStore";
-import axios from "@axios";
-import JsonExcel from "vue-json-excel3";
-import XLSX from "xlsx";
-import { useConfigDefaultStore } from "../../store/configDefault";
-const configDefaultStore = useConfigDefaultStore();
-if (configDefaultStore.config == undefined) {
-  configDefaultStore.fetchConfig().then(() => {});
-}
+} from "@/data-constant/data"
+import { useStudentListStore } from "./useStudentListStore"
+import axios from "@axios"
+import JsonExcel from "vue-json-excel3"
+import XLSX from "xlsx"
+import { useConfigDefaultStore } from "../../store/configDefault"
 
-const studentListStore = useStudentListStore();
+const props = defineProps(["user_type"])
 
-const props = defineProps(["user_type"]);
+const configDefaultStore = useConfigDefaultStore()
 
-const rowPerPage = ref(20);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const isOverlay = ref(true);
-const orderBy = ref("student.id");
-const order = ref("desc");
-const isDialogViewStudent = ref(false);
-const isDialogEditSupervisor = ref(false);
-const isDialogImportSupervisor = ref(false);
-const refImportSupervision = ref();
-const isImportValid = ref(false);
+const studentListStore = useStudentListStore()
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
-const importData = ref({ supervisor_file: [], semester_id: "" });
-const importResult = ref([]);
+const rowPerPage = ref(20)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const isOverlay = ref(true)
+const orderBy = ref("student.id")
+const order = ref("desc")
+const isDialogViewStudent = ref(false)
+const isDialogEditSupervisor = ref(false)
+const isDialogImportSupervisor = ref(false)
+const refImportSupervision = ref()
+const isImportValid = ref(false)
 
-const checkSemester = ref(true);
-const items = ref([]);
-const provinces = ref([]);
-const view_student_id = ref(null);
-const view_form_id = ref(null);
-const major = ref([]); // สำหรับประธานอาจารย์นิเทศ
-const supervision_id = ref(null);
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
+const importData = ref({ supervisor_file: [], semester_id: "" })
+const importResult = ref([])
+
+const checkSemester = ref(true)
+const items = ref([])
+const provinces = ref([])
+const view_student_id = ref(null)
+const view_form_id = ref(null)
+const major = ref([]) // สำหรับประธานอาจารย์นิเทศ
+const supervision_id = ref(null)
+
 const advancedSearch = reactive({
   semester_id: "",
   status_id: "",
@@ -63,7 +62,7 @@ const advancedSearch = reactive({
   province_id: "",
   approve_status: "",
   plan_status: "",
-});
+})
 
 const selectOptions = ref({
   perPage: [
@@ -82,22 +81,24 @@ const selectOptions = ref({
     { title: "รออนุมัติแผน", value: 1 },
     { title: "อนุมัติแผนเรียบร้อย", value: 2 },
   ],
-});
+})
 
 if (props.user_type == "teacher") {
-  const teacherData = JSON.parse(localStorage.getItem("teacherData"));
-  advancedSearch.advisor_id = teacherData.id;
+  const teacherData = JSON.parse(localStorage.getItem("teacherData"))
+
+  advancedSearch.advisor_id = teacherData.id
 
   selectOptions.value.approve_statuses = [
     { title: "รอที่ปรึกษาอนุมัติ", value: 1 },
     { title: "ที่ปรึกษาอนุมัติเรียบร้อย", value: 2 },
-  ];
+  ]
 } else if (props.user_type == "major-head") {
-  const teacherData = JSON.parse(localStorage.getItem("teacherData"));
+  const teacherData = JSON.parse(localStorage.getItem("teacherData"))
+
   selectOptions.value.approve_statuses = [
     { title: "รอประธานอาจารย์นิเทศอนุมัติ", value: 3 },
     { title: "ประธานอาจารย์นิเทศอนุมัติเรียบร้อย", value: 4 },
-  ];
+  ]
 
   const fetchMajorHeads = () => {
     studentListStore
@@ -105,63 +106,71 @@ if (props.user_type == "teacher") {
         teacher_id: teacherData.id,
         perPage: 100,
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
-          let semester = response.data.data.map((r) => {
-            return r.semester_id;
-          });
+          let semester = response.data.data.map(r => {
+            return r.semester_id
+          })
 
-          major.value = response.data.data.map((r) => {
-            return r.major_id;
-          });
+          major.value = response.data.data.map(r => {
+            return r.major_id
+          })
 
           if (semester.length == 0) {
-            checkSemester.value = false;
+            checkSemester.value = false
           }
-          fetchSemesters();
-          fetchItems();
+          fetchSemesters()
+          fetchItems()
         } else {
-          console.log("error");
+          console.log("error")
         }
       })
-      .catch((error) => {
-        console.error(error);
-        isOverlay.value = false;
-      });
-  };
-  fetchMajorHeads();
+      .catch(error => {
+        console.error(error)
+        isOverlay.value = false
+      })
+  }
+
+  if (configDefaultStore.config == undefined) {
+    configDefaultStore.fetchConfig().then(() => {
+      fetchMajorHeads()
+    })
+  } else {
+    fetchMajorHeads()
+  }
 } else if (props.user_type == "supervisor") {
-  selectOptions.value.approve_statuses = [];
+  selectOptions.value.approve_statuses = []
+
   //
 } else if (props.user_type == "chairman") {
-  selectOptions.value.approve_statuses = [];
+  selectOptions.value.approve_statuses = []
 } else {
   selectOptions.value.approve_statuses = [
     { title: "รอคณะอนุมัติ", value: 5 },
     { title: "คณะอนุมัติเรียบร้อย", value: 6 },
-  ];
+  ]
 }
 
 const fetchSemesters = () => {
-  let search = {};
+  let search = {}
 
   if (checkSemester.value == false) {
-    return;
+    return
   }
   if (props.user_type == "chairman") {
-    search["chairman_id"] = JSON.parse(localStorage.getItem("teacherData")).id;
+    search["chairman_id"] = JSON.parse(localStorage.getItem("teacherData")).id
   }
   studentListStore
     .fetchSemesters(search)
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.semesters = response.data.data.map((r) => {
+        selectOptions.value.semesters = response.data.data.map(r => {
           if (configDefaultStore.config) {
             advancedSearch.semester_id =
-              configDefaultStore.config.staff_year_default;
+              configDefaultStore.config.staff_year_default
           } else {
             if (r.is_current == 1) {
-              advancedSearch.semester_id = r.id;
+              advancedSearch.semester_id = r.id
             }
           }
 
@@ -170,100 +179,109 @@ const fetchSemesters = () => {
             value: r.id,
             start_date: r.start_date,
             end_date: r.end_date,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 if (props.user_type != "major-head") {
-  fetchSemesters();
+  if (configDefaultStore.config == undefined) {
+    configDefaultStore.fetchConfig().then(() => {
+      fetchSemesters()
+    })
+  } else {
+    fetchSemesters()
+  }
 }
 
 // เฉพาะเมนูของคณะและประธานบริหาร
 const fetchTeachers = () => {
   studentListStore
     .fetchTeachers({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.teachers = response.data.data.map((r) => {
+        selectOptions.value.teachers = response.data.data.map(r => {
           return {
             title: r.prefix + r.firstname + " " + r.surname,
             value: r.id,
-          };
-        });
+          }
+        })
 
         selectOptions.value.teachers.unshift({
           title: "ไม่มีอาจารย์นิเทศ",
           value: 999,
-        });
+        })
 
-        isOverlay.value = false;
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchTeachers();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchTeachers()
 
 // เฉพาะเมนูของคณะและประธานบริหาร
 const fetchMajors = () => {
   studentListStore
     .fetchMajors({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.majors = response.data.data.map((r) => {
+        selectOptions.value.majors = response.data.data.map(r => {
           return {
             title: r.name_th,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchMajors();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchMajors()
 
 // 👉 Fetching
 const fetchProvince = async () => {
   let res = await axios.get("/province", {
     validateStatus: () => true,
-  });
-  provinces.value = res.data.data;
-};
-fetchProvince();
+  })
+  provinces.value = res.data.data
+}
+
+fetchProvince()
 
 const fetchItems = () => {
   let search = {
     ...advancedSearch,
-  };
+  }
 
   if (advancedSearch.semester_id != "") {
     if (props.user_type == "major-head") {
-      search["major_id_array"] = major.value;
+      search["major_id_array"] = major.value
     }
 
     if (props.user_type == "supervisor") {
       search["supervision_id"] = JSON.parse(
-        localStorage.getItem("teacherData")
-      ).id;
+        localStorage.getItem("teacherData"),
+      ).id
     }
 
     studentListStore
@@ -276,44 +294,45 @@ const fetchItems = () => {
         includeAll: true,
         includeForm: true,
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
-          items.value = response.data.data;
-          totalPage.value = response.data.totalPage;
-          totalItems.value = response.data.totalData;
-          isOverlay.value = false;
+          items.value = response.data.data
+          totalPage.value = response.data.totalPage
+          totalItems.value = response.data.totalData
+          isOverlay.value = false
         } else {
-          console.log("error");
+          console.log("error")
         }
       })
-      .catch((error) => {
-        console.error(error);
-        isOverlay.value = false;
-      });
+      .catch(error => {
+        console.error(error)
+        isOverlay.value = false
+      })
   }
-};
+}
 
-const getProvince = (province_id) => {
-  if (province_id == null) return "";
-  let res = provinces.value.find((e) => {
-    return e.province_id == province_id;
-  });
-  return res.name_th;
-};
+const getProvince = province_id => {
+  if (province_id == null) return ""
+  let res = provinces.value.find(e => {
+    return e.province_id == province_id
+  })
+  
+  return res.name_th
+}
 
-watchEffect(fetchItems);
+watchEffect(fetchItems)
 
 watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value
+})
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
 const refreshData = () => {
-  fetchItems();
-};
+  fetchItems()
+}
 
 const onChangeSupervision = () => {
   studentListStore
@@ -321,83 +340,83 @@ const onChangeSupervision = () => {
       id: view_form_id.value,
       supervision_id: supervision_id.value,
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        localStorage.setItem("Approved", 1);
+        localStorage.setItem("Approved", 1)
         nextTick(() => {
-          isDialogEditSupervisor.value = false;
-          refreshData();
-        });
+          isDialogEditSupervisor.value = false
+          refreshData()
+        })
       } else {
-        isOverlay.value = false;
-        console.log("error");
+        isOverlay.value = false
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+    .catch(error => {
+      console.error(error)
+    })
+}
 
-const readFileAsync = (file) => {
+const readFileAsync = file => {
   return new Promise((resolve, reject) => {
-    let reader = new FileReader();
+    let reader = new FileReader()
 
     reader.onload = () => {
-      let data = reader.result;
-      data = new Uint8Array(data);
+      let data = reader.result
+      data = new Uint8Array(data)
 
-      let workbook = XLSX.read(data, { type: "array" });
-      let first_worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      let result = XLSX.utils.sheet_to_json(first_worksheet, { header: 1 });
-      resolve(result);
-    };
+      let workbook = XLSX.read(data, { type: "array" })
+      let first_worksheet = workbook.Sheets[workbook.SheetNames[0]]
+      let result = XLSX.utils.sheet_to_json(first_worksheet, { header: 1 })
+      resolve(result)
+    }
 
-    reader.onerror = reject;
+    reader.onerror = reject
 
-    reader.readAsArrayBuffer(file);
-  });
-};
+    reader.readAsArrayBuffer(file)
+  })
+}
 
 const onImportSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
 
   refImportSupervision.value?.validate().then(async ({ valid }) => {
     if (valid) {
-      let importFile = null;
+      let importFile = null
       if (importData.value.supervisor_file.length !== 0) {
-        importFile = importData.value.supervisor_file[0];
-        let result = await readFileAsync(importFile);
-        result.shift();
+        importFile = importData.value.supervisor_file[0]
+        let result = await readFileAsync(importFile)
+        result.shift()
 
-        let data = [];
-        result.forEach((el) => {
+        let data = []
+        result.forEach(el => {
           // let s_name_prefix = "";
 
           if (el.length != 0) {
-            let s_firstname = "";
-            let s_surname = "";
+            let s_firstname = ""
+            let s_surname = ""
 
             if (el[12] != "" && el[12] != null) {
-              let arr_prefix = el[12].split(".");
+              let arr_prefix = el[12].split(".")
 
               // for (let i = 0; i < arr_prefix.length - 1; i++) {
               //   s_name_prefix = s_name_prefix + arr_prefix[i] + ".";
               // }
 
-              let fullname = arr_prefix[arr_prefix.length - 1];
-              let arr_name = fullname.split(" ");
+              let fullname = arr_prefix[arr_prefix.length - 1]
+              let arr_name = fullname.split(" ")
 
-              s_firstname = arr_name[0];
+              s_firstname = arr_name[0]
               for (let i = 0; i < arr_name.length; i++) {
                 if (i != 0) {
-                  s_surname = s_surname + arr_name[i] + " ";
+                  s_surname = s_surname + arr_name[i] + " "
                 }
               }
 
-              s_surname = s_surname.trim();
+              s_surname = s_surname.trim()
             }
 
-            console.log(el[1]);
+            console.log(el[1])
 
             data.push({
               level: el[0],
@@ -406,32 +425,32 @@ const onImportSubmit = () => {
               supervision_fullname: el[12],
               firstname: s_firstname,
               surname: s_surname,
-            });
+            })
           }
-        });
+        })
 
         studentListStore
           .importSupervision({
             semester_id: importData.value.semester_id,
             data: data,
           })
-          .then((response) => {
+          .then(response => {
             if (response.status === 200) {
-              data = data.map((e) => {
-                let check = response.data.data.find((x) => {
-                  return x.student_code == e.student_code;
-                });
+              data = data.map(e => {
+                let check = response.data.data.find(x => {
+                  return x.student_code == e.student_code
+                })
                 if (check) {
-                  e["status"] = check.status;
-                  e["message"] = check.message;
+                  e["status"] = check.status
+                  e["message"] = check.message
                 }
 
-                return e;
-              });
+                return e
+              })
 
-              console.log(data);
+              console.log(data)
 
-              importResult.value = [...data];
+              importResult.value = [...data]
 
               // response.data.data.map((x) => {
               //   return {
@@ -442,26 +461,28 @@ const onImportSubmit = () => {
               //     message: x.message,
               //   };
               // });
-              fetchItems();
+              fetchItems()
+
               // isDialogVisible.value = false;
               // isOverlay.value = false;
               // snackbarText.value = "สำเร็จ";
               // snackbarColor.value = "success";
               // isSnackbarVisible.value = true;
             } else {
-              console.log("error");
+              console.log("error")
             }
           })
-          .catch((error) => {
-            console.error(error);
-            isOverlay.value = false;
-          });
+          .catch(error => {
+            console.error(error)
+            isOverlay.value = false
+          })
       }
     }
-    isOverlay.value = false;
-  });
+    isOverlay.value = false
+  })
+
   //
-};
+}
 </script>
 
 <template>
@@ -471,20 +492,26 @@ const onImportSubmit = () => {
       <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Search -->
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="จำนวนรายการ/page"
               v-model="rowPerPage"
+              label="จำนวนรายการ/page"
               density="compact"
               variant="outlined"
               :items="selectOptions.perPage"
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="8">
+          <VCol
+            cols="12"
+            sm="8"
+          >
             <VSelect
-              label="ปีการศึกษา"
               v-model="advancedSearch.semester_id"
+              label="ปีการศึกษา"
               density="compact"
               variant="outlined"
               clearable
@@ -492,10 +519,14 @@ const onImportSubmit = () => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="4" v-if="props.user_type != 'supervisor'">
+          <VCol
+            v-if="props.user_type != 'supervisor'"
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="สถานะการอนุมัติ"
               v-model="advancedSearch.approve_status"
+              label="สถานะการอนุมัติ"
               density="compact"
               variant="outlined"
               clearable
@@ -504,10 +535,14 @@ const onImportSubmit = () => {
           </VCol>
           <VSpacer />
 
-          <VCol cols="12" sm="4" v-if="props.user_type == 'staff'">
+          <VCol
+            v-if="props.user_type == 'staff'"
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="สถานะ"
               v-model="advancedSearch.status_id"
+              label="สถานะ"
               density="compact"
               variant="outlined"
               clearable
@@ -517,34 +552,43 @@ const onImportSubmit = () => {
           <VSpacer />
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'supervisor'"
             cols="12"
             sm="4"
-            v-if="props.user_type == 'staff' || props.user_type == 'supervisor'"
           >
             <VSelect
-              label="สถานะแผนการปฏิบัติงาน"
               v-model="advancedSearch.plan_status"
+              label="สถานะแผนการปฏิบัติงาน"
               density="compact"
               variant="outlined"
               clearable
               :items="selectOptions.plan_statuses"
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.student_code"
               label="รหัสนักศึกษา"
               density="compact"
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.firstname"
               label="ชื่อ"
               density="compact"
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.surname"
               label="นามสกุล"
@@ -552,13 +596,13 @@ const onImportSubmit = () => {
             />
           </VCol>
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="4"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <VSelect
-              label="สาขาวิชา"
               v-model="advancedSearch.major_id"
+              label="สาขาวิชา"
               density="compact"
               variant="outlined"
               clearable
@@ -566,10 +610,13 @@ const onImportSubmit = () => {
             />
           </VCol>
 
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="ชั้นปี"
               v-model="advancedSearch.class_year"
+              label="ชั้นปี"
               density="compact"
               variant="outlined"
               clearable
@@ -577,10 +624,14 @@ const onImportSubmit = () => {
             />
           </VCol>
 
-          <VCol cols="12" sm="4" v-if="props.user_type != 'chairman'">
+          <VCol
+            v-if="props.user_type != 'chairman'"
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="ห้อง"
               v-model="advancedSearch.class_room"
+              label="ห้อง"
               density="compact"
               variant="outlined"
               clearable
@@ -589,9 +640,9 @@ const onImportSubmit = () => {
           </VCol>
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="6"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <AppAutocomplete
               v-model="advancedSearch.advisor_id"
@@ -605,9 +656,9 @@ const onImportSubmit = () => {
           </VCol>
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="6"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <AppAutocomplete
               v-model="advancedSearch.supervision_id"
@@ -620,10 +671,13 @@ const onImportSubmit = () => {
             />
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <VTextField
-              label="สถานประกอบการ"
               v-model="advancedSearch.company_name"
+              label="สถานประกอบการ"
               density="compact"
             />
           </VCol>
@@ -631,7 +685,10 @@ const onImportSubmit = () => {
       </VCardItem>
 
       <VCardItem>
-        <VCol cols="12" class="mb-2 d-flex">
+        <VCol
+          cols="12"
+          class="mb-2 d-flex"
+        >
           <VSpacer />
           <VBtn
             color="primary"
@@ -639,8 +696,8 @@ const onImportSubmit = () => {
             href="http://co-op.fba.kmutnb.ac.th/storage/pdf/template_import_supervisor.xlsx"
             target="_blank"
           >
-            ดาวน์โหลด Template</VBtn
-          >
+            ดาวน์โหลด Template
+          </VBtn>
           <VBtn
             color="success"
             @click="
@@ -650,52 +707,81 @@ const onImportSubmit = () => {
               }
             "
           >
-            นำเข้าข้อมูล</VBtn
-          >
+            นำเข้าข้อมูล
+          </VBtn>
         </VCol>
       </VCardItem>
 
       <VCardItem class="list-table">
         <VRow>
           <!-- Table -->
-          <VCol cols="12" md="12" sm="12">
+          <VCol
+            cols="12"
+            md="12"
+            sm="12"
+          >
             <VTable
-              class=""
               v-if="
                 selectOptions.semesters.length != 0 ||
-                props.user_type == 'staff'
+                  props.user_type == 'staff'
               "
+              class=""
             >
               <!-- 👉 table head -->
               <thead>
                 <tr>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ชื่อ-นามสกุล
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สาขาวิชา
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สถานประกอบการ
                   </th>
 
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จังหวัด
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     อาจารย์นิเทศ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สถานะ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จัดการ
                   </th>
                 </tr>
               </thead>
               <!-- 👉 table body -->
               <tbody>
-                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
+                <tr
+                  v-for="it in items"
+                  :key="it.id"
+                  style="height: 3.75rem"
+                >
                   <td class="text-center">
                     {{ it.firstname + " " + it.surname }}
                   </td>
@@ -715,18 +801,29 @@ const onImportSubmit = () => {
                     {{ it.supervision_name }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    <VChip label :color="form_statuses[it.status_id]">{{
-                      statusShow(
-                        it.status_id,
-                        it.request_document_date,
-                        it.confirm_response_at
-                      )
-                    }}</VChip>
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
+                    <VChip
+                      label
+                      :color="form_statuses[it.status_id]"
+                    >
+                      {{
+                        statusShow(
+                          it.status_id,
+                          it.request_document_date,
+                          it.confirm_response_at
+                        )
+                      }}
+                    </VChip>
                   </td>
 
                   <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px">
+                  <td
+                    class="text-center"
+                    style="min-width: 80px"
+                  >
                     <VBtn
                       color="info"
                       target="_blank"
@@ -737,14 +834,19 @@ const onImportSubmit = () => {
                         }
                       "
                     >
-                      <!-- :to="{
+                      <!--
+                        :to="{
                         name: 'staff-students-view-id',
                         params: { id: it.id },
-                      }" -->
-                      View</VBtn
-                    >
+                        }" 
+                      -->
+                      View
+                    </VBtn>
                   </td>
-                  <td class="text-center" style="min-width: 80px">
+                  <td
+                    class="text-center"
+                    style="min-width: 80px"
+                  >
                     <VBtn
                       color="info"
                       target="_blank"
@@ -757,8 +859,8 @@ const onImportSubmit = () => {
                         }
                       "
                     >
-                      Edit</VBtn
-                    >
+                      Edit
+                    </VBtn>
                   </td>
                 </tr>
               </tbody>
@@ -766,14 +868,22 @@ const onImportSubmit = () => {
               <!-- 👉 table footer  -->
               <tfoot v-show="!items.length">
                 <tr>
-                  <td colspan="7" class="text-center">No data available</td>
+                  <td
+                    colspan="7"
+                    class="text-center"
+                  >
+                    No data available
+                  </td>
                 </tr>
               </tfoot>
-              <tfoot v-show="items.length"></tfoot>
+              <tfoot v-show="items.length" />
             </VTable>
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <span class="text-sm text-disabled">
               Showing {{ currentPage }} to {{ totalPage }} of
               {{ totalItems }} entries
@@ -796,11 +906,20 @@ const onImportSubmit = () => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
-    <VOverlay v-model="isOverlay" contained class="align-center justify-center">
+    <VOverlay
+      v-model="isOverlay"
+      contained
+      class="align-center justify-center"
+    >
       <VProgressCircular indeterminate />
     </VOverlay>
 
@@ -821,7 +940,8 @@ const onImportSubmit = () => {
             :student_id="view_student_id"
             @refresh-data="refreshData"
             @close="isDialogViewStudent = false"
-        /></VCardText>
+          />
+        </VCardText>
       </VCard>
     </VDialog>
 
@@ -832,14 +952,16 @@ const onImportSubmit = () => {
       style="z-index: 2000"
     >
       <!-- Dialog close btn -->
-      <DialogCloseBtn
-        @click="isDialogEditSupervisor = !isDialogEditSupervisor"
-      />
+      <DialogCloseBtn @click="isDialogEditSupervisor = !isDialogEditSupervisor" />
 
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์มเลือกอาจารย์นิเทศ">
         <VCardText>
-          <VCol cols="12" md="12" class="align-items-center">
+          <VCol
+            cols="12"
+            md="12"
+            class="align-items-center"
+          >
             <AppAutocomplete
               v-model="supervision_id"
               :items="selectOptions.teachers"
@@ -852,7 +974,12 @@ const onImportSubmit = () => {
           </VCol>
         </VCardText>
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn @click="onChangeSupervision()" color="success"> Submit</VBtn>
+          <VBtn
+            color="success"
+            @click="onChangeSupervision"
+          >
+            Submit
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -867,23 +994,28 @@ const onImportSubmit = () => {
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn
-        @click="isDialogImportSupervisor = !isDialogImportSupervisor"
         absolute
+        @click="isDialogImportSupervisor = !isDialogImportSupervisor"
       />
 
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์มอัพโหลดไฟล์ จับคู่อาจารย์นิเทศ">
         <VCardItem>
-          <VForm ref="refImportSupervision" v-model="isImportValid">
+          <VForm
+            ref="refImportSupervision"
+            v-model="isImportValid"
+          >
             <!-- @submit.prevent="onAddSubmit" -->
             <VRow>
               <VCol cols="12">
-                <!-- <AppTextField
+                <!--
+                  <AppTextField
                   id="send_document_number"
                   label="เลขที่หนังสือ"
                   v-model="document.send_document_number"
                   :rules="[requiredValidator]"
-                /> -->
+                  /> 
+                -->
                 <label>ปีการศึกษา</label>
                 <VSelect
                   v-model="importData.semester_id"
@@ -915,9 +1047,13 @@ const onImportSubmit = () => {
           >
             Cancel
           </VBtn>
-          <VBtn type="submit" id="btn-submit" @click="onImportSubmit">
-            <span>Import</span></VBtn
+          <VBtn
+            id="btn-submit"
+            type="submit"
+            @click="onImportSubmit"
           >
+            <span>Import</span>
+          </VBtn>
         </VCardText>
 
         <VCardItem class="mb-5">
@@ -933,20 +1069,18 @@ const onImportSubmit = () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(it, index) in importResult" :key="index">
+              <tr
+                v-for="(it, index) in importResult"
+                :key="index"
+              >
                 <td>{{ it.student_code }}</td>
                 <td>{{ it.student_fullname }}</td>
                 <td>{{ it.supervision_fullname }}</td>
-                <td
-                  :class="it.message == 'success' ? 'text-green' : 'text-red'"
-                >
+                <td :class="it.message == 'success' ? 'text-green' : 'text-red'">
                   {{ it.status }}
                 </td>
                 <td>
-                  <span
-                    :class="it.message == 'success' ? 'text-green' : 'text-red'"
-                    >{{ it.message }}</span
-                  >
+                  <span :class="it.message == 'success' ? 'text-green' : 'text-red'">{{ it.message }}</span>
                 </td>
               </tr>
             </tbody>

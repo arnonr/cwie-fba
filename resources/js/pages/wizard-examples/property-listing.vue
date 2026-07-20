@@ -1,9 +1,9 @@
 <script setup>
-import PersonalDetails from "@/views/wizard-examples/property-listing/PersonalDetails.vue";
-import PriceDetails from "@/views/wizard-examples/property-listing/PriceDetails.vue";
-import PropertyArea from "@/views/wizard-examples/property-listing/PropertyArea.vue";
-import PropertyDetails from "@/views/wizard-examples/property-listing/PropertyDetails.vue";
-import PropertyFeatures from "@/views/wizard-examples/property-listing/PropertyFeatures.vue";
+import PersonalDetails from "@/views/wizard-examples/property-listing/PersonalDetails.vue"
+import PriceDetails from "@/views/wizard-examples/property-listing/PriceDetails.vue"
+import PropertyArea from "@/views/wizard-examples/property-listing/PropertyArea.vue"
+import PropertyDetails from "@/views/wizard-examples/property-listing/PropertyDetails.vue"
+import PropertyFeatures from "@/views/wizard-examples/property-listing/PropertyFeatures.vue"
 
 const propertyListingSteps = [
   {
@@ -31,7 +31,7 @@ const propertyListingSteps = [
     subtitle: "Expected Price",
     icon: "tabler-currency-dollar",
   },
-];
+]
 
 const propertyListingData = ref({
   personalDetails: {
@@ -83,13 +83,13 @@ const propertyListingData = ref({
     landmark: "",
     address: "",
   },
-});
+})
 
-const currentStep = ref(0);
+const currentStep = ref(0)
 
 const onSubmit = () => {
-  console.log("propertyListingData :>> ", propertyListingData.value);
-};
+  console.log("propertyListingData :>> ", propertyListingData.value)
+}
 </script>
 
 <template>
@@ -111,37 +111,33 @@ const onSubmit = () => {
         </VCardText>
       </VCol>
 
-      <VCol cols="12" md="8">
+      <VCol
+        cols="12"
+        md="8"
+      >
         <VCardText>
-          <VWindow v-model="currentStep" class="disable-tab-transition">
+          <VWindow
+            v-model="currentStep"
+            class="disable-tab-transition"
+          >
             <VWindowItem>
-              <PersonalDetails
-                v-model:form-data="propertyListingData.personalDetails"
-              />
+              <PersonalDetails v-model:form-data="propertyListingData.personalDetails" />
             </VWindowItem>
 
             <VWindowItem>
-              <PropertyDetails
-                v-model:form-data="propertyListingData.propertyDetails"
-              />
+              <PropertyDetails v-model:form-data="propertyListingData.propertyDetails" />
             </VWindowItem>
 
             <VWindowItem>
-              <PropertyFeatures
-                v-model:form-data="propertyListingData.propertyFeatures"
-              />
+              <PropertyFeatures v-model:form-data="propertyListingData.propertyFeatures" />
             </VWindowItem>
 
             <VWindowItem>
-              <PropertyArea
-                v-model:form-data="propertyListingData.propertyArea"
-              />
+              <PropertyArea v-model:form-data="propertyListingData.propertyArea" />
             </VWindowItem>
 
             <VWindowItem>
-              <PriceDetails
-                v-model:form-data="propertyListingData.priceDetails"
-              />
+              <PriceDetails v-model:form-data="propertyListingData.priceDetails" />
             </VWindowItem>
           </VWindow>
 
@@ -152,7 +148,11 @@ const onSubmit = () => {
               :disabled="currentStep === 0"
               @click="currentStep--"
             >
-              <VIcon icon="tabler-arrow-left" start class="flip-in-rtl" />
+              <VIcon
+                icon="tabler-arrow-left"
+                start
+                class="flip-in-rtl"
+              />
               Previous
             </VBtn>
 
@@ -165,10 +165,17 @@ const onSubmit = () => {
               submit
             </VBtn>
 
-            <VBtn v-else @click="currentStep++">
+            <VBtn
+              v-else
+              @click="currentStep++"
+            >
               Next
 
-              <VIcon icon="tabler-arrow-right" end class="flip-in-rtl" />
+              <VIcon
+                icon="tabler-arrow-right"
+                end
+                class="flip-in-rtl"
+              />
             </VBtn>
           </div>
         </VCardText>

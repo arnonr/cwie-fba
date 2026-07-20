@@ -1,35 +1,35 @@
 <script setup>
-import { requiredValidator } from "@validators";
-import dayjs from "dayjs";
-import { useUserStore } from "./useUserStore";
+import { requiredValidator } from "@validators"
+import dayjs from "dayjs"
+import { useUserStore } from "./useUserStore"
 
-const userStore = useUserStore();
+const userStore = useUserStore()
 
-const rowPerPage = ref(20);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const items = ref([]);
-const item = ref({});
-const isOverlay = ref(true);
-const orderBy = ref("name");
-const order = ref("asc");
+const rowPerPage = ref(20)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const items = ref([])
+const item = ref({})
+const isOverlay = ref(true)
+const orderBy = ref("name")
+const order = ref("asc")
 
-const refForm = ref();
-const refAddForm = ref();
-const isFormValid = ref(false);
-const isAddFormValid = ref(false);
-const isSubmit = ref(false);
+const refForm = ref()
+const refAddForm = ref()
+const isFormValid = ref(false)
+const isAddFormValid = ref(false)
+const isSubmit = ref(false)
 
-const isDialogViewVisible = ref(false);
-const isDialogAddVisible = ref(false);
-const isDialogEditVisible = ref(false);
-const isDialogDelVisible = ref(false);
+const isDialogViewVisible = ref(false)
+const isDialogAddVisible = ref(false)
+const isDialogEditVisible = ref(false)
+const isDialogDelVisible = ref(false)
 
 const advancedSearch = reactive({
   name: "",
   account_type: "",
-});
+})
 
 const selectOptions = ref({
   perPage: [
@@ -48,14 +48,14 @@ const selectOptions = ref({
     { title: "เจ้าหน้าที่", value: 3 },
     { title: "Admin", value: 4 },
   ],
-});
+})
 
 // 👉 Fetching
 const fetchItems = () => {
   // isOverlay.value = true;
   let search = {
     ...advancedSearch,
-  };
+  }
 
   userStore
     .fetchUsers({
@@ -65,99 +65,100 @@ const fetchItems = () => {
       order: order.value,
       ...search,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        items.value = response.data.data;
-        totalPage.value = response.data.totalPage;
-        totalItems.value = response.data.totalData;
-        isOverlay.value = false;
+        items.value = response.data.data
+        totalPage.value = response.data.totalPage
+        totalItems.value = response.data.totalData
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
-watchEffect(fetchItems);
+watchEffect(fetchItems)
 
 // 👉 watching current page
 watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value
+})
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
 
-const resolveAccountType = (account_type) => {
-  if (account_type === 1) return "นักศึกษา";
-  if (account_type === 2) return "อาจารย์";
-  if (account_type === 3) return "เจ้าหน้าที่";
-  if (account_type === 4) return "Admin";
-  return "";
-};
+const resolveAccountType = account_type => {
+  if (account_type === 1) return "นักศึกษา"
+  if (account_type === 2) return "อาจารย์"
+  if (account_type === 3) return "เจ้าหน้าที่"
+  if (account_type === 4) return "Admin"
+  
+  return ""
+}
 
 const resolveActive = (active, blocked_at, type) => {
-  let data = "";
+  let data = ""
   if (blocked_at !== null) {
-    data = ["error", "Blocked"];
+    data = ["error", "Blocked"]
   } else {
-    if (active == 1) data = ["success", "Active"];
+    if (active == 1) data = ["success", "Active"]
 
-    if (active == 0) data = ["secondary", "In Active"];
+    if (active == 0) data = ["secondary", "In Active"]
   }
 
   if (type == "color") {
-    return data[0];
+    return data[0]
   }
 
-  return data[1];
-};
+  return data[1]
+}
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
 const onSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
 
   if (item.value.id == null) {
     userStore
       .addUser({
         username: item.value.username,
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
-          isDialogAddVisible.value = false;
-          snackbarText.value = "Added User";
-          snackbarColor.value = "success";
-          isSnackbarVisible.value = true;
-          isOverlay.value = false;
-          isSubmit.value = false;
-          fetchItems();
+          isDialogAddVisible.value = false
+          snackbarText.value = "Added User"
+          snackbarColor.value = "success"
+          isSnackbarVisible.value = true
+          isOverlay.value = false
+          isSubmit.value = false
+          fetchItems()
         } else {
-          isOverlay.value = false;
-          isSubmit.value = false;
-          console.log(response.data);
+          isOverlay.value = false
+          isSubmit.value = false
+          console.log(response.data)
         }
       })
-      .catch((error) => {
-        isOverlay.value = false;
-        isSubmit.value = false;
-        console.log(error.response.data.error.message);
-      });
+      .catch(error => {
+        isOverlay.value = false
+        isSubmit.value = false
+        console.log(error.response.data.error.message)
+      })
   } else {
     refForm.value?.validate().then(({ valid }) => {
       if (valid) {
-        let blocked = null;
+        let blocked = null
         if (item.value.blocked == 1) {
           if (item.value.blocked_at !== null) {
-            blocked = item.value.blocked_at;
+            blocked = item.value.blocked_at
           } else {
-            blocked = dayjs().format("YYYY-MM-DD");
+            blocked = dayjs().format("YYYY-MM-DD")
           }
         }
 
@@ -167,100 +168,103 @@ const onSubmit = () => {
             blocked: undefined,
             blocked_at: blocked,
           })
-          .then((response) => {
+          .then(response => {
             if (response.status === 200) {
-              isDialogEditVisible.value = false;
-              snackbarText.value = "Updated User";
-              snackbarColor.value = "success";
-              isSnackbarVisible.value = true;
-              fetchItems();
+              isDialogEditVisible.value = false
+              snackbarText.value = "Updated User"
+              snackbarColor.value = "success"
+              isSnackbarVisible.value = true
+              fetchItems()
             } else {
-              isOverlay.value = false;
-              console.log("error");
+              isOverlay.value = false
+              console.log("error")
             }
           })
-          .catch((error) => {
-            isOverlay.value = false;
-            snackbarText.value = error.response.data.error.message;
-            snackbarColor.value = "error";
-            isSnackbarVisible.value = true;
-          });
+          .catch(error => {
+            isOverlay.value = false
+            snackbarText.value = error.response.data.error.message
+            snackbarColor.value = "error"
+            isSnackbarVisible.value = true
+          })
       } else {
-        isOverlay.value = false;
+        isOverlay.value = false
       }
-    });
+    })
   }
-};
+}
 
 const onLoadUser = () => {
-  isSubmit.value = true;
-  isOverlay.value = true;
+  isSubmit.value = true
+  isOverlay.value = true
   refAddForm.value?.validate().then(({ valid }) => {
     if (valid) {
       userStore
         .loadUser({
           username: item.value.username,
         })
-        .then((response) => {
+        .then(response => {
           if (response.status === 200) {
-            item.value = response.data;
+            item.value = response.data
             item.value.account_type_name = resolveAccountType(
-              item.value.account_type
-            );
-            item.value.id = null;
+              item.value.account_type,
+            )
+            item.value.id = null
 
-            isOverlay.value = false;
+            isOverlay.value = false
           } else {
-            isOverlay.value = false;
-            console.log("error");
+            isOverlay.value = false
+            console.log("error")
           }
         })
-        .catch((e) => {
-          isOverlay.value = false;
-          isSubmit.value = false;
-          snackbarText.value = e.response.data.message;
-          snackbarColor.value = "error";
-          isSnackbarVisible.value = true;
-        });
+        .catch(e => {
+          isOverlay.value = false
+          isSubmit.value = false
+          snackbarText.value = e.response.data.message
+          snackbarColor.value = "error"
+          isSnackbarVisible.value = true
+        })
     } else {
-      isOverlay.value = false;
+      isOverlay.value = false
     }
-  });
-};
+  })
+}
 
-const onDelete = (id) => {
-  isOverlay.value = true;
+const onDelete = id => {
+  isOverlay.value = true
   userStore
     .deleteUser({
       id: id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        isDialogDelVisible.value = false;
-        snackbarText.value = "Deleted User";
-        snackbarColor.value = "success";
-        isSnackbarVisible.value = true;
-        fetchItems();
-        isOverlay.value = false;
+        isDialogDelVisible.value = false
+        snackbarText.value = "Deleted User"
+        snackbarColor.value = "success"
+        isSnackbarVisible.value = true
+        fetchItems()
+        isOverlay.value = false
       } else {
-        console.log("error");
-        isOverlay.value = false;
+        console.log("error")
+        isOverlay.value = false
       }
     })
-    .catch((error) => {
-      isOverlay.value = false;
-      snackbarText.value = error.response.data.error.message;
-      snackbarColor.value = "error";
-      isSnackbarVisible.value = true;
-    });
-};
+    .catch(error => {
+      isOverlay.value = false
+      snackbarText.value = error.response.data.error.message
+      snackbarColor.value = "error"
+      isSnackbarVisible.value = true
+    })
+}
 </script>
 
 <template>
   <!-- Table -->
   <div>
     <VRow>
-      <VCol cols="12" class="mb-2 text-right">
+      <VCol
+        cols="12"
+        class="mb-2 text-right"
+      >
         <VBtn
           color="primary"
           @click="
@@ -274,35 +278,44 @@ const onDelete = (id) => {
             }
           "
         >
-          ADD STAFF</VBtn
-        >
+          ADD STAFF
+        </VBtn>
       </VCol>
     </VRow>
 
     <VCard title="จัดการผู้ใช้งาน">
       <VCardItem>
         <VRow class="mt-1 mb-1">
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="จำนวนรายการ/page"
               v-model="rowPerPage"
+              label="จำนวนรายการ/page"
               density="compact"
               variant="outlined"
               :items="selectOptions.perPage"
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              :items="selectOptions.accountTypes"
               v-model="advancedSearch.account_type"
+              :items="selectOptions.accountTypes"
               label="ประเภทผู้ใช้งาน"
               variant="outlined"
               density="compact"
               clearable
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.name"
               label="ชื่อผู้ใช้งาน/Name"
@@ -310,55 +323,95 @@ const onDelete = (id) => {
             />
           </VCol>
           <!-- Table -->
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <VTable class="text-no-wrap">
               <!-- 👉 table head -->
               <thead>
                 <tr>
-                  <th scope="col" class="font-weight-bold">ชื่อ-นามสกุล</th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="font-weight-bold"
+                  >
+                    ชื่อ-นามสกุล
+                  </th>
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ICIT Account
                   </th>
-                  <th scope="col" class="font-weight-bold">เมล</th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="font-weight-bold"
+                  >
+                    เมล
+                  </th>
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ประเภทบัญชี
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สถานะ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จัดการ
                   </th>
                 </tr>
               </thead>
               <!-- 👉 table body -->
               <tbody>
-                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
+                <tr
+                  v-for="it in items"
+                  :key="it.id"
+                  style="height: 3.75rem"
+                >
                   <!-- 👉 User -->
                   <td>
                     <span>
                       {{ it.name }}
                     </span>
                   </td>
-                  <td class="text-center" style="min-width: 110px">
+                  <td
+                    class="text-center"
+                    style="min-width: 110px"
+                  >
                     {{ it.username }}
                   </td>
                   <td>
                     {{ it.email }}
                   </td>
-                  <td class="text-center" style="min-width: 100px">
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
                     {{ resolveAccountType(it.account_type) }}
                   </td>
-                  <td class="text-center" style="min-width: 100px">
-                    <VChip
-                      :color="resolveActive(it.active, it.blocked_at, 'color')"
-                      >{{
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
+                    <VChip :color="resolveActive(it.active, it.blocked_at, 'color')">
+                      {{
                         resolveActive(it.active, it.blocked_at, "text")
-                      }}</VChip
-                    >
+                      }}
+                    </VChip>
                   </td>
                   <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px">
+                  <td
+                    class="text-center"
+                    style="min-width: 80px"
+                  >
                     <VBtn
                       color="info"
                       @click="
@@ -368,8 +421,8 @@ const onDelete = (id) => {
                         }
                       "
                     >
-                      View</VBtn
-                    >
+                      View
+                    </VBtn>
                     <VBtn
                       color="success"
                       class="ml-1"
@@ -386,20 +439,22 @@ const onDelete = (id) => {
                         }
                       "
                     >
-                      Edit</VBtn
-                    >
-                    <!-- <VBtn size="38" class="ml-1" color="error">
+                      Edit
+                    </VBtn>
+                    <!--
+                      <VBtn size="38" class="ml-1" color="error">
                       <VIcon
-                        icon="tabler-trash"
-                        size="22"
-                        @click="
-                          () => {
-                            item = { ...it };
-                            isDialogDelVisible = true;
-                          }
-                        "
+                      icon="tabler-trash"
+                      size="22"
+                      @click="
+                      () => {
+                      item = { ...it };
+                      isDialogDelVisible = true;
+                      }
+                      "
                       />
-                    </VBtn> -->
+                      </VBtn> 
+                    -->
                   </td>
                 </tr>
               </tbody>
@@ -407,14 +462,22 @@ const onDelete = (id) => {
               <!-- 👉 table footer  -->
               <tfoot v-show="!items.length">
                 <tr>
-                  <td colspan="7" class="text-center">No data available</td>
+                  <td
+                    colspan="7"
+                    class="text-center"
+                  >
+                    No data available
+                  </td>
                 </tr>
               </tfoot>
-              <tfoot v-show="items.length"></tfoot>
+              <tfoot v-show="items.length" />
             </VTable>
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <span class="text-sm text-disabled">
               Showing {{ currentPage }} to {{ totalPage }} of
               {{ totalItems }} entries
@@ -437,58 +500,118 @@ const onDelete = (id) => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
-    <VOverlay v-model="isOverlay" contained class="align-center justify-center">
+    <VOverlay
+      v-model="isOverlay"
+      contained
+      class="align-center justify-center"
+    >
       <VProgressCircular indeterminate />
     </VOverlay>
     <!-- </section> -->
 
     <!-- View Dialog -->
-    <VDialog v-model="isDialogViewVisible" class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogViewVisible"
+      class="v-dialog-sm"
+    >
       <DialogCloseBtn @click="isDialogViewVisible = !isDialogViewVisible" />
       <VCard title="ข้อมูลผู้ใช้งาน">
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
           <VRow>
-            <VCol cols="6" sm="4" class="font-weight-bold"
-              >ชื่อ-นามสกุล :
-            </VCol>
-            <VCol cols="6" sm="8">{{ item.name }}</VCol>
-            <VCol cols="12">
-              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd" />
-            </VCol>
-            <VCol cols="6" sm="4" class="font-weight-bold"
-              >บัญชีเข้าใช้งาน :
-            </VCol>
-            <VCol cols="6" sm="8">{{ item.username }}</VCol>
-            <VCol cols="12">
-              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd" />
-            </VCol>
-            <VCol cols="6" sm="4" class="font-weight-bold">เมล : </VCol>
-            <VCol cols="6" sm="8">{{ item.email }}</VCol>
-            <VCol cols="12">
-              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd" />
-            </VCol>
-            <VCol cols="6" sm="4" class="font-weight-bold">ประเภทบัญชี : </VCol>
-            <VCol cols="6" sm="8">{{
-              resolveAccountType(item.account_type)
-            }}</VCol>
-            <VCol cols="12">
-              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd" />
-            </VCol>
-            <VCol cols="6" sm="4" class="font-weight-bold">สถานะ : </VCol>
-            <VCol cols="6" sm="8"
-              ><VChip
-                :color="resolveActive(item.active, item.blocked_at, 'color')"
-                >{{
-                  resolveActive(item.active, item.blocked_at, "text")
-                }}</VChip
-              ></VCol
+            <VCol
+              cols="6"
+              sm="4"
+              class="font-weight-bold"
             >
+              ชื่อ-นามสกุล :
+            </VCol>
+            <VCol
+              cols="6"
+              sm="8"
+            >
+              {{ item.name }}
+            </VCol>
             <VCol cols="12">
-              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd" />
+              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd">
+            </VCol>
+            <VCol
+              cols="6"
+              sm="4"
+              class="font-weight-bold"
+            >
+              บัญชีเข้าใช้งาน :
+            </VCol>
+            <VCol
+              cols="6"
+              sm="8"
+            >
+              {{ item.username }}
+            </VCol>
+            <VCol cols="12">
+              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd">
+            </VCol>
+            <VCol
+              cols="6"
+              sm="4"
+              class="font-weight-bold"
+            >
+              เมล :
+            </VCol>
+            <VCol
+              cols="6"
+              sm="8"
+            >
+              {{ item.email }}
+            </VCol>
+            <VCol cols="12">
+              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd">
+            </VCol>
+            <VCol
+              cols="6"
+              sm="4"
+              class="font-weight-bold"
+            >
+              ประเภทบัญชี :
+            </VCol>
+            <VCol
+              cols="6"
+              sm="8"
+            >
+              {{
+                resolveAccountType(item.account_type)
+              }}
+            </VCol>
+            <VCol cols="12">
+              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd">
+            </VCol>
+            <VCol
+              cols="6"
+              sm="4"
+              class="font-weight-bold"
+            >
+              สถานะ :
+            </VCol>
+            <VCol
+              cols="6"
+              sm="8"
+            >
+              <VChip :color="resolveActive(item.active, item.blocked_at, 'color')">
+                {{
+                  resolveActive(item.active, item.blocked_at, "text")
+                }}
+              </VChip>
+            </VCol>
+            <VCol cols="12">
+              <hr style="border-top: none; border-bottom: 0.5px dotted #ddd">
             </VCol>
           </VRow>
         </VCardText>
@@ -514,14 +637,17 @@ const onDelete = (id) => {
     >
       <!-- Dialog close btn -->
       <DialogCloseBtn
-        @click="isDialogAddVisible = !isDialogAddVisible"
         absolute
+        @click="isDialogAddVisible = !isDialogAddVisible"
       />
 
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์มเพิ่มผู้ใช้งาน">
         <VCardItem>
-          <VForm ref="refAddForm" v-model="isAddFormValid">
+          <VForm
+            ref="refAddForm"
+            v-model="isAddFormValid"
+          >
             <!-- @submit.prevent="onAddSubmit" -->
             <VRow>
               <VCol cols="12">
@@ -535,37 +661,68 @@ const onDelete = (id) => {
               </VCol>
 
               <VCol cols="12">
-                <VBtn color="success" @click="onLoadUser">Load Data</VBtn>
+                <VBtn
+                  color="success"
+                  @click="onLoadUser"
+                >
+                  Load Data
+                </VBtn>
               </VCol>
 
-              <VCol cols="12" v-if="item.name != ''">
+              <VCol
+                v-if="item.name != ''"
+                cols="12"
+              >
                 <VRow>
-                  <VCol cols="6" sm="4" class="font-weight-bold"
-                    >ชื่อ-นามสกุล :
+                  <VCol
+                    cols="6"
+                    sm="4"
+                    class="font-weight-bold"
+                  >
+                    ชื่อ-นามสกุล :
                   </VCol>
-                  <VCol cols="6" sm="8">{{ item.name }}</VCol>
+                  <VCol
+                    cols="6"
+                    sm="8"
+                  >
+                    {{ item.name }}
+                  </VCol>
                   <VCol cols="12">
-                    <hr
-                      style="border-top: none; border-bottom: 0.5px dotted #ddd"
-                    />
+                    <hr style="border-top: none; border-bottom: 0.5px dotted #ddd">
                   </VCol>
-                  <VCol cols="6" sm="4" class="font-weight-bold">เมล : </VCol>
-                  <VCol cols="6" sm="8">{{ item.email }}</VCol>
+                  <VCol
+                    cols="6"
+                    sm="4"
+                    class="font-weight-bold"
+                  >
+                    เมล :
+                  </VCol>
+                  <VCol
+                    cols="6"
+                    sm="8"
+                  >
+                    {{ item.email }}
+                  </VCol>
                   <VCol cols="12">
-                    <hr
-                      style="border-top: none; border-bottom: 0.5px dotted #ddd"
-                    />
+                    <hr style="border-top: none; border-bottom: 0.5px dotted #ddd">
                   </VCol>
-                  <VCol cols="6" sm="4" class="font-weight-bold"
-                    >ประเภทบัญชี :
+                  <VCol
+                    cols="6"
+                    sm="4"
+                    class="font-weight-bold"
+                  >
+                    ประเภทบัญชี :
                   </VCol>
-                  <VCol cols="6" sm="8">{{
-                    resolveAccountType(item.account_type)
-                  }}</VCol>
+                  <VCol
+                    cols="6"
+                    sm="8"
+                  >
+                    {{
+                      resolveAccountType(item.account_type)
+                    }}
+                  </VCol>
                   <VCol cols="12">
-                    <hr
-                      style="border-top: none; border-bottom: 0.5px dotted #ddd"
-                    />
+                    <hr style="border-top: none; border-bottom: 0.5px dotted #ddd">
                   </VCol>
                 </VRow>
               </VCol>
@@ -582,29 +739,37 @@ const onDelete = (id) => {
             Cancel
           </VBtn>
           <VBtn
-            type="submit"
-            @click="onSubmit"
             id="btn-submit"
+            type="submit"
             :disabled="!isSubmit"
+            @click="onSubmit"
           >
-            <span>Save</span></VBtn
-          >
+            <span>Save</span>
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
 
     <!-- Edit Form Dialog -->
-    <VDialog v-model="isDialogEditVisible" contained class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogEditVisible"
+      contained
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn
-        @click="isDialogEditVisible = !isDialogEditVisible"
         absolute
+        @click="isDialogEditVisible = !isDialogEditVisible"
       />
 
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์ม ผู้ใช้งาน">
         <VCardItem>
-          <VForm ref="refForm" v-model="isFormValid" @submit.prevent="onSubmit">
+          <VForm
+            ref="refForm"
+            v-model="isFormValid"
+            @submit.prevent="onSubmit"
+          >
             <VRow>
               <VCol cols="12">
                 <AppTextField
@@ -627,8 +792,8 @@ const onDelete = (id) => {
 
               <VCol cols="12">
                 <AppSelect
-                  :items="selectOptions.accountTypes"
                   v-model="item.account_type"
+                  :items="selectOptions.accountTypes"
                   label="ประเภทผู้ใช้งาน"
                   variant="outlined"
                   clearable
@@ -637,11 +802,11 @@ const onDelete = (id) => {
 
               <VCol cols="12">
                 <AppSelect
+                  v-model="item.active"
                   :items="[
                     { title: 'In Active', value: 0 },
                     { title: 'Active', value: 1 },
                   ]"
-                  v-model="item.active"
                   label="สถานะ"
                   variant="outlined"
                   clearable
@@ -650,11 +815,11 @@ const onDelete = (id) => {
 
               <VCol cols="12">
                 <AppSelect
+                  v-model="item.blocked"
                   :items="[
                     { title: 'Unblock', value: 0 },
                     { title: 'Blocked', value: 1 },
                   ]"
-                  v-model="item.blocked"
                   label="ระงับการใช้งาน"
                   variant="outlined"
                   clearable
@@ -672,15 +837,22 @@ const onDelete = (id) => {
           >
             Cancel
           </VBtn>
-          <VBtn type="submit" @click="onSubmit" id="btn-submit">
-            <span>Save</span></VBtn
+          <VBtn
+            id="btn-submit"
+            type="submit"
+            @click="onSubmit"
           >
+            <span>Save</span>
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
 
     <!-- Del Dialog -->
-    <VDialog v-model="isDialogDelVisible" class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogDelVisible"
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogDelVisible = !isDialogDelVisible" />
 
@@ -696,7 +868,12 @@ const onDelete = (id) => {
           >
             Cancel
           </VBtn>
-          <VBtn @click="onDelete(item.id)" color="error"> Delete </VBtn>
+          <VBtn
+            color="error"
+            @click="onDelete(item.id)"
+          >
+            Delete
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

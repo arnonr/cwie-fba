@@ -1,44 +1,49 @@
 <script setup>
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import "sweetalert2/src/sweetalert2.scss";
-import { useRoute, useRouter } from "vue-router";
-////
-import buddhistEra from "dayjs/plugin/buddhistEra";
-// import VuePdfApp from "vue3-pdf-app";
-import "vue3-pdf-app/dist/icons/main.css";
-import { useCwieDataStore } from "../useCwieDataStore";
+import dayjs from "dayjs"
+import "dayjs/locale/th"
+import "sweetalert2/src/sweetalert2.scss"
+import { useRoute, useRouter } from "vue-router"
 
-import { form_statuses, statusShow } from "@/data-constant/data";
+////
+import buddhistEra from "dayjs/plugin/buddhistEra"
+
+// import VuePdfApp from "vue3-pdf-app";
+import "vue3-pdf-app/dist/icons/main.css"
+import { useCwieDataStore } from "../useCwieDataStore"
+
+import { form_statuses, statusShow } from "@/data-constant/data"
 
 // const route = useRoute();
-dayjs.extend(buddhistEra);
-const route = useRoute();
-const router = useRouter();
-const cwieDataStore = useCwieDataStore();
+dayjs.extend(buddhistEra)
 
-let userData = JSON.parse(localStorage.getItem("userData"));
+const route = useRoute()
+const router = useRouter()
+const cwieDataStore = useCwieDataStore()
 
-const student = ref({});
-const item = ref({});
+let userData = JSON.parse(localStorage.getItem("userData"))
+
+const student = ref({})
+const item = ref({})
+
 const rejectLog = ref({
   comment: "",
   reject_status_id: 2,
   form_id: null,
   user_id: userData.user_id,
-});
+})
 
-const rowPerPage = ref(20);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const orderBy = ref("id");
-const order = ref("desc");
-const isAdd = ref(true);
-const isCheck = ref(true);
-const isDialogVisible = ref(false);
-const isDialogRejectVisible = ref(false);
-const currentStep = ref(0);
+const rowPerPage = ref(20)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const orderBy = ref("id")
+const order = ref("desc")
+const isAdd = ref(true)
+const isCheck = ref(true)
+const isDialogVisible = ref(false)
+const isDialogRejectVisible = ref(false)
+const currentStep = ref(0)
+
 const formSteps = [
   {
     title: "ข้อมูลใบสมัคร",
@@ -56,9 +61,11 @@ const formSteps = [
     size: 24,
     icon: "tabler-notes",
   },
-];
-const items = ref([]);
-const prependIcon = "tabler-arrow-big-right-filled";
+]
+
+const items = ref([])
+const prependIcon = "tabler-arrow-big-right-filled"
+
 const qualifications = [
   {
     title:
@@ -100,18 +107,18 @@ const qualifications = [
       prependIcon: prependIcon,
     },
   },
-];
+]
 
-const documents_certificate = ref([]);
+const documents_certificate = ref([])
 
-const isOverlay = ref(false);
-const isFormValid = ref(false);
-const refForm = ref();
-const currentTab = ref(0);
+const isOverlay = ref(false)
+const isFormValid = ref(false)
+const refForm = ref()
+const currentTab = ref(0)
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
 
 const selectOptions = ref({
   provinces: [],
@@ -123,72 +130,73 @@ const selectOptions = ref({
     { title: "Active", value: 1 },
     { title: "In Active", value: 0 },
   ],
-});
+})
 
 const fetchDocumentTypes = () => {
   cwieDataStore
     .fetchDocumentTypes({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.document_types = response.data.data.map((r) => {
-          return { title: r.name, value: r.id };
-        });
+        selectOptions.value.document_types = response.data.data.map(r => {
+          return { title: r.name, value: r.id }
+        })
 
         selectOptions.value.document_types =
-          selectOptions.value.document_types.filter((d) => {
-            return d.value != 1;
-          });
+          selectOptions.value.document_types.filter(d => {
+            return d.value != 1
+          })
 
-        fetchStudent();
+        fetchStudent()
 
-        isOverlay.value = false;
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchStudentDocuments = () => {
   cwieDataStore
     .fetchStudentDocuments({
       student_id: student.value.id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        const { data } = response.data;
+        const { data } = response.data
 
-        let document = data.filter((d) => {
-          return d.document_type_id != 1;
-        });
+        let document = data.filter(d => {
+          return d.document_type_id != 1
+        })
 
-        student.value.documents = student.value.documents.map((d) => {
-          let index = document.find((e) => {
-            return d.document_type_id == e.document_type_id;
-          });
+        student.value.documents = student.value.documents.map(d => {
+          let index = document.find(e => {
+            return d.document_type_id == e.document_type_id
+          })
           if (index) {
-            d.id = index.id;
-            d.document_file_old = index.document_file;
-            d.document_file = [];
+            d.id = index.id
+            d.document_file_old = index.document_file
+            d.document_file = []
           } else {
-            isCheck.value = false;
+            isCheck.value = false
           }
-          return d;
-        });
+          
+          return d
+        })
 
         // Cert
-        let document_cert = data.filter((d) => {
-          return d.document_type_id == 1;
-        });
+        let document_cert = data.filter(d => {
+          return d.document_type_id == 1
+        })
 
         if (document_cert.length > 0) {
-          documents_certificate.value = [];
+          documents_certificate.value = []
 
           for (let index = 0; index < document_cert.length; index++) {
-            let d = document_cert[index];
+            let d = document_cert[index]
             documents_certificate.value.push({
               id: d.id,
               document_type_id: 1,
@@ -197,20 +205,20 @@ const fetchStudentDocuments = () => {
               document_file_old:
                 d.document_file != null ? d.document_file : null,
               document_file: [],
-            });
+            })
           }
         }
 
-        isOverlay.value = false;
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 // let userData = JSON.parse(localStorage.getItem("userData"));
 
@@ -220,24 +228,25 @@ const fetchStudent = () => {
       id: route.params.id,
       includeAll: true,
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        const { data } = response.data;
-        student.value = { ...data[0] };
+        const { data } = response.data
+
+        student.value = { ...data[0] }
 
         student.value.faculty_name = student.value.faculty_name.replace(
           "คณะ",
-          ""
-        );
+          "",
+        )
 
         student.value.major_name = student.value.major_name
           ? student.value.major_name.replace("สาขาวิชา", "")
-          : "";
+          : ""
 
         // student.value.status = 1;
 
         student.value.documents = selectOptions.value.document_types.map(
-          (d) => {
+          d => {
             return {
               id: null,
               document_file: null,
@@ -245,9 +254,9 @@ const fetchStudent = () => {
               document_type_id: d.value,
               document_name: d.title,
               student_id: student.value.id,
-            };
-          }
-        );
+            }
+          },
+        )
 
         if (
           student.value.id &&
@@ -262,6 +271,7 @@ const fetchStudent = () => {
           student.value.tel &&
           student.value.email &&
           student.value.faculty_id &&
+
           //   student.value.major_id &&
           student.value.class_year &&
           student.value.class_room &&
@@ -276,7 +286,7 @@ const fetchStudent = () => {
           student.value.weight
         ) {
         } else {
-          isCheck.value = false;
+          isCheck.value = false
         }
 
         // if (isCheck == false) {
@@ -286,22 +296,23 @@ const fetchStudent = () => {
         // }
         // currentStep.value = 2;
         // console.log(currentStep);
-        fetchStudentDocuments();
-        fetchForms();
+        fetchStudentDocuments()
+        fetchForms()
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchForms = () => {
   cwieDataStore
     .fetchForms({
       student_id: route.params.id,
+
       //   student_id: student.value.id,
       perPage: rowPerPage.value,
       currentPage: currentPage.value,
@@ -309,11 +320,11 @@ const fetchForms = () => {
       order: order.value,
       includeAll: true,
     })
-    .then(async (response) => {
+    .then(async response => {
       // const { rows } = response.data;
       // isOverLay.value = false;
       if (response.data.message == "success") {
-        const { data } = response.data;
+        const { data } = response.data
 
         for (let i = 0; i < data.length; i++) {
           await cwieDataStore
@@ -323,30 +334,30 @@ const fetchForms = () => {
               active: 1,
               includeAll: true,
             })
-            .then((res) => {
-              data[i].major_head_name = res.data.data[0].teacher_name;
-            });
+            .then(res => {
+              data[i].major_head_name = res.data.data[0].teacher_name
+            })
         }
-        items.value = data;
+        items.value = data
 
         if (items.value.length != 0) {
-          isAdd.value = false;
+          isAdd.value = false
           if (items.value[0].status_id == 6 || items.value[0].status_id == 8) {
-            isAdd.value = true;
+            isAdd.value = true
           }
         }
 
-        totalPage.value = response.data.totalPage;
-        totalItems.value = response.data.totalData;
+        totalPage.value = response.data.totalPage
+        totalItems.value = response.data.totalData
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const onRejectSubmit = () => {
   if (rejectLog.comment != "") {
@@ -355,52 +366,52 @@ const onRejectSubmit = () => {
         ...rejectLog.value,
         active: 1,
       })
-      .then((response) => {
+      .then(response => {
         if (response.data.message == "success") {
-          localStorage.setItem("Rejected", 1);
+          localStorage.setItem("Rejected", 1)
           nextTick(() => {
-            fetchStudent();
-            fetchForms();
-            snackbarText.value = "Rejected";
-            snackbarColor.value = "success";
-            isSnackbarVisible.value = true;
-            isOverlay.value = false;
-            isDialogRejectVisible.value = false;
-          });
+            fetchStudent()
+            fetchForms()
+            snackbarText.value = "Rejected"
+            snackbarColor.value = "success"
+            isSnackbarVisible.value = true
+            isOverlay.value = false
+            isDialogRejectVisible.value = false
+          })
         } else {
-          isOverlay.value = false;
-          console.log("error");
+          isOverlay.value = false
+          console.log("error")
         }
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch(error => {
+        console.error(error)
+      })
   } else {
-    snackbarText.value = "โปรดระบุเหตุผล";
-    snackbarColor.value = "error";
-    isSnackbarVisible.value = true;
-    isOverlay.value = false;
+    snackbarText.value = "โปรดระบุเหตุผล"
+    snackbarColor.value = "error"
+    isSnackbarVisible.value = true
+    isOverlay.value = false
   }
-};
+}
 
 const fetchProvinces = () => {
   cwieDataStore
     .fetchProvinces({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.provinces = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.province_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.provinces = response.data.data.map(r => {
+          return { title: r.name_th, value: r.province_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const onSubmit = () => {
   cwieDataStore
@@ -409,86 +420,87 @@ const onSubmit = () => {
       status_id: 4,
       chairman_approved_at: dayjs().format("YYYY-MM-DD"),
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        localStorage.setItem("Approved", 1);
+        localStorage.setItem("Approved", 1)
         nextTick(() => {
-          fetchStudent();
-          fetchForms();
-          snackbarText.value = "Approved";
-          snackbarColor.value = "success";
-          isSnackbarVisible.value = true;
-          isOverlay.value = false;
-          isDialogVisible.value = false;
-        });
+          fetchStudent()
+          fetchForms()
+          snackbarText.value = "Approved"
+          snackbarColor.value = "success"
+          isSnackbarVisible.value = true
+          isOverlay.value = false
+          isDialogVisible.value = false
+        })
       } else {
-        isOverlay.value = false;
-        console.log("error");
+        isOverlay.value = false
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+    .catch(error => {
+      console.error(error)
+    })
+}
 
-const responseProvinceName = (response_province_id) => {
+const responseProvinceName = response_province_id => {
   if (response_province_id) {
-    let response_province_select = selectOptions.value.provinces.find((x) => {
-      return x.value == response_province_id;
-    });
-    return response_province_select.title;
+    let response_province_select = selectOptions.value.provinces.find(x => {
+      return x.value == response_province_id
+    })
+    
+    return response_province_select.title
   } else {
-    return "-";
+    return "-"
   }
-};
+}
 
-const reject_status_show = (reject_status_id) => {
+const reject_status_show = reject_status_id => {
   if (reject_status_id) {
     if (reject_status_id == 1) {
-      return "อาจารย์ที่ปรึกษา";
+      return "อาจารย์ที่ปรึกษา"
     }
 
     if (reject_status_id == 2) {
-      return "ประธานอาจารย์นิเทศ";
+      return "ประธานอาจารย์นิเทศ"
     }
 
     if (reject_status_id == 3) {
-      return "เจ้าหน้าที่คณะ";
+      return "เจ้าหน้าที่คณะ"
     }
 
     if (reject_status_id == 4) {
-      return "เอกสารตอบรับ";
+      return "เอกสารตอบรับ"
     }
 
     if (reject_status_id == 5) {
-      return "แผนการปฏิบัติงาน";
+      return "แผนการปฏิบัติงาน"
     }
   }
-  return "";
-};
+  
+  return ""
+}
 
 onMounted(() => {
-  window.scrollTo(0, 0);
+  window.scrollTo(0, 0)
 
-  fetchProvinces();
+  fetchProvinces()
+
   //   fetchTeachers();
-  fetchDocumentTypes();
-});
+  fetchDocumentTypes()
+})
 </script>
-<style lang="scss">
-.checkout-stepper {
-  .stepper-icon-step {
-    .step-wrapper + svg {
-      margin-inline: 3.5rem !important;
-    }
-  }
-}
-</style>
+
 <template>
   <div>
     <VRow>
-      <VCol cols="12" md="3">
-        <VCard title="" class="pa-3">
+      <VCol
+        cols="12"
+        md="3"
+      >
+        <VCard
+          title=""
+          class="pa-3"
+        >
           <VCardText>
             <VImg
               :src="student.photo_file"
@@ -500,29 +512,30 @@ onMounted(() => {
 
           <VCardText>
             <span class="font-weight-bold">ชื่อ : </span>
-            <span
-              >{{ student.prefix_name }}{{ student.firstname }}
-              {{ student.surname }}</span
-            ></VCardText
-          >
+            <span>{{ student.prefix_name }}{{ student.firstname }}
+              {{ student.surname }}</span>
+          </VCardText>
           <VDivider class="ml-4 mr-4" />
           <VCardText>
             <span class="font-weight-bold">รหัสนักศึกษา : </span>
-            <span>{{ student.student_code }}</span></VCardText
-          >
+            <span>{{ student.student_code }}</span>
+          </VCardText>
           <VDivider class="ml-4 mr-4" />
           <VCardText>
             <span class="font-weight-bold">สาขาวิชา : </span>
-            <span>{{ student.major_name }}</span></VCardText
-          >
+            <span>{{ student.major_name }}</span>
+          </VCardText>
           <VDivider class="ml-4 mr-4" />
           <VCardText>
             <span class="font-weight-bold">ชั้นปี : </span>
-            <span>{{ student.class_year }}</span></VCardText
-          >
+            <span>{{ student.class_year }}</span>
+          </VCardText>
         </VCard>
       </VCol>
-      <VCol cols="12" md="9">
+      <VCol
+        cols="12"
+        md="9"
+      >
         <VCard class="pa-5">
           <VTabs v-model="currentTab">
             <VTab>
@@ -534,15 +547,15 @@ onMounted(() => {
               />
               ข้อมูลทั่วไป
             </VTab>
-            <VTab
-              ><VIcon
+            <VTab>
+              <VIcon
                 size="16"
                 icon="tabler-heart"
                 style="opacity: 1"
                 class="mr-1"
               />
-              ข้อมูลสุขภาพ</VTab
-            >
+              ข้อมูลสุขภาพ
+            </VTab>
             <VTab>
               <VIcon
                 size="16"
@@ -550,15 +563,18 @@ onMounted(() => {
                 style="opacity: 1"
                 class="mr-1"
               />
-              ข้อมูลเอกสาร</VTab
-            >
+              ข้อมูลเอกสาร
+            </VTab>
           </VTabs>
 
           <VCardText>
             <VWindow v-model="currentTab">
               <VWindowItem>
                 <VRow>
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span class="font-weight-bold">
                       <VIcon
                         size="16"
@@ -566,26 +582,37 @@ onMounted(() => {
                         style="opacity: 1"
                         class="mr-1"
                       />
-                      ข้อมูลการศึกษา</span
-                    >
+                      ข้อมูลการศึกษา</span>
                   </VCol>
 
-                  <VCol cols="12" md="3">
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
                     <span>ห้อง : </span>
                     <span>{{ student.class_room }} </span>
                   </VCol>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>อาจารย์ที่ปรึกษา : </span>
                     <span>{{ student.advisor_name }} </span>
                   </VCol>
-                  <VCol cols="12" md="3">
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
                     <span>เกรดเฉลี่ย : </span>
                     <span>{{ student.gpa }} </span>
                   </VCol>
 
-                  <VDivider></VDivider>
+                  <VDivider />
                   <!-- address -->
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span class="font-weight-bold">
                       <VIcon
                         size="16"
@@ -593,37 +620,57 @@ onMounted(() => {
                         style="opacity: 1"
                         class="mr-1"
                       />
-                      ข้อมูลที่อยู่</span
-                    >
+                      ข้อมูลที่อยู่</span>
                   </VCol>
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span>ที่อยู่ปัจจุบัน : </span>
                     <span>{{ student.address }} </span>
                   </VCol>
 
-                  <VCol cols="12" md="4">
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
                     <span>จังหวัด : </span>
                     <span>{{ student.province_name }} </span>
                   </VCol>
-                  <VCol cols="12" md="4">
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
                     <span>อำเภอ/เขต : </span>
                     <span>{{ student.amphur_name }} </span>
                   </VCol>
-                  <VCol cols="12" md="4">
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
                     <span>ตำบล/แขวง : </span>
                     <span>{{ student.tumbol_name }} </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>เบอร์โทรศัพท์ : </span>
                     <span>{{ student.tel }} </span>
                   </VCol>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>เมล : </span>
                     <span>{{ student.email }} </span>
                   </VCol>
-                  <VDivider></VDivider>
-                  <VCol cols="12" md="12">
+                  <VDivider />
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span class="font-weight-bold">
                       <VIcon
                         size="16"
@@ -631,30 +678,47 @@ onMounted(() => {
                         style="opacity: 1"
                         class="mr-1"
                       />
-                      ผู้ที่ติดต่อได้</span
-                    >
+                      ผู้ที่ติดต่อได้</span>
                   </VCol>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>บุคคลที่ติดต่อได้1 : </span>
                     <span>{{ student.contact1_name }} </span>
                   </VCol>
-                  <VCol cols="12" md="3">
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
                     <span>ความสัมพันธ์ : </span>
                     <span>{{ student.contact1_relation }} </span>
                   </VCol>
-                  <VCol cols="12" md="3">
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
                     <span>โทร : </span>
                     <span>{{ student.contact1_tel }} </span>
                   </VCol>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>บุคคลที่ติดต่อได้2 : </span>
                     <span>{{ student.contact2_name }} </span>
                   </VCol>
-                  <VCol cols="12" md="3">
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
                     <span>ความสัมพันธ์ : </span>
                     <span>{{ student.contact2_relation }} </span>
                   </VCol>
-                  <VCol cols="12" md="3">
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
                     <span>โทร : </span>
                     <span>{{ student.contact2_tel }} </span>
                   </VCol>
@@ -662,7 +726,10 @@ onMounted(() => {
               </VWindowItem>
               <VWindowItem>
                 <VRow>
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span class="font-weight-bold">
                       <VIcon
                         size="16"
@@ -670,31 +737,48 @@ onMounted(() => {
                         style="opacity: 1"
                         class="mr-1"
                       />
-                      ข้อมูลสุขภาพ</span
-                    >
+                      ข้อมูลสุขภาพ</span>
                   </VCol>
 
-                  <VCol cols="12" md="4">
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
                     <span>กลุ่มเลือด : </span>
                     <span>{{ student.blood_group }} </span>
                   </VCol>
-                  <VCol cols="12" md="4">
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
                     <span>ส่วนสูง (ซม.) : </span>
                     <span>{{ student.height }} </span>
                   </VCol>
-                  <VCol cols="12" md="4">
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
                     <span>น้ำหนัก (กก.) : </span>
                     <span>{{ student.weight }} </span>
                   </VCol>
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span>เบอร์โทรฉุกเฉิน : </span>
                     <span>{{ student.emergency_tel }} </span>
                   </VCol>
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span>โรคประจำตัว : </span>
                     <span>{{ student.congenital_disease }} </span>
                   </VCol>
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span>ประวัติการแพ้ยา : </span>
                     <span>{{ student.drug_allergy }} </span>
                   </VCol>
@@ -702,7 +786,10 @@ onMounted(() => {
               </VWindowItem>
               <VWindowItem>
                 <VRow>
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span class="font-weight-bold">
                       <VIcon
                         size="16"
@@ -710,35 +797,35 @@ onMounted(() => {
                         style="opacity: 1"
                         class="mr-1"
                       />
-                      ประกาศนียบัตร</span
-                    >
+                      ประกาศนียบัตร</span>
                   </VCol>
                   <VCol
-                    cols="12"
-                    md="12"
                     v-for="(d, index) in documents_certificate"
                     :key="index"
+                    cols="12"
+                    md="12"
                   >
-                    <span class="font-weight-bold"
-                      >{{ d.document_name }} :
+                    <span class="font-weight-bold">{{ d.document_name }} :
                     </span>
                     <a
                       :href="
                         d.document_file_old != null ? d.document_file_old : '#'
                       "
                       target="_blank"
-                      ><span>
-                        <VIcon
-                          size="16"
-                          icon="tabler-file"
-                          style="opacity: 1"
-                          class="mr-1"
-                        />เอกสาร</span
-                      >
+                    ><span>
+                      <VIcon
+                        size="16"
+                        icon="tabler-file"
+                        style="opacity: 1"
+                        class="mr-1"
+                      />เอกสาร</span>
                     </a>
                   </VCol>
-                  <VDivider></VDivider>
-                  <VCol cols="12" md="12">
+                  <VDivider />
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span class="font-weight-bold">
                       <VIcon
                         size="16"
@@ -746,45 +833,46 @@ onMounted(() => {
                         style="opacity: 1"
                         class="mr-1"
                       />
-                      เอกสาร</span
-                    >
+                      เอกสาร</span>
                   </VCol>
 
                   <VCol
-                    cols="12"
-                    md="12"
                     v-for="(d, index) in student.documents"
                     :key="index"
+                    cols="12"
+                    md="12"
                   >
-                    <span class="font-weight-bold"
-                      >{{ d.document_name }} :
+                    <span class="font-weight-bold">{{ d.document_name }} :
                     </span>
                     <a
                       :href="
                         d.document_file_old != null ? d.document_file_old : '#'
                       "
                       target="_blank"
-                      ><span>
-                        <VIcon
-                          size="16"
-                          icon="tabler-file"
-                          style="opacity: 1"
-                          class="mr-1"
-                        />เอกสาร</span
-                      >
+                    ><span>
+                      <VIcon
+                        size="16"
+                        icon="tabler-file"
+                        style="opacity: 1"
+                        class="mr-1"
+                      />เอกสาร</span>
                     </a>
-                    <!-- <iframe
+                    <!--
+                      <iframe
                       v-if="d.document_file_old != null"
                       :src="d.document_file_old"
                       style="width: 100%; height: 500px"
-                    ></iframe>
+                      ></iframe>
 
-                    <span v-else> <br />- </span> -->
-                    <!-- <vue-pdf-app
+                      <span v-else> <br />- </span> 
+                    -->
+                    <!--
+                      <vue-pdf-app
                       :id="'pdf' + index"
                       style="height: 500px"
                       :pdf="d.document_file_old"
-                    ></vue-pdf-app> -->
+                      ></vue-pdf-app> 
+                    -->
                   </VCol>
                 </VRow>
               </VWindowItem>
@@ -793,7 +881,12 @@ onMounted(() => {
         </VCard>
       </VCol>
 
-      <VCol cols="12" md="12" v-for="(it, index) in items" :key="index">
+      <VCol
+        v-for="(it, index) in items"
+        :key="index"
+        cols="12"
+        md="12"
+      >
         <VCard class="pa-5">
           <VCardText>
             <h3>ครั้งที่ {{ items.length - index }}</h3>
@@ -803,38 +896,51 @@ onMounted(() => {
               v-model:current-step="currentStep"
               class="checkout-stepper"
               :items="formSteps"
-              :isActiveStepValid="true"
+              :is-active-step-valid="true"
               :direction="$vuetify.display.smAndUp ? 'horizontal' : 'vertical'"
             />
           </VCardText>
 
-          <VDivider></VDivider>
+          <VDivider />
           <VCardText>
             <!-- 👉 stepper content -->
-            <VWindow v-model="currentStep" class="disable-tab-transition">
+            <VWindow
+              v-model="currentStep"
+              class="disable-tab-transition"
+            >
               <VWindowItem>
                 <VRow>
-                  <!-- <VCol cols="12" md="12" class="d-flex">
+                  <!--
+                    <VCol cols="12" md="12" class="d-flex">
                     <VIcon size="22" icon="tabler-user" style="opacity: 1" />
                     <h4 class="pt-1 pl-1">ข้อมูลทั่วไป</h4>
-                  </VCol> -->
+                    </VCol> 
+                  -->
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <!-- <VCol cols="12" md="3"> -->
                     <span>สถานะฟอร์ม : </span>
                     <span>
-                      <VChip label :color="form_statuses[it.status_id]">
+                      <VChip
+                        label
+                        :color="form_statuses[it.status_id]"
+                      >
                         {{
                           statusShow(
                             it.status_id,
                             it.request_document_date,
                             it.confirm_response_at
                           )
-                        }}</VChip
-                      >
+                        }}</VChip>
                     </span>
                   </VCol>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <!-- <VCol cols="12" md="3"> -->
                     <span>ปีการศึกษา : </span>
                     <span>
@@ -842,14 +948,20 @@ onMounted(() => {
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ประธานอาจารย์นิเทศประจำสาขา : </span>
                     <span>
                       {{ it.major_head_name }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <!-- <VCol cols="12" md="3"> -->
                     <span>อาจารย์นิเทศ : </span>
                     <span>
@@ -857,7 +969,10 @@ onMounted(() => {
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <!-- <VCol cols="12" md="3"> -->
                     <span>วันที่เริ่มปฏิบัติสหกิจ : </span>
                     <span>
@@ -867,7 +982,10 @@ onMounted(() => {
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>วันสิ้นสุดปฏิบัติสหกิจ : </span>
                     <span>
                       {{
@@ -876,61 +994,88 @@ onMounted(() => {
                     </span>
                   </VCol>
 
-                  <VDivider class="mt-4 mb-4"></VDivider>
+                  <VDivider class="mt-4 mb-4" />
 
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span>สถานประกอบการ : </span>
                     <span>
                       {{ it.company_name }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ชื่อ-สกุล ผู้ประสานงาน : </span>
                     <span>
                       {{ it.co_name }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ตำแหน่งผู้ประสานงาน : </span>
                     <span>
                       {{ it.co_position }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>เบอร์โทรศัพท์ : </span>
                     <span>
                       {{ it.co_tel }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>email : </span>
                     <span>
                       {{ it.co_email }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ชื่อ-สกุลผู้เรียนถึง (ใช้ในการออกหนังสือ) : </span>
                     <span>
                       {{ it.request_name }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ตำแหน่งผู้เรียนถึง (ใช้ในการออกหนังสือ) : </span>
                     <span>
                       {{ it.request_position }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span>นามบัตร : </span>
                     <span>
-                      <a :href="it.namecard_file" target="_blank">
+                      <a
+                        :href="it.namecard_file"
+                        target="_blank"
+                      >
                         <VImg
                           :src="it.namecard_file"
                           style="max-width: 300px"
@@ -940,92 +1085,136 @@ onMounted(() => {
                     </span>
                   </VCol>
 
-                  <VDivider class="mt-6 mb-6"></VDivider>
+                  <VDivider class="mt-6 mb-6" />
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <h4>คุณสมบัติผู้สมัครโครงการสหกิจศึกษา</h4>
                     <VList :items="qualifications" />
                   </VCol>
 
-                  <VCol cols="12" md="6" class="text-error">
+                  <VCol
+                    cols="12"
+                    md="6"
+                    class="text-error"
+                  >
                     <VRow>
-                      <VCol cols="12" md="12">
+                      <VCol
+                        cols="12"
+                        md="12"
+                      >
                         <h4>Remark</h4>
                       </VCol>
                     </VRow>
-                    <VRow v-for="(rl, index) in it.reject_log" :key="index">
-                      <VCol cols="12" md="4" v-if="rl.reject_status_id < 4">
-                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
+                    <VRow
+                      v-for="(rl, index) in it.reject_log"
+                      :key="index"
+                    >
+                      <VCol
+                        v-if="rl.reject_status_id < 4"
+                        cols="12"
+                        md="4"
+                      >
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          วันที่ :
+                        </h4>
                         <span>
                           {{
                             dayjs(rl.created_at)
                               .locale("th")
                               .format("DD MMM BB")
-                          }}</span
-                        >
+                          }}</span>
                       </VCol>
 
-                      <VCol cols="12" md="8" v-if="rl.reject_status_id < 4">
-                        <h4 class="mb-0 d-inline mr-1 text-error">ผู้ตรวจ :</h4>
+                      <VCol
+                        v-if="rl.reject_status_id < 4"
+                        cols="12"
+                        md="8"
+                      >
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          ผู้ตรวจ :
+                        </h4>
                         <span>
-                          {{ reject_status_show(rl.reject_status_id) }}</span
-                        >
+                          {{ reject_status_show(rl.reject_status_id) }}</span>
                       </VCol>
 
-                      <VCol cols="12" md="12" v-if="rl.reject_status_id < 4">
+                      <VCol
+                        v-if="rl.reject_status_id < 4"
+                        cols="12"
+                        md="12"
+                      >
                         <h4 class="mb-0 d-inline mr-1 text-error">
                           รายละเอียด :
                         </h4>
                         <span> {{ rl.comment }}</span>
                       </VCol>
 
-                      <VCol cols="12" md="12" v-if="rl.reject_status_id < 4">
-                        <hr style="border: solid #eee 1px" />
+                      <VCol
+                        v-if="rl.reject_status_id < 4"
+                        cols="12"
+                        md="12"
+                      >
+                        <hr style="border: solid #eee 1px">
                       </VCol>
                     </VRow>
                   </VCol>
 
-                  <VDivider class="mt-6 mb-6"></VDivider>
-                  <VCol cols="12" md="6">
+                  <VDivider class="mt-6 mb-6" />
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>วันที่อาจารย์ที่ปรึกษาอนุมัติ : </span>
                     <span>
                       {{
                         it.advisor_verified_at
                           ? dayjs(it.advisor_verified_at)
-                              .locale("th")
-                              .format("DD MMM BBBB")
+                            .locale("th")
+                            .format("DD MMM BBBB")
                           : "-"
                       }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>วันที่ประธานอาจารย์นิเทศอนุมัติ : </span>
                     <span>
                       {{
                         it.chairman_approved_at
                           ? dayjs(it.chairman_approved_at)
-                              .locale("th")
-                              .format("DD MMM BBBB")
+                            .locale("th")
+                            .format("DD MMM BBBB")
                           : "-"
                       }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>วันที่คณะอนุมัติ : </span>
                     <span>
                       {{
                         it.faculty_confirmed_at
                           ? dayjs(it.faculty_confirmed_at)
-                              .locale("th")
-                              .format("DD MMM BBBB")
+                            .locale("th")
+                            .format("DD MMM BBBB")
                           : "-"
                       }}
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="12" class="text-center">
+                  <VCol
+                    cols="12"
+                    md="12"
+                    class="text-center"
+                  >
                     <VBtn
                       color="error"
                       :disabled="it.status_id != 3 || index != 0"
@@ -1041,7 +1230,7 @@ onMounted(() => {
                         icon="tabler-edit"
                         style="opacity: 1"
                         class="mr-1"
-                      ></VIcon>
+                      />
                       ส่งกลับให้แก้ไข
                     </VBtn>
 
@@ -1061,7 +1250,7 @@ onMounted(() => {
                         icon="tabler-file-description"
                         style="opacity: 1"
                         class="mr-1"
-                      ></VIcon>
+                      />
                       อนุมัติ
                     </VBtn>
                   </VCol>
@@ -1069,74 +1258,93 @@ onMounted(() => {
               </VWindowItem>
               <VWindowItem>
                 <VRow>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <!-- <VCol cols="12" md="3"> -->
                     <span>สถานะฟอร์ม : </span>
                     <span>
-                      <VChip label :color="form_statuses[it.status_id]">
+                      <VChip
+                        label
+                        :color="form_statuses[it.status_id]"
+                      >
                         {{
                           statusShow(
                             it.status_id,
                             it.request_document_date,
                             it.confirm_response_at
                           )
-                        }}</VChip
-                      >
+                        }}</VChip>
                     </span>
                   </VCol>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>หนังสือขอความอนุเคราะห์ : </span>
                     <span>
                       {{
                         it.request_document_date == null
                           ? "-"
                           : dayjs(it.request_document_date)
-                              .locale("th")
-                              .format("DD MMMM BBBB")
+                            .locale("th")
+                            .format("DD MMMM BBBB")
                       }}
                     </span>
                   </VCol>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>วันที่ต้องตอบรับเอกสาร : </span>
                     <span>{{
                       it.max_response_date == null
                         ? "-"
                         : dayjs(it.max_response_date)
-                            .locale("th")
-                            .format("DD MMMM BBBB")
+                          .locale("th")
+                          .format("DD MMMM BBBB")
                     }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ไฟล์หนังสือตอบกลับ : </span>
                     <a
                       v-if="it.response_document_file"
                       :href="it.response_document_file"
                       target="_blank"
-                      ><span>
-                        <VIcon
-                          size="16"
-                          icon="tabler-file"
-                          style="opacity: 1"
-                          class="mr-1"
-                        />เอกสาร</span
-                      >
+                    ><span>
+                      <VIcon
+                        size="16"
+                        icon="tabler-file"
+                        style="opacity: 1"
+                        class="mr-1"
+                      />เอกสาร</span>
                     </a>
                     <span v-else>-</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>วันที่ส่งหนังสือตอบกลับ : </span>
                     <span>{{
                       it.response_send_at == null
                         ? "-"
                         : dayjs(it.response_send_at)
-                            .locale("th")
-                            .format("DD MMMM BBBB")
+                          .locale("th")
+                          .format("DD MMMM BBBB")
                     }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ผลการตอบกลับ : </span>
                     <span>{{
                       it.response_result == null
@@ -1145,65 +1353,97 @@ onMounted(() => {
                     }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>จังหวัดที่ตอบรับสหกิจศึกษา : </span>
                     <span>{{
                       responseProvinceName(it.response_province_id)
                     }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>วันที่ตรวจสอบหนังสือตอบกลับ : </span>
                     <span>{{
                       it.confirm_response_at == null
                         ? "-"
                         : dayjs(it.confirm_response_at)
-                            .locale("th")
-                            .format("DD MMMM BBBB")
+                          .locale("th")
+                          .format("DD MMMM BBBB")
                     }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>หนังสือส่งตัว : </span>
                     <span>
                       {{
                         it.send_document_date == null
                           ? "-"
                           : dayjs(it.send_document_date)
-                              .locale("th")
-                              .format("DD MMMM BBBB")
+                            .locale("th")
+                            .format("DD MMMM BBBB")
                       }}
                     </span>
                   </VCol>
 
-                  <VDivider></VDivider>
+                  <VDivider />
 
-                  <VCol cols="12" md="6" class="text-error">
+                  <VCol
+                    cols="12"
+                    md="6"
+                    class="text-error"
+                  >
                     <VRow>
-                      <VCol cols="12" md="12">
+                      <VCol
+                        cols="12"
+                        md="12"
+                      >
                         <h4>Remark</h4>
                       </VCol>
                     </VRow>
-                    <VRow v-for="(rl, index) in it.reject_log" :key="index">
-                      <VCol cols="12" md="4" v-if="rl.reject_status_id > 3">
-                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
+                    <VRow
+                      v-for="(rl, index) in it.reject_log"
+                      :key="index"
+                    >
+                      <VCol
+                        v-if="rl.reject_status_id > 3"
+                        cols="12"
+                        md="4"
+                      >
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          วันที่ :
+                        </h4>
                         <span>
                           {{
                             dayjs(rl.created_at)
                               .locale("th")
                               .format("DD MMM BB")
-                          }}</span
-                        >
+                          }}</span>
                       </VCol>
-                      <VCol cols="12" md="8" v-if="rl.reject_status_id > 3">
+                      <VCol
+                        v-if="rl.reject_status_id > 3"
+                        cols="12"
+                        md="8"
+                      >
                         <h4 class="mb-0 d-inline mr-1 text-error">
                           รายละเอียด :
                         </h4>
                         <span> {{ rl.comment }}</span>
                       </VCol>
 
-                      <VCol cols="12" md="12" v-if="rl.reject_status_id > 3">
-                        <hr style="border: solid #eee 1px" />
+                      <VCol
+                        v-if="rl.reject_status_id > 3"
+                        cols="12"
+                        md="12"
+                      >
+                        <hr style="border: solid #eee 1px">
                       </VCol>
                     </VRow>
                   </VCol>
@@ -1211,82 +1451,110 @@ onMounted(() => {
               </VWindowItem>
               <VWindowItem>
                 <VRow>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <!-- <VCol cols="12" md="3"> -->
                     <span>สถานะฟอร์ม : </span>
                     <span>
-                      <VChip label :color="form_statuses[it.status_id]">
+                      <VChip
+                        label
+                        :color="form_statuses[it.status_id]"
+                      >
                         {{
                           statusShow(
                             it.status_id,
                             it.request_document_date,
                             it.confirm_response_at
                           )
-                        }}</VChip
-                      >
+                        }}</VChip>
                     </span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ไฟล์แผนการปฏิบัติงาน : </span>
                     <a
                       v-if="it.plan_document_file"
                       :href="it.plan_document_file"
                       target="_blank"
-                      ><span>
-                        <VIcon
-                          size="16"
-                          icon="tabler-file"
-                          style="opacity: 1"
-                          class="mr-1"
-                        />เอกสาร</span
-                      >
+                    ><span>
+                      <VIcon
+                        size="16"
+                        icon="tabler-file"
+                        style="opacity: 1"
+                        class="mr-1"
+                      />เอกสาร</span>
                     </a>
                     <span v-else>-</span>
                   </VCol>
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>วันที่ส่งแผน : </span>
                     <span>{{
                       it.plan_send_at == null
                         ? "-"
                         : dayjs(it.plan_send_at)
-                            .locale("th")
-                            .format("DD MMMM BBBB")
+                          .locale("th")
+                          .format("DD MMMM BBBB")
                     }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>วันที่อนุมัติแผน : </span>
                     <span>{{
                       it.plan_accept_at == null
                         ? "-"
                         : dayjs(it.plan_accept_at)
-                            .locale("th")
-                            .format("DD MMMM BBBB")
+                          .locale("th")
+                          .format("DD MMMM BBBB")
                     }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="12">
+                  <VCol
+                    cols="12"
+                    md="12"
+                  >
                     <span>ที่อยู่ที่ปฏิบัติงาน : </span>
                     <span>{{ it.workplace_address }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>จังหวัด : </span>
                     <span>{{ it.workplace_province_id }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>อำเภอ/เขต : </span>
                     <span>{{ it.workplace_amphur_id }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ตำบล/แขวง : </span>
                     <span>{{ it.workplace_tumbol_id }}</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ลิงค์แผนที่ : </span>
                     <a
                       v-if="it.workplace_googlemap_url"
@@ -1299,13 +1567,15 @@ onMounted(() => {
                           icon="tabler-map-pin"
                           style="opacity: 1"
                           class="mr-1"
-                        />Map</span
-                      >
+                        />Map</span>
                     </a>
                     <span v-else>-</span>
                   </VCol>
 
-                  <VCol cols="12" md="6">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <span>ภาพแผนที่ : </span>
                     <VImg
                       v-if="it.workplace_googlemap_file"
@@ -1313,33 +1583,56 @@ onMounted(() => {
                     />
                     <span v-else>-</span>
                   </VCol>
-                  <VDivider></VDivider>
+                  <VDivider />
 
-                  <VCol cols="12" md="6" class="text-error">
+                  <VCol
+                    cols="12"
+                    md="6"
+                    class="text-error"
+                  >
                     <VRow>
-                      <VCol cols="12" md="12">
+                      <VCol
+                        cols="12"
+                        md="12"
+                      >
                         <h4>Remark</h4>
                       </VCol>
                     </VRow>
-                    <VRow v-for="(rl, index) in it.reject_log" :key="index">
-                      <VCol cols="12" md="4" v-if="rl.reject_status_id > 4">
-                        <h4 class="mb-0 d-inline mr-1 text-error">วันที่ :</h4>
+                    <VRow
+                      v-for="(rl, index) in it.reject_log"
+                      :key="index"
+                    >
+                      <VCol
+                        v-if="rl.reject_status_id > 4"
+                        cols="12"
+                        md="4"
+                      >
+                        <h4 class="mb-0 d-inline mr-1 text-error">
+                          วันที่ :
+                        </h4>
                         <span>
                           {{
                             dayjs(rl.created_at)
                               .locale("th")
                               .format("DD MMM BB")
-                          }}</span
-                        >
+                          }}</span>
                       </VCol>
-                      <VCol cols="12" md="8" v-if="rl.reject_status_id > 4">
+                      <VCol
+                        v-if="rl.reject_status_id > 4"
+                        cols="12"
+                        md="8"
+                      >
                         <h4 class="mb-0 d-inline mr-1 text-error">
                           รายละเอียด :
                         </h4>
                         <span> {{ rl.comment }}</span>
                       </VCol>
-                      <VCol cols="12" md="12" v-if="rl.reject_status_id > 4">
-                        <hr style="border: solid #eee 1px" />
+                      <VCol
+                        v-if="rl.reject_status_id > 4"
+                        cols="12"
+                        md="12"
+                      >
+                        <hr style="border: solid #eee 1px">
                       </VCol>
                     </VRow>
                   </VCol>
@@ -1353,7 +1646,11 @@ onMounted(() => {
                 :disabled="currentStep === 0"
                 @click="currentStep--"
               >
-                <VIcon icon="tabler-chevron-left" start class="flip-in-rtl" />
+                <VIcon
+                  icon="tabler-chevron-left"
+                  start
+                  class="flip-in-rtl"
+                />
                 Previous
               </VBtn>
               <VBtn
@@ -1361,7 +1658,11 @@ onMounted(() => {
                 @click="currentStep++"
               >
                 Next
-                <VIcon icon="tabler-chevron-right" end class="flip-in-rtl" />
+                <VIcon
+                  icon="tabler-chevron-right"
+                  end
+                  class="flip-in-rtl"
+                />
               </VBtn>
             </div>
           </VCardText>
@@ -1376,7 +1677,12 @@ onMounted(() => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
@@ -1390,7 +1696,11 @@ onMounted(() => {
     </VOverlay>
 
     <!-- Dialog -->
-    <VDialog v-model="isDialogVisible" persistent class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogVisible"
+      persistent
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" />
 
@@ -1399,24 +1709,42 @@ onMounted(() => {
         <VCardText> ยืนยันการอนุมัติ </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn @click="isDialogVisible = !isDialogVisible" color="error">
+          <VBtn
+            color="error"
+            @click="isDialogVisible = !isDialogVisible"
+          >
             Cancel
           </VBtn>
-          <VBtn @click="onSubmit()" color="success"> Approve </VBtn>
+          <VBtn
+            color="success"
+            @click="onSubmit"
+          >
+            Approve
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
 
-    <VDialog v-model="isDialogRejectVisible" persistent class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogRejectVisible"
+      persistent
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogRejectVisible = !isDialogRejectVisible" />
 
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์มส่งข้อมูลกลับให้แก้ไข">
         <VCardText>
-          <VCol cols="12" md="12" class="align-items-center">
-            <label class="v-label font-weight-bold" for="comment"
-              >ระบุเหตุผล :
+          <VCol
+            cols="12"
+            md="12"
+            class="align-items-center"
+          >
+            <label
+              class="v-label font-weight-bold"
+              for="comment"
+            >ระบุเหตุผล :
             </label>
             <AppTextarea
               id="comment"
@@ -1429,17 +1757,32 @@ onMounted(() => {
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
           <VBtn
-            @click="isDialogRejectVisible = !isDialogRejectVisible"
             color="error"
+            @click="isDialogRejectVisible = !isDialogRejectVisible"
           >
             Cancel
           </VBtn>
-          <VBtn @click="onRejectSubmit()" color="success"> Reject </VBtn>
+          <VBtn
+            color="success"
+            @click="onRejectSubmit"
+          >
+            Reject
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
   </div>
 </template>
+
+<style lang="scss">
+.checkout-stepper {
+  .stepper-icon-step {
+    .step-wrapper + svg {
+      margin-inline: 3.5rem !important;
+    }
+  }
+}
+</style>
 
 <route lang="yaml">
 meta:

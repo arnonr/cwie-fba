@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useBookListStore = defineStore("BookListStore", {
   actions: {
@@ -9,8 +9,8 @@ export const useBookListStore = defineStore("BookListStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchSemesters(params) {
@@ -19,8 +19,8 @@ export const useBookListStore = defineStore("BookListStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajors(params) {
@@ -29,8 +29,8 @@ export const useBookListStore = defineStore("BookListStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTeachers(params) {
@@ -39,20 +39,20 @@ export const useBookListStore = defineStore("BookListStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async addRequestBook(dataSend) {
       return await axios.post(`/form/add-request-book`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async addSendBook(dataSend) {
       return await axios.post(`/form/add-send-book`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
   },
-});
+})

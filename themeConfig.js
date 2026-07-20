@@ -1,20 +1,21 @@
-import { breakpointsVuetify } from "@vueuse/core";
-import { VIcon } from "vuetify/components/VIcon";
+import { breakpointsVuetify } from "@vueuse/core"
+import { VIcon } from "vuetify/components/VIcon"
 
 // ❗ Logo SVG must be imported with ?raw suffix
-import { defineThemeConfig } from "@core";
-import { RouteTransitions, Skins } from "@core/enums";
-import logoFBA from "@images/logos/logo-fba.png";
+import { defineThemeConfig } from "@core"
+import { RouteTransitions, Skins } from "@core/enums"
+import logoFBA from "@images/logos/logo-fba.png"
 import {
   AppContentLayoutNav,
   ContentWidth,
   FooterType,
   NavbarType,
-} from "@layouts/enums";
+} from "@layouts/enums"
 
 export const { themeConfig, layoutConfig } = defineThemeConfig({
   app: {
     title: "COOP FBA",
+
     // logo: h('div', { innerHTML: logo, style: 'line-height:0; color: rgb(var(--v-global-theme-primary))' }),
     logo: h("img", {
       src: logoFBA,
@@ -54,4 +55,4 @@ export const { themeConfig, layoutConfig } = defineThemeConfig({
     verticalNavUnPinned: { icon: "tabler-circle" },
     sectionTitlePlaceholder: { icon: "tabler-separator" },
   },
-});
+})

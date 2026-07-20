@@ -14,4 +14,4 @@ export default [
     subject: "MajorHeadUser",
     action: "manage",
   },
-];
+]

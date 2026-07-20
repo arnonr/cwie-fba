@@ -1,49 +1,44 @@
 <script setup>
 // ห
-import StudentView from "@/components/student-view/StudentView.vue";
+import StudentView from "@/components/student-view/StudentView.vue"
 import {
   class_rooms,
   class_years,
   statuses,
   form_statuses,
   statusShow,
-} from "@/data-constant/data";
-import { useStudentListStore } from "./useStudentListStore";
-import axios from "@axios";
-import { useConfigDefaultStore } from "../../store/configDefault";
-const configDefaultStore = useConfigDefaultStore();
-if (configDefaultStore.config == undefined) {
-  configDefaultStore.fetchConfig().then(() => {
-    if (props.user_type != "major-head") {
-      fetchSemesters();
-    } else {
-      fetchMajorHeads();
-    }
-  });
-}
+} from "@/data-constant/data"
+import { useStudentListStore } from "./useStudentListStore"
+import axios from "@axios"
+import { useConfigDefaultStore } from "../../store/configDefault"
 
-const studentListStore = useStudentListStore();
+const props = defineProps(["user_type"])
 
-const props = defineProps(["user_type"]);
 
-const rowPerPage = ref(20);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const isOverlay = ref(true);
-const orderBy = ref("student.id");
-const order = ref("desc");
-const isDialogViewStudent = ref(false);
+const configDefaultStore = useConfigDefaultStore()
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
 
-const checkSemester = ref(true);
-const items = ref([]);
-const provinces = ref([]);
-const view_student_id = ref(null);
-const major = ref([]); // สำหรับประธานอาจารย์นิเทศ
+const studentListStore = useStudentListStore()
+
+const rowPerPage = ref(20)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const isOverlay = ref(true)
+const orderBy = ref("student.id")
+const order = ref("desc")
+const isDialogViewStudent = ref(false)
+
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
+
+const checkSemester = ref(true)
+const items = ref([])
+const provinces = ref([])
+const view_student_id = ref(null)
+const major = ref([]) // สำหรับประธานอาจารย์นิเทศ
+
 const advancedSearch = reactive({
   semester_id: "",
   status_id: "",
@@ -59,7 +54,7 @@ const advancedSearch = reactive({
   province_id: "",
   approve_status: "",
   plan_status: "",
-});
+})
 
 const selectOptions = ref({
   perPage: [
@@ -78,76 +73,79 @@ const selectOptions = ref({
     { title: "รออนุมัติแผน", value: 1 },
     { title: "อนุมัติแผนเรียบร้อย", value: 2 },
   ],
-});
+})
 
-let teacherData = null;
+let teacherData = null
 
 if (props.user_type == "teacher") {
-  teacherData = JSON.parse(localStorage.getItem("teacherData"));
-  advancedSearch.advisor_id = teacherData.id;
+  teacherData = JSON.parse(localStorage.getItem("teacherData"))
+  advancedSearch.advisor_id = teacherData.id
 
   selectOptions.value.approve_statuses = [
     { title: "รอที่ปรึกษาอนุมัติ", value: 1 },
     { title: "ที่ปรึกษาอนุมัติเรียบร้อย", value: 2 },
-  ];
+  ]
 } else if (props.user_type == "major-head") {
-  teacherData = JSON.parse(localStorage.getItem("teacherData"));
+  teacherData = JSON.parse(localStorage.getItem("teacherData"))
   selectOptions.value.approve_statuses = [
     { title: "รอประธานอาจารย์นิเทศอนุมัติ", value: 3 },
     { title: "ประธานอาจารย์นิเทศอนุมัติเรียบร้อย", value: 4 },
-  ];
+  ]
+
   // fetchMajorHeads();
 } else if (props.user_type == "supervisor") {
-  selectOptions.value.approve_statuses = [];
+  selectOptions.value.approve_statuses = []
+
   //
 } else if (props.user_type == "chairman") {
-  selectOptions.value.approve_statuses = [];
+  selectOptions.value.approve_statuses = []
 } else {
   selectOptions.value.approve_statuses = [
     { title: "รอคณะอนุมัติ", value: 5 },
     { title: "คณะอนุมัติเรียบร้อย", value: 6 },
-  ];
+  ]
 }
 
 const fetchSemesters = () => {
-  let search = {};
+  let search = {}
 
   if (checkSemester.value == false) {
-    return;
+    return
   }
   if (props.user_type == "chairman") {
-    search["chairman_id"] = JSON.parse(localStorage.getItem("teacherData")).id;
+    search["chairman_id"] = JSON.parse(localStorage.getItem("teacherData")).id
   }
   studentListStore
     .fetchSemesters(search)
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.semesters = response.data.data.map((r) => {
+        selectOptions.value.semesters = response.data.data.map(r => {
           if (configDefaultStore.config) {
             advancedSearch.semester_id =
-              configDefaultStore.config.staff_year_default;
+              configDefaultStore.config.staff_year_default
           } else {
             if (r.is_current == 1) {
-              advancedSearch.semester_id = r.id;
+              advancedSearch.semester_id = r.id
             }
           }
+          
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
             value: r.id,
             start_date: r.start_date,
             end_date: r.end_date,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchMajorHeads = () => {
   studentListStore
@@ -155,31 +153,32 @@ const fetchMajorHeads = () => {
       teacher_id: teacherData.id,
       perPage: 100,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        let semester = response.data.data.map((r) => {
-          console.log(r.semester_id);
-          return r.semester_id;
-        });
+        let semester = response.data.data.map(r => {
+          console.log(r.semester_id)
+          
+          return r.semester_id
+        })
 
-        major.value = response.data.data.map((r) => {
-          return r.major_id;
-        });
+        major.value = response.data.data.map(r => {
+          return r.major_id
+        })
 
         if (semester.length == 0) {
-          checkSemester.value = false;
+          checkSemester.value = false
         }
-        fetchSemesters();
-        fetchItems();
+        fetchSemesters()
+        fetchItems()
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 // if (props.user_type != "major-head") {
 //   fetchSemesters();
@@ -189,73 +188,76 @@ const fetchMajorHeads = () => {
 const fetchTeachers = () => {
   studentListStore
     .fetchTeachers({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.teachers = response.data.data.map((r) => {
+        selectOptions.value.teachers = response.data.data.map(r => {
           return {
             title: r.prefix + r.firstname + " " + r.surname,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchTeachers();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchTeachers()
 
 // เฉพาะเมนูของคณะและประธานบริหาร
 const fetchMajors = () => {
   studentListStore
     .fetchMajors({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.majors = response.data.data.map((r) => {
+        selectOptions.value.majors = response.data.data.map(r => {
           return {
             title: r.name_th,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchMajors();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchMajors()
 
 // 👉 Fetching
 const fetchProvince = async () => {
   let res = await axios.get("/province", {
     validateStatus: () => true,
-  });
-  provinces.value = res.data.data;
-};
-fetchProvince();
+  })
+  provinces.value = res.data.data
+}
+
+fetchProvince()
 
 const fetchItems = () => {
   let search = {
     ...advancedSearch,
-  };
+  }
 
   if (advancedSearch.semester_id != "") {
     if (props.user_type == "major-head") {
-      search["major_id_array"] = major.value;
+      search["major_id_array"] = major.value
     }
 
     if (props.user_type == "supervisor") {
       search["supervision_id"] = JSON.parse(
-        localStorage.getItem("teacherData")
-      ).id;
+        localStorage.getItem("teacherData"),
+      ).id
     }
 
     studentListStore
@@ -268,44 +270,61 @@ const fetchItems = () => {
         includeAll: true,
         includeForm: true,
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
-          items.value = response.data.data;
-          totalPage.value = response.data.totalPage;
-          totalItems.value = response.data.totalData;
-          isOverlay.value = false;
+          items.value = response.data.data
+          totalPage.value = response.data.totalPage
+          totalItems.value = response.data.totalData
+          isOverlay.value = false
         } else {
-          console.log("error");
+          console.log("error")
         }
       })
-      .catch((error) => {
-        console.error(error);
-        isOverlay.value = false;
-      });
+      .catch(error => {
+        console.error(error)
+        isOverlay.value = false
+      })
   }
-};
+}
 
-const getProvince = (province_id) => {
-  if (province_id == null) return "";
-  let res = provinces.value.find((e) => {
-    return e.province_id == province_id;
-  });
-  return res.name_th;
-};
+const getProvince = province_id => {
+  if (province_id == null) return ""
+  let res = provinces.value.find(e => {
+    return e.province_id == province_id
+  })
+  
+  return res.name_th
+}
 
-watchEffect(fetchItems);
+watchEffect(fetchItems)
 
 watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value
+})
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
 const refreshData = () => {
-  fetchItems();
-};
+  fetchItems()
+}
+
+if (configDefaultStore.config == undefined) {
+  configDefaultStore.fetchConfig().then(() => {
+    if (props.user_type != "major-head") {
+      fetchSemesters()
+    } else {
+      fetchMajorHeads()
+    }
+  })
+} else {
+  if (props.user_type != "major-head") {
+    fetchSemesters()
+  } else {
+    fetchMajorHeads()
+  }
+}
 </script>
 
 <template>
@@ -315,20 +334,26 @@ const refreshData = () => {
       <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Search -->
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="จำนวนรายการ/page"
               v-model="rowPerPage"
+              label="จำนวนรายการ/page"
               density="compact"
               variant="outlined"
               :items="selectOptions.perPage"
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="8">
+          <VCol
+            cols="12"
+            sm="8"
+          >
             <VSelect
-              label="ปีการศึกษา"
               v-model="advancedSearch.semester_id"
+              label="ปีการศึกษา"
               density="compact"
               variant="outlined"
               clearable
@@ -336,10 +361,14 @@ const refreshData = () => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="4" v-if="props.user_type != 'supervisor'">
+          <VCol
+            v-if="props.user_type != 'supervisor'"
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="สถานะการอนุมัติ"
               v-model="advancedSearch.approve_status"
+              label="สถานะการอนุมัติ"
               density="compact"
               variant="outlined"
               clearable
@@ -348,10 +377,14 @@ const refreshData = () => {
           </VCol>
           <VSpacer />
 
-          <VCol cols="12" sm="4" v-if="props.user_type == 'staff'">
+          <VCol
+            v-if="props.user_type == 'staff'"
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="สถานะ"
               v-model="advancedSearch.status_id"
+              label="สถานะ"
               density="compact"
               variant="outlined"
               clearable
@@ -361,34 +394,43 @@ const refreshData = () => {
           <VSpacer />
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'supervisor'"
             cols="12"
             sm="4"
-            v-if="props.user_type == 'staff' || props.user_type == 'supervisor'"
           >
             <VSelect
-              label="สถานะแผนการปฏิบัติงาน"
               v-model="advancedSearch.plan_status"
+              label="สถานะแผนการปฏิบัติงาน"
               density="compact"
               variant="outlined"
               clearable
               :items="selectOptions.plan_statuses"
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.student_code"
               label="รหัสนักศึกษา"
               density="compact"
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.firstname"
               label="ชื่อ"
               density="compact"
             />
           </VCol>
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VTextField
               v-model="advancedSearch.surname"
               label="นามสกุล"
@@ -396,13 +438,13 @@ const refreshData = () => {
             />
           </VCol>
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="4"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <VSelect
-              label="สาขาวิชา"
               v-model="advancedSearch.major_id"
+              label="สาขาวิชา"
               density="compact"
               variant="outlined"
               clearable
@@ -410,10 +452,13 @@ const refreshData = () => {
             />
           </VCol>
 
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="ชั้นปี"
               v-model="advancedSearch.class_year"
+              label="ชั้นปี"
               density="compact"
               variant="outlined"
               clearable
@@ -421,10 +466,14 @@ const refreshData = () => {
             />
           </VCol>
 
-          <VCol cols="12" sm="4" v-if="props.user_type != 'chairman'">
+          <VCol
+            v-if="props.user_type != 'chairman'"
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="ห้อง"
               v-model="advancedSearch.class_room"
+              label="ห้อง"
               density="compact"
               variant="outlined"
               clearable
@@ -433,9 +482,9 @@ const refreshData = () => {
           </VCol>
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="6"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <AppAutocomplete
               v-model="advancedSearch.advisor_id"
@@ -449,9 +498,9 @@ const refreshData = () => {
           </VCol>
 
           <VCol
+            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
             cols="12"
             sm="6"
-            v-if="props.user_type == 'staff' || props.user_type == 'chairman'"
           >
             <AppAutocomplete
               v-model="advancedSearch.supervision_id"
@@ -464,10 +513,13 @@ const refreshData = () => {
             />
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <VTextField
-              label="สถานประกอบการ"
               v-model="advancedSearch.company_name"
+              label="สถานประกอบการ"
               density="compact"
             />
           </VCol>
@@ -476,46 +528,85 @@ const refreshData = () => {
       <VCardItem class="list-table">
         <VRow>
           <!-- Table -->
-          <VCol cols="12" md="12" sm="12">
+          <VCol
+            cols="12"
+            md="12"
+            sm="12"
+          >
             <VTable
-              class=""
               v-if="
                 selectOptions.semesters.length != 0 ||
-                props.user_type == 'staff'
+                  props.user_type == 'staff'
               "
+              class=""
             >
               <!-- 👉 table head -->
               <thead>
                 <tr>
-                  <th scope="col" class="font-weight-bold">รหัสนักศึกษา</th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="font-weight-bold"
+                  >
+                    รหัสนักศึกษา
+                  </th>
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ชื่อ-นามสกุล
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สาขาวิชา
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     ชั้นปี
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">ห้อง</th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
+                    ห้อง
+                  </th>
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สถานประกอบการ
                   </th>
 
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จังหวัด
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     สถานะ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จัดการ
                   </th>
                 </tr>
               </thead>
               <!-- 👉 table body -->
               <tbody>
-                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
+                <tr
+                  v-for="it in items"
+                  :key="it.id"
+                  style="height: 3.75rem"
+                >
                   <td>
                     <span>
                       {{ it.student_code }}
@@ -528,11 +619,17 @@ const refreshData = () => {
                     {{ it.major_name }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
                     {{ it.class_year }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
                     {{ it.class_room }}
                   </td>
 
@@ -544,18 +641,29 @@ const refreshData = () => {
                     {{ getProvince(it.response_province_id) }}
                   </td>
 
-                  <td class="text-center" style="min-width: 100px">
-                    <VChip label :color="form_statuses[it.status_id]">{{
-                      statusShow(
-                        it.status_id,
-                        it.request_document_date,
-                        it.confirm_response_at
-                      )
-                    }}</VChip>
+                  <td
+                    class="text-center"
+                    style="min-width: 100px"
+                  >
+                    <VChip
+                      label
+                      :color="form_statuses[it.status_id]"
+                    >
+                      {{
+                        statusShow(
+                          it.status_id,
+                          it.request_document_date,
+                          it.confirm_response_at
+                        )
+                      }}
+                    </VChip>
                   </td>
 
                   <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px">
+                  <td
+                    class="text-center"
+                    style="min-width: 80px"
+                  >
                     <VBtn
                       color="info"
                       target="_blank"
@@ -566,12 +674,14 @@ const refreshData = () => {
                         }
                       "
                     >
-                      <!-- :to="{
+                      <!--
+                        :to="{
                         name: 'staff-students-view-id',
                         params: { id: it.id },
-                      }" -->
-                      View</VBtn
-                    >
+                        }" 
+                      -->
+                      View
+                    </VBtn>
                   </td>
                 </tr>
               </tbody>
@@ -579,14 +689,22 @@ const refreshData = () => {
               <!-- 👉 table footer  -->
               <tfoot v-show="!items.length">
                 <tr>
-                  <td colspan="7" class="text-center">No data available</td>
+                  <td
+                    colspan="7"
+                    class="text-center"
+                  >
+                    No data available
+                  </td>
                 </tr>
               </tfoot>
-              <tfoot v-show="items.length"></tfoot>
+              <tfoot v-show="items.length" />
             </VTable>
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <span class="text-sm text-disabled">
               Showing {{ currentPage }} to {{ totalPage }} of
               {{ totalItems }} entries
@@ -609,11 +727,20 @@ const refreshData = () => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
-    <VOverlay v-model="isOverlay" contained class="align-center justify-center">
+    <VOverlay
+      v-model="isOverlay"
+      contained
+      class="align-center justify-center"
+    >
       <VProgressCircular indeterminate />
     </VOverlay>
 
@@ -634,7 +761,8 @@ const refreshData = () => {
             :student_id="view_student_id"
             @refresh-data="refreshData"
             @close="isDialogViewStudent = false"
-        /></VCardText>
+          />
+        </VCardText>
       </VCard>
     </VDialog>
   </div>

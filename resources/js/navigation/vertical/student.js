@@ -22,4 +22,4 @@ export default [
     action: "manage",
     subject: "StudentUser",
   },
-];
+]

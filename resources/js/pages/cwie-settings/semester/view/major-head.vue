@@ -1,38 +1,38 @@
 <script setup>
-import { requiredValidator } from "@validators";
-import { useMajorHeadStore } from "./useMajorHeadStore";
+import { requiredValidator } from "@validators"
+import { useMajorHeadStore } from "./useMajorHeadStore"
 
-const majorHeadStore = useMajorHeadStore();
-const route = useRoute();
-const router = useRouter();
+const props = defineProps(["semester_year", "semester_id"])
+const majorHeadStore = useMajorHeadStore()
+const route = useRoute()
+const router = useRouter()
 
-const props = defineProps(["semester_year", "semester_id"]);
-const semester_year = ref(props.semester_year);
-const semester_id = ref(props.semester_id);
-
-watchEffect(() => {
-  semester_year.value = props.semester_year;
-});
+const semester_year = ref(props.semester_year)
+const semester_id = ref(props.semester_id)
 
 watchEffect(() => {
-  semester_id.value = props.semester_id;
-});
+  semester_year.value = props.semester_year
+})
 
-const rowPerPage = ref(20);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const items = ref([]);
-const item = ref({});
-const isOverlay = ref(true);
-const orderBy = ref("id");
-const order = ref("asc");
+watchEffect(() => {
+  semester_id.value = props.semester_id
+})
 
-const refForm = ref();
-const isFormValid = ref(false);
+const rowPerPage = ref(20)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const items = ref([])
+const item = ref({})
+const isOverlay = ref(true)
+const orderBy = ref("id")
+const order = ref("asc")
 
-const isDialogVisible = ref(false);
-const isDialogDelVisible = ref(false);
+const refForm = ref()
+const isFormValid = ref(false)
+
+const isDialogVisible = ref(false)
+const isDialogDelVisible = ref(false)
 
 const selectOptions = ref({
   perPage: [{ title: "20", value: 20 }],
@@ -42,50 +42,52 @@ const selectOptions = ref({
     { title: "มาก -> น้อย", value: "desc" },
   ],
   departments: [],
-});
+})
 
 const fetchMajors = () => {
   majorHeadStore
     .fetchMajors({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.majors = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.majors = response.data.data.map(r => {
+          return { title: r.name_th, value: r.id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchMajors();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchMajors()
 
 const fetchTeachers = () => {
   majorHeadStore
     .fetchTeachers({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.teachers = response.data.data.map((r) => {
+        selectOptions.value.teachers = response.data.data.map(r => {
           return {
             title: r.prefix + r.firstname + " " + r.surname,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchTeachers();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchTeachers()
 
 // 👉 Fetching
 const fetchItems = () => {
@@ -98,39 +100,39 @@ const fetchItems = () => {
       semester_id: route.params.id,
       includeAll: true,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        items.value = response.data.data;
-        totalPage.value = response.data.totalPage;
-        totalItems.value = response.data.totalData;
-        isOverlay.value = false;
+        items.value = response.data.data
+        totalPage.value = response.data.totalPage
+        totalItems.value = response.data.totalData
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
-watchEffect(fetchItems);
+watchEffect(fetchItems)
 
 // 👉 watching current page
 watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value
+})
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
 const onSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
 
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
@@ -140,83 +142,86 @@ const onSubmit = () => {
             ...item.value,
             semester_id: semester_id.value,
           })
-          .then((response) => {
+          .then(response => {
             if (response.status === 200) {
-              isDialogVisible.value = false;
-              snackbarText.value = "Updated Major Head";
-              snackbarColor.value = "success";
-              isSnackbarVisible.value = true;
+              isDialogVisible.value = false
+              snackbarText.value = "Updated Major Head"
+              snackbarColor.value = "success"
+              isSnackbarVisible.value = true
 
-              fetchItems();
+              fetchItems()
             } else {
-              isOverlay.value = false;
-              console.log("error");
+              isOverlay.value = false
+              console.log("error")
             }
           })
-          .catch((error) => {
-            console.error(error);
-          });
+          .catch(error => {
+            console.error(error)
+          })
       } else {
         majorHeadStore
           .addMajorHead({
             ...item.value,
             semester_id: semester_id.value,
           })
-          .then((response) => {
+          .then(response => {
             if (response.status === 200) {
-              isDialogVisible.value = false;
-              snackbarText.value = "Added Major Head";
-              snackbarColor.value = "success";
-              isSnackbarVisible.value = true;
+              isDialogVisible.value = false
+              snackbarText.value = "Added Major Head"
+              snackbarColor.value = "success"
+              isSnackbarVisible.value = true
 
-              fetchItems();
+              fetchItems()
             } else {
-              isOverlay.value = false;
-              console.log("error");
+              isOverlay.value = false
+              console.log("error")
             }
           })
-          .catch((error) => {
-            console.error(error);
-          });
+          .catch(error => {
+            console.error(error)
+          })
       }
     }
-    isOverlay.value = false;
-  });
-};
+    isOverlay.value = false
+  })
+}
 
-const onDelete = (id) => {
-  isOverlay.value = true;
+const onDelete = id => {
+  isOverlay.value = true
   majorHeadStore
     .deleteMajorHead({
       id: id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        isDialogDelVisible.value = false;
-        snackbarText.value = "Deleted Major Head";
-        snackbarColor.value = "success";
-        isSnackbarVisible.value = true;
-        fetchItems();
-        isOverlay.value = false;
+        isDialogDelVisible.value = false
+        snackbarText.value = "Deleted Major Head"
+        snackbarColor.value = "success"
+        isSnackbarVisible.value = true
+        fetchItems()
+        isOverlay.value = false
       } else {
-        console.log("error");
-        isOverlay.value = false;
+        console.log("error")
+        isOverlay.value = false
       }
     })
-    .catch((error) => {
-      isOverlay.value = false;
-      snackbarText.value = error.response.data.error.message;
-      snackbarColor.value = "error";
-      isSnackbarVisible.value = true;
-    });
-};
+    .catch(error => {
+      isOverlay.value = false
+      snackbarText.value = error.response.data.error.message
+      snackbarColor.value = "error"
+      isSnackbarVisible.value = true
+    })
+}
 </script>
 
 <template>
   <div>
     <!-- Table -->
     <VRow>
-      <VCol cols="12" class="mb-2 text-right">
+      <VCol
+        cols="12"
+        class="mb-2 text-right"
+      >
         <VBtn
           color="primary"
           @click="
@@ -228,8 +233,8 @@ const onDelete = (id) => {
             }
           "
         >
-          ADD Teacher</VBtn
-        >
+          ADD Teacher
+        </VBtn>
       </VCol>
     </VRow>
     <VCard>
@@ -239,23 +244,41 @@ const onDelete = (id) => {
       <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Table -->
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <VTable class="text-no-wrap">
               <!-- 👉 table head -->
               <thead>
                 <tr>
-                  <th scope="col" class="font-weight-bold">สาขาวิชา</th>
-                  <th scope="col" class="font-weight-bold">
+                  <th
+                    scope="col"
+                    class="font-weight-bold"
+                  >
+                    สาขาวิชา
+                  </th>
+                  <th
+                    scope="col"
+                    class="font-weight-bold"
+                  >
                     ประธานอาจารย์นิเทศ
                   </th>
-                  <th scope="col" class="text-center font-weight-bold">
+                  <th
+                    scope="col"
+                    class="text-center font-weight-bold"
+                  >
                     จัดการ
                   </th>
                 </tr>
               </thead>
               <!-- 👉 table body -->
               <tbody>
-                <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
+                <tr
+                  v-for="it in items"
+                  :key="it.id"
+                  style="height: 3.75rem"
+                >
                   <!-- 👉 User -->
                   <td>
                     <span>
@@ -266,7 +289,10 @@ const onDelete = (id) => {
                     {{ it.teacher_name }}
                   </td>
                   <!-- 👉 Actions -->
-                  <td class="text-center" style="min-width: 80px">
+                  <td
+                    class="text-center"
+                    style="min-width: 80px"
+                  >
                     <VBtn
                       color="success"
                       class="ml-1"
@@ -277,8 +303,8 @@ const onDelete = (id) => {
                         }
                       "
                     >
-                      Edit</VBtn
-                    >
+                      Edit
+                    </VBtn>
 
                     <VBtn
                       color="error"
@@ -291,7 +317,10 @@ const onDelete = (id) => {
                         }
                       "
                     >
-                      <VIcon icon="tabler-trash" size="22" />
+                      <VIcon
+                        icon="tabler-trash"
+                        size="22"
+                      />
                     </VBtn>
                   </td>
                 </tr>
@@ -300,10 +329,15 @@ const onDelete = (id) => {
               <!-- 👉 table footer  -->
               <tfoot v-show="!items.length">
                 <tr>
-                  <td colspan="7" class="text-center">No data available</td>
+                  <td
+                    colspan="7"
+                    class="text-center"
+                  >
+                    No data available
+                  </td>
                 </tr>
               </tfoot>
-              <tfoot v-show="items.length"></tfoot>
+              <tfoot v-show="items.length" />
             </VTable>
           </VCol>
         </VRow>
@@ -317,7 +351,12 @@ const onDelete = (id) => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
@@ -332,14 +371,22 @@ const onDelete = (id) => {
     <!-- </section> -->
 
     <!-- Form Dialog -->
-    <VDialog v-model="isDialogVisible" persistent class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogVisible"
+      persistent
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" />
 
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์ม เลือกประธานอาจารย์นิเทศ">
         <VCardItem>
-          <VForm ref="refForm" v-model="isFormValid" @submit.prevent="onSubmit">
+          <VForm
+            ref="refForm"
+            v-model="isFormValid"
+            @submit.prevent="onSubmit"
+          >
             <VRow>
               <VCol cols="12">
                 <AppTextField
@@ -351,34 +398,40 @@ const onDelete = (id) => {
                 />
               </VCol>
 
-              <VCol cols="12" md="12">
+              <VCol
+                cols="12"
+                md="12"
+              >
                 <label
                   class="v-label font-weight-bold"
                   for="major_id"
                   cols="12"
                   md="12"
-                  >สาขาวิชา :
+                >สาขาวิชา :
                 </label>
                 <AppSelect
-                  :items="selectOptions.majors"
                   v-model="item.major_id"
+                  :items="selectOptions.majors"
                   :rules="[requiredValidator]"
                   variant="outlined"
                   placeholder="Major"
                 />
               </VCol>
 
-              <VCol cols="12" md="12">
+              <VCol
+                cols="12"
+                md="12"
+              >
                 <label
                   class="v-label font-weight-bold"
                   for="teacher_id"
                   cols="12"
                   md="12"
-                  >ประธานอาจารย์นิเทศ :
+                >ประธานอาจารย์นิเทศ :
                 </label>
                 <AppSelect
-                  :items="selectOptions.teachers"
                   v-model="item.teacher_id"
+                  :items="selectOptions.teachers"
                   :rules="[requiredValidator]"
                   variant="outlined"
                   placeholder="Teacher"
@@ -396,13 +449,21 @@ const onDelete = (id) => {
           >
             Close
           </VBtn>
-          <VBtn type="submit" @click="onSubmit"> Save </VBtn>
+          <VBtn
+            type="submit"
+            @click="onSubmit"
+          >
+            Save
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
 
     <!-- Del Dialog -->
-    <VDialog v-model="isDialogDelVisible" class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogDelVisible"
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogDelVisible = !isDialogDelVisible" />
 
@@ -418,7 +479,12 @@ const onDelete = (id) => {
           >
             Cancel
           </VBtn>
-          <VBtn @click="onDelete(item.id)" color="error"> Delete </VBtn>
+          <VBtn
+            color="error"
+            @click="onDelete(item.id)"
+          >
+            Delete
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

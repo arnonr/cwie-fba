@@ -1,11 +1,12 @@
 <script setup>
-import { requiredValidator } from "@validators";
-import { useRoute, useRouter } from "vue-router";
-import { useTeacherStore } from "./useTeacherStore";
+import { requiredValidator } from "@validators"
+import { useRoute, useRouter } from "vue-router"
+import { useTeacherStore } from "./useTeacherStore"
+
 // const route = useRoute();
-const route = useRoute();
-const router = useRouter();
-const teacherStore = useTeacherStore();
+const route = useRoute()
+const router = useRouter()
+const teacherStore = useTeacherStore()
 
 const item = ref({
   id: null,
@@ -24,11 +25,11 @@ const item = ref({
   amphur_id: "",
   tumbol_id: "",
   active: 1,
-});
+})
 
-const isOverlay = ref(false);
-const isFormValid = ref(false);
-const refForm = ref();
+const isOverlay = ref(false)
+const isFormValid = ref(false)
+const refForm = ref()
 
 const selectOptions = ref({
   provinces: [],
@@ -42,99 +43,100 @@ const selectOptions = ref({
     { title: "No", value: 0 },
     { title: "Yes", value: 1 },
   ],
-});
+})
 
 const fetchProvinces = () => {
   teacherStore
     .fetchProvinces({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.provinces = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.province_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.provinces = response.data.data.map(r => {
+          return { title: r.name_th, value: r.province_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchProvinces();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchProvinces()
 
 const fetchAmphurs = () => {
   teacherStore
     .fetchAmphurs({
       province_id: item.value.province_id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.amphurs = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.amphur_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.amphurs = response.data.data.map(r => {
+          return { title: r.name_th, value: r.amphur_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchTumbols = () => {
   teacherStore
     .fetchTumbols({
       amphur_id: item.value.amphur_id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.tumbols = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.tumbol_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.tumbols = response.data.data.map(r => {
+          return { title: r.name_th, value: r.tumbol_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 watch(
   () => item.value.province_id,
   (value, oldValue) => {
     if (value != null) {
-      fetchAmphurs();
+      fetchAmphurs()
       if (oldValue != "") {
-        item.value.amphur_id = null;
-        item.value.tumbol_id = null;
+        item.value.amphur_id = null
+        item.value.tumbol_id = null
       }
-      console.log(item.value.amphur_id);
+      console.log(item.value.amphur_id)
     }
-  }
-);
+  },
+)
 
 watch(
   () => item.value.amphur_id,
   (value, oldValue) => {
     if (value != null) {
-      fetchTumbols();
+      fetchTumbols()
       if (oldValue != "") {
-        item.value.tumbol_id = null;
+        item.value.tumbol_id = null
       }
     }
-    console.log(value);
-  }
-);
+    console.log(value)
+  },
+)
 
 const onSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
       teacherStore
@@ -149,56 +151,73 @@ const onSubmit = () => {
               ? item.value.location_file[0]
               : null,
         })
-        .then((response) => {
+        .then(response => {
           if (response.data.message == "success") {
-            localStorage.setItem("added", 1);
+            localStorage.setItem("added", 1)
             nextTick(() => {
               router.push({
                 path: "/cwie-settings/teacher/view/" + response.data.data.id,
-              });
-            });
+              })
+            })
           } else {
-            isOverlay.value = false;
-            console.log("error");
+            isOverlay.value = false
+            console.log("error")
           }
         })
-        .catch((error) => {
-          console.error(error);
+        .catch(error => {
+          console.error(error)
+
           //   isOverlay.value = false;
-        });
+        })
     }
-    isOverlay.value = false;
-  });
-};
+    isOverlay.value = false
+  })
+}
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 </script>
 
 <template>
   <div>
     <VCard title="เพิ่มสถานประกอบการ">
       <VCardItem>
-        <VForm ref="refForm" v-model="isFormValid" @submit.prevent="onSubmit">
+        <VForm
+          ref="refForm"
+          v-model="isFormValid"
+          @submit.prevent="onSubmit"
+        >
           <VRow class="mt-1 mb-1">
-            <VCol cols="12" md="2">
+            <VCol
+              cols="12"
+              md="2"
+            >
               <label class="font-weight-bold">ชื่อบริษัท : </label>
             </VCol>
-            <VCol cols="12" md="10">
+            <VCol
+              cols="12"
+              md="10"
+            >
               <AppTextField
                 id="name_th"
-                :rules="[requiredValidator]"
                 v-model="item.name_th"
+                :rules="[requiredValidator]"
                 placeholder="Name"
                 persistent-placeholder
               />
             </VCol>
 
-            <VCol cols="12" md="2">
+            <VCol
+              cols="12"
+              md="2"
+            >
               <label class="font-weight-bold">ที่อยู่ : </label>
             </VCol>
-            <VCol cols="12" md="10">
+            <VCol
+              cols="12"
+              md="10"
+            >
               <AppTextField
                 id="address"
                 v-model="item.address"
@@ -207,47 +226,61 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="4" class="align-items-center">
+            <VCol
+              cols="12"
+              md="4"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="province_id"
                 cols="12"
                 md="4"
-                >จังหวัด :
+              >จังหวัด :
               </label>
               <AppSelect
-                :items="selectOptions.provinces"
                 v-model="item.province_id"
+                :items="selectOptions.provinces"
                 variant="outlined"
                 placeholder="Province"
                 clearable
               />
             </VCol>
 
-            <VCol cols="12" md="4" class="align-items-center">
+            <VCol
+              cols="12"
+              md="4"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="amphur_id"
                 cols="12"
                 md="4"
-                >อำเภอ/เขต :
+              >อำเภอ/เขต :
               </label>
               <AppSelect
-                :items="selectOptions.amphurs"
                 v-model="item.amphur_id"
+                :items="selectOptions.amphurs"
                 variant="outlined"
                 placeholder="Amphur"
                 clearable
               />
             </VCol>
 
-            <VCol cols="12" md="4" class="align-items-center">
-              <label class="v-label font-weight-bold" for="tumbol_id"
-                >ตำบล/แขวง :
+            <VCol
+              cols="12"
+              md="4"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="tumbol_id"
+              >ตำบล/แขวง :
               </label>
               <AppSelect
-                :items="selectOptions.tumbols"
                 v-model="item.tumbol_id"
+                :items="selectOptions.tumbols"
                 variant="outlined"
                 placeholder="Tumbol"
                 clearable
@@ -255,9 +288,15 @@ onMounted(() => {
             </VCol>
 
             <!--  -->
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="tel"
-                >โทรศัพท์ :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="tel"
+              >โทรศัพท์ :
               </label>
               <AppTextField
                 id="tel"
@@ -267,8 +306,15 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="fax">แฟกซ์ : </label>
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="fax"
+              >แฟกซ์ : </label>
               <AppTextField
                 id="fax"
                 v-model="item.fax"
@@ -277,8 +323,15 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="mail">เมล : </label>
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="mail"
+              >เมล : </label>
               <AppTextField
                 id="email"
                 v-model="item.email"
@@ -287,9 +340,15 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="website"
-                >เว็บไซต์ :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="website"
+              >เว็บไซต์ :
               </label>
               <AppTextField
                 id="website"
@@ -299,36 +358,54 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="2">
+            <VCol
+              cols="12"
+              md="2"
+            >
               <span class="font-weight-bold">นามบัตร : </span>
             </VCol>
 
-            <VCol cols="12" md="10">
+            <VCol
+              cols="12"
+              md="10"
+            >
               <VFileInput
-                label="Upload Namecard"
                 id="namecard_file"
                 v-model="item.namecard_file"
+                label="Upload Namecard"
                 persistent-placeholder
               />
             </VCol>
 
-            <VCol cols="12" md="2">
+            <VCol
+              cols="12"
+              md="2"
+            >
               <span class="font-weight-bold">ภาพ Google Map : </span>
             </VCol>
 
-            <VCol cols="12" md="10">
+            <VCol
+              cols="12"
+              md="10"
+            >
               <VFileInput
-                label="Upload Google Map"
                 id="location_file"
                 v-model="item.location_file"
+                label="Upload Google Map"
                 persistent-placeholder
               />
             </VCol>
 
-            <VCol cols="12" md="2">
+            <VCol
+              cols="12"
+              md="2"
+            >
               <label class="font-weight-bold">ความคิดเห็น : </label>
             </VCol>
-            <VCol cols="12" md="10">
+            <VCol
+              cols="12"
+              md="10"
+            >
               <AppTextField
                 id="comment"
                 v-model="item.comment"
@@ -337,36 +414,59 @@ onMounted(() => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="mail"
-                >Blacklist :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="mail"
+              >Blacklist :
               </label>
               <AppSelect
-                :items="selectOptions.blacklists"
                 v-model="item.blacklist"
+                :items="selectOptions.blacklists"
                 variant="outlined"
                 placeholder="Blacklist"
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="website"
-                >สถานะ :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="website"
+              >สถานะ :
               </label>
               <AppSelect
-                :items="selectOptions.actives"
                 v-model="item.active"
+                :items="selectOptions.actives"
                 variant="outlined"
                 placeholder="Status"
               />
             </VCol>
 
             <!-- 👉 submit and reset button -->
-            <VCol cols="12" md="9" class="d-flex gap-4">
-              <VBtn type="submit" color="success"> Submit </VBtn>
-              <!-- <VBtn color="secondary" variant="tonal" type="reset">
-                      Reset
-                    </VBtn> -->
+            <VCol
+              cols="12"
+              md="9"
+              class="d-flex gap-4"
+            >
+              <VBtn
+                type="submit"
+                color="success"
+              >
+                Submit
+              </VBtn>
+              <!--
+                <VBtn color="secondary" variant="tonal" type="reset">
+                Reset
+                </VBtn> 
+              -->
             </VCol>
             <!--  -->
           </VRow>

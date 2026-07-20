@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useVisitDownloadStore = defineStore("VisitDownloadStore", {
   actions: {
@@ -22,8 +22,8 @@ export const useVisitDownloadStore = defineStore("VisitDownloadStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async fetchMajorHeads(params) {
@@ -32,8 +32,8 @@ export const useVisitDownloadStore = defineStore("VisitDownloadStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async fetchProvinces(params) {
@@ -42,8 +42,8 @@ export const useVisitDownloadStore = defineStore("VisitDownloadStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async fetchAmphurs(params) {
@@ -52,8 +52,8 @@ export const useVisitDownloadStore = defineStore("VisitDownloadStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async fetchTumbols(params) {
@@ -62,27 +62,27 @@ export const useVisitDownloadStore = defineStore("VisitDownloadStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async sendReport(dataSend) {
-      var form_data = new FormData();
+      var form_data = new FormData()
 
       for (var key in dataSend) {
-        form_data.append(key, dataSend[key]);
+        form_data.append(key, dataSend[key])
         if (dataSend[key] == null) {
-          dataSend[key] = "";
+          dataSend[key] = ""
         }
       }
-      form_data.append("_method", "PUT");
+      form_data.append("_method", "PUT")
 
       return await axios.post(`/visit/${dataSend.visit_id}`, form_data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         validateStatus: () => true,
-      });
+      })
     },
   },
-});
+})

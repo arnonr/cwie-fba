@@ -1,33 +1,34 @@
 <script setup>
-import { class_rooms, class_years, statuses } from "@/data-constant/data";
-import { useStudentStore } from "./useStudentStore";
-import { requiredValidator } from "@validators";
+import { class_rooms, class_years, statuses, form_statuses, statusShow, visit_status } from "@/data-constant/data"
+import { useStudentStore } from "./useStudentStore"
+import { requiredValidator } from "@validators"
 
-import VueDatePicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
+import VueDatePicker from "@vuepic/vue-datepicker"
+import "@vuepic/vue-datepicker/dist/main.css"
 
-import { form_statuses, statusShow, visit_status } from "@/data-constant/data";
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import buddhistEra from "dayjs/plugin/buddhistEra";
-dayjs.extend(buddhistEra);
-const studentStore = useStudentStore();
+import dayjs from "dayjs"
+import "dayjs/locale/th"
+import buddhistEra from "dayjs/plugin/buddhistEra"
 
-const rowPerPage = ref(20);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const document = ref({});
-const items = ref([]);
-const isOverlay = ref(true);
-const orderBy = ref("student.id");
-const order = ref("desc");
-const major = ref([]);
-const selectedItem = ref([]);
+dayjs.extend(buddhistEra)
 
-const refAddBook = ref();
-const isAddBookValid = ref(false);
-const isDialogVisible = ref(false);
+const studentStore = useStudentStore()
+
+const rowPerPage = ref(20)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const document = ref({})
+const items = ref([])
+const isOverlay = ref(true)
+const orderBy = ref("student.id")
+const order = ref("desc")
+const major = ref([])
+const selectedItem = ref([])
+
+const refAddBook = ref()
+const isAddBookValid = ref(false)
+const isDialogVisible = ref(false)
 
 const advancedSearch = reactive({
   semester_id: "",
@@ -43,7 +44,7 @@ const advancedSearch = reactive({
   province_id: "",
   visit_status: "",
   book_status: "",
-});
+})
 
 const selectOptions = ref({
   perPage: [
@@ -75,104 +76,109 @@ const selectOptions = ref({
     { title: "รอออกหนังสือขอเข้านิเทศ", value: 31 },
     { title: "ออกหนังสือขอเข้านิเทศแล้ว", value: 4 },
   ],
-});
+})
 
 const fetchProvinces = () => {
   studentStore
     .fetchProvinces({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.provinces = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.province_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.provinces = response.data.data.map(r => {
+          return { title: r.name_th, value: r.province_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchProvinces();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchProvinces()
 
 const fetchSemesters = () => {
   studentStore
     .fetchSemesters({
       perPage: 100,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.semesters = response.data.data.map((r) => {
+        selectOptions.value.semesters = response.data.data.map(r => {
           if (r.is_current == 1) {
-            advancedSearch.semester_id = r.id;
+            advancedSearch.semester_id = r.id
           }
+          
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
             value: r.id,
             start_date: r.start_date,
             end_date: r.end_date,
-          };
-        });
+          }
+        })
 
-        isOverlay.value = false;
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchSemesters();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchSemesters()
 
 const fetchTeachers = () => {
   studentStore
     .fetchTeachers({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.teachers = response.data.data.map((r) => {
+        selectOptions.value.teachers = response.data.data.map(r => {
           return {
             title: r.prefix + r.firstname + " " + r.surname,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchTeachers();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchTeachers()
 
 const fetchMajors = () => {
   studentStore
     .fetchMajors({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.majors = response.data.data.map((r) => {
+        selectOptions.value.majors = response.data.data.map(r => {
           return {
             title: r.name_th,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchMajors();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchMajors()
 
 // 👉 Fetching
 const fetchItems = () => {
@@ -181,7 +187,7 @@ const fetchItems = () => {
       ...advancedSearch,
       includeAll: true,
       major_id_array: major.value,
-    };
+    }
     studentStore
       .fetchListStudents({
         perPage: rowPerPage.value,
@@ -192,79 +198,81 @@ const fetchItems = () => {
         includeForm: true,
         includeVisit: true,
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
-          items.value = response.data.data;
-          totalPage.value = response.data.totalPage;
-          totalItems.value = response.data.totalData;
-          isOverlay.value = false;
+          items.value = response.data.data
+          totalPage.value = response.data.totalPage
+          totalItems.value = response.data.totalData
+          isOverlay.value = false
         } else {
-          console.log("error");
+          console.log("error")
         }
       })
-      .catch((error) => {
-        console.error(error);
-        isOverlay.value = false;
-      });
+      .catch(error => {
+        console.error(error)
+        isOverlay.value = false
+      })
   }
-};
+}
 
-watchEffect(fetchItems);
+watchEffect(fetchItems)
 
 // 👉 watching current page
 watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value
+})
 
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
 
-const responseProvinceName = (response_province_id) => {
+const responseProvinceName = response_province_id => {
   if (response_province_id) {
-    let response_province_select = selectOptions.value.provinces.find((x) => {
-      return x.value == response_province_id;
-    });
-    return response_province_select.title;
+    let response_province_select = selectOptions.value.provinces.find(x => {
+      return x.value == response_province_id
+    })
+    
+    return response_province_select.title
   } else {
-    return "-";
+    return "-"
   }
-};
+}
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
 // selectItem
 const onSelectItemAll = () => {
-  selectedItem.value = [];
-  selectedItem.value = items.value.map((d) => {
-    return d.form_id;
-  });
+  selectedItem.value = []
+  selectedItem.value = items.value.map(d => {
+    return d.form_id
+  })
+
   //   chkItem
-  console.log(selectedItem.value);
-};
+  console.log(selectedItem.value)
+}
 
 const onDisSelectItemAll = () => {
-  selectedItem.value = [];
-  console.log(selectedItem.value);
-};
+  selectedItem.value = []
+  console.log(selectedItem.value)
+}
 
 const onAddBook = () => {
   if (selectedItem.value.length != 0) {
     if (advancedSearch.semester_id != "") {
-      isDialogVisible.value = true;
+      isDialogVisible.value = true
     }
   } else {
-    snackbarText.value = "โปรดเลือกนักศึกษา";
-    snackbarColor.value = "error";
-    isSnackbarVisible.value = true;
-    isDialogVisible.value = false;
+    snackbarText.value = "โปรดเลือกนักศึกษา"
+    snackbarColor.value = "error"
+    isSnackbarVisible.value = true
+    isDialogVisible.value = false
   }
-};
+}
 
 const onSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
   refAddBook.value?.validate().then(({ valid }) => {
     //
     if (valid) {
@@ -277,48 +285,38 @@ const onSubmit = () => {
               ? dayjs(document.value.document_date).format("YYYY-MM-DD")
               : null,
         })
-        .then((response) => {
+        .then(response => {
           if (response.status === 200) {
             //
-            fetchItems();
-            isDialogVisible.value = false;
-            isOverlay.value = false;
-            snackbarText.value = "ออกหนังสือสำเร็จ";
-            snackbarColor.value = "success";
-            isSnackbarVisible.value = true;
+            fetchItems()
+            isDialogVisible.value = false
+            isOverlay.value = false
+            snackbarText.value = "ออกหนังสือสำเร็จ"
+            snackbarColor.value = "success"
+            isSnackbarVisible.value = true
           } else {
-            console.log("error");
+            console.log("error")
           }
         })
-        .catch((error) => {
-          console.error(error);
-          isOverlay.value = false;
-        });
+        .catch(error => {
+          console.error(error)
+          isOverlay.value = false
+        })
     }
-    isOverlay.value = false;
-  });
+    isOverlay.value = false
+  })
+
   //
-};
+}
 
-const format = (date) => {
-  const day = dayjs(date).locale("th").format("DD");
-  const month = dayjs(date).locale("th").format("MMM");
-  const year = date.getFullYear() + 543;
+const format = date => {
+  const day = dayjs(date).locale("th").format("DD")
+  const month = dayjs(date).locale("th").format("MMM")
+  const year = date.getFullYear() + 543
 
-  return `${day} ${month} ${year}`;
-};
+  return `${day} ${month} ${year}`
+}
 </script>
-
-<style lang="scss">
-.v-card,
-.v-card-item__content {
-  overflow: visible !important;
-}
-
-.dp__input {
-  color: #787878;
-}
-</style>
 
 <template>
   <div>
@@ -327,20 +325,26 @@ const format = (date) => {
       <VCardItem>
         <VRow class="mt-1 mb-1">
           <!-- Search -->
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="จำนวนรายการ/page"
               v-model="rowPerPage"
+              label="จำนวนรายการ/page"
               density="compact"
               variant="outlined"
               :items="selectOptions.perPage"
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="8">
+          <VCol
+            cols="12"
+            sm="8"
+          >
             <VSelect
-              label="ปีการศึกษา"
               v-model="advancedSearch.semester_id"
+              label="ปีการศึกษา"
               density="compact"
               variant="outlined"
               clearable
@@ -348,10 +352,13 @@ const format = (date) => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <VSelect
-              label="สถานะการขอออกนิเทศ"
               v-model="advancedSearch.visit_status"
+              label="สถานะการขอออกนิเทศ"
               density="compact"
               variant="outlined"
               clearable
@@ -359,7 +366,10 @@ const format = (date) => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="2">
+          <VCol
+            cols="12"
+            sm="2"
+          >
             <VTextField
               v-model="advancedSearch.student_code"
               label="รหัสนักศึกษา"
@@ -367,7 +377,10 @@ const format = (date) => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol
+            cols="12"
+            sm="3"
+          >
             <VTextField
               v-model="advancedSearch.firstname"
               label="ชื่อ"
@@ -375,7 +388,10 @@ const format = (date) => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol
+            cols="12"
+            sm="3"
+          >
             <VTextField
               v-model="advancedSearch.surname"
               label="นามสกุล"
@@ -383,10 +399,13 @@ const format = (date) => {
             />
           </VCol>
           <VSpacer />
-          <VCol cols="12" sm="6">
+          <VCol
+            cols="12"
+            sm="6"
+          >
             <VSelect
-              label="สาขาวิชา"
               v-model="advancedSearch.major_id"
+              label="สาขาวิชา"
               density="compact"
               variant="outlined"
               clearable
@@ -395,10 +414,13 @@ const format = (date) => {
           </VCol>
 
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol
+            cols="12"
+            sm="3"
+          >
             <VSelect
-              label="ชั้นปี"
               v-model="advancedSearch.class_year"
+              label="ชั้นปี"
               density="compact"
               variant="outlined"
               clearable
@@ -407,10 +429,13 @@ const format = (date) => {
           </VCol>
 
           <VSpacer />
-          <VCol cols="12" sm="3">
+          <VCol
+            cols="12"
+            sm="3"
+          >
             <VSelect
-              label="ห้อง"
               v-model="advancedSearch.class_room"
+              label="ห้อง"
               density="compact"
               variant="outlined"
               clearable
@@ -418,10 +443,13 @@ const format = (date) => {
             />
           </VCol>
 
-          <VCol cols="12" sm="6">
+          <VCol
+            cols="12"
+            sm="6"
+          >
             <VSelect
-              label="อาจารย์นิเทศ"
               v-model="advancedSearch.supervision_id"
+              label="อาจารย์นิเทศ"
               density="compact"
               variant="outlined"
               clearable
@@ -429,21 +457,36 @@ const format = (date) => {
             />
           </VCol>
 
-          <VCol cols="12" sm="6">
+          <VCol
+            cols="12"
+            sm="6"
+          >
             <VTextField
-              label="สถานประกอบการ"
               v-model="advancedSearch.company_name"
+              label="สถานประกอบการ"
               density="compact"
             />
           </VCol>
 
           <!-- Table -->
 
-          <VCol cols="12" class="mb-2 d-flex">
-            <VBtn color="primary" @click="onSelectItemAll"> เลือกทั้งหมด</VBtn>
-            <VBtn color="error" @click="onDisSelectItemAll" class="ml-2">
-              ยกเลิก</VBtn
+          <VCol
+            cols="12"
+            class="mb-2 d-flex"
+          >
+            <VBtn
+              color="primary"
+              @click="onSelectItemAll"
             >
+              เลือกทั้งหมด
+            </VBtn>
+            <VBtn
+              color="error"
+              class="ml-2"
+              @click="onDisSelectItemAll"
+            >
+              ยกเลิก
+            </VBtn>
             <VSpacer />
             <VBtn
               color="success"
@@ -454,55 +497,93 @@ const format = (date) => {
                 }
               "
             >
-              ออกหนังสือ</VBtn
-            >
+              ออกหนังสือ
+            </VBtn>
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <div style="overflow-x: auto">
               <VTable class="">
                 <!-- 👉 table head -->
                 <thead>
                   <tr>
-                    <th scope="col" class="font-weight-bold">เลือก</th>
-                    <th scope="col" class="text-center font-weight-bold">
+                    <th
+                      scope="col"
+                      class="font-weight-bold"
+                    >
+                      เลือก
+                    </th>
+                    <th
+                      scope="col"
+                      class="text-center font-weight-bold"
+                    >
                       อาจารย์นิเทศ
                     </th>
-                    <th scope="col" class="text-center font-weight-bold">
+                    <th
+                      scope="col"
+                      class="text-center font-weight-bold"
+                    >
                       ชื่อ-นามสกุล
                     </th>
-                    <th scope="col" class="text-center font-weight-bold">
+                    <th
+                      scope="col"
+                      class="text-center font-weight-bold"
+                    >
                       สถานประกอบการ
                     </th>
-                    <th scope="col" class="text-center font-weight-bold">
+                    <th
+                      scope="col"
+                      class="text-center font-weight-bold"
+                    >
                       จังหวัด
                     </th>
-                    <!-- <th scope="col" class="text-center font-weight-bold">
+                    <!--
+                      <th scope="col" class="text-center font-weight-bold">
                       สถานะ
-                    </th> -->
-                    <th scope="col" class="text-center font-weight-bold">
+                      </th> 
+                    -->
+                    <th
+                      scope="col"
+                      class="text-center font-weight-bold"
+                    >
                       สถานะใบขอออกนิเทศ
                     </th>
-                    <th scope="col" class="text-center font-weight-bold">
+                    <th
+                      scope="col"
+                      class="text-center font-weight-bold"
+                    >
                       วันที่ออกนิเทศ
                     </th>
-                    <th scope="col" class="text-center font-weight-bold">
+                    <th
+                      scope="col"
+                      class="text-center font-weight-bold"
+                    >
                       เลขที่หนังสือ
                     </th>
-                    <th scope="col" class="text-center font-weight-bold">
+                    <th
+                      scope="col"
+                      class="text-center font-weight-bold"
+                    >
                       จัดการ
                     </th>
                   </tr>
                 </thead>
                 <!-- 👉 table body -->
                 <tbody>
-                  <tr v-for="it in items" :key="it.id" style="height: 3.75rem">
+                  <tr
+                    v-for="it in items"
+                    :key="it.id"
+                    style="height: 3.75rem"
+                  >
                     <td>
                       <VCheckbox
+                        v-if="it.visit_status > 2"
                         v-model="selectedItem"
                         class="chkItem"
                         :value="it.visit_id"
-                        v-if="it.visit_status > 2"
                       />
                       <!-- @click="onSelectItem(it.id)" -->
                     </td>
@@ -512,11 +593,17 @@ const format = (date) => {
                     <td class="text-center">
                       {{ it.firstname + " " + it.surname }}
                     </td>
-                    <td class="text-center" style="min-width: 100px">
+                    <td
+                      class="text-center"
+                      style="min-width: 100px"
+                    >
                       {{ it.company_name }}
                     </td>
 
-                    <td class="text-center" style="min-width: 100px">
+                    <td
+                      class="text-center"
+                      style="min-width: 100px"
+                    >
                       {{ responseProvinceName(it.response_province_id) }}
                     </td>
 
@@ -525,28 +612,36 @@ const format = (date) => {
                         <VChip
                           label
                           :color="visit_status[it.visit_status].color"
-                          >{{ visit_status[it.visit_status].title }}</VChip
-                        >
+                        >{{ visit_status[it.visit_status].title }}</VChip>
                       </span>
                     </td>
-                    <td class="text-center" style="min-width: 100px">
+                    <td
+                      class="text-center"
+                      style="min-width: 100px"
+                    >
                       {{
                         it.visit_date
                           ? dayjs(it.visit_date)
-                              .locale("th")
-                              .format("DD MMM BB") +
+                            .locale("th")
+                            .format("DD MMM BB") +
                             " " +
                             it.visit_time
                           : ""
                       }}
                     </td>
 
-                    <td class="text-center" style="min-width: 100px">
+                    <td
+                      class="text-center"
+                      style="min-width: 100px"
+                    >
                       {{ it.visit_document_number }}
                     </td>
 
                     <!-- 👉 Actions -->
-                    <td class="text-center" style="min-width: 80px">
+                    <td
+                      class="text-center"
+                      style="min-width: 80px"
+                    >
                       <VBtn
                         v-if="it.visit_id != null"
                         color="info"
@@ -559,23 +654,25 @@ const format = (date) => {
                       >
                         View
                       </VBtn>
-                      <!-- <VBtn
+                      <!--
+                        <VBtn
                         color="primary"
                         class="ml-2"
                         :disabled="it.send_document_date == null"
                         @click="
-                          () => {
-                            selectedItem = [it.form_id];
-                            document = [];
-                            document.send_document_number =
-                              it.send_document_number;
-                            document.send_document_date = it.send_document_date;
-                            onAddBook();
-                          }
+                        () => {
+                        selectedItem = [it.form_id];
+                        document = [];
+                        document.send_document_number =
+                        it.send_document_number;
+                        document.send_document_date = it.send_document_date;
+                        onAddBook();
+                        }
                         "
-                      >
+                        >
                         Edit</VBtn
-                      > -->
+                        > 
+                      -->
                     </td>
                   </tr>
                 </tbody>
@@ -583,15 +680,23 @@ const format = (date) => {
                 <!-- 👉 table footer  -->
                 <tfoot v-show="!items.length">
                   <tr>
-                    <td colspan="7" class="text-center">No data available</td>
+                    <td
+                      colspan="7"
+                      class="text-center"
+                    >
+                      No data available
+                    </td>
                   </tr>
                 </tfoot>
-                <tfoot v-show="items.length"></tfoot>
+                <tfoot v-show="items.length" />
               </VTable>
             </div>
           </VCol>
 
-          <VCol cols="12" sm="12">
+          <VCol
+            cols="12"
+            sm="12"
+          >
             <span class="text-sm text-disabled">
               Showing {{ currentPage }} to {{ totalPage }} of
               {{ totalItems }} entries
@@ -614,41 +719,65 @@ const format = (date) => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
-    <VOverlay v-model="isOverlay" contained class="align-center justify-center">
+    <VOverlay
+      v-model="isOverlay"
+      contained
+      class="align-center justify-center"
+    >
       <VProgressCircular indeterminate />
     </VOverlay>
 
     <!-- Add Form Dialog -->
-    <VDialog v-model="isDialogVisible" contained persistent class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogVisible"
+      contained
+      persistent
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
-      <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" absolute />
+      <DialogCloseBtn
+        absolute
+        @click="isDialogVisible = !isDialogVisible"
+      />
 
       <!-- Dialog Content -->
       <VCard title="แบบฟอร์มออกหนังสือ">
         <VCardItem>
-          <VForm ref="refAddBook" v-model="isAddBookValid">
+          <VForm
+            ref="refAddBook"
+            v-model="isAddBookValid"
+          >
             <!-- @submit.prevent="onAddSubmit" -->
             <VRow>
               <VCol cols="12">
                 <AppTextField
                   id="send_document_number"
-                  label="เลขที่หนังสือ"
                   v-model="document.document_number"
+                  label="เลขที่หนังสือ"
                   :rules="[requiredValidator]"
                 />
               </VCol>
 
-              <VCol cols="12" md="12" class="align-items-center">
+              <VCol
+                cols="12"
+                md="12"
+                class="align-items-center"
+              >
                 <label
                   class="v-label font-weight-bold"
                   for="send_document_date"
                   cols="12"
                   md="4"
-                  >วันที่หนังสือ :
+                >วันที่หนังสือ :
                 </label>
                 <VueDatePicker
                   v-model="document.document_date"
@@ -677,14 +806,29 @@ const format = (date) => {
           >
             Cancel
           </VBtn>
-          <VBtn type="submit" id="btn-submit" @click="onSubmit">
-            <span>Save</span></VBtn
+          <VBtn
+            id="btn-submit"
+            type="submit"
+            @click="onSubmit"
           >
+            <span>Save</span>
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
   </div>
 </template>
+
+<style lang="scss">
+.v-card,
+.v-card-item__content {
+  overflow: visible !important;
+}
+
+.dp__input {
+  color: #787878;
+}
+</style>
 
 <style lang="scss"></style>
 

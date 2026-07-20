@@ -66,4 +66,4 @@ export default [
     action: "manage",
     subject: "StaffUser",
   },
-];
+]

@@ -1,10 +1,10 @@
 <script setup>
-import AddressContent from "@/views/wizard-examples/checkout/Address.vue";
-import CartContent from "@/views/wizard-examples/checkout/Cart.vue";
-import ConfirmationContent from "@/views/wizard-examples/checkout/Confirmation.vue";
-import PaymentContent from "@/views/wizard-examples/checkout/Payment.vue";
-import googleHome from "@images/pages/google-home.png";
-import iphone11 from "@images/pages/iphone-11.png";
+import AddressContent from "@/views/wizard-examples/checkout/Address.vue"
+import CartContent from "@/views/wizard-examples/checkout/Cart.vue"
+import ConfirmationContent from "@/views/wizard-examples/checkout/Confirmation.vue"
+import PaymentContent from "@/views/wizard-examples/checkout/Payment.vue"
+import googleHome from "@images/pages/google-home.png"
+import iphone11 from "@images/pages/iphone-11.png"
 
 const checkoutSteps = [
   {
@@ -23,7 +23,7 @@ const checkoutSteps = [
     title: "Confirmation",
     icon: "custom-trending",
   },
-];
+]
 
 const checkoutData = ref({
   cartItems: [
@@ -71,9 +71,9 @@ const checkoutData = ref({
       value: "office",
     },
   ],
-});
+})
 
-const currentStep = ref(0);
+const currentStep = ref(0)
 </script>
 
 <template>
@@ -92,7 +92,10 @@ const currentStep = ref(0);
 
     <VCardText>
       <!-- 👉 stepper content -->
-      <VWindow v-model="currentStep" class="disable-tab-transition">
+      <VWindow
+        v-model="currentStep"
+        class="disable-tab-transition"
+      >
         <VWindowItem>
           <CartContent
             v-model:current-step="currentStep"

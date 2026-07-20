@@ -1,10 +1,10 @@
 <script setup>
-import { useRoute, useRouter } from "vue-router";
-import { useCompanyStore } from "../useCompanyStore";
+import { useRoute, useRouter } from "vue-router"
+import { useCompanyStore } from "../useCompanyStore"
 
-const companyStore = useCompanyStore();
-const route = useRoute();
-const router = useRouter();
+const companyStore = useCompanyStore()
+const route = useRoute()
+const router = useRouter()
 
 const item = ref({
   id: null,
@@ -23,151 +23,209 @@ const item = ref({
   amphur_id: "",
   tumbol_id: "",
   active: 1,
-});
+})
 
-const isOverlay = ref(false);
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
-const isDialogVisible = ref(false);
+const isOverlay = ref(false)
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
+const isDialogVisible = ref(false)
 
 if (localStorage.getItem("added") == 1) {
-  snackbarText.value = "Added Company";
-  snackbarColor.value = "success";
-  isSnackbarVisible.value = true;
-  localStorage.removeItem("added");
+  snackbarText.value = "Added Company"
+  snackbarColor.value = "success"
+  isSnackbarVisible.value = true
+  localStorage.removeItem("added")
 }
 
 if (localStorage.getItem("updated") == 1) {
-  snackbarText.value = "Updated Company";
-  snackbarColor.value = "success";
-  isSnackbarVisible.value = true;
-  localStorage.removeItem("updated");
+  snackbarText.value = "Updated Company"
+  snackbarColor.value = "success"
+  isSnackbarVisible.value = true
+  localStorage.removeItem("updated")
 }
 
 companyStore
   .fetchCompany({
     id: route.params.id,
   })
-  .then((response) => {
+  .then(response => {
     if (response.data.message == "success") {
-      item.value = response.data.data;
+      item.value = response.data.data
     } else {
-      console.log("error");
+      console.log("error")
     }
   })
-  .catch((error) => {
-    console.error(error);
-    isOverlay.value = false;
-  });
+  .catch(error => {
+    console.error(error)
+    isOverlay.value = false
+  })
 
-const onDelete = (id) => {
+const onDelete = id => {
   companyStore
     .deleteCompany({
       id: id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        localStorage.setItem("deleted", 1);
+        localStorage.setItem("deleted", 1)
         router.push({
           path: "/cwie-settings/company",
-        });
+        })
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 </script>
-<style lang="scss">
-hr {
-  border-top: none;
-}
-</style>
 
 <template>
   <div>
     <VCard title="ข้อมูลสถานประกอบการ">
       <VCardText>
         <VRow class="mt-1 mb-1">
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">ชื่อบริษัท : </span>
           </VCol>
-          <VCol cols="12" md="10">
+          <VCol
+            cols="12"
+            md="10"
+          >
             <span class="font-italic">{{ item.name_th }}</span>
           </VCol>
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
 
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">ที่อยู่ : </span>
           </VCol>
-          <VCol cols="12" md="10">
+          <VCol
+            cols="12"
+            md="10"
+          >
             <span class="font-italic">{{ item.address }}</span>
           </VCol>
 
-          <VCol cols="12" md="1">
+          <VCol
+            cols="12"
+            md="1"
+          >
             <span class="font-weight-bold">จังหวัด : </span>
           </VCol>
-          <VCol cols="12" md="3">
+          <VCol
+            cols="12"
+            md="3"
+          >
             <span class="font-italic">{{ item.province_name }}</span>
           </VCol>
-          <VCol cols="12" md="1">
+          <VCol
+            cols="12"
+            md="1"
+          >
             <span class="font-weight-bold">อำเภอ/เขต : </span>
           </VCol>
-          <VCol cols="12" md="3">
+          <VCol
+            cols="12"
+            md="3"
+          >
             <span class="font-italic">{{ item.amphur_name }}</span>
           </VCol>
-          <VCol cols="12" md="1">
+          <VCol
+            cols="12"
+            md="1"
+          >
             <span class="font-weight-bold">ตำบล/แขวง : </span>
           </VCol>
-          <VCol cols="12" md="3">
+          <VCol
+            cols="12"
+            md="3"
+          >
             <span class="font-italic">{{ item.tumbol_name }}</span>
           </VCol>
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
           <!--  -->
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">โทรศัพท์ : </span>
           </VCol>
-          <VCol cols="12" md="4">
+          <VCol
+            cols="12"
+            md="4"
+          >
             <span class="font-italic">{{ item.tel }}</span>
           </VCol>
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">แฟกซ์ : </span>
           </VCol>
-          <VCol cols="12" md="4">
+          <VCol
+            cols="12"
+            md="4"
+          >
             <span class="font-italic">{{ item.fax }}</span>
           </VCol>
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">เมล : </span>
           </VCol>
-          <VCol cols="12" md="4">
+          <VCol
+            cols="12"
+            md="4"
+          >
             <span class="font-italic">{{ item.email }}</span>
           </VCol>
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">เว็บไซต์ : </span>
           </VCol>
-          <VCol cols="12" md="4">
+          <VCol
+            cols="12"
+            md="4"
+          >
             <span class="font-italic">{{ item.website }}</span>
           </VCol>
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">นามบัตร : </span>
           </VCol>
-          <VCol cols="12" md="10">
-            <a :href="item.namecard_file" target="_blank">
+          <VCol
+            cols="12"
+            md="10"
+          >
+            <a
+              :href="item.namecard_file"
+              target="_blank"
+            >
               <VImg
                 :src="item.namecard_file"
                 style="max-width: 300px"
@@ -176,13 +234,22 @@ hr {
             </a>
           </VCol>
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">ภาพ Google MAP : </span>
           </VCol>
-          <VCol cols="12" md="10">
-            <a :href="item.location_file" target="_blank">
+          <VCol
+            cols="12"
+            md="10"
+          >
+            <a
+              :href="item.location_file"
+              target="_blank"
+            >
               <VImg
                 :src="item.location_file"
                 style="max-width: 300px"
@@ -191,16 +258,22 @@ hr {
             </a>
           </VCol>
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">ความคิดเห็น : </span>
           </VCol>
-          <VCol cols="12" md="10">
+          <VCol
+            cols="12"
+            md="10"
+          >
             <span class="font-italic">{{ item.comment }}</span>
           </VCol>
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
         </VRow>
       </VCardText>
@@ -213,11 +286,20 @@ hr {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
-    <VDialog v-model="isDialogVisible" persistent class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogVisible"
+      persistent
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" />
 
@@ -235,12 +317,23 @@ hr {
           >
             Cancel
           </VBtn>
-          <VBtn @click="onDelete(route.params.id)" color="error"> Delete </VBtn>
+          <VBtn
+            color="error"
+            @click="onDelete(route.params.id)"
+          >
+            Delete
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
   </div>
 </template>
+
+<style lang="scss">
+hr {
+  border-top: none;
+}
+</style>
 
 <route lang="yaml">
 meta:

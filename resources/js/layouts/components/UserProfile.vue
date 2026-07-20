@@ -1,29 +1,30 @@
 <script setup>
-import { PerfectScrollbar } from "vue3-perfect-scrollbar";
-import { initialAbility } from "@/plugins/casl/ability";
-import { useAppAbility } from "@/plugins/casl/useAppAbility";
+import { PerfectScrollbar } from "vue3-perfect-scrollbar"
+import { initialAbility } from "@/plugins/casl/ability"
+import { useAppAbility } from "@/plugins/casl/useAppAbility"
 
-const router = useRouter();
-const ability = useAppAbility();
-const userData = JSON.parse(localStorage.getItem("userData") || "null");
+const router = useRouter()
+const ability = useAppAbility()
+const userData = JSON.parse(localStorage.getItem("userData") || "null")
 
 const logout = () => {
   // Remove "userData" from localStorage
-  localStorage.removeItem("userData");
+  localStorage.removeItem("userData")
 
   // Remove "accessToken" from localStorage
-  localStorage.removeItem("accessToken");
+  localStorage.removeItem("accessToken")
   router.push("/login").then(() => {
     // Remove "userAbilities" from localStorage
-    localStorage.removeItem("userAbilities");
+    localStorage.removeItem("userAbilities")
 
     // Reset ability to initial ability
-    ability.update(initialAbility);
-  });
-};
+    ability.update(initialAbility)
+  })
+}
 
 const userProfileList = [
   { type: "divider" },
+
   //   {
   //     type: "navItem",
   //     icon: "tabler-user",
@@ -81,7 +82,7 @@ const userProfileList = [
     title: "Logout",
     onClick: logout,
   },
-];
+]
 </script>
 
 <template>
@@ -98,11 +99,22 @@ const userProfileList = [
       :color="!(userData && userData.avatar) ? 'primary' : undefined"
       :variant="!(userData && userData.avatar) ? 'tonal' : undefined"
     >
-      <VImg v-if="userData && userData.avatar" :src="userData.avatar" />
-      <VIcon v-else icon="tabler-user" />
+      <VImg
+        v-if="userData && userData.avatar"
+        :src="userData.avatar"
+      />
+      <VIcon
+        v-else
+        icon="tabler-user"
+      />
 
       <!-- SECTION Menu -->
-      <VMenu activator="parent" width="230" location="bottom end" offset="14px">
+      <VMenu
+        activator="parent"
+        width="230"
+        location="bottom end"
+        offset="14px"
+      >
         <VList>
           <VListItem>
             <template #prepend>
@@ -127,7 +139,10 @@ const userProfileList = [
                       v-if="userData && userData.avatar"
                       :src="userData.avatar"
                     />
-                    <VIcon v-else icon="tabler-user" />
+                    <VIcon
+                      v-else
+                      icon="tabler-user"
+                    />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
@@ -140,24 +155,37 @@ const userProfileList = [
           </VListItem>
 
           <PerfectScrollbar :options="{ wheelPropagation: false }">
-            <template v-for="item in userProfileList" :key="item.title">
+            <template
+              v-for="item in userProfileList"
+              :key="item.title"
+            >
               <VListItem
                 v-if="item.type === 'navItem'"
                 :to="item.to"
                 @click="item.onClick && item.onClick()"
               >
                 <template #prepend>
-                  <VIcon class="me-2" :icon="item.icon" size="22" />
+                  <VIcon
+                    class="me-2"
+                    :icon="item.icon"
+                    size="22"
+                  />
                 </template>
 
                 <VListItemTitle>{{ item.title }}</VListItemTitle>
 
-                <template v-if="item.badgeProps" #append>
+                <template
+                  v-if="item.badgeProps"
+                  #append
+                >
                   <VBadge v-bind="item.badgeProps" />
                 </template>
               </VListItem>
 
-              <VDivider v-else class="my-2" />
+              <VDivider
+                v-else
+                class="my-2"
+              />
             </template>
           </PerfectScrollbar>
         </VList>

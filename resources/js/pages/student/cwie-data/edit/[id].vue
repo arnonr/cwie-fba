@@ -1,20 +1,14 @@
 <script setup>
-import { requiredValidator } from "@validators";
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import buddhistEra from "dayjs/plugin/buddhistEra";
-import { useRoute, useRouter } from "vue-router";
-import CompanyAdd from "../../../cwie-settings/company/add.vue";
-import { useCwieDataStore } from "../useCwieDataStore";
+import { requiredValidator } from "@validators"
+import dayjs from "dayjs"
+import "dayjs/locale/th"
+import buddhistEra from "dayjs/plugin/buddhistEra"
+import { useRoute, useRouter } from "vue-router"
+import CompanyAdd from "../../../cwie-settings/company/add.vue"
+import { useCwieDataStore } from "../useCwieDataStore"
 
-import VueDatePicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
-
-const cwieDataStore = useCwieDataStore();
-dayjs.extend(buddhistEra);
-// const route = useRoute();
-const route = useRoute();
-const router = useRouter();
+import VueDatePicker from "@vuepic/vue-datepicker"
+import "@vuepic/vue-datepicker/dist/main.css"
 
 const props = defineProps({
   fromStudentPage: {
@@ -30,7 +24,16 @@ const props = defineProps({
     type: Number,
     required: false,
   },
-});
+})
+
+const cwieDataStore = useCwieDataStore()
+
+dayjs.extend(buddhistEra)
+
+
+// const route = useRoute();
+const route = useRoute()
+const router = useRouter()
 
 const item = ref({
   id: null,
@@ -71,22 +74,23 @@ const item = ref({
   amphur_id: null,
   tumbol_id: null,
   active: 1,
-});
-const companyItem = ref({});
-const isNewCompany = ref(true);
+})
 
-const isOverlay = ref(false);
-const isFormValid = ref(false);
-const refForm = ref();
-const isDialogAddCompanyVisible = ref(false);
-const isDialogConfirmVisible = ref(false);
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
+const companyItem = ref({})
+const isNewCompany = ref(true)
 
-const setIsDialogAddCompanyVisible = (value) => {
-  isDialogAddCompanyVisible.value = value;
-};
+const isOverlay = ref(false)
+const isFormValid = ref(false)
+const refForm = ref()
+const isDialogAddCompanyVisible = ref(false)
+const isDialogConfirmVisible = ref(false)
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
+
+const setIsDialogAddCompanyVisible = value => {
+  isDialogAddCompanyVisible.value = value
+}
 
 const selectOptions = ref({
   provinces: [],
@@ -97,101 +101,103 @@ const selectOptions = ref({
     { title: "Active", value: 1 },
     { title: "In Active", value: 0 },
   ],
-});
+})
 
 const fetchProvinces = () => {
   cwieDataStore
     .fetchProvinces({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.provinces = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.province_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.provinces = response.data.data.map(r => {
+          return { title: r.name_th, value: r.province_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchProvinces();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchProvinces()
 
 const fetchAmphurs = () => {
   cwieDataStore
     .fetchAmphurs({
       province_id: item.value.province_id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.amphurs = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.amphur_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.amphurs = response.data.data.map(r => {
+          return { title: r.name_th, value: r.amphur_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchTumbols = () => {
   cwieDataStore
     .fetchTumbols({
       amphur_id: item.value.amphur_id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.tumbols = response.data.data.map((r) => {
-          return { title: r.name_th, value: r.tumbol_id };
-        });
-        isOverlay.value = false;
+        selectOptions.value.tumbols = response.data.data.map(r => {
+          return { title: r.name_th, value: r.tumbol_id }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 const fetchSemesters = () => {
   cwieDataStore
     .fetchSemesters({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.semesters = response.data.data.map((r) => {
+        selectOptions.value.semesters = response.data.data.map(r => {
           return {
             title: r.term + "/" + r.semester_year + " รอบที่" + r.round_no,
             value: r.id,
             start_date: r.start_date,
             end_date: r.end_date,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchSemesters();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchSemesters()
 
 const fetchCompanies = () => {
   cwieDataStore
     .fetchCompanies({})
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.companies = response.data.data.map((r) => {
+        selectOptions.value.companies = response.data.data.map(r => {
           return {
             title: r.name_th,
             value: r.id,
@@ -203,34 +209,35 @@ const fetchCompanies = () => {
             fax: r.fax,
             email: r.email,
             website: r.website,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchCompanies();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
-let userData = JSON.parse(localStorage.getItem("userData"));
+fetchCompanies()
+
+let userData = JSON.parse(localStorage.getItem("userData"))
 
 const fetchStudent = () => {
-  let searh = {};
+  let searh = {}
 
   if (userData.role == "admin" || userData.role == "staff") {
     searh = {
       // id: route.query.student_id,
       id: props.student_id,
-    };
+    }
   } else {
     searh = {
       student_code: userData.username.slice(1, userData.username.length),
-    };
+    }
   }
 
   cwieDataStore
@@ -238,83 +245,86 @@ const fetchStudent = () => {
       // id: route.params.id,
       ...searh,
       includeAll: true,
+
       // get id self
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        const { data } = response.data;
+        const { data } = response.data
+
         // student.value = { ...data[0] };
 
-        item.value.student_id = data[0].id;
+        item.value.student_id = data[0].id
 
-        fetchForm();
+        fetchForm()
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchStudent();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchStudent()
 
 const fetchForm = () => {
   cwieDataStore
     .fetchForm({
       id: props.fromStudentPage == true ? props.form_id : route.params.id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        item.value = response.data.data;
-        item.value.namecard_file_old = null;
+        item.value = response.data.data
+        item.value.namecard_file_old = null
         if (item.value.namecard_file != null) {
-          item.value.namecard_file_old = response.data.data.namecard_file;
+          item.value.namecard_file_old = response.data.data.namecard_file
         }
-        item.value.namecard_file = [];
+        item.value.namecard_file = []
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 watch(
   () => item.value.province_id,
   (value, oldValue) => {
     if (value != null) {
-      fetchAmphurs();
+      fetchAmphurs()
       if (oldValue != "") {
-        item.value.amphur_id = null;
-        item.value.tumbol_id = null;
+        item.value.amphur_id = null
+        item.value.tumbol_id = null
       }
     }
-  }
-);
+  },
+)
 
 watch(
   () => item.value.amphur_id,
   (value, oldValue) => {
     if (value != null) {
-      fetchTumbols();
+      fetchTumbols()
       if (oldValue != "") {
-        item.value.tumbol_id = null;
+        item.value.tumbol_id = null
       }
     }
-    console.log(value);
-  }
-);
+    console.log(value)
+  },
+)
 
 watch(
   () => item.value.company_id,
-  (value) => {
+  value => {
     if (value != null) {
-      let check = selectOptions.value.companies.find((c) => {
-        return c.value == item.value.company_id;
-      });
+      let check = selectOptions.value.companies.find(c => {
+        return c.value == item.value.company_id
+      })
 
       if (check) {
         companyItem.value = {
@@ -326,16 +336,16 @@ watch(
           website: check.website != "null" ? check.website : "",
           address: check.address,
           province_id: check.province_id,
-        };
+        }
 
-        isNewCompany.value = false;
+        isNewCompany.value = false
       } else {
-        isNewCompany.value = true;
+        isNewCompany.value = true
       }
     } else {
     }
-  }
-);
+  },
+)
 
 // watch(
 //   () => item.value.semester_id,
@@ -354,14 +364,15 @@ watch(
 
 const onCheckSubmit = () => {
   if (userData.role == "admin" || userData.role == "staff") {
-    onStaffSubmit();
+    onStaffSubmit()
   } else {
-    console.log("DSD1");
-    onSubmit();
+    console.log("DSD1")
+    onSubmit()
   }
-};
+}
+
 const onSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
 
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
@@ -380,34 +391,34 @@ const onSubmit = () => {
               ? item.value.namecard_file[0]
               : null,
         })
-        .then((response) => {
+        .then(response => {
           if (response.data.message == "success") {
-            localStorage.setItem("updated", 1);
+            localStorage.setItem("updated", 1)
             nextTick(() => {
               router.push({
                 name: "student-cwie-data",
-              });
-            });
+              })
+            })
           } else {
-            isOverlay.value = false;
-            isDialogConfirmVisible.value = false;
-            console.log("error");
+            isOverlay.value = false
+            isDialogConfirmVisible.value = false
+            console.log("error")
           }
         })
-        .catch((error) => {
-          console.error(error);
-          isOverlay.value = false;
-          isDialogConfirmVisible.value = false;
-        });
+        .catch(error => {
+          console.error(error)
+          isOverlay.value = false
+          isDialogConfirmVisible.value = false
+        })
     } else {
-      isOverlay.value = false;
-      isDialogConfirmVisible.value = false;
+      isOverlay.value = false
+      isDialogConfirmVisible.value = false
     }
-  });
-};
+  })
+}
 
 const onStaffSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
       cwieDataStore
@@ -422,66 +433,62 @@ const onStaffSubmit = () => {
           response_document_file: undefined,
           plan_document_file: undefined,
         })
-        .then((response) => {
+        .then(response => {
           if (response.data.message == "success") {
-            localStorage.setItem("updated", 1);
+            localStorage.setItem("updated", 1)
             nextTick(() => {
-              isOverlay.value = false;
-              isDialogConfirmVisible.value = false;
-              snackbarText.value = "Updated Student";
-              snackbarColor.value = "success";
-              isSnackbarVisible.value = true;
+              isOverlay.value = false
+              isDialogConfirmVisible.value = false
+              snackbarText.value = "Updated Student"
+              snackbarColor.value = "success"
+              isSnackbarVisible.value = true
 
               // router.push({
               //   path: "/staff/students/view/" + route.query.student_id,
               // });
-            });
+            })
           } else {
-            isOverlay.value = false;
-            isDialogConfirmVisible.value = false;
-            console.log("error");
+            isOverlay.value = false
+            isDialogConfirmVisible.value = false
+            console.log("error")
           }
         })
-        .catch((error) => {
-          console.error(error);
-          isOverlay.value = false;
-          isDialogConfirmVisible.value = false;
-        });
+        .catch(error => {
+          console.error(error)
+          isOverlay.value = false
+          isDialogConfirmVisible.value = false
+        })
     } else {
-      isOverlay.value = false;
-      isDialogConfirmVisible.value = false;
+      isOverlay.value = false
+      isDialogConfirmVisible.value = false
     }
-  });
-};
+  })
+}
 
 const onValidate = () => {
   refForm.value?.validate().then(({ valid }) => {
     if (!valid) {
-      isOverlay.value = false;
-      isDialogConfirmVisible.value = false;
+      isOverlay.value = false
+      isDialogConfirmVisible.value = false
     } else {
-      isDialogConfirmVisible.value = true;
+      isDialogConfirmVisible.value = true
     }
-  });
-};
+  })
+}
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
-const format = (date) => {
-  const day = dayjs(date).locale("th").format("DD");
-  const month = dayjs(date).locale("th").format("MMM");
-  const year = date.getFullYear() + 543;
+const format = date => {
+  const day = dayjs(date).locale("th").format("DD")
+  const month = dayjs(date).locale("th").format("MMM")
+  const year = date.getFullYear() + 543
 
-  return `${day} ${month} ${year}`;
-};
-</script>
-<style lang="scss">
-.dp__input {
-  color: #787878;
+  return `${day} ${month} ${year}`
 }
-</style>
+</script>
+
 <template>
   <div>
     <VCard title="แบบฟอร์มสมัครโครงการสหกิจศึกษา">
@@ -489,26 +496,38 @@ const format = (date) => {
         <VForm
           ref="refForm"
           v-model="isFormValid"
-          @submit.prevent="onValidate()"
+          @submit.prevent="onValidate"
         >
           <!-- <VRow> </VRow> -->
 
           <VRow class="mb-1">
-            <VCol cols="12" md="12" class="d-flex">
-              <VIcon size="22" icon="tabler-user" style="opacity: 1" />
-              <h4 class="pt-1 pl-1">ข้อมูลสหกิจศึกษา</h4>
+            <VCol
+              cols="12"
+              md="12"
+              class="d-flex"
+            >
+              <VIcon
+                size="22"
+                icon="tabler-user"
+                style="opacity: 1"
+              />
+              <h4 class="pt-1 pl-1">
+                ข้อมูลสหกิจศึกษา
+              </h4>
             </VCol>
             <VCol style="margin-top: -1.5em">
               <small> หมายเหตุ : โปรดระบุข้อมูลให้ครบถ้วน </small>
             </VCol>
 
-            <VCol cols="12" md="12">
-              <label class="font-weight-bold"
-                >ปีการศึกษา/รอบที่ออกสหกิจ :
+            <VCol
+              cols="12"
+              md="12"
+            >
+              <label class="font-weight-bold">ปีการศึกษา/รอบที่ออกสหกิจ :
               </label>
               <AppSelect
-                :items="selectOptions.semesters"
                 v-model="item.semester_id"
+                :items="selectOptions.semesters"
                 variant="outlined"
                 placeholder="Semester"
                 :rules="[requiredValidator]"
@@ -516,13 +535,17 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="start_date"
                 cols="12"
                 md="4"
-                >วันที่เริ่มออกสหกิจศึกษา :
+              >วันที่เริ่มออกสหกิจศึกษา :
               </label>
               <VueDatePicker
                 v-model="item.start_date"
@@ -541,13 +564,17 @@ const format = (date) => {
               </VueDatePicker>
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="end_date"
                 cols="12"
                 md="4"
-                >วันที่สิ้นสุดการปฏิบัติสหกิจ :
+              >วันที่สิ้นสุดการปฏิบัติสหกิจ :
               </label>
               <VueDatePicker
                 v-model="item.end_date"
@@ -566,23 +593,39 @@ const format = (date) => {
               </VueDatePicker>
             </VCol>
 
-            <VDivider class="mt-4 mb-4"></VDivider>
+            <VDivider class="mt-4 mb-4" />
 
-            <VCol cols="12" md="12" class="d-flex">
-              <VIcon size="22" icon="tabler-map-pin" style="opacity: 1" />
-              <h4 class="pt-1 pl-1">ข้อมูลสถานประกอบการ</h4>
+            <VCol
+              cols="12"
+              md="12"
+              class="d-flex"
+            >
+              <VIcon
+                size="22"
+                icon="tabler-map-pin"
+                style="opacity: 1"
+              />
+              <h4 class="pt-1 pl-1">
+                ข้อมูลสถานประกอบการ
+              </h4>
             </VCol>
-            <!-- <VCol style="margin-top: -1.5em" cols="12" md="12">
+            <!--
+              <VCol style="margin-top: -1.5em" cols="12" md="12">
               <small> หมายเหตุ : โปรดระบุข้อมูลให้ครบถ้วน </small>
-            </VCol> -->
+              </VCol> 
+            -->
 
-            <VCol cols="12" md="12" class="align-items-center">
+            <VCol
+              cols="12"
+              md="12"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="company_id"
                 cols="12"
                 md="4"
-                >เลือก สถานประกอบการ :
+              >เลือก สถานประกอบการ :
               </label>
               <!-- <AppSelect variant="outlined" placeholder="Province" clearable /> -->
               <AppAutocomplete
@@ -595,20 +638,24 @@ const format = (date) => {
               <span
                 style="padding-top: 20px; cursor: pointer; float: inline-end"
                 @click="isDialogAddCompanyVisible = true"
-                >ไม่พบชื่อสถานประกอบการ ?</span
-              >
+              >ไม่พบชื่อสถานประกอบการ ?</span>
             </VCol>
-            <!-- <VCol cols="12" md="5">
+            <!--
+              <VCol cols="12" md="5">
               <VBtn
-                class="mt-6"
-                @click="isDialogAddCompanyVisible = true"
-                color="info"
-                style="width: 100%"
-                >คลิกเพิ่มสถานประกอบการ (ใช้ในกรณีไม่พบชื่อสถานประกอบการ)
+              class="mt-6"
+              @click="isDialogAddCompanyVisible = true"
+              color="info"
+              style="width: 100%"
+              >คลิกเพิ่มสถานประกอบการ (ใช้ในกรณีไม่พบชื่อสถานประกอบการ)
               </VBtn>
-            </VCol> -->
+              </VCol> 
+            -->
 
-            <VCol cols="12" md="8">
+            <VCol
+              cols="12"
+              md="8"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="company_id"
@@ -619,24 +666,28 @@ const format = (date) => {
               </label>
               <AppTextField
                 id="address"
-                disabled
                 v-model="companyItem.address"
+                disabled
                 placeholder="Address"
                 persistent-placeholder
               />
             </VCol>
 
-            <VCol cols="12" md="4" class="align-items-center">
+            <VCol
+              cols="12"
+              md="4"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="province_id"
                 cols="12"
                 md="4"
-                >จังหวัด :
+              >จังหวัด :
               </label>
               <AppSelect
-                :items="selectOptions.provinces"
                 v-model="companyItem.province_id"
+                :items="selectOptions.provinces"
                 disabled
                 variant="outlined"
                 placeholder="Province"
@@ -644,9 +695,15 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="tel"
-                >โทรศัพท์ :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="tel"
+              >โทรศัพท์ :
               </label>
               <AppTextField
                 id="tel"
@@ -657,8 +714,15 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="fax">แฟกซ์ : </label>
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="fax"
+              >แฟกซ์ : </label>
               <AppTextField
                 id="fax"
                 v-model="companyItem.fax"
@@ -668,8 +732,15 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="mail">เมล : </label>
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="mail"
+              >เมล : </label>
               <AppTextField
                 id="email"
                 v-model="companyItem.email"
@@ -679,9 +750,15 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="website"
-                >เว็บไซต์ :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="website"
+              >เว็บไซต์ :
               </label>
               <AppTextField
                 id="website"
@@ -692,23 +769,31 @@ const format = (date) => {
               />
             </VCol>
 
-            <!-- <VCol cols="12" md="12" class="align-items-center">
+            <!--
+              <VCol cols="12" md="12" class="align-items-center">
               <label class="v-label font-weight-bold" for="location_file"
-                >นามบัตร :
+              >นามบัตร :
               </label>
-            </VCol>
+              </VCol>
 
-            <VCol cols="12" md="12" class="align-items-center">
+              <VCol cols="12" md="12" class="align-items-center">
               <label class="v-label font-weight-bold" for="location_file"
-                >ภาพ Google Map :
+              >ภาพ Google Map :
               </label>
-            </VCol> -->
+              </VCol> 
+            -->
 
-            <VDivider class="mt-4 mb-4"></VDivider>
+            <VDivider class="mt-4 mb-4" />
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="co_name"
-                >ชื่อ-สกุล ผู้ประสานงาน :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="co_name"
+              >ชื่อ-สกุล ผู้ประสานงาน :
               </label>
               <AppTextField
                 id="co_name"
@@ -718,9 +803,15 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="co_position"
-                >ตำแหน่ง ผู้ประสานงาน :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="co_position"
+              >ตำแหน่ง ผู้ประสานงาน :
               </label>
               <AppTextField
                 id="co_position"
@@ -730,9 +821,15 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="co_tel"
-                >เบอร์โทรศัพท์ ผู้ประสานงาน :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="co_tel"
+              >เบอร์โทรศัพท์ ผู้ประสานงาน :
               </label>
               <AppTextField
                 id="co_tel"
@@ -742,9 +839,15 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="co_email"
-                >เมล ผู้ประสานงาน :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="co_email"
+              >เมล ผู้ประสานงาน :
               </label>
               <AppTextField
                 id="co_email"
@@ -754,20 +857,30 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="2">
+            <VCol
+              cols="12"
+              md="2"
+            >
               <span class="font-weight-bold">นามบัตร : </span>
             </VCol>
 
-            <VCol cols="12" md="8">
+            <VCol
+              cols="12"
+              md="8"
+            >
               <VFileInput
-                label="Upload Namecard"
                 id="namecard_file"
                 v-model="item.namecard_file"
+                label="Upload Namecard"
                 persistent-placeholder
               />
             </VCol>
 
-            <VCol cols="12" md="2" class="pl-2">
+            <VCol
+              cols="12"
+              md="2"
+              class="pl-2"
+            >
               <a
                 :href="
                   item.namecard_file_old != null ? item.namecard_file_old : '/'
@@ -778,11 +891,17 @@ const format = (date) => {
               </a>
             </VCol>
 
-            <VDivider class="mt-4 mb-4"></VDivider>
+            <VDivider class="mt-4 mb-4" />
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="request_name"
-                >ชื่อ-สกุล ผู้เรียนถึง (โปรดระบุคำนำหน้า ชื่อ นามสกุล) :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="request_name"
+              >ชื่อ-สกุล ผู้เรียนถึง (โปรดระบุคำนำหน้า ชื่อ นามสกุล) :
               </label>
               <AppTextField
                 id="request_name"
@@ -792,9 +911,15 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="request_position"
-                >ตำแหน่ง ผู้เรียนถึง (หนังสือ) :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="request_position"
+              >ตำแหน่ง ผู้เรียนถึง (หนังสือ) :
               </label>
               <AppTextField
                 id="request_position"
@@ -805,15 +930,24 @@ const format = (date) => {
             </VCol>
 
             <!-- 👉 submit and reset button -->
-            <VCol cols="12" md="9" class="d-flex gap-4">
-              <VBtn type="submit" color="success"> ส่งข้อมูล</VBtn>
-              <span class="text-error"
-                >**ตรวจสอบข้อมูลให้ถูกต้องก่อนส่งข้อมูล
-                (ไม่สามารถแก้ไขข้อมูลได้ภายหลัง)</span
+            <VCol
+              cols="12"
+              md="9"
+              class="d-flex gap-4"
+            >
+              <VBtn
+                type="submit"
+                color="success"
               >
-              <!-- <VBtn color="secondary" variant="tonal" type="reset">
-                      Reset
-                    </VBtn> -->
+                ส่งข้อมูล
+              </VBtn>
+              <span class="text-error">**ตรวจสอบข้อมูลให้ถูกต้องก่อนส่งข้อมูล
+                (ไม่สามารถแก้ไขข้อมูลได้ภายหลัง)</span>
+              <!--
+                <VBtn color="secondary" variant="tonal" type="reset">
+                Reset
+                </VBtn> 
+              -->
             </VCol>
             <!--  -->
           </VRow>
@@ -831,14 +965,18 @@ const format = (date) => {
     </VOverlay>
 
     <!-- Edit Form Dialog -->
-    <VDialog v-model="isDialogAddCompanyVisible" persistent class="v-dialog-lg">
+    <VDialog
+      v-model="isDialogAddCompanyVisible"
+      persistent
+      class="v-dialog-lg"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn
-        @click="isDialogAddCompanyVisible = !isDialogAddCompanyVisible"
         absolute
+        @click="isDialogAddCompanyVisible = !isDialogAddCompanyVisible"
       />
       <CompanyAdd
-        :isDialogAddCompanyVisible="isDialogAddCompanyVisible"
+        :is-dialog-add-company-visible="isDialogAddCompanyVisible"
         @toggle:isDialogAddCompanyVisible="
           (newValue) => (isDialogAddCompanyVisible = newValue)
         "
@@ -860,9 +998,7 @@ const format = (date) => {
       style="z-index: 20003 !important"
     >
       <!-- Dialog close btn -->
-      <DialogCloseBtn
-        @click="isDialogConfirmVisible = !isDialogConfirmVisible"
-      />
+      <DialogCloseBtn @click="isDialogConfirmVisible = !isDialogConfirmVisible" />
 
       <!-- Dialog Content -->
       <VCard title="ยืนยันการส่งข้อมูล">
@@ -876,7 +1012,12 @@ const format = (date) => {
           >
             Cancel
           </VBtn>
-          <VBtn @click="onCheckSubmit()" color="error"> ส่งข้อมูล </VBtn>
+          <VBtn
+            color="error"
+            @click="onCheckSubmit"
+          >
+            ส่งข้อมูล
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -889,11 +1030,22 @@ const format = (date) => {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
   </div>
 </template>
+
+<style lang="scss">
+.dp__input {
+  color: #787878;
+}
+</style>
 
 <route lang="yaml">
 meta:

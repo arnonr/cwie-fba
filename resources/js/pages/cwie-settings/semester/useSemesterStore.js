@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useSemesterStore = defineStore("SemesterStore", {
   actions: {
@@ -10,30 +10,30 @@ export const useSemesterStore = defineStore("SemesterStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchSemester({ id }) {
-      return axios.get(`/semester/${id}`);
+      return axios.get(`/semester/${id}`)
     },
 
     async addSemester(dataSend) {
       return await axios.post(`/semester`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async editSemester(dataSend) {
       return await axios.put(`/semester/${dataSend.id}`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async deleteSemester({ id }) {
       return await axios.delete(`/semester/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     fetchTeachers(params) {
@@ -42,8 +42,8 @@ export const useSemesterStore = defineStore("SemesterStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDepartments(params) {
@@ -52,8 +52,8 @@ export const useSemesterStore = defineStore("SemesterStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
   },
-});
+})

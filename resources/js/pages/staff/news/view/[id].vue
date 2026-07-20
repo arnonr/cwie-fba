@@ -1,10 +1,10 @@
 <script setup>
-import { useRoute, useRouter } from "vue-router";
-import { useNewsStore } from "../useNewsStore";
+import { useRoute, useRouter } from "vue-router"
+import { useNewsStore } from "../useNewsStore"
 
-const newsStore = useNewsStore();
-const route = useRoute();
-const router = useRouter();
+const newsStore = useNewsStore()
+const route = useRoute()
+const router = useRouter()
 
 const item = ref({
   id: null,
@@ -12,79 +12,77 @@ const item = ref({
   news_detail: "",
   news_file: [],
   active: 1,
-});
+})
 
-const isOverlay = ref(false);
-const isSnackbarVisible = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
-const isDialogVisible = ref(false);
+const isOverlay = ref(false)
+const isSnackbarVisible = ref(false)
+const snackbarText = ref("")
+const snackbarColor = ref("success")
+const isDialogVisible = ref(false)
 
 if (localStorage.getItem("added") == 1) {
-  snackbarText.value = "Added News";
-  snackbarColor.value = "success";
-  isSnackbarVisible.value = true;
-  localStorage.removeItem("added");
+  snackbarText.value = "Added News"
+  snackbarColor.value = "success"
+  isSnackbarVisible.value = true
+  localStorage.removeItem("added")
 }
 
 if (localStorage.getItem("updated") == 1) {
-  snackbarText.value = "Updated News";
-  snackbarColor.value = "success";
-  isSnackbarVisible.value = true;
-  localStorage.removeItem("updated");
+  snackbarText.value = "Updated News"
+  snackbarColor.value = "success"
+  isSnackbarVisible.value = true
+  localStorage.removeItem("updated")
 }
 
 newsStore
   .fetchNews({
     id: route.params.id,
   })
-  .then((response) => {
+  .then(response => {
     if (response.data.message == "success") {
-      item.value = response.data.data;
+      item.value = response.data.data
     } else {
-      console.log("error");
+      console.log("error")
     }
   })
-  .catch((error) => {
-    console.error(error);
-    isOverlay.value = false;
-  });
+  .catch(error => {
+    console.error(error)
+    isOverlay.value = false
+  })
 
-const onDelete = (id) => {
+const onDelete = id => {
   newsStore
     .deleteNews({
       id: id,
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.message == "success") {
-        localStorage.setItem("deleted", 1);
+        localStorage.setItem("deleted", 1)
         router.push({
           path: "/staff/news",
-        });
+        })
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 </script>
-<style lang="scss">
-hr {
-  border-top: none;
-}
-</style>
 
 <template>
   <div>
     <VRow>
-      <VCol cols="12" class="mb-2 text-right">
+      <VCol
+        cols="12"
+        class="mb-2 text-right"
+      >
         <VBtn
           color="success"
           prepend-icon="tabler-edit"
@@ -93,8 +91,8 @@ hr {
             params: { id: route.params.id },
           }"
         >
-          EDIT</VBtn
-        >
+          EDIT
+        </VBtn>
         <VBtn
           prepend-icon="tabler-trash"
           class="ml-2"
@@ -109,11 +107,20 @@ hr {
     <VCard title="ข้อมูลข่าว">
       <VCardText>
         <VRow class="mt-1 mb-1">
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">ปกข่าว : </span>
           </VCol>
-          <VCol cols="12" md="10">
-            <a :href="item.news_file" target="_blank">
+          <VCol
+            cols="12"
+            md="10"
+          >
+            <a
+              :href="item.news_file"
+              target="_blank"
+            >
               <VImg
                 :src="item.news_file"
                 style="max-width: 300px"
@@ -122,51 +129,87 @@ hr {
             </a>
           </VCol>
 
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">หัวข้อข่าว: </span>
           </VCol>
-          <VCol cols="12" md="10">
+          <VCol
+            cols="12"
+            md="10"
+          >
             <span class="font-italic">{{ item.news_title }}</span>
           </VCol>
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
 
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <span class="font-weight-bold">เนื้อหาข่าว : </span>
           </VCol>
-          <VCol cols="12" md="10">
-            <div v-html="item.news_detail"></div>
+          <VCol
+            cols="12"
+            md="10"
+          >
+            <div v-html="item.news_detail" />
           </VCol>
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
 
-          <VCol cols="6" md="2">
+          <VCol
+            cols="6"
+            md="2"
+          >
             <span class="font-weight-bold">สถานะ : </span>
           </VCol>
-          <VCol cols="6" md="10">
+          <VCol
+            cols="6"
+            md="10"
+          >
             <span class="font-italic">
-              <VChip color="success" v-if="item.active == 1"> Active </VChip>
-              <VChip color="default" v-else> In Active </VChip>
+              <VChip
+                v-if="item.active == 1"
+                color="success"
+              > Active </VChip>
+              <VChip
+                v-else
+                color="default"
+              > In Active </VChip>
             </span>
           </VCol>
 
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
 
-          <VCol cols="6" md="2">
+          <VCol
+            cols="6"
+            md="2"
+          >
             <span class="font-weight-bold">ปักหมุด : </span>
           </VCol>
-          <VCol cols="6" md="10">
+          <VCol
+            cols="6"
+            md="10"
+          >
             <span class="font-italic">
-              <VChip color="success" v-if="item.pinned == 1"> Yes </VChip>
-              <VChip color="default" v-else> No </VChip>
+              <VChip
+                v-if="item.pinned == 1"
+                color="success"
+              > Yes </VChip>
+              <VChip
+                v-else
+                color="default"
+              > No </VChip>
             </span>
           </VCol>
           <VCol cols="12">
-            <hr />
+            <hr>
           </VCol>
         </VRow>
       </VCardText>
@@ -179,11 +222,20 @@ hr {
     >
       {{ snackbarText }}
       <template #actions>
-        <VBtn color="error" @click="isSnackbarVisible = false"> Close </VBtn>
+        <VBtn
+          color="error"
+          @click="isSnackbarVisible = false"
+        >
+          Close
+        </VBtn>
       </template>
     </VSnackbar>
 
-    <VDialog v-model="isDialogVisible" persistent class="v-dialog-sm">
+    <VDialog
+      v-model="isDialogVisible"
+      persistent
+      class="v-dialog-sm"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isDialogVisible = !isDialogVisible" />
 
@@ -201,12 +253,23 @@ hr {
           >
             Cancel
           </VBtn>
-          <VBtn @click="onDelete(route.params.id)" color="error"> Delete </VBtn>
+          <VBtn
+            color="error"
+            @click="onDelete(route.params.id)"
+          >
+            Delete
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
   </div>
 </template>
+
+<style lang="scss">
+hr {
+  border-top: none;
+}
+</style>
 
 <route lang="yaml">
 meta:

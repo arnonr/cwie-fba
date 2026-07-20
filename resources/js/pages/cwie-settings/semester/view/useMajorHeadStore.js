@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useMajorHeadStore = defineStore("MajorHeadStore", {
   actions: {
@@ -10,30 +10,30 @@ export const useMajorHeadStore = defineStore("MajorHeadStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajorHead({ id }) {
-      return axios.get(`/major-head/${id}`);
+      return axios.get(`/major-head/${id}`)
     },
 
     async addMajorHead(dataSend) {
       return await axios.post(`/major-head`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async editMajorHead(dataSend) {
       return await axios.put(`/major-head/${dataSend.id}`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async deleteMajorHead({ id }) {
       return await axios.delete(`/major-head/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     fetchTeachers(params) {
@@ -42,8 +42,8 @@ export const useMajorHeadStore = defineStore("MajorHeadStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDepartments(params) {
@@ -52,8 +52,8 @@ export const useMajorHeadStore = defineStore("MajorHeadStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajors(params) {
@@ -62,8 +62,8 @@ export const useMajorHeadStore = defineStore("MajorHeadStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
   },
-});
+})

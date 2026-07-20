@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useConfigStore = defineStore("ConfigStore", {
   actions: {
@@ -10,18 +10,18 @@ export const useConfigStore = defineStore("ConfigStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchConfig({ id }) {
-      return axios.get(`/config/${id}`);
+      return axios.get(`/config/${id}`)
     },
 
     async editConfig(dataSend) {
       return await axios.put(`/config/${dataSend.setting_id}`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
   },
-});
+})

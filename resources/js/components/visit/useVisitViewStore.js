@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useVisitViewStore = defineStore("VisitViewStore", {
   actions: {
@@ -9,8 +9,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudents(params) {
@@ -19,21 +19,21 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudent({ id }) {
       return axios.get(`/student/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async editStudent(dataSend) {
       //
       return await axios.put(`/student/${dataSend.id}`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     fetchTeachers(params) {
@@ -42,8 +42,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchProvinces(params) {
@@ -52,8 +52,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchAmphurs(params) {
@@ -62,8 +62,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTumbols(params) {
@@ -72,8 +72,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDepartments(params) {
@@ -82,8 +82,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDocumentTypes(params) {
@@ -92,8 +92,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudentDocuments(params) {
@@ -102,8 +102,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchSemesters(params) {
@@ -112,8 +112,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchCompanies(params) {
@@ -122,8 +122,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajorHeads(params) {
@@ -132,32 +132,34 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async addRejectLog(dataSend) {
       return await axios.post(`/reject-log`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async approve(dataSend) {
-      console.log(dataSend);
+      console.log(dataSend)
+      
       return await axios.put(`/form/${dataSend.id}`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
 
     async addVisit(dataSend) {
-      var form_data = new FormData();
+      var form_data = new FormData()
 
       for (var key in dataSend) {
-        form_data.append(key, dataSend[key]);
+        form_data.append(key, dataSend[key])
         if (dataSend[key] == null) {
-          dataSend[key] = "";
+          dataSend[key] = ""
         }
       }
+
       //   form_data.append("_method", "PUT");
 
       return await axios.post(`/visit`, form_data, {
@@ -165,7 +167,7 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
           "Content-Type": "multipart/form-data",
         },
         validateStatus: () => true,
-      });
+      })
     },
 
     fetchVisits(params) {
@@ -174,8 +176,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchVisitRejectLogs(params) {
@@ -184,8 +186,8 @@ export const useVisitViewStore = defineStore("VisitViewStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
   },
-});
+})

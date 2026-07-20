@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useStudentListStore = defineStore("StudentListStore", {
   actions: {
@@ -9,8 +9,8 @@ export const useStudentListStore = defineStore("StudentListStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchSemesters(params) {
@@ -19,8 +19,8 @@ export const useStudentListStore = defineStore("StudentListStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajors(params) {
@@ -29,8 +29,8 @@ export const useStudentListStore = defineStore("StudentListStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTeachers(params) {
@@ -39,8 +39,8 @@ export const useStudentListStore = defineStore("StudentListStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajorHeads(params) {
@@ -49,8 +49,8 @@ export const useStudentListStore = defineStore("StudentListStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async editSupervision(dataSend) {
@@ -59,14 +59,14 @@ export const useStudentListStore = defineStore("StudentListStore", {
         dataSend,
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     async importSupervision(dataSend) {
       return await axios.post(`/form/import-form-supervision`, dataSend, {
         validateStatus: () => true,
-      });
+      })
     },
   },
-});
+})

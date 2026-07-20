@@ -1,26 +1,27 @@
 <script setup>
-import { requiredValidator } from "@validators";
-import { useRoute, useRouter } from "vue-router";
-import { useSemesterStore } from "../useSemesterStore";
+import { requiredValidator } from "@validators"
+import { useRoute, useRouter } from "vue-router"
+import { useSemesterStore } from "../useSemesterStore"
 
-import VueDatePicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
+import VueDatePicker from "@vuepic/vue-datepicker"
+import "@vuepic/vue-datepicker/dist/main.css"
 
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import buddhistEra from "dayjs/plugin/buddhistEra";
+import dayjs from "dayjs"
+import "dayjs/locale/th"
+import buddhistEra from "dayjs/plugin/buddhistEra"
 
 // const route = useRoute();
-dayjs.extend(buddhistEra);
-const route = useRoute();
-const router = useRouter();
-const semesterStore = useSemesterStore();
+dayjs.extend(buddhistEra)
 
-const item = ref({});
+const route = useRoute()
+const router = useRouter()
+const semesterStore = useSemesterStore()
 
-const isOverlay = ref(false);
-const isFormValid = ref(false);
-const refForm = ref();
+const item = ref({})
+
+const isOverlay = ref(false)
+const isFormValid = ref(false)
+const refForm = ref()
 
 const selectOptions = ref({
   teachers: [],
@@ -29,30 +30,31 @@ const selectOptions = ref({
     { title: "Active", value: 1 },
     { title: "In Active", value: 0 },
   ],
-});
+})
 
 const fetchTeachers = () => {
   semesterStore
     .fetchTeachers()
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.teachers = response.data.data.map((r) => {
+        selectOptions.value.teachers = response.data.data.map(r => {
           return {
             title: r.prefix + r.firstname + " " + r.surname,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchTeachers();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchTeachers()
 
 const fetchDepartments = () => {
   semesterStore
@@ -60,48 +62,50 @@ const fetchDepartments = () => {
       faculty_id: 1,
       name_th: "สาขาวิชา",
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        selectOptions.value.departments = response.data.data.map((r) => {
+        selectOptions.value.departments = response.data.data.map(r => {
           return {
             title: r.name_th,
             value: r.id,
-          };
-        });
-        isOverlay.value = false;
+          }
+        })
+        isOverlay.value = false
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-      isOverlay.value = false;
-    });
-};
-fetchDepartments();
+    .catch(error => {
+      console.error(error)
+      isOverlay.value = false
+    })
+}
+
+fetchDepartments()
 
 semesterStore
   .fetchSemester({
     id: route.params.id,
   })
-  .then((response) => {
+  .then(response => {
     if (response.data.message == "success") {
-      const { data } = response.data;
-      item.value = { ...data };
+      const { data } = response.data
+
+      item.value = { ...data }
     } else {
-      console.log("error");
+      console.log("error")
     }
   })
-  .catch((error) => {
-    console.error(error);
-    isOverlay.value = false;
-  });
+  .catch(error => {
+    console.error(error)
+    isOverlay.value = false
+  })
 
 const onSubmit = () => {
-  isOverlay.value = true;
+  isOverlay.value = true
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
-      console.log(item.value.default_request_doc_date);
+      console.log(item.value.default_request_doc_date)
       semesterStore
         .editSemester({
           ...item.value,
@@ -128,132 +132,147 @@ const onSubmit = () => {
               ? dayjs(item.value.default_request_doc_date).format("YYYY-MM-DD")
               : null,
         })
-        .then((response) => {
+        .then(response => {
           if (response.data.message == "success") {
-            localStorage.setItem("updated", 1);
+            localStorage.setItem("updated", 1)
             nextTick(() => {
               router.push({
                 path: "/cwie-settings/semester/view/" + response.data.data.id,
-              });
-            });
+              })
+            })
           } else {
-            isOverlay.value = false;
-            console.log("error");
+            isOverlay.value = false
+            console.log("error")
           }
         })
-        .catch((error) => {
-          console.error(error);
+        .catch(error => {
+          console.error(error)
+
           //   isOverlay.value = false;
-        });
+        })
     }
-    isOverlay.value = false;
-  });
-};
+    isOverlay.value = false
+  })
+}
 
 onMounted(() => {
-  window.scrollTo(0, 0);
-});
+  window.scrollTo(0, 0)
+})
 
-const format = (date) => {
-  const day = dayjs(date).locale("th").format("DD");
-  const month = dayjs(date).locale("th").format("MMM");
-  const year = date.getFullYear() + 543;
+const format = date => {
+  const day = dayjs(date).locale("th").format("DD")
+  const month = dayjs(date).locale("th").format("MMM")
+  const year = date.getFullYear() + 543
 
-  return `${day} ${month} ${year}`;
-};
+  return `${day} ${month} ${year}`
+}
 </script>
-<style lang="scss">
-.v-card,
-.v-card-item__content {
-  overflow: visible !important;
-}
-.dp__input {
-  color: #787878;
-}
-</style>
 
 <template>
   <div>
     <VCard title="แบบฟอร์มปีการศึกษา">
       <VCardItem>
-        <VForm ref="refForm" v-model="isFormValid" @submit.prevent="onSubmit">
+        <VForm
+          ref="refForm"
+          v-model="isFormValid"
+          @submit.prevent="onSubmit"
+        >
           <VRow class="mt-1 mb-1">
-            <VCol cols="12" md="4" class="align-items-center">
+            <VCol
+              cols="12"
+              md="4"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="term"
                 cols="12"
                 md="4"
-                >ภาคการศึกษาที่ :
+              >ภาคการศึกษาที่ :
               </label>
               <AppTextField
                 id="term"
-                :rules="[requiredValidator]"
                 v-model="item.term"
+                :rules="[requiredValidator]"
                 placeholder="Term"
                 persistent-placeholder
               />
             </VCol>
 
-            <VCol cols="12" md="4" class="align-items-center">
+            <VCol
+              cols="12"
+              md="4"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="semester_year"
                 cols="12"
                 md="4"
-                >ปีการศึกษา (พ.ศ.) :
+              >ปีการศึกษา (พ.ศ.) :
               </label>
               <AppTextField
                 id="semester_year"
-                :rules="[requiredValidator]"
                 v-model="item.semester_year"
+                :rules="[requiredValidator]"
                 placeholder="Year"
                 persistent-placeholder
               />
             </VCol>
 
-            <VCol cols="12" md="4" class="align-items-center">
+            <VCol
+              cols="12"
+              md="4"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="round_no"
                 cols="12"
                 md="4"
-                >รอบการออกสหกิจศึกษาที่ :
+              >รอบการออกสหกิจศึกษาที่ :
               </label>
               <AppTextField
                 id="round_no"
-                :rules="[requiredValidator]"
                 v-model="item.round_no"
+                :rules="[requiredValidator]"
                 placeholder="Round"
                 persistent-placeholder
               />
             </VCol>
 
             <!--  -->
-            <VCol cols="12" md="12">
+            <VCol
+              cols="12"
+              md="12"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="chairman_id"
                 cols="12"
                 md="12"
-                >ประธานบริหารโครงการสหกิจศึกษา :
+              >ประธานบริหารโครงการสหกิจศึกษา :
               </label>
               <AppSelect
-                :items="selectOptions.teachers"
                 v-model="item.chairman_id"
+                :items="selectOptions.teachers"
                 :rules="[requiredValidator]"
                 variant="outlined"
                 placeholder="Chairman"
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="start_date"
                 cols="12"
                 md="4"
-                >วันที่เริ่มออกสหกิจศึกษา :
+              >วันที่เริ่มออกสหกิจศึกษา :
               </label>
               <VueDatePicker
                 v-model="item.start_date"
@@ -272,13 +291,17 @@ const format = (date) => {
               </VueDatePicker>
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="end_date"
                 cols="12"
                 md="4"
-                >วันที่สิ้นสุดการปฏิบัติสหกิจศึกษา :
+              >วันที่สิ้นสุดการปฏิบัติสหกิจศึกษา :
               </label>
               <VueDatePicker
                 v-model="item.end_date"
@@ -297,13 +320,17 @@ const format = (date) => {
               </VueDatePicker>
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="province_id"
                 cols="12"
                 md="4"
-                >วันที่เปิดรับสมัคร :
+              >วันที่เปิดรับสมัคร :
               </label>
               <VueDatePicker
                 v-model="item.regis_start_date"
@@ -322,13 +349,17 @@ const format = (date) => {
               </VueDatePicker>
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="province_id"
                 cols="12"
                 md="4"
-                >วันที่ปิดรับสมัคร :
+              >วันที่ปิดรับสมัคร :
               </label>
               <VueDatePicker
                 v-model="item.regis_end_date"
@@ -347,13 +378,17 @@ const format = (date) => {
               </VueDatePicker>
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="default_request_doc_no"
                 cols="12"
                 md="4"
-                >เลขที่หนังสือขอความอนุเคราะห์ :
+              >เลขที่หนังสือขอความอนุเคราะห์ :
               </label>
               <AppTextField
                 id="default_request_doc_no"
@@ -363,13 +398,17 @@ const format = (date) => {
               />
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
               <label
                 class="v-label font-weight-bold"
                 for="default_request_doc_date"
                 cols="12"
                 md="4"
-                >วันที่ออกหนังสือขอความอนุเคราะห์ :
+              >วันที่ออกหนังสือขอความอนุเคราะห์ :
               </label>
               <VueDatePicker
                 v-model="item.default_request_doc_date"
@@ -387,24 +426,41 @@ const format = (date) => {
               </VueDatePicker>
             </VCol>
 
-            <VCol cols="12" md="6" class="align-items-center">
-              <label class="v-label font-weight-bold" for="website"
-                >สถานะ :
+            <VCol
+              cols="12"
+              md="6"
+              class="align-items-center"
+            >
+              <label
+                class="v-label font-weight-bold"
+                for="website"
+              >สถานะ :
               </label>
               <AppSelect
-                :items="selectOptions.actives"
                 v-model="item.active"
+                :items="selectOptions.actives"
                 variant="outlined"
                 placeholder="Status"
               />
             </VCol>
 
             <!-- 👉 submit and reset button -->
-            <VCol cols="12" md="9" class="d-flex gap-4">
-              <VBtn type="submit" color="success"> Submit </VBtn>
-              <!-- <VBtn color="secondary" variant="tonal" type="reset">
-                      Reset
-                    </VBtn> -->
+            <VCol
+              cols="12"
+              md="9"
+              class="d-flex gap-4"
+            >
+              <VBtn
+                type="submit"
+                color="success"
+              >
+                Submit
+              </VBtn>
+              <!--
+                <VBtn color="secondary" variant="tonal" type="reset">
+                Reset
+                </VBtn> 
+              -->
             </VCol>
             <!--  -->
           </VRow>
@@ -422,6 +478,16 @@ const format = (date) => {
     </VOverlay>
   </div>
 </template>
+
+<style lang="scss">
+.v-card,
+.v-card-item__content {
+  overflow: visible !important;
+}
+.dp__input {
+  color: #787878;
+}
+</style>
 
 <route lang="yaml">
 meta:

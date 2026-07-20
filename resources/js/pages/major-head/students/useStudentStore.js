@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useStudentStore = defineStore("StudentStore", {
   actions: {
@@ -9,8 +9,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudents(params) {
@@ -19,8 +19,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchListStudents(params) {
@@ -29,14 +29,14 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudent({ id }) {
       return axios.get(`/student/${id}`, {
         validateStatus: () => true,
-      });
+      })
     },
 
     fetchProvinces(params) {
@@ -45,8 +45,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchAmphurs(params) {
@@ -55,8 +55,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTumbols(params) {
@@ -65,8 +65,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDepartments(params) {
@@ -75,8 +75,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchDocumentTypes(params) {
@@ -85,8 +85,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchStudentDocuments(params) {
@@ -95,8 +95,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchSemesters(params) {
@@ -105,8 +105,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchCompanies(params) {
@@ -115,8 +115,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajorHeads(params) {
@@ -125,8 +125,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajors(params) {
@@ -135,8 +135,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTeachers(params) {
@@ -145,8 +145,8 @@ export const useStudentStore = defineStore("StudentStore", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
   },
-});
+})

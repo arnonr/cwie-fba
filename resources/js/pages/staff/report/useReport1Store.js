@@ -1,5 +1,5 @@
-import axios from "@axios";
-import { defineStore } from "pinia";
+import axios from "@axios"
+import { defineStore } from "pinia"
 
 export const useReport1Store = defineStore("Report1Store", {
   actions: {
@@ -9,8 +9,8 @@ export const useReport1Store = defineStore("Report1Store", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchSemesters(params) {
@@ -19,8 +19,8 @@ export const useReport1Store = defineStore("Report1Store", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajors(params) {
@@ -29,8 +29,8 @@ export const useReport1Store = defineStore("Report1Store", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchTeachers(params) {
@@ -39,8 +39,8 @@ export const useReport1Store = defineStore("Report1Store", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
 
     fetchMajorHeads(params) {
@@ -49,8 +49,8 @@ export const useReport1Store = defineStore("Report1Store", {
         { params },
         {
           validateStatus: () => true,
-        }
-      );
+        },
+      )
     },
   },
-});
+})

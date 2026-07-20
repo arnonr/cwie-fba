@@ -1,27 +1,28 @@
 <script setup>
-import { useDashboardStore } from "./useDashboardStore";
+import { useDashboardStore } from "./useDashboardStore"
 
-const rowPerPage = ref(8);
-const currentPage = ref(1);
-const totalPage = ref(1);
-const totalItems = ref(0);
-const orderBy = ref("news.id");
-const order = ref("desc");
+const rowPerPage = ref(8)
+const currentPage = ref(1)
+const totalPage = ref(1)
+const totalItems = ref(0)
+const orderBy = ref("news.id")
+const order = ref("desc")
 
-const rowPerPage1 = ref(10);
-const currentPage1 = ref(1);
-const totalPage1 = ref(1);
-const totalItems1 = ref(0);
+const rowPerPage1 = ref(10)
+const currentPage1 = ref(1)
+const totalPage1 = ref(1)
+const totalItems1 = ref(0)
 
-const rowPerPage2 = ref(10);
-const currentPage2 = ref(1);
-const totalPage2 = ref(1);
-const totalItems2 = ref(0);
+const rowPerPage2 = ref(10)
+const currentPage2 = ref(1)
+const totalPage2 = ref(1)
+const totalItems2 = ref(0)
 
-const dashboardStore = useDashboardStore();
+const dashboardStore = useDashboardStore()
 
-const news = ref([]);
-const documentDownloads = ref([]);
+const news = ref([])
+const documentDownloads = ref([])
+
 const manuals = ref([
   {
     manual_file: "https://youtu.be/qL2st5Ls57c",
@@ -33,7 +34,7 @@ const manuals = ref([
     manual_url: "https://youtu.be/QFhDqZdy8ms",
     name: "การอัพโหลดแผนการปฏิบัติงาน",
   },
-]);
+])
 
 // 👉 Fetching
 const fetchItems = () => {
@@ -44,27 +45,28 @@ const fetchItems = () => {
       orderBy: orderBy.value,
       order: order.value,
       active: 1,
+
       //   ...search,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        news.value = response.data.data;
-        totalPage.value = response.data.totalPage;
-        totalItems.value = response.data.totalData;
+        news.value = response.data.data
+        totalPage.value = response.data.totalPage
+        totalItems.value = response.data.totalData
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+    .catch(error => {
+      console.error(error)
+    })
+}
 
-watchEffect(fetchItems);
+watchEffect(fetchItems)
 
 watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value
+})
 
 // 👉 Fetching
 const fetchDocumentDownload = () => {
@@ -72,50 +74,66 @@ const fetchDocumentDownload = () => {
     .fetchDocumentDownloads({
       perPage: rowPerPage1.value,
       currentPage: currentPage1.value,
+
       //   orderBy: '',
       //   order: order.value,
       //   ...search,
     })
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
-        documentDownloads.value = response.data.data;
-        totalPage1.value = response.data.totalPage;
-        totalItems1.value = response.data.totalData;
+        documentDownloads.value = response.data.data
+        totalPage1.value = response.data.totalPage
+        totalItems1.value = response.data.totalData
       } else {
-        console.log("error");
+        console.log("error")
       }
     })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+    .catch(error => {
+      console.error(error)
+    })
+}
 
-fetchDocumentDownload();
+fetchDocumentDownload()
 </script>
 
 <template>
   <div>
     <VRow class="match-height">
       <!--     -->
-      <VCol cols="12" class="mt-5">
+      <VCol
+        cols="12"
+        class="mt-5"
+      >
         <h2>ข่าวประชาสัมพันธ์</h2>
-        <hr />
+        <hr>
       </VCol>
 
-      <VCol cols="12" lg="12">
+      <VCol
+        cols="12"
+        lg="12"
+      >
         <VRow>
           <!-- Card -->
-          <VCol cols="12" sm="6" md="4" v-for="nw in news" :key="nw.id">
+          <VCol
+            v-for="nw in news"
+            :key="nw.id"
+            cols="12"
+            sm="6"
+            md="4"
+          >
             <VCard
+              class="news-card cursor-pointer"
               @click="
                 $router.push({
                   name: 'dashboards-new-id',
                   params: { id: nw.id },
                 })
               "
-              class="news-card cursor-pointer"
             >
-              <VImg :src="nw.news_file" cover />
+              <VImg
+                :src="nw.news_file"
+                cover
+              />
 
               <VCardText style="min-height: 200px !important">
                 <h2 style="font-size: 1.25rem; font-weight: 500">
@@ -149,29 +167,52 @@ fetchDocumentDownload();
     </VRow>
 
     <VRow>
-      <VCol cols="6" lg="6">
+      <VCol
+        cols="6"
+        lg="6"
+      >
         <h2>เอกสารดาวน์โหลด</h2>
-        <hr class="mb-2" />
+        <hr class="mb-2">
 
         <VRow>
           <!-- Card -->
-          <VCol cols="12" sm="12" md="12">
+          <VCol
+            cols="12"
+            sm="12"
+            md="12"
+          >
             <VTable>
               <thead>
                 <tr>
-                  <th class="text-left">ชื่อเอกสาร</th>
-                  <th class="text-center" style="width: 200px">ดาวน์โหลด</th>
+                  <th class="text-left">
+                    ชื่อเอกสาร
+                  </th>
+                  <th
+                    class="text-center"
+                    style="width: 200px"
+                  >
+                    ดาวน์โหลด
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(dd, index) in documentDownloads" :key="index">
+                <tr
+                  v-for="(dd, index) in documentDownloads"
+                  :key="index"
+                >
                   <td>
-                    <a :href="dd.document_file" target="_blank">{{
+                    <a
+                      :href="dd.document_file"
+                      target="_blank"
+                    >{{
                       dd.document_name
                     }}</a>
                   </td>
                   <td class="text-center">
-                    <a :href="dd.document_file" target="_blank">
+                    <a
+                      :href="dd.document_file"
+                      target="_blank"
+                    >
                       <VIcon
                         size="22"
                         icon="tabler-file"
@@ -203,27 +244,50 @@ fetchDocumentDownload();
         />
       </VCol>
       <!--  -->
-      <VCol cols="6" lg="6">
+      <VCol
+        cols="6"
+        lg="6"
+      >
         <h2>คู่มือการใช้งานระบบ</h2>
-        <hr class="mb-2" />
+        <hr class="mb-2">
 
         <VRow>
           <!-- Card -->
-          <VCol cols="12" sm="12" md="12">
+          <VCol
+            cols="12"
+            sm="12"
+            md="12"
+          >
             <VTable>
               <thead>
                 <tr>
-                  <th class="text-left">ไฟล์</th>
-                  <th class="text-center" style="width: 200px">ดาวน์โหลด</th>
+                  <th class="text-left">
+                    ไฟล์
+                  </th>
+                  <th
+                    class="text-center"
+                    style="width: 200px"
+                  >
+                    ดาวน์โหลด
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(mn, index) in manuals" :key="index">
+                <tr
+                  v-for="(mn, index) in manuals"
+                  :key="index"
+                >
                   <td>
-                    <a :href="mn.manual_url" target="_blank">{{ mn.name }}</a>
+                    <a
+                      :href="mn.manual_url"
+                      target="_blank"
+                    >{{ mn.name }}</a>
                   </td>
                   <td class="text-center">
-                    <a :href="mn.manual_url" target="_blank">
+                    <a
+                      :href="mn.manual_url"
+                      target="_blank"
+                    >
                       <VIcon
                         size="22"
                         icon="tabler-file"
