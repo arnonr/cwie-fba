@@ -116,6 +116,13 @@ class MajorController extends Controller
 
     public function import($code,$name){
         $item = Major::where('major_code',$code)->first();
+
+        if(!$item){
+            $item = Major::where('name_th',$name)
+                ->orWhere('name_en',$name)
+                ->first();
+        }
+
         if(!$item){
             $item = new Major;
             $item->major_code = $code;
