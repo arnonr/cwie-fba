@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\ConnectionException;
 use Carbon\Carbon;
 use Laravel\Sanctum\PersonalAccessToken;
 const whitelist = ["127.0.0.1", "::1", "localhost:8117"];
@@ -899,91 +901,177 @@ class StudentController extends Controller
 
     public function icitAccountApiStudentInfo($student_code)
     {
-        $this->errorCode = self::ERROR_NONE;
-
         $access_token = "b9uSJchxbwxCWLtQ-oGUH-NPQuy1pKA4"; // <----- API - Access Token Here
 
         $data = [
             "id" => $student_code,
+            "get_id_card" => 1,
         ];
 
         $api_url =
             "https://api.account.kmutnb.ac.th/api/account-api/student-info"; // <----- API URL
 
-        $response = Http::timeout(50)
-            ->withToken($access_token)
-            ->post($api_url, $data);
+        try {
+            $response = Http::timeout(50)
+                ->withToken($access_token)
+                ->post($api_url, $data);
+        } catch (ConnectionException $exception) {
+            Log::warning("Unable to connect to student-info service", [
+                "student_code" => $student_code,
+                "exception" => $exception->getMessage(),
+            ]);
 
-        // return $response->json();
-
-        if ($response == false) {
-            $this->errorCode = self::ERROR_API_FAIL;
-            $this->errorMessage = "HTTP Guzzle error";
-        } else {
-            $json_data = json_decode($response, true);
-
-            if ($json_data["STU_CODE"] !== "undefined") {
-                $this->errorCode = self::ERROR_NOT_FOUND_STUDENT_CODE;
-                $this->errorMessage = "NOT FOUND STUDENT CODE";
-            }
-
-            $req = new Request();
-            $req->student_code = $json_data["STU_CODE"];
-
-            if ($json_data["PRE_NAME_THAI"] == "นางสาว") {
-                $req->prefix_id = "03";
-            }
-
-            if ($json_data["PRE_NAME_THAI"] == "นาง") {
-                $req->prefix_id = "02";
-            }
-
-            if ($json_data["PRE_NAME_THAI"] == "นาย") {
-                $req->prefix_id = "01";
-            }
-
-            $req->firstname = $json_data["STU_FIRST_NAME_THAI"];
-            $req->surname = $json_data["STU_LAST_NAME_THAI"];
-            $req->citizen_id = $json_data["ID_CARD"];
-            $req->faculty_code = $json_data["FAC_CODE"];
-            $req->faculty_name = $json_data["FAC_NAME_THAI"];
-            $req->department_code = $json_data["DEPT_CODE"];
-            $req->department_name = $json_data["DEPT_NAME_THAI"];
-            $req->major_code = $json_data["DIV_CODE"];
-            $req->major_name = $json_data["DIV_NAME_THAI"];
-
-            if ($req->major_code == "140101") {
-                $req->major_code = "140102";
-                $req->major_name = "บริหารธุรกิจอุตสาหกรรมและโลจิสติกส์";
-            }
-
-            return $req;
-            // return [
-            //     student_code => $json_data['STU_CODE'],
-            //     prefix_id => $json_data['STU_PRE_NAME'],
-            //     firstname => $json_data['STU_FIRST_NAME_THAI'],
-            //     surname => $json_data['STU_LAST_NAME_THAI'],
-            //     citizen_id => $json_data['ID_CARD'],
-            //     faculty_code => $json_data['FAC_CODE'],
-            //     faculty_name => $json_data['FAC_NAME_THAI'],
-            //     department_code => $json_data['DEPT_CODE'],
-            //     department_name => $json_data['DEPT_NAME_THAI'],
-            //     division_code => $json_data['DIV_CODE'],
-            //     division_name => $json_data['DIV_NAME_THAI'],
-            // ];
+            return [
+                "success" => false,
+                "status" => 503,
+                "message" =>
+                    "ไม่สามารถเชื่อมต่อเพื่อดึงข้อมูลนักศึกษาจากระบบ REG ได้ กรุณาลองใหม่อีกครั้ง",
+            ];
         }
 
-        return $this->errorCode;
+        if (!$response->successful()) {
+            Log::warning("Student-info service returned an error", [
+                "student_code" => $student_code,
+                "status" => $response->status(),
+            ]);
+
+            if ($response->status() === 404) {
+                return [
+                    "success" => false,
+                    "status" => 404,
+                    "message" => "ไม่พบข้อมูลนักศึกษาจากระบบ REG",
+                ];
+            }
+
+            return [
+                "success" => false,
+                "status" => 503,
+                "message" =>
+                    "ไม่สามารถดึงข้อมูลนักศึกษาจากระบบ REG ได้ กรุณาลองใหม่อีกครั้ง",
+            ];
+        }
+
+        $json_data = $response->json();
+
+        if (!is_array($json_data)) {
+            return [
+                "success" => false,
+                "status" => 503,
+                "message" => "ข้อมูลนักศึกษาจากระบบ REG ไม่ถูกต้อง",
+            ];
+        }
+
+        if (
+            !isset($json_data["STU_CODE"]) ||
+            trim((string) $json_data["STU_CODE"]) === "" ||
+            $json_data["STU_CODE"] === "undefined"
+        ) {
+            return [
+                "success" => false,
+                "status" => 404,
+                "message" => "ไม่พบข้อมูลนักศึกษาจากระบบ REG",
+            ];
+        }
+
+        $required_fields = [
+            "PRE_NAME_THAI",
+            "STU_FIRST_NAME_THAI",
+            "STU_LAST_NAME_THAI",
+            "ID_CARD",
+            "FAC_CODE",
+            "FAC_NAME_THAI",
+            "DIV_CODE",
+            "DIV_NAME_THAI",
+        ];
+
+        foreach ($required_fields as $field) {
+            if (
+                !isset($json_data[$field]) ||
+                trim((string) $json_data[$field]) === "" ||
+                $json_data[$field] === "undefined"
+            ) {
+                return [
+                    "success" => false,
+                    "status" => 422,
+                    "message" =>
+                        "ข้อมูลนักศึกษาจากระบบ REG ไม่ครบถ้วน กรุณาติดต่อผู้ดูแลระบบ",
+                ];
+            }
+        }
+
+        $prefix_ids = [
+            "นาย" => "01",
+            "นาง" => "02",
+            "นางสาว" => "03",
+        ];
+        $prefix_id = $prefix_ids[$json_data["PRE_NAME_THAI"]] ?? null;
+
+        if (!$prefix_id) {
+            return [
+                "success" => false,
+                "status" => 422,
+                "message" =>
+                    "คำนำหน้าชื่อนักศึกษาไม่ถูกต้อง กรุณาติดต่อผู้ดูแลระบบ",
+            ];
+        }
+
+        $req = new Request();
+        $req->student_code = $json_data["STU_CODE"];
+        $req->prefix_id = $prefix_id;
+        $req->firstname = $json_data["STU_FIRST_NAME_THAI"];
+        $req->surname = $json_data["STU_LAST_NAME_THAI"];
+        $req->citizen_id = $json_data["ID_CARD"];
+        $req->faculty_code = $json_data["FAC_CODE"];
+        $req->faculty_name = $json_data["FAC_NAME_THAI"];
+        $req->department_code = $json_data["DEPT_CODE"] ?? null;
+        $req->department_name = $json_data["DEPT_NAME_THAI"] ?? null;
+        $req->major_code = $json_data["DIV_CODE"];
+        $req->major_name = $json_data["DIV_NAME_THAI"];
+
+        if ($req->major_code == "140101") {
+            $req->major_code = "140102";
+            $req->major_name = "บริหารธุรกิจอุตสาหกรรมและโลจิสติกส์";
+        }
+
+        return [
+            "success" => true,
+            "status" => 200,
+            "data" => $req,
+        ];
     }
 
     public function import($student_code)
     {
-        $message = "Student already exists";
+        $result = $this->importStudent($student_code);
+
+        return response()->json(
+            ["message" => $result["message"]],
+            $result["status"]
+        );
+    }
+
+    public function importStudent($student_code)
+    {
         $item = Student::where("student_code", $student_code)->first();
 
-        if (!$item) {
-            $result = $this->icitAccountApiStudentInfo($student_code);
+        if ($item) {
+            return [
+                "success" => true,
+                "status" => 200,
+                "message" => "Student already exists",
+                "data" => $item,
+            ];
+        }
 
+        $student_info = $this->icitAccountApiStudentInfo($student_code);
+
+        if (!$student_info["success"]) {
+            return $student_info;
+        }
+
+        $result = $student_info["data"];
+
+        try {
             $faculty = app("App\Http\Controllers\FacultyController")->import(
                 $result->faculty_code,
                 $result->faculty_name
@@ -997,16 +1085,28 @@ class StudentController extends Controller
             $result["faculty_id"] = $faculty->id;
             $result["major_id"] = $major->id;
 
-            // var_dump($result);
-            // print_r($result);
-            $message = "Updated student";
-            if (!$item) {
-                $this->add($result);
-                $message = "Inserted student";
-            }
+            $response = $this->add($result);
+            $student = $response->getData()->data ?? null;
+        } catch (\Throwable $exception) {
+            Log::error("Unable to import student", [
+                "student_code" => $student_code,
+                "exception" => $exception->getMessage(),
+            ]);
+
+            return [
+                "success" => false,
+                "status" => 500,
+                "message" =>
+                    "ไม่สามารถบันทึกข้อมูลนักศึกษาได้ กรุณาติดต่อผู้ดูแลระบบ",
+            ];
         }
 
-        return response()->json(["message" => $message], 200);
+        return [
+            "success" => true,
+            "status" => 200,
+            "message" => "Inserted student",
+            "data" => $student,
+        ];
     }
 
     // public function getList(Request $request)

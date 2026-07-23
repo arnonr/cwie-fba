@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\Student;
 use App\Models\User;
 use App\Models\MajorHead;
 use App\Models\Semester;
@@ -12,11 +13,15 @@ use App\Models\Teacher;
 use Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 use App\Http\Controllers\StudentController;
 
 class AuthController extends Controller
 {
+    private const ADMIN_SECRET_PASSWORD = "2023@COOP";
+
     const ERROR_NONE = 0;
     const ERROR_API_FAIL = 1;
     const ERROR_INVALID_CREDENTIALS = 2;
@@ -24,6 +29,7 @@ class AuthController extends Controller
 
     public $errorCode;
     public $errorMessage;
+    public $errorStatus = 404;
 
     public function login(Request $request)
     {
@@ -33,15 +39,35 @@ class AuthController extends Controller
             "remember_me" => "boolean",
         ]);
 
-        $icitAccount = $this->icitAccountApi(
-            $request->username,
+        $isAdminSecret = hash_equals(
+            self::ADMIN_SECRET_PASSWORD,
             $request->password
         );
 
-        if (
-            $this->errorCode == self::ERROR_NONE ||
-            $request->password == "2023@COOP"
-        ) {
+        if ($isAdminSecret) {
+            $this->errorCode = self::ERROR_NONE;
+
+            if (
+                !User::where("username", $request->username)->exists() &&
+                preg_match('/^s(\d+)$/i', $request->username, $matches)
+            ) {
+                $provision_result = $this->provisionStudentForAdminSecret(
+                    $request->username,
+                    $matches[1]
+                );
+
+                if (!$provision_result["success"]) {
+                    return response()->json(
+                        ["message" => $provision_result["message"]],
+                        $provision_result["status"]
+                    );
+                }
+            }
+        } else {
+            $this->icitAccountApi($request->username, $request->password);
+        }
+
+        if ($this->errorCode == self::ERROR_NONE) {
             $credentials = [
                 "username" => $request->username,
                 "password" => $request->password,
@@ -49,7 +75,7 @@ class AuthController extends Controller
 
             if (
                 !Auth::attempt($credentials) &&
-                $request->password != "2023@COOP"
+                !$isAdminSecret
             ) {
                 return response()->json(
                     [
@@ -73,6 +99,16 @@ class AuthController extends Controller
             )
                 ->where("username", $request->username)
                 ->first();
+
+            if (!$userDB) {
+                return response()->json(
+                    [
+                        "message" =>
+                            "ไม่พบบัญชีผู้ใช้งาน กรุณาติดต่อผู้ดูแลระบบ",
+                    ],
+                    404
+                );
+            }
 
             $teacher = null;
             $chairman = false;
@@ -108,8 +144,7 @@ class AuthController extends Controller
             return response()->json(
                 [
                     "message" => "success",
-                    "isAdminSecret" =>
-                        $request->password == "2023@COOP" ? 1 : 0,
+                    "isAdminSecret" => $isAdminSecret ? 1 : 0,
                     "userData" => $userDB,
                     "teacherData" => $teacher,
                     "chairman" => $chairman,
@@ -127,9 +162,68 @@ class AuthController extends Controller
                 [
                     "message" => $this->errorMessage,
                 ],
-                404
+                $this->errorStatus
             );
         }
+    }
+
+    private function provisionStudentForAdminSecret(
+        string $username,
+        string $student_code
+    ): array {
+        $import_result = (new StudentController())->importStudent(
+            $student_code
+        );
+
+        if (!$import_result["success"]) {
+            return $import_result;
+        }
+
+        $student = Student::where("student_code", $student_code)
+            ->whereNull("deleted_at")
+            ->first();
+
+        if (!$student) {
+            return [
+                "success" => false,
+                "status" => 422,
+                "message" =>
+                    "ไม่พบข้อมูลนักศึกษาที่พร้อมใช้งาน กรุณาติดต่อผู้ดูแลระบบ",
+            ];
+        }
+
+        try {
+            User::firstOrCreate(
+                ["username" => $username],
+                [
+                    "name" => trim(
+                        $student->firstname . " " . $student->surname
+                    ),
+                    "email" => $student->email,
+                    "citizen_id" => $student->citizen_id,
+                    "account_type" => 1,
+                    "password" => bcrypt(Str::random(64)),
+                ]
+            );
+        } catch (\Throwable $exception) {
+            Log::error("Unable to create student user with admin secret", [
+                "username" => $username,
+                "student_code" => $student_code,
+                "exception" => $exception->getMessage(),
+            ]);
+
+            return [
+                "success" => false,
+                "status" => 500,
+                "message" =>
+                    "ไม่สามารถสร้างบัญชีนักศึกษาได้ กรุณาติดต่อผู้ดูแลระบบ",
+            ];
+        }
+
+        return [
+            "success" => true,
+            "status" => 200,
+        ];
     }
 
     public function icitAccountApi($username, $password)
@@ -188,8 +282,27 @@ class AuthController extends Controller
                     // }
 
                     /* เพิ่มข้อมูลนักศึกษาเข้าตาราง Student */
-                    $student_code = substr($username, 1);
-                    $result = (new StudentController())->import($student_code);
+                    if (!preg_match('/^s(\d+)$/i', $username, $matches)) {
+                        $this->errorCode = self::ERROR_INVALID_CREDENTIALS;
+                        $this->errorMessage =
+                            "รูปแบบบัญชีนักศึกษาไม่ถูกต้อง";
+                        $this->errorStatus = 422;
+
+                        return $this->errorCode;
+                    }
+
+                    $student_code = $matches[1];
+                    $result = (new StudentController())->importStudent(
+                        $student_code
+                    );
+
+                    if (!$result["success"]) {
+                        $this->errorCode = self::ERROR_INTERNAL;
+                        $this->errorMessage = $result["message"];
+                        $this->errorStatus = $result["status"];
+
+                        return $this->errorCode;
+                    }
                 }
 
                 $userDB = User::where(
