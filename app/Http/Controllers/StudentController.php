@@ -954,6 +954,21 @@ class StudentController extends Controller
         $json_data = $response->json();
 
         if (!is_array($json_data)) {
+            $response_body = preg_replace(
+                '/("id_card"\s*:\s*")[^"]+("?)/i',
+                '$1***$2',
+                $response->body()
+            );
+
+            Log::warning("Invalid REG student-info response", [
+                "student_code" => $student_code,
+                "status" => $response->status(),
+                "content_type" => $response->header("Content-Type"),
+                "decoded_type" => gettype($json_data),
+                "json_error" => json_last_error_msg(),
+                "body_preview" => substr($response_body, 0, 2000),
+            ]);
+
             return [
                 "success" => false,
                 "status" => 503,
