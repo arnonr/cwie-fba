@@ -962,9 +962,9 @@ class StudentController extends Controller
         }
 
         if (
-            !isset($json_data["STU_CODE"]) ||
-            trim((string) $json_data["STU_CODE"]) === "" ||
-            $json_data["STU_CODE"] === "undefined"
+            !isset($json_data["stu_code"]) ||
+            trim((string) $json_data["stu_code"]) === "" ||
+            $json_data["stu_code"] === "undefined"
         ) {
             return [
                 "success" => false,
@@ -974,14 +974,14 @@ class StudentController extends Controller
         }
 
         $required_fields = [
-            "PRE_NAME_THAI",
-            "STU_FIRST_NAME_THAI",
-            "STU_LAST_NAME_THAI",
-            "ID_CARD",
-            "FAC_CODE",
-            "FAC_NAME_THAI",
-            "DIV_CODE",
-            "DIV_NAME_THAI",
+            "pre_name_thai",
+            "first_name_thai",
+            "last_name_thai",
+            "id_card",
+            "fac_code",
+            "fac_name_thai",
+            "div_code",
+            "div_name_thai",
         ];
 
         foreach ($required_fields as $field) {
@@ -1004,7 +1004,7 @@ class StudentController extends Controller
             "นาง" => "02",
             "นางสาว" => "03",
         ];
-        $prefix_id = $prefix_ids[$json_data["PRE_NAME_THAI"]] ?? null;
+        $prefix_id = $prefix_ids[$json_data["pre_name_thai"]] ?? null;
 
         if (!$prefix_id) {
             return [
@@ -1016,17 +1016,17 @@ class StudentController extends Controller
         }
 
         $req = new Request();
-        $req->student_code = $json_data["STU_CODE"];
+        $req->student_code = $json_data["stu_code"];
         $req->prefix_id = $prefix_id;
-        $req->firstname = $json_data["STU_FIRST_NAME_THAI"];
-        $req->surname = $json_data["STU_LAST_NAME_THAI"];
-        $req->citizen_id = $json_data["ID_CARD"];
-        $req->faculty_code = $json_data["FAC_CODE"];
-        $req->faculty_name = $json_data["FAC_NAME_THAI"];
-        $req->department_code = $json_data["DEPT_CODE"] ?? null;
-        $req->department_name = $json_data["DEPT_NAME_THAI"] ?? null;
-        $req->major_code = $json_data["DIV_CODE"];
-        $req->major_name = $json_data["DIV_NAME_THAI"];
+        $req->firstname = $json_data["first_name_thai"];
+        $req->surname = $json_data["last_name_thai"];
+        $req->citizen_id = $json_data["id_card"];
+        $req->faculty_code = $json_data["fac_code"];
+        $req->faculty_name = $json_data["fac_name_thai"];
+        $req->department_code = $json_data["dept_code"] ?? null;
+        $req->department_name = $json_data["dept_name_thai"] ?? null;
+        $req->major_code = $json_data["div_code"];
+        $req->major_name = $json_data["div_name_thai"];
 
         if ($req->major_code == "140101") {
             $req->major_code = "140102";
