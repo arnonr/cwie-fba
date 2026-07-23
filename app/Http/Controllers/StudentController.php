@@ -904,7 +904,7 @@ class StudentController extends Controller
         $access_token = "b9uSJchxbwxCWLtQ-oGUH-NPQuy1pKA4"; // <----- API - Access Token Here
 
         $data = [
-            "id" => $student_code,
+            "stu_code" => $student_code,
             "get_id_card" => 1,
         ];
 
