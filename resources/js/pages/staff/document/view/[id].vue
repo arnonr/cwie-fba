@@ -50,8 +50,8 @@ documentDownloadStore
   })
 
 const onDelete = id => {
-  newsStore
-    .deleteDocumentDownlaod({
+  documentDownloadStore
+    .deleteDocumentDownload({
       id: id,
     })
     .then(response => {

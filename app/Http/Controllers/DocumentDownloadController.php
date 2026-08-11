@@ -26,10 +26,10 @@ class DocumentDownloadController extends Controller
             "document_download.id as id",
             "document_download.document_name as document_name",
             DB::raw(
-                "(CASE WHEN document_file = NULL THEN ''
+                "(CASE WHEN document_file IS NULL OR document_file = '' THEN ''
              ELSE CONCAT('" .
                     $this->uploadUrl .
-                    "',document_file) END) AS document_file"
+                    "', LTRIM(document_file, '/')) END) AS document_file"
             ),
             "document_download.document_type_id as document_type_id",
             "document_download.active as active"
@@ -110,10 +110,10 @@ class DocumentDownloadController extends Controller
             "document_download.id as id",
             "document_download.document_name as document_name",
             DB::raw(
-                "(CASE WHEN document_file = NULL THEN ''
+                "(CASE WHEN document_file IS NULL OR document_file = '' THEN ''
              ELSE CONCAT('" .
                     $this->uploadUrl .
-                    "',document_file) END) AS document_file"
+                    "', LTRIM(document_file, '/')) END) AS document_file"
             ),
             "document_download.document_type_id as document_type_id",
             "document_download.active as active",
@@ -140,8 +140,8 @@ class DocumentDownloadController extends Controller
     public function add(Request $request)
     {
         $request->validate([
-            "document_name as required",
-            "document_type_id as required",
+            "document_name" => "required",
+            "document_type_id" => "required",
         ]);
 
         $pathDocument = null;
@@ -181,7 +181,7 @@ class DocumentDownloadController extends Controller
 
     public function edit($id, Request $request)
     {
-        $request->validate(["id as required"]);
+        $request->validate(["id" => "required"]);
 
         $item = DocumentDownload::where("id", $request->id)->first();
 
@@ -197,7 +197,7 @@ class DocumentDownloadController extends Controller
                 rand(1, 10000) .
                 "." .
                 $request->file("document_file")->extension();
-            $pathDocument = "/document_download/" . $fileDocument;
+            $pathDocument = "document_download/" . $fileDocument;
             Storage::disk("public")->put(
                 $pathDocument,
                 file_get_contents($request->document_file)

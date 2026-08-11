@@ -18,6 +18,7 @@ const item = ref({
   id: null,
   document_name: "",
   document_type_id: 1,
+  document_file: [],
   news_file: [],
   active: 1,
 })
@@ -43,11 +44,11 @@ const onSubmit = () => {
         .addDocumentDownload({
           ...item.value,
           document_file:
-            item.value.document_file.length !== 0
+            item.value.document_file && item.value.document_file.length !== 0
               ? item.value.document_file[0]
               : null,
           news_file:
-            item.value.document_file.length !== 0
+            item.value.document_file && item.value.document_file.length !== 0
               ? item.value.document_file[0]
               : null,
           document_type_id: 1,

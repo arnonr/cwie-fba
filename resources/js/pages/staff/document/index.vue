@@ -9,7 +9,7 @@ const totalPage = ref(1)
 const totalItems = ref(0)
 const items = ref([])
 const isOverlay = ref(true)
-const orderBy = ref("name")
+const orderBy = ref("id")
 const order = ref("asc")
 
 const advancedSearch = reactive({
@@ -24,7 +24,10 @@ const selectOptions = ref({
     { title: "40", value: 40 },
     { title: "60", value: 60 },
   ],
-  orderBy: [{ title: "ลำดับ/level", value: "level" }],
+  orderBy: [
+    { title: "ID", value: "id" },
+    { title: "ชื่อเอกสาร", value: "document_name" },
+  ],
   order: [
     { title: "น้อย -> มาก", value: "asc" },
     { title: "มาก -> น้อย", value: "desc" },

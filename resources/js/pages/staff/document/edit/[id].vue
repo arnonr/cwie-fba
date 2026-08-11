@@ -59,7 +59,7 @@ const onSubmit = () => {
         .editDocumentDownload({
           ...item.value,
           document_file:
-            item.value.document_file.length !== 0
+            item.value.document_file && item.value.document_file.length !== 0
               ? item.value.document_file[0]
               : null,
         })
