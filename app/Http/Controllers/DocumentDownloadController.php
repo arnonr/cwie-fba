@@ -29,7 +29,7 @@ class DocumentDownloadController extends Controller
                 "(CASE WHEN document_file IS NULL OR document_file = '' THEN ''
              ELSE CONCAT('" .
                     $this->uploadUrl .
-                    "', LTRIM(document_file, '/')) END) AS document_file"
+                    "', TRIM(LEADING '/' FROM document_file)) END) AS document_file"
             ),
             "document_download.document_type_id as document_type_id",
             "document_download.active as active"
@@ -113,7 +113,7 @@ class DocumentDownloadController extends Controller
                 "(CASE WHEN document_file IS NULL OR document_file = '' THEN ''
              ELSE CONCAT('" .
                     $this->uploadUrl .
-                    "', LTRIM(document_file, '/')) END) AS document_file"
+                    "', TRIM(LEADING '/' FROM document_file)) END) AS document_file"
             ),
             "document_download.document_type_id as document_type_id",
             "document_download.active as active",
