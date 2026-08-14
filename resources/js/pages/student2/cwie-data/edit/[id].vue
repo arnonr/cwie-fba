@@ -839,6 +839,7 @@ const format = date => {
               <VFileInput
                 id="namecard_file"
                 v-model="item.namecard_file"
+                :rules="[!item.namecard_file_old ? requiredValidator : () => true]"
                 label="Upload Namecard"
                 persistent-placeholder
               />

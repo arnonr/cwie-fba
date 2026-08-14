@@ -573,6 +573,13 @@ class FormController extends Controller
             );
         }
 
+        if (!$request->hasFile("namecard_file")) {
+            return response()->json(
+                ["message" => "error", "error" => "กรุณาแนบไฟล์นามบัตร"],
+                422
+            );
+        }
+
         $pathNamecard = null;
         if ($request->hasFile("namecard_file")) {
             $namecardExt = $request->file("namecard_file")->extension();
@@ -698,6 +705,13 @@ class FormController extends Controller
         $request->validate(["id as required"]);
 
         $item = Form::where("id", $request->id)->first();
+
+        if (!$item->namecard_file && !$request->hasFile("namecard_file")) {
+            return response()->json(
+                ["message" => "error", "error" => "กรุณาแนบไฟล์นามบัตร"],
+                422
+            );
+        }
 
         $pathNamecard = null;
         if ($request->hasFile("namecard_file")) {
